@@ -12,7 +12,7 @@ function App()
 	//this.apiURL = "http://server.dream-fusion.net/simbqa/planetearth/api/";
 	this.apiURL = "http://server.dream-fusion.net/simbqa/blueprint/api/";
 	// this.apiURL = "http://projects.loc/simbqa/blueprint/api/";
-	this.phonegapBuild = true; 	// Set this to true when phonegap is the target
+	this.phonegapBuild = false; 	// Set this to true when phonegap is the target
 	this.version = 12;				// Identifies the app version to the server
 	this.versionStatus = "Production";
 	this.localMode = false;
