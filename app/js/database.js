@@ -413,6 +413,13 @@ function DBUtils()
 					  attr("title", row[self.primaryKey]).
 					  text(row[self.showColumn]));
                     }
+					else if(html_tag == 'td')
+					{
+						$(param).
+							append($("<tr></tr>").
+							append($("<td></td>").
+							text(row[self.showColumn])));
+					}
                     else
                     {
                     $(param).
