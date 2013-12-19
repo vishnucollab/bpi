@@ -2021,8 +2021,8 @@ var Inspections = function()
             self.checkSaveInspection();
         });
         
-        $("body").on("change", "#frmDefectDetails #observation_suggestion" , function() {
-            var selectedTxt = $('#frmDefectDetails #observation_suggestion  option:selected').text();
+        $("body").on("click", "#frmDefectDetails #observation_suggestion tr td" , function() {
+			var selectedTxt = $(this).text();
             $('#frmDefectDetails #observation').val(selectedTxt);
         });
         

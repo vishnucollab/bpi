@@ -1662,10 +1662,15 @@ table th, td {
     text-overflow: ellipsis;
 }
 
-#inspection table th, #inspection td ,#inspectionStep2 table th, #inspectionStep2 td
+#inspection table td, #inspection td ,#inspectionStep2 table th, #inspectionStep2 td
 {
     border: none; 
     background: transparent;   
+}
+
+#inspectionStep2 table#observation_suggestion td
+{ 
+	border: 1px solid #000 !important;
 }
 
 table td {border-bottom: 0; border-top: 0}
