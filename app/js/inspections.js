@@ -1311,7 +1311,7 @@ var Inspections = function()
             else
             {
                 objApp.setSubExtraHeading("Step 1 of 3", true);
-                objApp.keys.report_type = "";
+                objApp.keys.report_type = $(this).val();
             }
         });
         $(".inspectionDetails #btnCapturePhoto").bind(objApp.touchEvent, function(e)
@@ -1643,6 +1643,7 @@ var Inspections = function()
                 alert("Please select a state");
                 return;
             }
+			
             self.showStep2();
 			return false;
 		});
@@ -1911,6 +1912,7 @@ var Inspections = function()
                             
                             var token = data.message;                   
                         
+						
                             if(objApp.keys.report_type == 'Handovers')
                                 var downloadURL = objApp.apiURL + "reports/print_report_handovers/" + objApp.keys.inspection_id + "?token=" + token;
                             else if(objApp.keys.report_type == 'Quality Inspection')
