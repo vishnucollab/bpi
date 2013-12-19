@@ -214,15 +214,15 @@ class reports extends MY_Controller
         if ( empty($save)) 
         {
             // Output the report binary
-            header("Content-type:application/pdf");
+            // header("Content-type:application/pdf");
 
             // It will be called downloaded.pdf
-            header("Content-Disposition:attachment;filename=inspection.pdf");        
+            // header("Content-Disposition:attachment;filename=inspection.pdf");        
             
             echo $reportData;            
-        }
-        else 
-        {
+        // }
+        // else 
+        // {
             // Save the report locally
             // check inspection directory
             $inspectionDir = FCPATH . INSPECTION_FOLDER;
@@ -239,7 +239,24 @@ class reports extends MY_Controller
             }
             
             file_put_contents($inspectionDir . '/Inspection-'.$inspectionID.'.pdf', $reportData);
-            return true;
+            
+			
+			require_once(ABSOLUTE_PATH . "classes/DropboxUploader.php");
+			
+			try {
+				
+				// Upload database backup to Dropbox
+				$dropbox_user = "andy@simb.com.au"; // username for Dropbox
+				$dropbox_password = "mango77z"; // password for Dropbox
+				$dropbox_dest_db = "Blueprint_reports/";
+				
+				$uploader = new DropboxUploader($dropbox_user, $dropbox_password);
+				$uploader->upload($inspectionDir . '/Inspection-'.$inspectionID.'.pdf', $dropbox_dest_db, "Inspection-".$inspectionID.'.pdf');
+			} catch(Exception $e) {
+				die($e->getMessage());
+			}
+			
+			return true;
         }                      
     }
     
