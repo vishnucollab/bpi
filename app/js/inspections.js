@@ -170,9 +170,9 @@ var Inspections = function()
         $("#inspectionScrollWrapper").html("");            	
 		
 		
-		var sql = "SELECT i.*" +
+		var sql = "SELECT i.*, b.name " +
 			"FROM inspections i " +
-            
+            "INNER JOIN builders b ON b.id = i.builder_id " +
 			"WHERE i.deleted = 0 ";
 			
 		var values = new Array();
@@ -220,7 +220,7 @@ var Inspections = function()
             sql += "AND i.created_by = ? ";
             values.push(objFilters.user);
         }        	    	    	     	    	                      
-	    
+		
 	    sql += "ORDER BY " + self.sortBy + " " + self.sortDir + " ";	// Show the most recent inspections first.
 	    
 	    if((objFilters.recordLimit != "") && (objFilters.recordLimit != "all"))
@@ -252,10 +252,11 @@ var Inspections = function()
 			
 			for(r = 0; r < maxLoop; r++)
 			{
+				
 				var num_defects = 0;
 			    var row = items.rows.item(r);
 			    var inspDate = objApp.isoDateStrToDate(row.inspection_date);
-			    
+			    console.log(row);
 			    html += '<tr rel="' + row.id + '">';	
                 html += '<td class="delete"></td>';
 			    html += '<td>'
@@ -271,12 +272,9 @@ var Inspections = function()
 			
 			    html += objApp.formatUserDate(inspDate) + '</td>';  
 			    html += '<td>' + row.lot_no + ' ' + row.address + ' ' + row.suburb + '</td>';
-			    html += '<td><div class="i-passed">';
-                if (row.failed == 1)
-                    html += 'Failed<a href="#" class="status-failed"></a></div>';
-                else
-                    html += 'Passed<a href="#" class="status-passed"></a></div>';
-                html += '</div></td>';
+			    html += '<td>' + row.name + '</td>';
+			    html += '<td>' + row.report_type + '</td>';
+			   
                 html += '<td><div class="action">';
                 if(row.finalised == 0)
                     html += '<a href="#" class="action passed">View</a>';
@@ -3654,6 +3652,8 @@ var Inspections = function()
 		
    		if((location == "") || (location.toUpperCase() == "CHOOSE") || observation == "")
    		{
+			$("#inspectionStep2 textarea#observation").val('');
+            $("#inspectionStep2 ul#popAction li:first-child").text('Choose');
 			return;
    		}
    		else
@@ -3664,6 +3664,8 @@ var Inspections = function()
 		{
 			if((action == "") || (action.toUpperCase() == "CHOOSE"))
 			{
+				$("#inspectionStep2 textarea#observation").val('');
+                $("#inspectionStep2 ul#popAction li:first-child").text('Choose');
 				return;
 			} 
 			else
