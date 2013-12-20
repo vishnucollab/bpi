@@ -827,7 +827,8 @@ aside textarea
 
 /* Inspection list*/
 #inspectionList #builder_id {
-    margin-left: 150px;
+    margin-left: 10px;
+	margin-bottom: 15px;
     width: 250px;
 }
 #inspectionList .bottomBtns {
