@@ -7,6 +7,7 @@ class reports extends MY_Controller
         
 		$this->load->model("inspection_model",'ismd');
         $this->load->model("account_model");
+        $this->load->model("report_mdoel");
     }
     
     /***
@@ -157,6 +158,30 @@ class reports extends MY_Controller
         }                      
     }
     
+    function print_report($report_type, $inspection_id)
+    {
+        if(empty($report_type)) {
+            show_error("Invalid Report Type");        
+        }
+        
+        if(empty($inspection_id)) {
+            show_error("Invalid Inspection ID");        
+        }        
+        
+        $report_data = $this->report_model->generate_report($report_type, $inspection_id, $message);
+        if(!$report_data) {
+            show_error("Report Failed To Generate: $message");    
+        }
+        
+
+        // Output the report binary
+        header("Content-type:application/pdf");
+
+        // It will be called downloaded.pdf
+        header("Content-Disposition:attachment;filename=inspection.pdf");        
+        
+        echo $reportData;                             
+    }
     
     function print_report_handovers( $inspectionID='', $save='', &$message = "" )
     {
