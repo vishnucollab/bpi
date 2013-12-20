@@ -329,7 +329,7 @@ function App()
         $(".panel").css("height", (mainHeight - 60) + "px");
         $(".scrollWrapper").css("height", (mainHeight - 200) + "px");
         $("#inspectionStep3 .scrollWrapper").css("height", (mainHeight - 280) + "px");
-        
+        $("#reinspectionScrollWrapper").css("height", (mainHeight - 326) + "px");
         
 		$("#datepicker").css("height", $(window).height());
         
