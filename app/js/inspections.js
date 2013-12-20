@@ -256,7 +256,6 @@ var Inspections = function()
 				var num_defects = 0;
 			    var row = items.rows.item(r);
 			    var inspDate = objApp.isoDateStrToDate(row.inspection_date);
-			    console.log(row);
 			    html += '<tr rel="' + row.id + '">';	
                 html += '<td class="delete"></td>';
 			    html += '<td>'
