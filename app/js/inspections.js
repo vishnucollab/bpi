@@ -630,6 +630,14 @@ var Inspections = function()
         {
             objApp.setSubExtraHeading("Step 2 of 3", true);
         }
+		if(objApp.keys.report_type == 'Handovers')
+		{
+			$('#inspectionStep2 #frmDefectDetails tr#action_wrapper').show();
+		}
+		else
+		{
+			$('#inspectionStep2 #frmDefectDetails tr#action_wrapper').hide();
+		}
         // Show the inspection screen.
         objApp.clearMain();
 		$("#inspectionStep2").removeClass("hidden");
@@ -3652,16 +3660,17 @@ var Inspections = function()
    		{
 			$("#frmDefectDetails #location").val(location);	
    		}
-   		
-   		if((action == "") || (action.toUpperCase() == "CHOOSE"))
-   		{
-			return;
-   		} 
-   		else
-   		{
-			$("#frmDefectDetails #action").val(action);
-   		} 
-   		
+   		if(objApp.keys.report_type == 'Handovers')
+		{
+			if((action == "") || (action.toUpperCase() == "CHOOSE"))
+			{
+				return;
+			} 
+			else
+			{
+				$("#frmDefectDetails #action").val(action);
+			} 
+   		}
    		// Set the current inspection id into the form.
    		$("#frmDefectDetails #inspection_id").val(objApp.keys.inspection_id);
    		
@@ -3788,11 +3797,19 @@ var Inspections = function()
 	*/	
 	this.checkAllSelected = function()
 	{		
-		// Are there selected values for ALL pop lists?
-		if((self.objPopLocation.getValue() != "")  && (self.objPopAction.getValue() != ""))
+		if(objApp.keys.report_type == 'Handovers')
 		{
-			// Yes there are - create the defect item.
-			self.saveDefect(); 
+			// Are there selected values for ALL pop lists?
+			if((self.objPopLocation.getValue() != "")  && (self.objPopAction.getValue() != ""))
+			{
+				// Yes there are - create the defect item.
+				self.saveDefect(); 
+			}
+		}
+		else
+		{
+			if(self.objPopLocation.getValue() != "")
+				self.saveDefect(); 
 		}
 	}
     this.checkSaveRectifiedInspectionitem = function(primaryKey)
@@ -4004,16 +4021,19 @@ var Inspections = function()
 	    // Validate the form
 	    if(!$("#frmInspectionDetails").validate().form())
 	    {
+			console.log('4024');
 	        return;
 	    }
 	    
 	    // Make sure both the client and site pop selectors are also set
 	    if((self.objPopBuilders.getValue() == ""))
 	    {
+			console.log('4031');
 			return;
 	    }
         
         if(self.doingSave) {
+			console.log('4036');
             return false;    
         }
         
@@ -4035,7 +4055,7 @@ var Inspections = function()
 		
 		// Calculate inspection duration
 		var duration = objTimePicker.timeToSeconds(finish) - objTimePicker.timeToSeconds(start);
-		
+		console.log('4058');
 		// Check for a negative time which means we're spanning midnight
         if (duration < 0)
         {
@@ -4212,7 +4232,14 @@ var Inspections = function()
 		// {
 			// listDeleteMode = false;
 		// }
-        
+		if(objApp.keys.report_type == 'Handovers')
+		{
+			$("#tblDefectListingHeader th").eq(4).show();
+		}
+		else
+		{
+			$("#tblDefectListingHeader th").eq(4).hide();
+		}
         // Remove the triangle from the table header cells
 		$("#tblDefectListingHeader th .triangle").remove();
 		// Inject the triangle
@@ -4273,7 +4300,10 @@ var Inspections = function()
 			        }
                     html += '<td>' + row.location + '</td>';
 			        html += '<td>' + row.observation + '</td>';
-			        html += '<td>' + row.action + '</td>';
+					if(objApp.keys.report_type == 'Handovers')
+					{
+						html += '<td>' + row.action + '</td>';
+					}
 			        html += '</tr>';
                     
                     if(row.itemtype == 0) {
@@ -4311,7 +4341,10 @@ var Inspections = function()
 						
 						$(this).find("td:eq(0)").before('<td class="delete"></td>');
 					}); */
-					self.setTableWidths2('tblDefectListingHeader', 'tblDefectListing', 5);
+					if(objApp.keys.report_type == 'Handovers')
+						self.setTableWidths2('tblDefectListingHeader', 'tblDefectListing', 5);
+					else
+						self.setTableWidths2('tblDefectListingHeader', 'tblDefectListing', 4);
 					// Make the header table cell widths exactly the same as the first row of the data table.
 					/* var idx = 0;
 					$("#tblDefectListing tr:eq(0) td").each(function()
@@ -4469,6 +4502,14 @@ var Inspections = function()
         objApp.setSubExtraHeading("", true);
         $("#reinspection").removeClass("hidden");
 		// Ensure a valid inspection id is set
+		if(objApp.keys.report_type == 'Handovers')
+		{
+			$("#tblReinspectionHeader th").eq(3).show();
+		}
+		else
+		{
+			$("#tblReinspectionHeader th").eq(3).hide();
+		}
         if(reinspection_id)
             self.reinspectionKey = reinspection_id;
 		if(objApp.keys.inspection_id == "")
@@ -4476,6 +4517,8 @@ var Inspections = function()
 			return;
 		}
 		blockElement(".inspectionDetails");
+		$(".inspectionDetails .failed").removeClass('active');
+        $(".inspectionDetails .passed").removeClass('active');
         var sql = "";
         if (action == "view")
         {
@@ -4484,8 +4527,6 @@ var Inspections = function()
             "INNER JOIN reinspectionitems ri ON ri.inspectionitem_id = ii.id " +
             "INNER JOIN reinspections r ON r.id = ri.reinspection_id " +
             "WHERE ii.deleted = 0 ";
-            $(".inspectionDetails .failed").removeClass('active');
-            $(".inspectionDetails .passed").removeClass('active');
             $(".inspectionDetails .finished").removeClass('active');
             $(".inspectionDetails .passed").addClass('active');
         }
@@ -4494,6 +4535,7 @@ var Inspections = function()
             sql += "SELECT ii.* " +
 			"FROM inspectionitems ii " +
             "WHERE ii.deleted = 0 ";
+			$(".inspectionDetails .failed").addClass('active');
         }
             
         var values = new Array();
@@ -4534,7 +4576,9 @@ var Inspections = function()
 			        html += '<td>' + row.seq_no + '</td>';
                     html += '<td>' + row.location + '</td>';
 			        html += '<td>' + row.observation + '</td>';
-			        html += '<td>' + row.action + '</td>';
+					if(objApp.keys.report_type == 'Handovers'){
+						html += '<td>' + row.action + '</td>';
+					}
 			        html += '<td>' + row.rectified + '</td>';
 			        html += '</tr>';
                     
@@ -4548,8 +4592,13 @@ var Inspections = function()
 				html += '</table>';
 				
 				$("#reinspectionScrollWrapper").html(html);
-                
-                self.setTableWidths2('tblReinspectionHeader', 'tblReinspectionListing', 5);
+                if(objApp.keys.report_type == 'Handovers'){
+					self.setTableWidths2('tblReinspectionHeader', 'tblReinspectionListing', 5);
+				}
+                else
+				{
+					self.setTableWidths2('tblReinspectionHeader', 'tblReinspectionListing', 4);
+				}
 				self.handleFinalised();
 				
 				if(objUtils.isMobileDevice())	    
@@ -4567,7 +4616,14 @@ var Inspections = function()
                     var text = $(this).find("td:eq(0)").text() + ". ";
                     text += $(this).find("td:eq(1)").text() + ", ";
                     text += $(this).find("td:eq(2)").text();
-                    var val_rec = $(this).find("td:eq(4)").text();
+					if(objApp.keys.report_type == 'Handovers')
+					{
+						var val_rec = $(this).find("td:eq(4)").text();
+					}
+					else
+					{
+						var val_rec = $(this).find("td:eq(3)").text();
+					}
                     $('#reinspection select#rectified').val(val_rec);
                     $('#reinspection .infomation p').html(text);
                     $('#reinspection .infomation input#inspectionitem_id').val($(this).attr("rel"));
@@ -4576,7 +4632,15 @@ var Inspections = function()
                 });
                 $('#reinspection select#rectified').bind("change", function() {
                     var text = $(this).val();
-                    self.cur_sel_ins_item.children("td:nth-child(5)").text(text);
+					if(objApp.keys.report_type == 'Handovers')
+					{
+						self.cur_sel_ins_item.children("td:nth-child(5)").text(text);
+					}
+					else
+					{
+						self.cur_sel_ins_item.children("td:nth-child(4)").text(text);
+					}
+                    
                     self.checkSaveRectifiedInspectionitem(self.cur_sel_ins_item.attr("rel"));
                     
                 });
