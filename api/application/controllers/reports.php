@@ -456,48 +456,4 @@ class reports extends MY_Controller
             return FALSE;
         }
     }
-	
-	function uploadDropbox($inspectionID, $reportData)
-	{
-	
-		$inspectionDir = FCPATH . INSPECTION_FOLDER;
-            
-		if (!file_exists($inspectionDir))
-		{
-			@mkdir($inspectionDir);
-			@chmod($inspectionDir, DIR_WRITE_MODE);
-		}
-		
-		if (!file_exists($inspectionDir)) 
-		{
-			return false;
-		}
-		
-		file_put_contents($inspectionDir . '/Inspection-'.$inspectionID.'.pdf', $reportData);
-		
-		// Load the inspection in question
-		$inspection = $this->ismd->get_detail($inspectionID);
-	
-		require_once(ABSOLUTE_PATH . "classes/DropboxUploader.php");
-			
-		try {
-			// $uploader = new DropboxUploader(DROPBOX_USER, DROPBOX_PASSWORD);
-			// $uploader->upload($inspectionDir . '/Inspection-'.$inspectionID.'.pdf',
-							 // DROPBOX_FOLDER . '/',
-							 // '[' . $inspection->lot . ']_' . $inspection->address . ']_' . 'Inspection_' .$inspectionID . '.pdf');
-			
-			
-			// Upload database backup to Dropbox
-			$dropbox_user = "andy@simb.com.au"; // username for Dropbox
-			$dropbox_password = "mango77z"; // password for Dropbox
-			$dropbox_dest_db = "Blueprint_reports/";
-			
-			$uploader = new DropboxUploader($dropbox_user, $dropbox_password);
-			$uploader->upload($inspectionDir . '/Inspection-'.$inspectionID.'.pdf', $dropbox_dest_db, "Inspection-".$inspectionID.'.pdf');
-
-			
-		} catch(Exception $e) {
-			die($e->getMessage());
-		}
-	}
 }

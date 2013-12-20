@@ -11,26 +11,9 @@ class inspection_model extends CI_Model
     {
         $rs = $this->db->select('`is`.*')
                     ->select('UNIX_TIMESTAMP(is.inspection_date) AS `ts_date_start`')
-                    
-                    ->select("IF(cl.name='',IF(cl.contact='',cl.address1,cl.contact),cl.name) AS `client_name`",false)
-                    ->select("CONCAT(IF(cl.name='',cl.contact,cl.name),' / ', cl.address1,IF(cl.address2='','',CONCAT(', ',cl.address2))) AS `client_fullname`", false)
-                    
-                    ->select('CONCAT(st.address1,st.address2) AS `site_name`')
-                    ->select('st.address1 AS `site_address1`')
-                    ->select('st.city AS `site_city`')
-                    ->select('st.state AS `site_state`')
-                    ->select('st.postcode AS `site_postcode`')
-                    ->select('st.country AS `site_country`')
-                    ->select('st.notes AS `site_notes`')
-                    
                     ->select("CONCAT(usr.first_name,' ',usr.last_name) AS `inspector`", false)
-                    
                     ->where('is.id', $id)
-                    
-                    ->join('clients AS `cl`','cl.id = is.client_id','inner')
-                    ->join('sites AS `st`','st.id = is.site_id','inner')
                     ->join('users AS `usr`','usr.id = is.created_by','inner')
-                    
                     ->get('inspections AS `is`');
                     
         if ( isset($_GET['dbug']) ) {
@@ -64,5 +47,23 @@ class inspection_model extends CI_Model
                     ->get('inspectionitemphotos AS `isitp`')
                     ->result();
         return $rs;
+    }
+    
+    function get_inspections_for_dropbox()
+    {
+        // Get a list of inspections that have been finalised but have NOT been sent to dropbox or have been updated
+        $this->db->select("i.id, i.report_type, ds.sent_dtm, i.modified, ds.id AS dropbox_sent_id");
+        $this->db->from("inspections i");
+        $this->db->join("dropbox_sent ds", "i.id = ds.foreign_id AND ds.foreign_type = 'inspections'", "left");
+        $this->db->where("i.deleted", "0");
+        $this->db->where("i.finalised", "1");
+        $this->db->where("((ds.sent_dtm IS NULL) OR (i.modified > ds.sent_dtm))");
+        
+        $rst = $this->db->get();
+        if($rst->num_rows() == 0) {
+            return false;
+        }
+        
+        return $rst;
     }
 }
