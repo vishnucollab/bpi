@@ -1049,6 +1049,7 @@ function DBUtils()
 				"'finalised' INTEGER NOT NULL DEFAULT 0, " +
 				"'failed' INTEGER NOT NULL DEFAULT 1, " +
 				"'client_info' VARCHAR, " +
+				"'notes' TEXT, " +
 				"'initials' VARCHAR NOT NULL, " +
 				"'created_by' INTEGER NOT NULL, " + 
 				"'deleted' INTEGER NOT NULL DEFAULT 0 , " + 

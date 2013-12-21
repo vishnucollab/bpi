@@ -605,10 +605,16 @@ var Inspections = function()
         else
         {
             objApp.setSubHeading("Create a New Inspection");
-            if($("#inspection #report_type").val() == "Quality Inspection")
+            if(($("#inspection #report_type").val() == "Quality Inspection") || (objApp.keys.report_type == "Quality Inspection"))
+            {
                 objApp.setSubExtraHeading("Step 1 of 4", true);
+                $("a.btnEditNotes").show(); 
+            }
             else
+            {
                 objApp.setSubExtraHeading("Step 1 of 3", true);
+                $("a.btnEditNotes").hide(); 
+            }
         }
         
     }
@@ -619,13 +625,15 @@ var Inspections = function()
 		// Set the main heading
         objApp.setSubHeading("Add Issues");
         
-        if(objApp.keys.report_type == 'Quality Inspection')
+        if(($("#inspection #report_type").val() == "Quality Inspection") || (objApp.keys.report_type == "Quality Inspection"))
         {
             objApp.setSubExtraHeading("Step 2 of 4", true);
+            $("a.btnEditNotes").show(); 
         }
         else
         {
             objApp.setSubExtraHeading("Step 2 of 3", true);
+            $("a.btnEditNotes").hide(); 
         }
 		if(objApp.keys.report_type == 'Handovers')
 		{
@@ -660,7 +668,8 @@ var Inspections = function()
     this.showStep3 = function()
     {
         self.setStep(3);
-        
+        objApp.clearMain();
+        $("#inspectionStep3").removeClass("hidden");
         // Load the inspection object
         objDBUtils.loadRecord("inspections", objApp.keys.inspection_id, function(inspection_id, inspection) {
             if(!inspection) {
@@ -668,7 +677,7 @@ var Inspections = function()
             }
         }, inspection_id);            
         objApp.setSubHeading("Review Inspection");     
-        if(objApp.keys.report_type == 'Quality Inspection')
+        if(($("#inspection #report_type").val() == "Quality Inspection") || (objApp.keys.report_type == "Quality Inspection"))
         {
             objApp.setSubExtraHeading("Step 3 of 4", true);
             $('#inspectionStep3 > .bottomBtns > .btnContainer.right > a#btnStep3Email').hide();
@@ -681,8 +690,7 @@ var Inspections = function()
             $('#inspectionStep3 > .bottomBtns > .btnContainer.right > a#btnStep3Next').html('Done');
         }
         
-        objApp.clearMain();
-        $("#inspectionStep3").removeClass("hidden");
+        
         
         this.handleFinalised();
         
@@ -1061,6 +1069,8 @@ var Inspections = function()
         $("#inspection #address").val(inspection.address);
         $("#inspection #suburb").val(inspection.suburb);
         $("#inspection #postcode").val(inspection.postcode);
+        $("#inspection #notes").val(inspection.notes);
+        $("#inspection #client_info").val(inspection.client_info);
         
         if (inspection.failed)
         {
@@ -1312,11 +1322,13 @@ var Inspections = function()
             {
                 objApp.setSubExtraHeading("Step 1 of 4", true);
                 objApp.keys.report_type = "Quality Inspection";
+                $('#inspection .btnEditNotes').show();
             }
             else
             {
                 objApp.setSubExtraHeading("Step 1 of 3", true);
                 objApp.keys.report_type = $(this).val();
+                $('#inspection .btnEditNotes').hide();
             }
         });
         $(".inspectionDetails #btnCapturePhoto").bind(objApp.touchEvent, function(e)
@@ -1674,7 +1686,6 @@ var Inspections = function()
                 return false;
             }
             var inspection_id = objApp.keys.inspection_id;
-	    console.log(inspection_id);
             var sql = "SELECT * FROM reinspections WHERE inspection_id = ? AND inspection_type = 'Original'";
             objDBUtils.loadRecordsSQL(sql, [inspection_id], function(param, items){
                 if(!items)
@@ -1965,6 +1976,11 @@ var Inspections = function()
         
         $('.btnEditNotes').bind(objApp.touchEvent, function(e){
             e.preventDefault();
+            if (objApp.keys.inspection_id == "")
+            {
+                alert("Please create new inspection");
+                return;
+            }
             var objNoteModal = new noteModal("Coversheet Notes", $("#inspection #notes").val(), function(notes)
 			{
 				// The user has updated the notes value.
@@ -4022,19 +4038,16 @@ var Inspections = function()
 	    // Validate the form
 	    if(!$("#frmInspectionDetails").validate().form())
 	    {
-			console.log('4024');
 	        return;
 	    }
 	    
 	    // Make sure both the client and site pop selectors are also set
 	    if((self.objPopBuilders.getValue() == ""))
 	    {
-			console.log('4031');
 			return;
 	    }
         
         if(self.doingSave) {
-			console.log('4036');
             return false;    
         }
         
@@ -4056,7 +4069,6 @@ var Inspections = function()
 		
 		// Calculate inspection duration
 		var duration = objTimePicker.timeToSeconds(finish) - objTimePicker.timeToSeconds(start);
-		console.log('4058');
 		// Check for a negative time which means we're spanning midnight
         if (duration < 0)
         {
@@ -4227,7 +4239,14 @@ var Inspections = function()
 		{
 			return;
 		}
-		
+		if(objApp.keys.report_type == 'Quality Inspection')
+        {
+            $('a.btnEditNotes').show();
+        }
+        else
+        {
+            $('a.btnEditNotes').hide();
+        }
 		var listDeleteMode = true;
 		// if(self.finalised == 1)
 		// {

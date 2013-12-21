@@ -784,6 +784,7 @@ aside textarea
     
 #btnAddDefect, a.btnEditNotes{
     margin-left: 10px;
+    top: 10px;
 }
 #btnStep3AddAnotherIssue{
     margin-left: 50px;

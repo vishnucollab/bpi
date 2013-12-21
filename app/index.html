@@ -449,9 +449,11 @@
 		                <input type="hidden" id="finalised" name="finalised" value="0" />
 		                <input type="hidden" id="failed" name="failed" value="1" />
 		                <input type="hidden" id="initials" name="initials" value="" />
-		            </form>
+                        <textarea id="notes" name="notes" class="hidden"></textarea>
+                    </form>
                     
                     <div id="controlBtns">
+                    <a class="button left btnEditNotes" href="#">Coversheet Notes</a>
                     <a id="btnCapturePhoto" data-reveal-id="photoWrapper" class="right" href="#"></a>
                     <a id="btnStep1Next" class="button right rightmargin" href="#">Next &rsaquo;&rsaquo;</a>
                     </div>
@@ -509,6 +511,7 @@
                     <a id="btnCapturePhoto" data-reveal-id="photoWrapper" class="right" href="#"></a>
                     <a id="btnStep2Back" class="button left leftmargin gotoStep1" href="#">&lsaquo;&lsaquo; Back</a>
                     <a id="btnStep2Next" class="button right rightmargin" href="#">Next &rsaquo;&rsaquo;</a>
+                    <a class="button left btnEditNotes" href="#">Coversheet Notes</a>
                 </div>
 		    </div> <!--! end of inspection step 2 screen wrapper -->
             
@@ -550,6 +553,7 @@
                         <a href="#" id="preview" class="preview"></a>
                         <span>Preview</span>
                     </div>
+                    <a class="button left btnEditNotes" href="#">Coversheet Notes</a>
                     <div class="btnContainer right">
                         <!-- <a id="btnStep3Email" class="button right rightmargin" href="#">Email</a> -->
                         <a id="btnStep3Next" class="button right rightmargin" href="#">Done</a>
