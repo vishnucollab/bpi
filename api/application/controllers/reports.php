@@ -7,7 +7,7 @@ class reports extends MY_Controller
         
 		$this->load->model("inspection_model",'ismd');
         $this->load->model("account_model");
-        $this->load->model("report_mdoel");
+        $this->load->model("report_model");
     }
     
     /***
@@ -166,8 +166,9 @@ class reports extends MY_Controller
         
         if(empty($inspection_id)) {
             show_error("Invalid Inspection ID");        
-        }        
-        
+        }       
+
+		$report_type = str_replace("%20", " ", $report_type);
         $report_data = $this->report_model->generate_report($report_type, $inspection_id, $message);
         if(!$report_data) {
             show_error("Report Failed To Generate: $message");    
@@ -180,209 +181,7 @@ class reports extends MY_Controller
         // It will be called downloaded.pdf
         header("Content-Disposition:attachment;filename=inspection.pdf");        
         
-        echo $reportData;                             
-    }
-    
-    function print_report_handovers( $inspectionID='', $save='', &$message = "" )
-    {
-        // Include required classes for generating the jasper report.
-        require_once(ABSOLUTE_PATH . "classes/reportLauncher.class.php");
-        require_once(ABSOLUTE_PATH . "classes/handoversReportLauncher.class.php");
-        
-        // Make sure the inspection ID is valid
-        if($inspectionID == "")
-        {
-            if($save != "")
-            {
-                $message = "Missing inspection ID";
-                return false;
-            }
-            
-            show_error("Missing inspection ID");   
-        }
-        
-        // Load the inspection in question
-        // $inspection = $this->ismd->get_detail($inspectionID);
-        // if(!$inspection) show_error("Invalid inspection ID"); 
-        
-        // Before generating the report, set the required data into the POST array.
-        // These are passed through to jasper as parameters
-        $_POST["SUBREPORT_DIR"] = JASPER_SUBREPORT_PATH;    // This is important for any reports that contain sub reports
-        $_POST["INSPECTION_ID"] = $inspectionID;
-        
-        // Create the report
-        $objLauncher = new HandoverReportLauncher(); 
-        
-        if(!$objLauncher->createReport($error_message))
-        {
-            if($save != "")
-            {
-                $message = "An error occured whilst creating the report";
-                return false;
-            }
-            
-            show_error("Error creating report: " . $error_message);   
-        }
-        
-        // The report was generated OK.
-        if(!$objLauncher->getReport($reportData))
-        {
-            if($save != "")
-            {
-                $message = "The report could not be retrieved";
-                return false;
-            }
-                        
-            show_error("Error getting report data");       
-        }  
-        
-        if ( empty($save)) 
-        {
-            // Output the report binary
-            header("Content-type:application/pdf");
-
-            // It will be called downloaded.pdf
-            header("Content-Disposition:attachment;filename=inspection.pdf");        
-            
-            echo $reportData; 
-			
-			$this->uploadDropbox($inspectionID, $reportData);
-			return true;
-        }                      
-    }
-    
-    function print_report_quality( $inspectionID='', $save='', &$message = "" )
-    {
-        // Include required classes for generating the jasper report.
-        require_once(ABSOLUTE_PATH . "classes/reportLauncher.class.php");
-        require_once(ABSOLUTE_PATH . "classes/qualityReportLauncher.class.php");
-        
-        // Make sure the inspection ID is valid
-        if($inspectionID == "")
-        {
-            if($save != "")
-            {
-                $message = "Missing inspection ID";
-                return false;
-            }
-            
-            show_error("Missing inspection ID");   
-        }
-        
-        // Load the inspection in question
-        // $inspection = $this->ismd->get_detail($inspectionID);
-        // if(!$inspection) show_error("Invalid inspection ID"); 
-        
-        // Before generating the report, set the required data into the POST array.
-        // These are passed through to jasper as parameters
-        $_POST["SUBREPORT_DIR"] = JASPER_SUBREPORT_PATH;    // This is important for any reports that contain sub reports
-        $_POST["INSPECTION_ID"] = $inspectionID;
-        
-        // Create the report
-        $objLauncher = new QualityReportLauncher(); 
-        
-        if(!$objLauncher->createReport($error_message))
-        {
-            if($save != "")
-            {
-                $message = "An error occured whilst creating the report";
-                return false;
-            }
-            
-            show_error("Error creating report: " . $error_message);   
-        }
-        
-        // The report was generated OK.
-        if(!$objLauncher->getReport($reportData))
-        {
-            if($save != "")
-            {
-                $message = "The report could not be retrieved";
-                return false;
-            }
-                        
-            show_error("Error getting report data");       
-        }  
-        
-        if ( empty($save)) 
-        {
-            // Output the report binary
-            header("Content-type:application/pdf");
-
-            // It will be called downloaded.pdf
-            header("Content-Disposition:attachment;filename=inspection.pdf");        
-            
-            echo $reportData;   
-
-			$this->uploadDropbox($inspectionID, $reportData);
-        }                   
-    }
-    
-    function print_report_pci( $inspectionID='', $save='', &$message = "" )
-    {
-        // Include required classes for generating the jasper report.
-        require_once(ABSOLUTE_PATH . "classes/reportLauncher.class.php");
-        require_once(ABSOLUTE_PATH . "classes/pciReportLauncher.class.php");
-        
-        // Make sure the inspection ID is valid
-        if($inspectionID == "")
-        {
-            if($save != "")
-            {
-                $message = "Missing inspection ID";
-                return false;
-            }
-            
-            show_error("Missing inspection ID");   
-        }
-        
-        // Load the inspection in question
-        // $inspection = $this->ismd->get_detail($inspectionID);
-        // if(!$inspection) show_error("Invalid inspection ID"); 
-        
-        // Before generating the report, set the required data into the POST array.
-        // These are passed through to jasper as parameters
-        $_POST["SUBREPORT_DIR"] = JASPER_SUBREPORT_PATH;    // This is important for any reports that contain sub reports
-        $_POST["INSPECTION_ID"] = $inspectionID;
-        
-        // Create the report
-        $objLauncher = new PCIReportLauncher(); 
-        
-        if(!$objLauncher->createReport($error_message))
-        {
-            if($save != "")
-            {
-                $message = "An error occured whilst creating the report";
-                return false;
-            }
-            
-            show_error("Error creating report: " . $error_message);   
-        }
-        
-        // The report was generated OK.
-        if(!$objLauncher->getReport($reportData))
-        {
-            if($save != "")
-            {
-                $message = "The report could not be retrieved";
-                return false;
-            }
-                        
-            show_error("Error getting report data");       
-        }  
-        
-        if ( empty($save)) 
-        {
-            // Output the report binary
-            header("Content-type:application/pdf");
-
-            // It will be called downloaded.pdf
-            header("Content-Disposition:attachment;filename=inspection.pdf");        
-            
-            echo $reportData;            
-			
-			$this->uploadDropbox($inspectionID, $reportData);
-        }                      
+        echo $report_data;                             
     }
 
     function inspection_pdf( $inspectionID='' )
