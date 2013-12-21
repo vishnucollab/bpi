@@ -49,7 +49,7 @@ define("ABSOLUTE_PATH", FCPATH);
 //define("JASPER_SUBREPORT_PATH", "/home/inspections/java/JasperServerDev/reports/jetquo/");
 define("ADMIN_PATH", "/home/simbqa/blueprint/admin/");
 define("JASPER_SUBREPORT_PATH", "/home/achapman/java/JasperServerDev/reports/Blueprint/");
-define("DROPBOX_FOLDER", "Blueprint_reports");
+define("DROPBOX_FOLDER", "Blueprint");
 define("DROPBOX_USER", "andy@simb.com.au");
 define("DROPBOX_PASSWORD", "mango77z");
 

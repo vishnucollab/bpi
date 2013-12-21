@@ -10,6 +10,23 @@ class Inspectionitemphotos_model extends CI_Model
         $this->CI = & get_instance();
 	}
 	
+	public function get_photos_for_dropbox($inspection_id)
+	{	
+		$this->db->select("isitp.id, isitp.photodata_tmb, isitp.modified, ds.id AS dropbox_sent_id");
+        $this->db->from("inspectionitemphotos isitp");
+        $this->db->join("dropbox_sent ds", "isitp.id = ds.foreign_id AND ds.foreign_type = 'inspectionitemphotos'", "left");
+        $this->db->where("isitp.deleted", "0");
+        $this->db->where("isitp.inspection_id", $inspection_id);
+        $this->db->where("((ds.sent_dtm IS NULL) OR (isitp.modified > ds.sent_dtm))");
+		
+        $rst = $this->db->get();
+        if($rst->num_rows() == 0) {
+            return false;
+        }
+        
+        return $rst;
+	}
+	
 	public function get_photo($company_id, $photoid)
 	{
 		if($photoid == "")

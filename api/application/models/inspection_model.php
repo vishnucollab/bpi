@@ -52,7 +52,7 @@ class inspection_model extends CI_Model
     function get_inspections_for_dropbox()
     {
         // Get a list of inspections that have been finalised but have NOT been sent to dropbox or have been updated
-        $this->db->select("i.id, i.report_type, ds.sent_dtm, i.modified, ds.id AS dropbox_sent_id");
+        $this->db->select("i.id, i.report_type, i.inspection_date, ds.sent_dtm, i.modified, ds.id AS dropbox_sent_id");
         $this->db->from("inspections i");
         $this->db->join("dropbox_sent ds", "i.id = ds.foreign_id AND ds.foreign_type = 'inspections'", "left");
         $this->db->where("i.deleted", "0");
