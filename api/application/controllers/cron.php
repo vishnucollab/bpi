@@ -83,7 +83,7 @@ class Cron extends CI_Controller
 				}
 			
 				$photo_path = $inspection_dir . "/" . $inspection->id . '/' . $photo->id . '.jpg';
-				file_put_contents($photo_path, $photo->photodata_tmb);
+				file_put_contents($photo_path, base64_decode($photo->photodata_tmb));
             
 				if(!file_exists($photo_path)) {
                 $this->handle_error("Couldn't generate report for inspection id $inspection_id");
