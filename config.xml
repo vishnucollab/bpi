@@ -20,7 +20,8 @@
     <preference name="target-device" value="tablet" />
     <preference name="fullscreen" value="false" />
     <preference name="webviewbounce" value="false" />
-    <gap:plugin name="com.phonegap.plugins.childbrowser" />
+    
+    <plugin name="InAppBrowser" value="CDVInAppBrowser" />
 
     <icon src="icon.png" />
     <icon src="res/icon/ios/launcher72.png" gap:platform="ios" width="72" height="72" />

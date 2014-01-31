@@ -57,14 +57,10 @@
 	}
 
 	var screenHeight = getAvailableHeight();
-    var cb = null;
 
     // PhoneGap is ready
     function onDeviceReady()
     {
-        cb = window.plugins.childBrowser;
-        //cb = ChildBrowser.install(); 
-        
         // Override the hardware back button
         document.addEventListener("backbutton", function()
         {
@@ -90,10 +86,8 @@
 	</script>
 
     <script src="phonegap.js"></script>
-    <script src="childbrowser.js"></script>
     
     <script type="text/javascript" src="js/json.js"></script>
-    
     <script type="text/javascript" src="js/jquery.js"></script>
 	<script type="text/javascript" src="js/jquery.validate.min.js"></script>
 	<script type="text/javascript" src="js/jquery.blockUI.js"></script>

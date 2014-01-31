@@ -1928,22 +1928,11 @@ var Inspections = function()
                             
                             var token = data.message;                   
                         
-						
-                            // if(objApp.keys.report_type == 'Handovers')
-                                // var downloadURL = objApp.apiURL + "reports/print_report_handovers/" + objApp.keys.inspection_id + "?token=" + token;
-                            // else if(objApp.keys.report_type == 'Quality Inspection')
-                                // var downloadURL = objApp.apiURL + "reports/print_report_quality/" + objApp.keys.inspection_id + "?token=" + token;
-                            // else
                             var downloadURL = objApp.apiURL + "reports/print_report/" + objApp.keys.report_type + '/' + objApp.keys.inspection_id + "?token=" + token;
-                            if(objApp.phonegapBuild)
-                            {
-                                if(cb != null)
-                                {     
-                                    window.plugins.childBrowser.showWebPage(downloadURL);
-                                }                            
-                            }
-                            else
-                            {
+                            
+                            if(objApp.phonegapBuild) {
+                                var ref = window.open(downloadURL, '_blank', 'location=yes');                           
+                            } else {
                                 $.download(downloadURL, [], "post");
                             }                            
                             
@@ -5132,15 +5121,9 @@ var Inspections = function()
 					
 					    var downloadURL = objApp.apiURL + "reports/inspection/" + objApp.keys.inspection_id + "?token=" + token;
 					    
-					    if(objApp.phonegapBuild)
-					    {
-						    if(cb != null)
-						    {     
-							    window.plugins.childBrowser.showWebPage(downloadURL);
-						    }							
-					    }
-					    else
-					    {
+					    if(objApp.phonegapBuild) {
+                            var ref = window.open(downloadURL, '_blank', 'location=yes');  						
+					    } else {
 						    $.download(downloadURL, [], "post");
 					    }
                     }, "JSON");
