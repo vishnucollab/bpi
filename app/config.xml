@@ -2,7 +2,7 @@
 <widget xmlns = "http://www.w3.org/ns/widgets"
         xmlns:gap = "http://phonegap.com/ns/1.0"
         id = "com.simb.Blueprint"
-        version = "0.8.0">
+        version = "0.8.5">
     <name>Blueprint</name>
 
     <description>
@@ -15,7 +15,7 @@
 
     <feature name="http://api.phonegap.com/1.0/device" />
 
-    <preference name="phonegap-version" value="2.9.0" />
+    <preference name="phonegap-version" value="3.1.0" />
     <preference name="orientation" value="landscape" />
     <preference name="target-device" value="tablet" />
     <preference name="fullscreen" value="false" />
