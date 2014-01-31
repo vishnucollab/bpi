@@ -239,13 +239,21 @@
     
     
 <div class="wrapper  hidden" id="forgotpass_screen">
-        <h1 class="leader">Blueprint Inspections</h1>
-        <h1 class="leader subleader">Reset Your Password</h1>
+        <div id="header">
+            <div class="left">
+                <h1>Blueprint Inspections</h1>
+            </div>
+        </div>
+        
+        <div id="subheader">
+            <div class="left">
+                <h1>Reset Your Password</h1>
+            </div>
+        </div>
 
         <form action="#" method="post" id="frmForgetPass">
        <div id="frm">
             <fieldset class="thefs">
-            	<legend class="theleg">Reset Your Password</legend>
                 <div  id="retrievepass">
                 <label for="username_fp">Email Address</label>
                 <input type="email" name="username_fp" id="username_fp" value="" class="required" />
@@ -279,8 +287,19 @@
     
     <!-- creating user screen -->
     <div class="twocolumn hidden" id="create_user_screen">
+        <div id="header">
+            <div class="left">
+                <h1>Blueprint Inspections</h1>
+            </div>
+        </div>
+        
+        <div id="subheader">
+            <div class="left">
+                <h1>Create A User Account</h1>
+            </div>
+        </div>    
+    
         <form action="#" method="post" id="frmCreateUser">
-            <h1>Blueprint Inspections</h1>
             <div>
             <div id="error_msg_new_user" style="color: red; display: none; padding: 10px 0 0 100px">
                 <span></span>
@@ -312,7 +331,7 @@
             
             </div>
         </form>
-         <footer><span>&copy; Blueprint, 2013</span></footer>
+         <footer><span>&copy; Blueprint, 2014</span></footer>
     </div> <!--! end of create user screen -->
     
     <!-- inspection listing screen -->
