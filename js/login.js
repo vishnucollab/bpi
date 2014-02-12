@@ -3,7 +3,7 @@ OBJECT: LOGIN
 ***********************************************************/
 
 /***
-* @project: PlanetEarth
+* @project: Blueprint
 * @author: Andrew Chapman
 * @copyright: SIMB Pty Ltd 2011
 */

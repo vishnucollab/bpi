@@ -27,7 +27,7 @@ function DBUtils()
 	
 	this.data = "";
 	
-	// Define the PlanetEarth database tables and versions
+	// Define the Blueprint database tables and versions
 	this.tables = new Array();
 	this.tables.push(new Array('app_tables', 1.0));
 	this.tables.push(new Array('builders', 1.0));

@@ -3,7 +3,7 @@ OBJECT: INSPECTIONS
 ***********************************************************/
 
 /***
-* @project: Planet Earth Cleaning Company iPad App
+* @project: Blueprint Inspections iPad App
 * @author: Andrew Chapman
 */
 
@@ -2907,7 +2907,7 @@ var Inspections = function()
 					var params = {};
 					params["subject"] = emailSubject;
 					params["recipients"] = emailTo;
-					params["from"] = "noreply@planetearthapp.com";
+					params["from"] = "noreply@Blueprintapp.com";
 					params["message"] = emailMessage;
 					params["inspectionid"] = objApp.keys.inspection_id;
                     

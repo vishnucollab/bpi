@@ -77,11 +77,13 @@ var imageMarker = function(objImage, heading, notes, saveMethod, deleteMethod, p
 			// Left Panel
 			var leftPanel = $('<div class="imColLeft" style="width: ' + (width - 300) + 'px; height: ' + (height - 120) + 'px;" />');
 				leftPanel.append('<canvas id="im_Canvas" width="' + canvasWidth + '" height="' + canvasHeight + '"></canvas>');
-				leftPanel.append('<ul id="colorControls">' +
+				/*
+                leftPanel.append('<ul id="colorControls">' +
 					'<li><a class="colorRed selected" href="javascript:void(0);">Red</a></li>' +
 					'<li><a class="colorYellow" href="javascript:void(0);">Yellow</a></li>' +
 					'<li><a class="colorGreen" href="javascript:void(0);">Green</a></li>' +
 					'</ul>');
+                */
 
 			// Right panel
 			var rightPanel = $('<div class="imColRight" style="width: 250px; height: ' + (height - 120) + 'px;" />');
@@ -99,7 +101,7 @@ var imageMarker = function(objImage, heading, notes, saveMethod, deleteMethod, p
 			if(self.readOnly == false)
 			{
 				form.append('<a id="btnIMSave" class="button" name="btnIMSave">Save</a>');
-				form.append('<a id="btnIMReset" class="button" name="btnIMReset">Reset</a>');
+				//form.append('<a id="btnIMReset" class="button" name="btnIMReset">Reset</a>');
                 form.append('<a id="btnIMDelete" class="button warning" name="btnIMDelete">Delete</a>');
 			}
 			

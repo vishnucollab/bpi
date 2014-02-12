@@ -3,7 +3,7 @@ OBJECT: INSPECTIONS
 ***********************************************************/
 
 /***
-* @project: Planet Earth Cleaning Company iPad App
+* @project: Blueprint Inspections iPad App
 * @author: Andrew Chapman
 */
 
@@ -41,8 +41,12 @@ var Inspections = function()
     this.cur_sel_ins_item;
 	this.numImgCurr = 0;
     this.reinspectionKey = null;
+    this.inspection = false;
+    
 	var self = this;
+    
 	$(".inspectionDetails #btnCapturePhoto").append('<div class="numImgCurr">' + self.numImgCurr + '</div>');
+    
 	this.setupInspections = function()
 	{
 		// Clear the main screen area
@@ -582,10 +586,6 @@ var Inspections = function()
         self.setStep(1);
         objApp.clearMain();
         
-        // if (self.glDatePicker) {
-            // self.glDatePicker.show();
-        // }
-        
         // If we do not have an active inspection
         if(objApp.keys.inspection_id == "") {
             // hide the coversheet notes button.
@@ -605,15 +605,17 @@ var Inspections = function()
         else
         {
             objApp.setSubHeading("Create a New Inspection");
+            
+            $("a.btnEditNotes").show();
+            
             if(($("#inspection #report_type").val() == "Quality Inspection") || (objApp.keys.report_type == "Quality Inspection"))
             {
-                objApp.setSubExtraHeading("Step 1 of 4", true);
-                $("a.btnEditNotes").show(); 
+                objApp.setSubExtraHeading("Step 1 of 4", true); 
             }
             else
             {
                 objApp.setSubExtraHeading("Step 1 of 3", true);
-                $("a.btnEditNotes").hide(); 
+                //$("a.btnEditNotes").hide(); 
             }
         }
         
@@ -622,29 +624,31 @@ var Inspections = function()
     this.showStep2 = function(inspectionItem)
     {
         self.setStep(2);
+        
 		// Set the main heading
         objApp.setSubHeading("Add Issues");
+        $("a.btnEditNotes").show(); 
         
-        if(($("#inspection #report_type").val() == "Quality Inspection") || (objApp.keys.report_type == "Quality Inspection"))
-        {
+        if(($("#inspection #report_type").val() == "Quality Inspection") || (objApp.keys.report_type == "Quality Inspection")) {
             objApp.setSubExtraHeading("Step 2 of 4", true);
-            $("a.btnEditNotes").show(); 
-        }
-        else
-        {
+            
+        } else {
             objApp.setSubExtraHeading("Step 2 of 3", true);
-            $("a.btnEditNotes").hide(); 
         }
-		if(objApp.keys.report_type == 'Handovers')
-		{
+        
+		if(objApp.keys.report_type == 'Handovers') {
 			$('#inspectionStep2 #frmDefectDetails tr#action_wrapper').show();
 		}
-		else
-		{
+		else {
 			$('#inspectionStep2 #frmDefectDetails tr#action_wrapper').hide();
 		}
+        
         // Show the inspection screen.
         objApp.clearMain();
+        
+        // Clear the observations window
+        $("#frmDefectDetails #observation_suggestion").html("");
+        
 		$("#inspectionStep2").removeClass("hidden");
         $("#inspectionStep2 textarea#observation").val('');
         $("#inspectionStep2 ul#popAction li:first-child").text('Choose');
@@ -669,33 +673,49 @@ var Inspections = function()
     {
         self.setStep(3);
         objApp.clearMain();
+        
         $("#inspectionStep3").removeClass("hidden");
+        
         // Load the inspection object
         objDBUtils.loadRecord("inspections", objApp.keys.inspection_id, function(inspection_id, inspection) {
             if(!inspection) {
                 return;    
             }
+            
+            self.inspection = inspection;
+            
+            objApp.setSubHeading("Review Inspection");  
+            
+            // If this a 4 step inspection, hide the finalisation buttons on step 3
+            if(inspection.report_type == "Quality Inspection") {
+                $("#btnFinishedWrapper").hide();
+            } else {
+                $("#btnFinishedWrapper").show();
+            }
+            
+            if(inspection.report_type == "Quality Inspection")
+            {
+                objApp.setSubExtraHeading("Step 3 of 4", true);
+                $('#inspectionStep3 > .bottomBtns > .btnContainer.right > a#btnStep3Email').hide();
+                $('#inspectionStep3 > .bottomBtns > .btnContainer.right > a#btnStep3Next').html('Next');
+            }
+            else
+            {
+                objApp.setSubExtraHeading("Step 3 of 3", true);
+                $('#inspectionStep3 > .bottomBtns > .btnContainer.right > a#btnStep3Email').show();
+                $('#inspectionStep3 > .bottomBtns > .btnContainer.right > a#btnStep3Next').html('Done');
+            }
+            
+            $("a.btnEditNotes").show(); 
+            
+            self.handleFinalised();
+            
+            // Load the defect items for this inspection
+            self.loadInspectionItems();  
+            
+            self.setNoteButtonContentIndicators();
+            
         }, inspection_id);            
-        objApp.setSubHeading("Review Inspection");     
-        if(($("#inspection #report_type").val() == "Quality Inspection") || (objApp.keys.report_type == "Quality Inspection"))
-        {
-            objApp.setSubExtraHeading("Step 3 of 4", true);
-            $('#inspectionStep3 > .bottomBtns > .btnContainer.right > a#btnStep3Email').hide();
-            $('#inspectionStep3 > .bottomBtns > .btnContainer.right > a#btnStep3Next').html('Next');
-        }
-        else
-        {
-            objApp.setSubExtraHeading("Step 3 of 3", true);
-            $('#inspectionStep3 > .bottomBtns > .btnContainer.right > a#btnStep3Email').show();
-            $('#inspectionStep3 > .bottomBtns > .btnContainer.right > a#btnStep3Next').html('Done');
-        }
-        
-        
-        
-        this.handleFinalised();
-        
-        // Load the defect items for this inspection
-		self.loadInspectionItems();
     }
     
     this.showStep4 = function()
@@ -906,12 +926,16 @@ var Inspections = function()
         self.handleFinalised();
         self.setStep(1);
         self.numImgCurr = 0;
+        self.inspection = false;
+        
         $(".inspectionDetails #btnCapturePhoto .numImgCurr").text(self.numImgCurr);
         $('#frmInspectionDetails #lot_no').val('');
         $('#frmInspectionDetails #address').val('');
         $('#frmInspectionDetails #suburb').val('');
         $('#frmInspectionDetails #postcode').val('');
         $('#frmInspectionDetails #weather').val('');
+        $("#inspection #notes").val("");
+        
         // if (self.glDatePicker) {
             // self.glDatePicker.show();
         // }
@@ -1140,7 +1164,7 @@ var Inspections = function()
         noteFields["notes"] = "btnEditNotes";
         noteFields["privatenotes"] = "btnEditPrivateNotes";
         noteFields["clientnotes"] = "btnEditClientNotes";
-        
+
         for(var key in noteFields) {
             var buttons = $(".inspectionDetails ." + noteFields[key]);
             var e = $("#inspection #" + key);
@@ -1322,14 +1346,15 @@ var Inspections = function()
             {
                 objApp.setSubExtraHeading("Step 1 of 4", true);
                 objApp.keys.report_type = "Quality Inspection";
-                $('#inspection .btnEditNotes').show();
             }
             else
             {
                 objApp.setSubExtraHeading("Step 1 of 3", true);
                 objApp.keys.report_type = $(this).val();
-                $('#inspection .btnEditNotes').hide();
             }
+            
+            $('#inspection .btnEditNotes').show();
+            
         });
         $(".inspectionDetails #btnCapturePhoto").bind(objApp.touchEvent, function(e)
 		{
@@ -2350,22 +2375,33 @@ var Inspections = function()
 		
 		// Unbind key events
 		$("#btnCapturePhoto").unbind();	
-		//$("#btnSaveDefect").unbind();
-		$("#btnDeleteDefect").unbind();
-		$("#notes").unbind(); 
-        $("#frmDefectDetails #observation").unbind();
-        
-        if(!$(".inspectionDetails .historySection").hasClass("hidden"))
-		{
-			$(".inspectionDetails .historySection").addClass("hidden");
-		}
-		
+
 		var user_id = localStorage.getItem("user_id");	
+        
+           // Setup defect pop selectors
+        if(self.objPopLocation == null)
+        {
+            // The pop selectors have not been initialised yet.
+            self.objPopLocation = new popselector("#frmDefectDetails #popLocation", "Please select a location"); 
+            self.objPopLocation.callbackMethod = objApp.objInspection.handleLocationChanged;
+            self.objPopLocation.addNewMethod = self.addNewLocation;
+            self.objPopLocation.deleteCallback = self.deleteLocation;
+        }
+        
+        if(self.objPopAction == null)
+        {
+            // The pop selectors have not been initialised yet.
+            self.objPopAction = new popselector("#frmDefectDetails #popAction", "Please select an action"); 
+            self.objPopAction.callbackMethod = objApp.objInspection.handleActionChanged;
+            self.objPopAction.addNewMethod = self.addNewAction;
+            self.objPopAction.deleteCallback = self.deleteAction;     
+        }        
 		
-		// If an inspection item has been passed through, set the notes from it, otherwise initialise to blank.
+		// If an inspection item has been passed through, set the item details from it, otherwise initialise to blank.
 		if(inspectionItem == null)
 		{
-			$("#frmDefectDetails #notes").val("");
+			$("#frmDefectDetails #observation").val("");
+            self.objPopLocation.clear("", "Choose");
 			$("#frmDefectDetails #created_by").val(user_id);
             $("#frmDefectDetails #itemtype").val("0");
             $("#frmDefectDetails #numrepeats").val("0");
@@ -2395,11 +2431,19 @@ var Inspections = function()
 		}
 		else
 		{
-			$("#frmDefectDetails #notes").val(inspectionItem.notes);
-            self.touchScroll(document.querySelector("#frmDefectDetails #notes"));
+			// Set observation text
+            $("#frmDefectDetails #observation").val(inspectionItem.observation);
+            
+            // Preselect location pop selector 
+            objApp.keys.action = inspectionItem.action;
+            objApp.keys.location = inspectionItem.location;
+            
+            //self.touchScroll(document.querySelector("#frmDefectDetails #notes"));
 			$("#frmDefectDetails #created_by").val(inspectionItem.created_by);
 			$("#frmDefectDetails #seq_no").val(inspectionItem.seq_no);
+            
 			$("#photoWrapper").removeClass("hidden");
+            
             $("#frmDefectDetails #itemtype").val(inspectionItem.itemtype);
             $("#frmDefectDetails #numrepeats").val(inspectionItem.numrepeats);
 		}
@@ -2409,120 +2453,53 @@ var Inspections = function()
         } else {
             $("a.itemtype").removeClass("acknowledgement");    
         }
-		
-   		// Setup defect pop selectors
-		if(self.objPopLocation == null)
-		{
-			// The pop selectors have not been initialised yet.
-			self.objPopLocation = new popselector("#frmDefectDetails #popLocation", "Please select a location"); 
-			
-			self.objPopLocation.callbackMethod = objApp.objInspection.handleLocationChanged;
-			
-			self.objPopLocation.addNewMethod = self.addNewLocation;
-			
-			self.objPopLocation.deleteCallback = self.deleteLocation;
-		}
         
-        if(self.objPopAction == null)
-		{
-			// The pop selectors have not been initialised yet.
-			self.objPopAction = new popselector("#frmDefectDetails #popAction", "Please select an action"); 
-			
-			self.objPopAction.callbackMethod = objApp.objInspection.handleActionChanged;
-			
-			self.objPopAction.addNewMethod = self.addNewAction;
-			
-			self.objPopAction.deleteCallback = self.deleteAction;
-		}
-		
 		// If the user is in an audit (i.e, the have actively saved a defect), do NOT reset the level and area pop selectors.
 		$("#frmDefectDetails #observation_suggestion").empty();
-        if((self.inAudit) && (inspectionItem == null))
-		{
+        
 
- 			self.loadPhotos();											
-		}
-		else
-		{
-			// The user is NOT in an audit, clear all pop selectors.
-			// Clear any existing pop filter options.
-			self.objPopLocation.removePopOptions(0, "", "Choose");
-			self.objPopAction.removePopOptions(0, "", "Choose");
-			
-			// Load available levels into the pop selector
-			objDBUtils.primaryKey = "id";
-			objDBUtils.showColumn = "name";
-			objDBUtils.orderBy = "name ASC";
-			
-			var filters = [];
-			filters.push(new Array("resource_type = 1"));
-			
-			objDBUtils.loadSelect("resources", filters, "#frmDefectDetails #popLocation", function()
-			{
-				if(objApp.keys.location != "")
-				{
-					self.objPopLocation.preselectByText(objApp.keys.location);
-				}
-				else
-				{
-					self.objPopLocation.clear("", "Choose");	
-				}
-				
-				if(inspectionItem != null)
-				{
- 					self.loadHistory(inspectionItem.level, inspectionItem.area, inspectionItem.issue, inspectionItem.detail);
- 					self.loadPhotos();
-				}	
-				else
-				{
-					if(!$("#historyWrapper").hasClass("hidden"))
-					{
-						$("#historyWrapper").addClass("hidden");
-					}
-				}			
-			});	
-            
-            
-            var filters = [];
-			filters.push(new Array("resource_type = 2"));
-			
-			objDBUtils.loadSelect("resources", filters, "#frmDefectDetails #popAction", function()
-			{
-				if(objApp.keys.action != "")
-				{
-					self.objPopAction.preselectByText(objApp.keys.action);
-				}
-				else
-				{
-					self.objPopAction.clear("", "Choose");	
-				}	
-			});
-            objDBUtils.orderBy = "";
-        }
-							
+		// Clear any existing pop filter options.
+		self.objPopLocation.removePopOptions(0, "", "Choose");
+		self.objPopAction.removePopOptions(0, "", "Choose");
 		
-		// ************************** SAVE DEFECT ********************************
-		// ***********************************************************************
-		/*
-		$("#btnSaveDefect").bind(objApp.touchEvent, function(e)
-		{
-			e.preventDefault();
-			self.saveDefect(); 
-		});*/
+		// Load available levels into the pop selector
+		objDBUtils.primaryKey = "id";
+		objDBUtils.showColumn = "name";
+		objDBUtils.orderBy = "name ASC";
 		
-		// ************************** DELETE DEFECT ********************************
-		// ***********************************************************************
-		$("#btnDeleteDefect").bind(objApp.touchEvent, function(e)
+		var filters = [];
+		filters.push(new Array("resource_type = 1"));
+		
+		objDBUtils.loadSelect("resources", filters, "#frmDefectDetails #popLocation", function()
 		{
-			e.preventDefault();
-			
-			if(!confirm("Are you sure you want to delete this issue?  Once the issue has been deleted you cannot recover it."))
+			if(objApp.keys.location != "")
 			{
-				return false;
+				self.objPopLocation.preselectByText(objApp.keys.location);
 			}
-			
-			self.deleteDefect(objApp.getKey("inspection_item_id"));
-		});		
+			else
+			{
+				self.objPopLocation.clear("", "Choose");	
+			}		
+		});	
+        
+        
+        var filters = [];
+		filters.push(new Array("resource_type = 2"));
+		
+		objDBUtils.loadSelect("resources", filters, "#frmDefectDetails #popAction", function()
+		{
+			if(objApp.keys.action != "")
+			{
+				self.objPopAction.preselectByText(objApp.keys.action);
+			}
+			else
+			{
+				self.objPopAction.clear("", "Choose");	
+			}	
+		});
+        
+        objDBUtils.orderBy = "";
+	
 		
 		// If the ipad has scrolled to show the notes field,
 		// make sure we scroll back down after the user has finished typing.
@@ -2530,18 +2507,23 @@ var Inspections = function()
 		$('#frmDefectDetails #observation').bind('keyup', function(e)
 		{
                 objDBUtils.orderBy = "";
-                self.observation = $('#frmDefectDetails textarea#observation').val();
+                self.observation = $('#frmDefectDetails textarea#observation').val().trim();
 				$("#frmDefectDetails #observation_suggestion").empty();
-                if(self.observation == ''){
+                
+                if(self.observation == '') {
                     return false;
                 }
+
                 var filters = [];
                 filters.push(new Array("resource_type = 3"));
                 filters.push(new Array("name LIKE '%" + self.observation + "%'"));
+                //filters.push(new Array("limit", 4));
+                
                 objDBUtils.loadSelect("resources", filters, "#frmDefectDetails #observation_suggestion", function()
                 {
-                    // TODO
-                    console.log('load oservation suggession finish 1');
+                    if(objUtils.isMobileDevice()) {
+                        scroller = new iScroll('observationWrapper', { hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar'});
+                    }
                 }, 'td');
 		});
 		              
@@ -4129,31 +4111,39 @@ var Inspections = function()
 			        // objDBUtils.setKeyFromLastInsertID("report_type");
 			    }
                 
-                // If we have an active inspection then show the coversheet notes button
-                if(self.finalised == 0) {
-                    $("a.btnEditNotes").show();
-                    $("a.btnEditClientNotes").show();
-                    $("a.btnEditPrivateNotes").show();
-                } else {
-                    $("a.btnEditNotes").hide();
-                    $("a.btnEditClientNotes").hide();
-                    $("a.btnEditPrivateNotes").hide();
-                }
-			    
-			    self.setReturnInspectionID(objApp.keys.inspection_id);
-                $('#btnCapturePhoto').attr('data-reveal-id', 'photoWrapper');
-			    
-			    unblockElement(".inspectionDetails");
-			    
-			    // Show the toggle objects
-			    $("#toggles").removeClass("hidden");
-			    
-			    self.checkCanDelete();
-                
-                self.doingSave = false;
-			    
-			    // Show the client options modal
-			    			
+                // Load the inspection object
+                objDBUtils.loadRecord("inspections", objApp.keys.inspection_id, function(inspection_id, inspection) {
+                    if(!inspection) {
+                        return;    
+                    }  
+                    
+                    // Set the inspection object.
+                    self.inspection = inspection;
+
+                    // If we have an active inspection then show the coversheet notes button
+                    if(self.finalised == 0) {
+                        $("a.btnEditNotes").show();
+                        $("a.btnEditClientNotes").show();
+                        $("a.btnEditPrivateNotes").show();
+                    } else {
+                        $("a.btnEditNotes").hide();
+                        $("a.btnEditClientNotes").hide();
+                        $("a.btnEditPrivateNotes").hide();
+                    }
+			        
+			        self.setReturnInspectionID(objApp.keys.inspection_id);
+                    $('#btnCapturePhoto').attr('data-reveal-id', 'photoWrapper');
+			        
+			        unblockElement(".inspectionDetails");
+			        
+			        // Show the toggle objects
+			        $("#toggles").removeClass("hidden");
+			        
+			        self.checkCanDelete();
+                    
+                    self.doingSave = false;
+                });
+			    			    
 			});	
 	    }, 250);
 	}
@@ -4228,14 +4218,7 @@ var Inspections = function()
 		{
 			return;
 		}
-		if(objApp.keys.report_type == 'Quality Inspection')
-        {
-            $('a.btnEditNotes').show();
-        }
-        else
-        {
-            $('a.btnEditNotes').hide();
-        }
+
 		var listDeleteMode = true;
 		// if(self.finalised == 1)
 		// {
@@ -4894,6 +4877,7 @@ var Inspections = function()
             // Show the notes and add anoter issue button
             $('.reportNotes').removeClass('hidden');
             $("a.btnEditNotes").show();
+            
             $("a.btnEditClientNotes").show();
             $("a.btnEditPrivateNotes").show();            
             $(".inspectionDetails .finished").removeClass('active');
@@ -5179,7 +5163,7 @@ var Inspections = function()
 					var params = {};
 					params["subject"] = emailSubject;
 					params["recipients"] = emailTo;
-					params["from"] = "noreply@planetearthapp.com";
+					params["from"] = "noreply@Blueprintapp.com";
 					params["message"] = emailMessage;
 					params["inspectionid"] = objApp.keys.inspection_id;
                     
@@ -5529,7 +5513,7 @@ var Inspections = function()
 					var params = {};
 					params["subject"] = emailSubject;
 					params["recipients"] = emailTo;
-					params["from"] = "noreply@planetearthapp.com";
+					params["from"] = "noreply@Blueprintapp.com";
 					params["message"] = emailMessage;
 					params["inspectionid"] = objApp.keys.inspection_id;
                     

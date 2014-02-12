@@ -524,8 +524,8 @@ var popselector = function(selector, heading)
 	* if a matching text value can be found.
 	*/
 	this.preselectByText = function(text)
-	{
-		// See if we can find a value in the selector control that matches the passed value
+	{        
+        // See if we can find a value in the selector control that matches the passed value
 		var foundNode = null;
 		
 		$(this.selector + ' li').each(function()
@@ -535,9 +535,10 @@ var popselector = function(selector, heading)
 				foundNode = $(this);	
 			}
 		});
-		
-		if(foundNode == null)
+        
+		if(foundNode == null) {
 			return;
+        }
 
 		// Set the id and text of first option in the source selector so it's preselected.
 		$(this.selector + ' li:eq(0)').attr("title", $(foundNode).attr("title"));

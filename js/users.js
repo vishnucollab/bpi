@@ -106,7 +106,7 @@ var Users = function()
             else
             {
                 // Registration was successfull.
-                self.createDefaultData(1);
+                //self.createDefaultData(1);
                 
                 unblockElement("body");
             
@@ -292,7 +292,7 @@ var Users = function()
                     alert("Sorry, the following database error occured\n\n" +
                     "Code: " + error.code + "\n" +
                     "Message: " + error.message);                        
-                });                
+                });             
             });
         });             
     }

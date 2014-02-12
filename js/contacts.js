@@ -3,7 +3,7 @@ OBJECT: CONTACTS
 ***********************************************************/
 
 /***
-* @project: Planet Earth Cleaning Company iPad App
+* @project: Blueprint Inspections iPad App
 * @author: Andrew Chapman
 * @copyright: SIMB Pty Ltd 2013
 */

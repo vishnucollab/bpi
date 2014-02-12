@@ -3,7 +3,7 @@ OBJECT: SYNC
 ***********************************************************/
 
 /***
-* @project: PlanetEarth
+* @project: Blueprint
 * @author: Andrew Chapman
 * @copyright: SIMB Pty Ltd 2010 - 2011
 */
@@ -288,7 +288,7 @@ function Sync()
 	
 
 	/***
-	* sendData Sends data to the PlanetEarth server,
+	* sendData Sends data to the Blueprint server,
 	* awaits processing, and then receives any new
 	* data and stores it locally.
 	*/

@@ -505,10 +505,8 @@
                         
                         <!-- <select class="ignore" name="observation_suggestion" id="observation_suggestion" size="10">
                         </select> -->
-						<div style="height: 300px; overflow-y: auto;">
-						<table class="listing" id="observation_suggestion" style="table-layout: fixed; width: 405px;">
-						
-						</table>
+						<div id="observationWrapper" style="height: 300px; overflow-y: auto;">
+						    <table class="listing" id="observation_suggestion" style="table-layout: fixed; width: 405px;"></table>
 						</div>
                     </fieldset>        
                         
@@ -556,11 +554,11 @@
                     To finalise this report, please preview it and then if you're satisfied, tap the "Finished" icon. You will then be able to send the report.
                     </div>
                     
-                    <div class="btnContainer left">
+                    <div class="btnContainer left" id="btnFinishedWrapper">
                         <a href="#" id="finished" class="finished"></a>
                         <span>Finished</span>
                     </div>
-                    <div class="btnContainer left">
+                    <div class="btnContainer left" id="btnPreviewWrapper">
                         <a href="#" id="preview" class="preview"></a>
                         <span>Preview</span>
                     </div>
