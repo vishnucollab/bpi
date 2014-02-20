@@ -2105,7 +2105,7 @@ var Inspections = function()
                     $("#btnDeleteDefect").css("visibility", "hidden");
                     
                     // Initialise defect form.
-                    self.initDefectForm(null);
+                    self.initDefectForm(null, false);
                 });
 			}
             
@@ -2365,8 +2365,10 @@ var Inspections = function()
 	* resets the popSelectors and loads their values as appropriate.
 	* If an existing defect is being shown, the defect values are preselected.
 	*/
-	this.initDefectForm = function(inspectionItem)
-	{	
+	this.initDefectForm = function(inspectionItem, resetLocation)
+	{
+	    if (typeof(resetLocation)=='undefined') resetLocation = true;
+
 		self.lastKeyPress = null;
 		self.doingSave = false;
 		
@@ -2398,6 +2400,8 @@ var Inspections = function()
         }        
 		
 		// If an inspection item has been passed through, set the item details from it, otherwise initialise to blank.
+		var currentLocation = self.objPopLocation.getValue();
+		
 		if(inspectionItem == null)
 		{
 			$("#frmDefectDetails #observation").val("");
@@ -2472,14 +2476,21 @@ var Inspections = function()
 		
 		objDBUtils.loadSelect("resources", filters, "#frmDefectDetails #popLocation", function()
 		{
-			if(objApp.keys.location != "")
-			{
-				self.objPopLocation.preselectByText(objApp.keys.location);
-			}
-			else
-			{
-				self.objPopLocation.clear("", "Choose");	
-			}		
+		    if (!resetLocation)
+		    {
+                self.objPopLocation.preselect(currentLocation);
+		    }
+		    else
+		    {
+    			if(objApp.keys.location != "")
+    			{
+    				self.objPopLocation.preselectByText(objApp.keys.location);
+    			}
+    			else
+    			{
+    				self.objPopLocation.clear("", "Choose");	
+    			}
+		    }
 		});	
         
         
