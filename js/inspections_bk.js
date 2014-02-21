@@ -2720,7 +2720,7 @@ var Inspections = function()
 				addressStr += ", " + client.site_address2;
 			}
 			
-			$("#printModal #emailSubject").val("Planet Earth Inspection Report");
+			$("#printModal #emailSubject").val("Blueprint Inspection Report");
 			$("#printModal #emailMessage").val("Please find attached an inspection report for " + client.name + " at " + addressStr + ".");
 		});
 		
@@ -2859,7 +2859,7 @@ var Inspections = function()
 				else
 				{
 					unblockElement("#printModal");
-					alert("Sorry, something went wrong whilst syncing your data back to the Planet Earth server.  Please try again later.");
+					alert("Sorry, something went wrong whilst syncing your data back to the Blueprint server.  Please try again later.");
 				}
 			});
 		});	
@@ -2933,7 +2933,7 @@ var Inspections = function()
 				else
 				{
 					unblockElement("#printModal");
-					alert("Sorry, something went wrong whilst syncing your data back to the Planet Earth server.  Please try again later.");
+					alert("Sorry, something went wrong whilst syncing your data back to the Blueprint server.  Please try again later.");
 				}
 			});					
 		});

@@ -1041,9 +1041,6 @@ function DBUtils()
 				"'exterior_quality' INTEGER, " +	
 				"'inspection_date' DATE NOT NULL, " + 			
 				"'inspection_start' BIGINT(20) NOT NULL DEFAULT 0, " +
-				"'start' VARCHAR NOT NULL, " + 
-				"'finish' VARCHAR NOT NULL, " +
-				"'duration' REAL NOT NULL DEFAULT 0, " +
 				"'status' INTEGER NOT NULL DEFAULT 0 , " + 
 				"'num_defects' INTEGER NOT NULL DEFAULT 0, " +
 				"'finalised' INTEGER NOT NULL DEFAULT 0, " +

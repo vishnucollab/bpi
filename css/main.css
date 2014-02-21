@@ -378,6 +378,7 @@ a.button, input[type="submit"], input[type="button"]
         -webkit-box-shadow: inset 0px 0px 15px 0px rgba(227, 245, 139, .8); box-shadow: inset 0px 0px 15px 0px rgba(227, 245, 139, .8);    
         color: #262627;   
         text-shadow: #f0f7cb 0px 1px 0;
+        margin-left: 50px !important;
     }
 
         a#btnAddDefect:hover, a#btnStep3AddAnotherIssue:hover
@@ -782,10 +783,11 @@ aside textarea
     padding: 2px 5px;
 }
     
-#btnAddDefect, a.btnEditNotes{
+#btnAddDefect, a.btnEditNotes, #btnStep3Email {
     margin-left: 10px;
-    top: 10px;
+    top: 20px;
 }
+
 #btnStep3AddAnotherIssue{
     margin-left: 50px;
 }
@@ -928,7 +930,7 @@ aside textarea
 
 .inspectionDetails #searchItemsContainer{
     float: right;
-    width: 250px;
+    width: 223px;
 }
     .inspectionDetails #searchItemsContainer #keywords{
         font-size: 14px;
@@ -1645,7 +1647,7 @@ a#forgotpass {color: #80b1df; font-weight: bold; text-transform: none}
 
 #btnCreateUser, #backtoLog {margin-top: 20px}
 
-fieldset.thefs {padding: 20px; min-width: 425px; float: left}
+fieldset.thefs {padding: 0px 20px; min-width: 425px; float: left}
 legend.theleg {font-weight: bold}
 
 #previousLogins {padding-top: 20px; padding-right: 10px; width: 180px}

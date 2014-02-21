@@ -187,7 +187,7 @@ function Sync()
 			
 			if(($("#frmSync #refresh_sync").is(":checked")) && (!objApp.objSync.noRefreshWarning))
 			{
-				if(!confirm("Warning, you have selected the 'reset my data' option.  This will delete all your local data and then download everything from the Planet Earth server.  Any data that you've entered since your last sync will be lost.  Are you sure?'"))
+				if(!confirm("Warning, you have selected the 'reset my data' option.  This will delete all your local data and then download everything from the Blueprint server.  Any data that you've entered since your last sync will be lost.  Are you sure?'"))
 					return;
 					
 				objApp.objSync.refreshSync = true;  
@@ -276,7 +276,7 @@ function Sync()
 				if(!self.silentMode)
 				{				
 					unblockElement("#frmSync");
-					$("#accountMessage").text("Sorry, something went wrong.  Please report this error to the Planet Earth support team.");				
+					$("#accountMessage").text("Sorry, something went wrong.  Please report this error to the Blueprint support team.");				
 				}
 				else if(self.callbackMethod != null)
 				{
@@ -351,8 +351,8 @@ function Sync()
                     if(!self.silentMode)
                     {                
                         unblockElement("#frmSync");
-                        alert("Warning: An error occured during the data sync operation.  Please report this error to the Planet Earth team.");
-                        $("#accountMessage").text("Sorry, something went wrong during the processing phase.  Please report this error to the Planet Earth team.");                                    
+                        alert("Warning: An error occured during the data sync operation.  Please report this error to the Blueprint team.");
+                        $("#accountMessage").text("Sorry, something went wrong during the processing phase.  Please report this error to the Blueprint team.");                                    
                     }
                     else if(self.callbackMethod != null)
                     {
@@ -366,8 +366,8 @@ function Sync()
                 if(!self.silentMode)
                 {                
                     unblockElement("#frmSync");
-                    alert("Warning: An error occured during the data sync operation.  Please report this error to the Planet Earth team.");
-                    $("#accountMessage").text("Sorry, something went wrong during the processing phase.  Please report this error to the Planet Earth team.");                                    
+                    alert("Warning: An error occured during the data sync operation.  Please report this error to the Blueprint team.");
+                    $("#accountMessage").text("Sorry, something went wrong during the processing phase.  Please report this error to the Blueprint team.");                                    
                 }
                 else if(self.callbackMethod != null)
                 {

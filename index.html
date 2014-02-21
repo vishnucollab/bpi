@@ -452,11 +452,8 @@
                         </tr>
                         </table>
                     </fieldset>
-                        <input type="hidden" name="start" id="start" value="" class="time" />
-		                <input type="hidden" name="finish" id="finish"  value="" />
 		                <input type="hidden" id="inspection_start" name="inspection_start" value="" />
 		                <input type="hidden" id="created_by" name="created_by" value="" />
-		                <input type="hidden" id="duration" name="duration" value="0" />
 		                <input type="hidden" id="finalised" name="finalised" value="0" />
 		                <input type="hidden" id="failed" name="failed" value="1" />
 		                <input type="hidden" id="initials" name="initials" value="" />
@@ -540,7 +537,7 @@
 	                </thead>
 	            </table>
 	            <div id="defectScrollWrapper" class="scrollWrapper"></div>
-                <div class="bottomBtns">
+                <div class="bottomBtns">   
                     <div class="btnContainer left">
                         <a href="#" id="passed" class="passed"></a>
                         <span>Passed</span>
@@ -550,8 +547,8 @@
                         <span>Failed</span>
                     </div>
                     
-                    <div class="reportNotes">
-                    To finalise this report, please preview it and then if you're satisfied, tap the "Finished" icon. You will then be able to send the report.
+                    <div class="reportNotes hidden">
+                        To finalise this report, please preview it and then if you're satisfied, tap the "Finished" icon. You will then be able to send the report.
                     </div>
                     
                     <div class="btnContainer left" id="btnFinishedWrapper">
@@ -562,10 +559,12 @@
                         <a href="#" id="preview" class="preview"></a>
                         <span>Preview</span>
                     </div>
-                    <a class="button left btnEditNotes" href="#">Coversheet Notes</a>
+                    
+                    <a class="button left btnEditNotes" href="#">Inspection Notes</a>
+                    <a id="btnStep3Email" class="button left" href="#">Email Inspection</a>
+                    
                     <div class="btnContainer right">
-                        <!-- <a id="btnStep3Email" class="button right rightmargin" href="#">Email</a> -->
-                        <a id="btnStep3Next" class="button right rightmargin" href="#">Done</a>
+                        <a id="btnStep3Next" class="button right rightmargin" href="#">Exit</a>
                     </div>
                 </div>
                 <div style="clear: both;"></div>
@@ -573,12 +572,6 @@
                 
                 <div id="controlBtns">
                     <a id="btnCapturePhoto" data-reveal-id="photoWrapper" class="right reveal" href="#"></a>
-                    <!--
-                    <a id="btnStep3Back" class="button left leftmargin gotoStep2" href="#">&lsaquo;&lsaquo; Back</a>
-                    <a class="button left leftmargin alert" href="#" id="btnDeleteInspection" style="margin-left: 10px;">Delete Inspection</a>
-                    
-                    
-                    -->
                 </div>
                 
 		    </div> <!--! end of inspection step 3 screen wrapper -->
@@ -713,6 +706,7 @@
 			                <th class="i.address">Address</th>
 			                <th class="b.name">Builder</th>
 			                <th class="i.report_type">Report Type</th>
+                            <th class="i.failed">Status</th>
                             <th class="i.inspection_start">Action</th>
 			            </tr>
 			        </thead>

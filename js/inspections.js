@@ -121,6 +121,7 @@ var Inspections = function()
 		self.doInspectionSearch();
         
         $("form.search").unbind();
+        
         $('#inspectionList .btnContainer a#passed').click(function() {
             if (!$(this).hasClass("active"))
             {
@@ -129,6 +130,7 @@ var Inspections = function()
                 self.doInspectionSearch();
             }
         });
+        
         $('#inspectionList .btnContainer a#failed').click(function() {
             if (!$(this).hasClass("active"))
             {
@@ -137,9 +139,11 @@ var Inspections = function()
                 self.doInspectionSearch();
             } 
         });
+        
         $("form.search input").keyup(function() {
             self.doInspectionSearch();    
         });
+        
         $("#inspectionList #builder_id").change(function(){
             self.doInspectionSearch();
         });
@@ -254,8 +258,7 @@ var Inspections = function()
 			var maxLoop = items.rows.length;
 			var r = 0;
 			
-			for(r = 0; r < maxLoop; r++)
-			{
+			for(r = 0; r < maxLoop; r++) {
 				
 				var num_defects = 0;
 			    var row = items.rows.item(r);
@@ -266,8 +269,7 @@ var Inspections = function()
                 
                 html += '<span class="icon';
 			    
-			    if(row.finalised)
-			    {
+			    if(row.finalised) {
 					html += ' finalised';
 			    }
 			    
@@ -277,6 +279,12 @@ var Inspections = function()
 			    html += '<td>' + row.lot_no + ' ' + row.address + ' ' + row.suburb + '</td>';
 			    html += '<td>' + row.name + '</td>';
 			    html += '<td>' + row.report_type + '</td>';
+                
+                if (row.failed == 1) {
+                    html += '<td>Failed</td>';    
+                } else {
+                    html += '<td>Passed</td>';    
+                }
 			   
                 html += '<td><div class="action">';
                 if(row.finalised == 0)
@@ -311,8 +319,7 @@ var Inspections = function()
 		    
 			// Bind click event to list items
             
-            $("#tblInspectionListing td.delete").bind("click", function(e)
-                {
+            $("#tblInspectionListing td.delete").bind("click", function(e) {
                     self.is_change_order = true;
 					e.preventDefault();
 					var inspection_item_id = $(this).parent().attr("rel");
@@ -321,7 +328,7 @@ var Inspections = function()
 
 				    
                     var item_name = $(parent).find("td:eq(2)").text();
-                    if(confirm("are you sure you wish to delte this inspection for " + item_name))
+                    if(confirm("Are you sure you wish to delete this inspection for " + item_name))
                     {
                         var sql = "UPDATE inspections " +
                                   "SET deleted = 1, dirty = 1 " +
@@ -703,7 +710,7 @@ var Inspections = function()
             {
                 objApp.setSubExtraHeading("Step 3 of 3", true);
                 $('#inspectionStep3 > .bottomBtns > .btnContainer.right > a#btnStep3Email').show();
-                $('#inspectionStep3 > .bottomBtns > .btnContainer.right > a#btnStep3Next').html('Done');
+                $('#inspectionStep3 > .bottomBtns > .btnContainer.right > a#btnStep3Next').html('Exit');
             }
             
             $("a.btnEditNotes").show(); 
@@ -730,6 +737,7 @@ var Inspections = function()
         self.setTableWidths2('tblRateListingHeader', 'tblRateListing', 2, 500);
         
     }
+    
     this.showReinspection = function()
     {
         var text = "";
@@ -934,15 +942,16 @@ var Inspections = function()
         $('#frmInspectionDetails #suburb').val('');
         $('#frmInspectionDetails #postcode').val('');
         $('#frmInspectionDetails #weather').val('');
+        $('#frmInspectionDetails #client_info').val('');
         $("#inspection #notes").val("");
         
         // if (self.glDatePicker) {
             // self.glDatePicker.show();
         // }
         
-        // Remove any preset passed/failed indication
+        // By default an inspection should be set as failed.
         $("a#passed").removeClass('active');
-        $("a#failed").removeClass('active');
+        $("a#failed").addClass('active');
         
         // Make sure the coversheet notes button is hidden.
         $("a.btnEditNotes").hide();    
@@ -1971,7 +1980,7 @@ var Inspections = function()
 				else
 				{
 					unblockElement(".inspectionDetails");
-					alert("Sorry, something went wrong whilst syncing your data back to the Planet Earth server.  Please try again later.");
+					alert("Sorry, something went wrong whilst syncing your data back to the Blueprint server.  Please try again later.");
 				}
 			});
 		});	
@@ -4044,41 +4053,6 @@ var Inspections = function()
 	    	// This is not a new inspection.
 			newInspection = false;
 	    }
-	    
-	    // Set the duration and inspection start hidden vars
-		var start = $("#frmInspectionDetails #start").val();
-		var finish = $("#frmInspectionDetails #finish").val();
-		
-		// Calculate inspection duration
-		var duration = objTimePicker.timeToSeconds(finish) - objTimePicker.timeToSeconds(start);
-		// Check for a negative time which means we're spanning midnight
-        if (duration < 0)
-        {
-            // We're spanning midnight
-            var bm; 	// Before midnight
-            var am;	    // After midnight
-
-            // Find out how much time was before midnight,
-            // and how much after.  (There are 86400 secs in a day)
-            bm = 86400 - objTimePicker.timeToSeconds(start);
-            am = objTimePicker.timeToSeconds(finish);
-
-            // Add them together to get total visit time
-            duration = bm + am;
-        }		
-		
-		// Convert the visit duration from seconds to an expression of hours
-		if(duration <= 0) 
-		{
-			duration = 0; 
-		}
-		else
-		{
-			// Get duration into minutes
-			duration = Math.floor(duration / 60);			    
-		}
-		
-		$("#frmInspectionDetails #duration").val(duration);
 
 		// Get the inspection date as a date object
 		var inspection_date = $("#frmInspectionDetails #inspection_date").val(); 
@@ -4490,8 +4464,7 @@ var Inspections = function()
 						{
 							// Setup delete 
 							// Get the item name
-							var item_name = $(parent).find("td:eq(1)").text();
-							item_name += ", " + $(parent).find("td:eq(2)").text();
+							var item_name = $(parent).find("td:eq(2)").text();
 							item_name += ", " + $(parent).find("td:eq(3)").text();
 							
 							if(confirm("Delete '" + item_name + "', are you sure?"))
@@ -4903,7 +4876,7 @@ var Inspections = function()
         if (self.finalised == 1)
         {
             // Hide the buttons for notes and adding more issues.
-            $('.reportNotes').addClass('hidden');
+            //$('.reportNotes').addClass('hidden');
             $("a.btnEditNotes").hide();
             $("a.btnEditClientNotes").hide();
             $("a.btnEditPrivateNotes").hide();            
@@ -4922,7 +4895,7 @@ var Inspections = function()
             // $('#btnStep3Next').addClass('hidden'); 
             
             // Show the notes and add anoter issue button
-            $('.reportNotes').removeClass('hidden');
+            //$('.reportNotes').removeClass('hidden');
             $("a.btnEditNotes").show();
             
             $("a.btnEditClientNotes").show();
@@ -5029,7 +5002,7 @@ var Inspections = function()
 				addressStr += ", " + client.site_address2;
 			}
 			
-			$("#printModal #emailSubject").val("Planet Earth Inspection Report");
+			$("#printModal #emailSubject").val("Blueprint Inspection Report");
 			$("#printModal #emailMessage").val("Please find attached an inspection report for " + client.name + " at " + addressStr + ".");
 		});
 		
@@ -5162,7 +5135,7 @@ var Inspections = function()
 				else
 				{
 					unblockElement("#printModal");
-					alert("Sorry, something went wrong whilst syncing your data back to the Planet Earth server.  Please try again later.");
+					alert("Sorry, something went wrong whilst syncing your data back to the Blueprint server.  Please try again later.");
 				}
 			});
 		});	
@@ -5246,7 +5219,7 @@ var Inspections = function()
 				else
 				{
 					unblockElement("#printModal");
-					alert("Sorry, something went wrong whilst syncing your data back to the Planet Earth server.  Please try again later.");
+					alert("Sorry, something went wrong whilst syncing your data back to the Blueprint server.  Please try again later.");
 				}
 			});					
 		});
@@ -5365,7 +5338,7 @@ var Inspections = function()
             // We will use this to avoid adding duplicates.
             var addedEmails = [];
 			
-			//$("#printModal #emailSubject").val("Planet Earth Inspection Report");
+			//$("#printModal #emailSubject").val("Blueprint Inspection Report");
 			//$("#printModal #emailMessage").val("Please find attached an inspection report for " + client.name + " at " + addressStr + ".");
             
             // Also load any contacts that the user has favourited
@@ -5594,7 +5567,7 @@ var Inspections = function()
 				else
 				{
 					unblockElement("#inspectionStep4");
-					alert("Sorry, something went wrong whilst syncing your data back to the Planet Earth server.  Please try again later.");
+					alert("Sorry, something went wrong whilst syncing your data back to the Blueprint server.  Please try again later.");
 				}
 			});					
 		});
