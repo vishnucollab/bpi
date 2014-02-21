@@ -819,6 +819,17 @@ aside textarea
 #inspectionStep3 #tblDefectListing span.seq_no{
     float: left;
 }
+#inspectionStep3 #tblDefectListing a.edit_issue_btn{
+    float: left;
+    margin-left:10px;
+    text-decoration:none;
+    color:#FFF;
+    background:#5391CD;
+    padding:0 10px;
+    font-size:.9em;
+    border-radius:10px;
+    -webkit-border-radius:10px;
+}
 #inspectionStep3 #tblDefectListing .arrow.up{
     background: url('../images/arrow-up.png') top left no-repeat;
 }

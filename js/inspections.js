@@ -4251,6 +4251,7 @@ var Inspections = function()
 		// Unbind any more button events
 		$("#defectScrollWrapper").unbind();
 		$("#tblDefectListing td").unbind();
+		$("#tblDefectListing a.edit_issue_btn").unbind();
 		
 		// Load the inspection items records
 		objDBUtils.orderBy = self.itemSortBy + " " + self.itemSortDir; //"seq_no DESC";
@@ -4292,6 +4293,7 @@ var Inspections = function()
 			        html += '<tr rel="' + row.id + '">';
                     html += '<td class="delete"></td>';
 			        html += '<td><span class="seq_no">' + row.seq_no + '</span>';
+			        html += '<a href="#" rel="' + row.id + '" class="edit_issue_btn">Edit Issue</a>';
                     if (maxLoop > 1)
                     {
                         if (r == 0)
@@ -4421,6 +4423,41 @@ var Inspections = function()
                         e.preventDefault();
                     });
                 
+                $('#tblDefectListing a.edit_issue_btn').bind('click', function(e){
+                    e.preventDefault();
+                    if(self.is_change_order)
+                    {
+                        is_change_order = false;
+                        return;
+                    }
+                    var $t = $(this)
+                        , inspection_item_id = this.rel;
+
+					if(confirm("Would you like to edit this item?"))
+					{
+						blockElement("#tblDefectListing");
+					
+    					// Load the inspection item record
+    					objDBUtils.loadRecord("inspectionitems", inspection_item_id, function(inspection_item_id, item)
+    					{
+    						unblockElement("#tblDefectListing");
+
+    						if(!item)
+    						{
+    							return;
+    						}
+    						
+    						objApp.keys.inspection_item_id = item.id;
+    						objApp.keys.level = item.level;
+    						objApp.keys.area = item.area;
+    						objApp.keys.issue = item.issue;
+    						objApp.keys.detail = item.detail;
+    						
+    						self.showStep2(item);
+    								
+    					}, inspection_item_id);
+					}
+                });
                 
 				$("#tblDefectListing td").bind("click", function(e)
 				{
@@ -4463,8 +4500,7 @@ var Inspections = function()
 								return;
 							}
 						}
-                        
-                        if(confirm("Would you like to edit this item?"))
+						/*else if(confirm("Would you like to edit this item?"))
     					{
     						blockElement("#tblDefectListing");
     					
@@ -4487,7 +4523,7 @@ var Inspections = function()
         						self.showStep2(item);
         								
         					}, inspection_item_id);
-    					}
+    					}*/
 				    }
 					return false;
 				});
