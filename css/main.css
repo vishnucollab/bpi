@@ -1040,10 +1040,10 @@ aside textarea
 #photoWrapper #addPhoto-wrapper>a#addPhoto-btn{
     background: url("../images/camera.png") top left no-repeat;
     right: 0px;
-    width: 90px;
+    width: 140px;
     padding-left: 60px;
     position: absolute;
-    height: 50px;
+    height: 100px;
     text-decoration: none;
     color: black;
     font-weight: bold;
