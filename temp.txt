@@ -1,0 +1,53 @@
+            var inspection_id = objApp.keys.inspection_id;
+            var sql = "SELECT * FROM reinspections WHERE inspection_id = ? AND inspection_type = 'Original'";
+            
+            objDBUtils.loadRecordsSQL(sql, [inspection_id], function(param, items) {
+                
+                if(!items) {
+                    var failed = 1;
+                    
+                    if($(".inspectionDetails .passed").hasClass('active')) {
+                        failed = 0;
+                    }
+                    
+                    /**** THERE IS SOMETHING VERY WRONG HERE - WHY ARE WE CREATING A REINSPECTION RECORD???  **********/
+                    
+                    var currentdate = new Date(); 
+                    var curdate = currentdate.getFullYear() + "-"
+                                    + (currentdate.getMonth()+1)  + "-" 
+                                    + currentdate.getDate();
+                    var primaryKey = objDBUtils.makeInsertKey(objApp.sync_prefix);
+                    var values = [primaryKey, inspection_id, curdate, failed, 'Original'];
+                    sql = "INSERT INTO reinspections(id, inspection_id, reinspection_date, failed, inspection_type) VALUES(?,?,?,?,?)";
+                    objDBUtils.execute(sql, values, function(){
+                        console.log("Insert reinspection success");
+                    });
+                    sql = "SELECT * FROM inspectionitems WHERE inspection_id = ?";
+                    objDBUtils.loadRecordsSQL(sql, [inspection_id], function(param, items)
+                    {
+                        if(!items)
+                        {
+                            return;
+                        }
+                        else
+                        {
+                            var maxLoop = items.rows.length;
+                            var r = 0;
+                            
+                            for(r = 0; r < maxLoop; r++)
+                            {
+                                values = [];
+                                var row = items.rows.item(r);
+                                sql = "INSERT INTO reinspectionitems(id,reinspection_id, inspectionitem_id, rectified) " +
+                                      "VALUES(?,?,?,?)";
+                                var primaryKey1 = objDBUtils.makeInsertKey(objApp.sync_prefix) + r;
+                                values = [primaryKey1, primaryKey, row.id, row.rectified];
+                                objDBUtils.execute(sql, values, function(){
+                                    console.log("Insert reinspectionitem success");
+                                });
+                            }    
+                        }
+                    },"");
+                }
+                
+            }, "");

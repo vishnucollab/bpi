@@ -120,7 +120,7 @@ var Login = function()
 		params["password"] = $("#pword_pf").val();
 		
 		
-		$.post(objApp.apiURL + "/account/retrieve_password", params, function(data)
+		$.post(objApp.apiURL + "account/retrieve_password", params, function(data)
 		{
 			
 			if(data.status != "OK")
@@ -155,7 +155,7 @@ var Login = function()
 					params["email"] = $("#username_fp").val();
 					params["password"] = $("#pword_pf").val();
 					
-					$.post(objApp.apiURL + "/account/change_password", params, function(data)
+					$.post(objApp.apiURL + "account/change_password", params, function(data)
 					{	
 						if(data.status != "OK")
 						{         
@@ -306,7 +306,7 @@ var Login = function()
 		// The form is valid.  Submit a login request.
 		blockElement("body");
 		
-		$.post(objApp.apiURL + "/account/do_login", params, function(data)
+		$.post(objApp.apiURL + "account/do_login", params, function(data)
 		{
 	
 			unblockElement("body");

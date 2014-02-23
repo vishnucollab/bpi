@@ -452,19 +452,20 @@
                         </tr>
                         </table>
                     </fieldset>
-		                <input type="hidden" id="inspection_start" name="inspection_start" value="" />
-		                <input type="hidden" id="created_by" name="created_by" value="" />
-		                <input type="hidden" id="finalised" name="finalised" value="0" />
-		                <input type="hidden" id="failed" name="failed" value="1" />
-		                <input type="hidden" id="initials" name="initials" value="" />
-                        <textarea id="notes" name="notes" class="hidden"></textarea>
-                    </form>
                     
-                    <div id="controlBtns">
-                    <a class="button left btnEditNotes" href="#">Coversheet Notes</a>
-                    <a id="btnCapturePhoto" data-reveal-id="photoWrapper" class="right" href="#"></a>
-                    <a id="btnStep1Next" class="button right rightmargin" href="#">Next &rsaquo;&rsaquo;</a>
-                    </div>
+		            <input type="hidden" id="inspection_start" name="inspection_start" value="" />
+		            <input type="hidden" id="created_by" name="created_by" value="" />
+		            <input type="hidden" id="finalised" name="finalised" value="0" />
+		            <input type="hidden" id="failed" name="failed" value="1" />
+		            <input type="hidden" id="initials" name="initials" value="" />
+                    <textarea id="notes" name="notes" class="hidden"></textarea>
+                </form>
+                
+                <div id="controlBtns">
+                <a class="button left btnEditNotes" href="#">Coversheet Notes</a>
+                <a id="btnCapturePhoto" data-reveal-id="photoWrapper" class="right" href="#"></a>
+                <a id="btnStep1Next" class="button right rightmargin" href="#">Next &rsaquo;&rsaquo;</a>
+                </div>
 		    </div> <!--! end of inspection details screen wrapper -->
             
             <!-- inspection step 2 screen -->
@@ -496,22 +497,21 @@
                                 </td>
                         	</tr>
                         </table>
-                    </fieldset>        
-                    <fieldset class="thefs">
-                        <label for="observation_suggestion" style="display: block;">Observation Suggestions</label>
-                        
-                        <!-- <select class="ignore" name="observation_suggestion" id="observation_suggestion" size="10">
-                        </select> -->
-						<div id="observationWrapper" style="height: 300px; overflow-y: auto;">
+                    </fieldset> 
+                           
+                    <fieldset id="observationFS" class="thefs">
+                        <legend>Observation Suggestions</legend>
+
+						<div id="observationWrapper" style="height: 350px; overflow-y: auto;">
 						    <table class="listing" id="observation_suggestion" style="table-layout: fixed; width: 405px;"></table>
 						</div>
                     </fieldset>        
                         
-		                <input type="hidden" id="inspection_id" name="inspection_id" value="" />
-		                <input type="hidden" id="created_by" name="created_by" value="" />
-		                <input type="hidden" id="seq_no" name="seq_no" value="" />
-		                <input type="hidden" id="hash" name="hash" value="" />
-		            </form>
+		            <input type="hidden" id="inspection_id" name="inspection_id" value="" />
+		            <input type="hidden" id="created_by" name="created_by" value="" />
+		            <input type="hidden" id="seq_no" name="seq_no" value="" />
+		            <input type="hidden" id="hash" name="hash" value="" />
+		        </form>
                 
                 <div id="controlBtns">
                     <a id="btnCapturePhoto" data-reveal-id="photoWrapper" class="right" href="#"></a>
@@ -536,18 +536,22 @@
 	                    </tr>
 	                </thead>
 	            </table>
+                
 	            <div id="defectScrollWrapper" class="scrollWrapper"></div>
+                
                 <div class="bottomBtns">   
-                    <div class="btnContainer left">
-                        <a href="#" id="passed" class="passed"></a>
+                
+                    <div class="btnContainer left hidden reinspectOnly">
+                        <a href="#" id="btnPassed" class="passed"></a>
                         <span>Passed</span>
                     </div>
-                    <div class="btnContainer left">
-                        <a href="#" id="failed" class="failed"></a>
+                    
+                    <div class="btnContainer left hidden reinspectOnly">
+                        <a href="#" id="btnFailed" class="failed"></a>
                         <span>Failed</span>
                     </div>
                     
-                    <div class="reportNotes hidden">
+                    <div class="reportNotes hidden reinspectOnly">
                         To finalise this report, please preview it and then if you're satisfied, tap the "Finished" icon. You will then be able to send the report.
                     </div>
                     
@@ -555,6 +559,7 @@
                         <a href="#" id="finished" class="finished"></a>
                         <span>Finished</span>
                     </div>
+                    
                     <div class="btnContainer left" id="btnPreviewWrapper">
                         <a href="#" id="preview" class="preview"></a>
                         <span>Preview</span>
@@ -586,83 +591,87 @@
                     <a id="btnDone" class="button right rightmargin close-reveal-modal" href="#">Done</a>
                     </div>
             </div>
+            
             <!-- inspection step 4 screen -->
 		    <div id="inspectionStep4" class="inspectionDetails hidden panel">
                 <form action="#" id="frmRateDetails" method="post">
-                <table id="tblRateListingHeader" class="listing">
-	                <thead>
-	                    <tr>
-                            <th class="category">Category</th>
-	                        <th class="rate">Rate out of 5</th>
-	                    </tr>
-	                </thead>
-	            </table>
-	            <div id="rateScrollWrapper" class="scrollWrapper">
-                <table id="tblRateListing" class="listing">
-                	<tr>
-                		<td>Brickwork</td>
-                		<td><select name="" id="brickwork">
-                			<option value="1" selected>1</option>
-                			<option value="2">2</option>
-                			<option value="3">3</option>
-                			<option value="4">4</option>
-                			<option value="5">5</option>
-                		</select></td>
-                	</tr>
-                	<tr>
-                		<td>Paint Quality</td>
-                		<td><select name="" id="paint_quality">
-                			<option value="1" selected>1</option>
-                			<option value="2">2</option>
-                			<option value="3">3</option>
-                			<option value="4">4</option>
-                			<option value="5">5</option>
-                		</select></td>
-                	</tr>
-                	<tr>
-                		<td>Plaster Quality</td>
-                		<td><select name="" id="plaster_quality">
-                			<option value="1" selected>1</option>
-                			<option value="2">2</option>
-                			<option value="3">3</option>
-                			<option value="4">4</option>
-                			<option value="5">5</option>
-                		</select></td>
-                	</tr>
-                	<tr>
-                		<td>Interior Quality</td>
-                		<td><select name="" id="interior_quality">
-                			<option value="1" selected>1</option>
-                			<option value="2">2</option>
-                			<option value="3">3</option>
-                			<option value="4">4</option>
-                			<option value="5">5</option>
-                		</select></td>
-                	</tr>
-                	<tr>
-                		<td>Exterior Quality</td>
-                		<td><select name="" id="exterior_quality">
-                			<option value="1" selected>1</option>
-                			<option value="2">2</option>
-                			<option value="3">3</option>
-                			<option value="4">4</option>
-                			<option value="5">5</option>
-                		</select></td>
-                	</tr>
-                	<tr>
-                		<td>TOTAL</td>
-                		<td id="total"></td>
-                	</tr>
-                </table>
-                </div>
+                    <table id="tblRateListingHeader" class="listing">
+	                    <thead>
+	                        <tr>
+                                <th class="category">Category</th>
+	                            <th class="rate">Rate out of 5</th>
+	                        </tr>
+	                    </thead>
+	                </table>
+	                
+                    <div id="rateScrollWrapper" class="scrollWrapper">
+                    
+                        <table id="tblRateListing" class="listing">
+                	        <tr>
+                		        <td>Brickwork</td>
+                		        <td><select name="" id="brickwork">
+                			        <option value="1" selected>1</option>
+                			        <option value="2">2</option>
+                			        <option value="3">3</option>
+                			        <option value="4">4</option>
+                			        <option value="5">5</option>
+                		        </select></td>
+                	        </tr>
+                	        <tr>
+                		        <td>Paint Quality</td>
+                		        <td><select name="" id="paint_quality">
+                			        <option value="1" selected>1</option>
+                			        <option value="2">2</option>
+                			        <option value="3">3</option>
+                			        <option value="4">4</option>
+                			        <option value="5">5</option>
+                		        </select></td>
+                	        </tr>
+                	        <tr>
+                		        <td>Plaster Quality</td>
+                		        <td><select name="" id="plaster_quality">
+                			        <option value="1" selected>1</option>
+                			        <option value="2">2</option>
+                			        <option value="3">3</option>
+                			        <option value="4">4</option>
+                			        <option value="5">5</option>
+                		        </select></td>
+                	        </tr>
+                	        <tr>
+                		        <td>Interior Quality</td>
+                		        <td><select name="" id="interior_quality">
+                			        <option value="1" selected>1</option>
+                			        <option value="2">2</option>
+                			        <option value="3">3</option>
+                			        <option value="4">4</option>
+                			        <option value="5">5</option>
+                		        </select></td>
+                	        </tr>
+                	        <tr>
+                		        <td>Exterior Quality</td>
+                		        <td><select name="" id="exterior_quality">
+                			        <option value="1" selected>1</option>
+                			        <option value="2">2</option>
+                			        <option value="3">3</option>
+                			        <option value="4">4</option>
+                			        <option value="5">5</option>
+                		        </select></td>
+                	        </tr>
+                	        <tr>
+                		        <td>TOTAL</td>
+                		        <td id="total"></td>
+                	        </tr>
+                        </table>
+                    </div>
                 </form>
-                <div class="bottomBtns">
                 
+                <div class="bottomBtns">
                     <div class="btnContainer left">
                         <a id="btnStep4Back" class="button left leftmargin gotoStep3" href="#">&lsaquo;&lsaquo; Back</a>
                     </div>
+                    
                     <div class="reportNotes">
-                    To finalise this report, please preview it and then if you're satisfied, tap the "Finished" icon. You will then be able to send the report.
+                        To finalise this report, please preview it and then if you're satisfied, tap the "Finished" icon. You will then be able to send the report.
                     </div>
                     
                     <div class="btnContainer left">
@@ -673,6 +682,7 @@
                         <a href="#" id="preview" class="preview"></a>
                         <span>Preview</span>
                     </div>
+                    
                     <div class="btnContainer right">
                         <!-- <a id="btnStep3Email" class="button right rightmargin" href="#">Email</a> -->
                         <a id="btnStep4Next" class="button right rightmargin" href="#">Done</a>
@@ -685,14 +695,6 @@
 			<!-- inspection listing screen -->
 		    <div id="inspectionList" class="hidden panel">
             <div class="bottomBtns">
-                <!-- <div class="btnContainer left">
-                        <a href="#" id="passed" class="status-passed"></a>
-                        <span>Passed</span>
-                </div>
-                <div class="btnContainer left">
-                        <a href="#" id="failed" class="status-failed"></a>
-                        <span>Failed</span>
-                </div> -->
                 <select name="" id="builder_id">
                 	<option value="">Choose</option>
                 </select>
@@ -721,55 +723,49 @@
             
             <!--reinspection screen -->
             <div id="reinspection" class="inspectionDetails hidden panel">
-                <form action="#" id="frmReinspection">
-                <table id="tblReinspectionHeader" class="listing">
-                    <thead>
-			            <tr>
-			                <th class="tagID">Tag Id</th>
-	                        <th class="location">Location</th>
-	                        <th class="observation">Observation</th>
-	                        <th class="action">Action</th>
-			                <th class="rectified">Rectified</th>
-			            </tr>
-			        </thead>
-                </table>
-                <div id="reinspectionScrollWrapper" class="scrollWrapper"></div>
-                <div class="infomation">
-                    <div style="float: left; width: 70%; overflow-y: auto; height: 60px;">
-                    <p></p>
+                <form action="#" id="frmReinspection" name="frmReinspection">
+                    <table id="tblReinspectionHeader" class="listing">
+                        <thead>
+			                <tr>
+			                    <th class="tagID">Tag Id</th>
+	                            <th class="location">Location</th>
+	                            <th class="observation">Observation</th>
+	                            <th class="action">Action</th>
+			                    <th class="rectified">Rectified</th>
+			                </tr>
+			            </thead>
+                    </table>
+                    <div id="reinspectionScrollWrapper" class="scrollWrapper"></div>
+                    <div class="infomation">
+                        <div style="float: left; width: 70%; overflow-y: auto; height: 60px;">
+                        <p></p>
+                        </div>
+                        <select name="rectified" id="rectified" style="display: none">
+                            <option value="Not Rectified">Not Rectified</option>
+                            <option value="Rectified">Rectified</option>
+                            <option value="Improvement Made">Improvement Made</option>
+                            <option value="On Order">On Order</option>
+                            <option value="Approved By CM">Approved By CM</option>
+                        </select>
+                        <input type="hidden" name="inspectionitem_id" value="" class="ignore"/>
+                        <input type="hidden" name="reinspection_id" value="" class="ignore"/>
                     </div>
-                    <select name="rectified" id="rectified" style="display: none">
-                        <option value="Not Rectified">Not Rectified</option>
-                        <option value="Rectified">Rectified</option>
-                        <option value="Improvement Made">Improvement Made</option>
-                        <option value="On Order">On Order</option>
-                        <option value="Approved By CM">Approved By CM</option>
-                    </select>
-                    <input type="hidden" id="inspectionitem_id" value="" class="ignore"/>
-                    <input type="hidden" id="reinspection_id" value="" class="ignore"/>
-                </div>
-                <input type="hidden" id="failed" value="" class="ignore" />
-                <input type="hidden" id="finalised" value="0" class="ignore" />
+                    <input type="hidden" name="failed" value="" class="ignore" />
+                    <input type="hidden" name="finalised" value="0" class="ignore" />
                 </form>
+                
                 <div style="clear: both;"></div>
+                
                 <div class="bottomBtns">
                     <div class="btnContainer left">
-                        <a href="#" id="passed" class="passed"></a>
+                        <a href="#" class="passed"></a>
                         <span>Passed</span>
                     </div>
                     <div class="btnContainer left">
-                        <a href="#" id="failed" class="failed"></a>
+                        <a href="#" class="failed"></a>
                         <span>Failed</span>
                     </div>
-                    
-                    <!-- <div class="reportNotes">
-                    To finalise this report, please preview it and then if you're satisfied, tap the "Finished" icon. You will then be able to send the report.
-                    </div>
-                    
-                    <div class="btnContainer left">
-                        <a href="#" id="finished" class="finished"></a>
-                        <span>Finished</span>
-                    </div> -->
+
                     <div class="btnContainer left">
                         <a href="#" id="preview" class="preview"></a>
                         <span>Preview</span>
@@ -782,7 +778,7 @@
                 <div style="clear: both;"></div>
             </div>
             
-			<!-- client listing screen -->
+			<!-- Builder listing screen -->
 		    <div id="buildersList" class="hidden panel">                
 		        <a id="btnAddBuilder" class="button right rightmargin" href="#">Add New Builder</a>
 			    <table id="tblBuilderListingHeader" class="listing">
@@ -799,9 +795,9 @@
 			    <div id="builderScrollWrapper" class="scrollWrapper">
 
 			    </div>
-		    </div> <!--! end of client listing -->
+		    </div> <!--! end of builder listing -->
 
-			<!-- client detail screen -->
+			<!-- Buidler detail screen -->
 		    <div id="builderDetails" class="hidden panel twocolumn">
 					<form id="frmBuilderDetails" action="#" method="post">
                     <fieldset class="thefs">
@@ -839,393 +835,8 @@
                         <a id="btnSaveBuilder" class="button right" href="#">Save</a>
 		                <input type="hidden" id="created_by" name="created_by" value="" />
 		            </form>
-		        
 
-		    </div> <!--! end of client detail screen -->
-
-			<!-- site listing screen -->
-		    <div id="siteList" class="hidden panel">
-
-		        <a id="btnAddSite" class="button right rightmargin" href="#">Add Site</a>
-			    <table id="tblSiteListingHeader" class="listing">
-			        <thead>
-			            <tr>
-			                <th class="c.name">Client Name</th>
-			                <th class="s.address1">Location</th>
-			                <th class="s.lastinspectiondate">Last Inspection</th>
-			            </tr>
-			        </thead>
-			    </table>
-
-			    <div id="siteScrollWrapper" class="scrollWrapper">
-
-			    </div>
-		    </div> <!--! end of site listing -->
-
-			<!-- site detail screen -->
-		    <div id="siteDetails" class="hidden panel twocolumn">
-		        <section>
-					<form id="frmSiteDetails" action="#" method="post">
-						<a id="btnSaveSite" class="button right" href="#">Save</a>
-
-				        <fieldset>
-				            <table class="plain">
-				                <tr>
-				                    <td>
-				                        <label for="client_id">Client</label>
-				                    </td>
-				                    <td>
-										<ul class="selector" id="client_id" title="Select a Client">
-											<li title="">Choose</li>
-										</ul>
-				                    </td>
-				                    <td>
-				                        <label for="phone">Phone</label>
-				                    </td>
-				                    <td>       
-		                            	<input type="text" name="phone" id="phone" value="" class="" tabindex="10" />
-				                    </td>
-				                </tr>
-				                <tr>
-				                    <td>
-				                        <label for="contact">Contact Name</label>
-				                    </td>
-				                    <td>
-				                        <input type="text" name="contact" id="contact" value="" class="" tabindex="3" />
-				                    </td>
-				                    <td>
-				                        <label for="fax">Fax</label>
-				                    </td>
-				                    <td>
-		                            	<input type="text" name="fax" id="fax" value="" class="" tabindex="11" />
-				                    </td>
-				                </tr>
-				                <tr>
-				                    <td>
-				                        <label for="address1">Address 1</label>
-				                    </td>
-				                    <td>
-				                        <input type="text" name="address1" id="address1" value="" class="required" tabindex="4" />
-				                    </td>
-				                    <td>
-				                        <label for="mobile">Mobile</label>
-				                    </td>
-				                    <td>
-		                            	<input type="text" name="mobile" id="mobile" value="" class="" tabindex="12" />
-				                    </td>
-				                </tr>
-				                <tr>
-				                    <td>
-				                        <label for="address2">Address 2</label>
-				                    </td>
-				                    <td>
-				                        <input type="text" name="address2" id="address2" value="" class="" tabindex="5" />
-				                    </td>
-				                    <td>
-				                        <label for="email">Email</label>
-				                    </td>
-				                    <td>
-		                            	<input type="text" name="email" id="email" value="" class="email" tabindex="13" />
-				                    </td>
-				                </tr>
-	                        	<tr>
- 				                    <td>
-				                        <label for="city">Suburb</label>
-				                    </td>
-				                    <td>
-				                        <input type="text" name="city" id="city" value="" class="" tabindex="6" />
-				                    </td>
-				                    <td>
-				                        <label for="state">State</label>
-				                    </td>
-				                    <td>
-										<ul class="selector" id="state" title="Select a State">
-											<li title="">Choose</li>
-											<li title="VIC">VIC</li>
-											<li title="NSW">NSW</li>
-											<li title="ACT">ACT</li>
-											<li title="QLD">QLD</li>
-											<li title="NT">NT</li>
-											<li title="WA">WA</li>
-											<li title="SA">SA</li>
-											<li title="TAS">TAS</li>
-										</ul>
-				                    </td>
-				                </tr>
-	                        	<tr>
-				                    <td>
-				                        <label for="postcode">Postcode</label>
-				                    </td>
-				                    <td>
-				                        <input type="text" name="postcode" id="postcode" value="" class="" maxlength="4" minlength="4" tabindex="7" />
-				                    </td>
- 				                    <td>
-				                        <label for="country">Country</label>
-				                    </td>
-				                    <td>
-										<ul class="selector" id="country" title="Select a Country">
-											<li title="">Choose</li>
-											<li title="Australia">Australia</li>
-										</ul>
-				                    </td>
-				                </tr>
-				                
-	                        	<tr>
-				                    <td>
-				                        <label for="external_contact">Ext. Contact</label>
-				                    </td>
-				                    <td>
-				                        <input type="text" name="external_contact" id="external_contact" value="" class="" />
-				                    </td>
-				                    <td>
-				                        <label for="external_email">Ext. Email</label>
-				                    </td>
-				                    <td>
-				                        <input type="text" name="external_email" id="external_email" value="" class="email" />
-				                    </td>
-				                </tr>
-                                
-                                <tr>
-                                    <td>
-                                        <label for="contact_id1">Contact 1</label>
-                                    </td>
-                                    <td>
-                                        <ul class="selector" id="contact_id1" title="Select a Contact">
-                                            <li title="">Choose</li>
-                                        </ul>
-                                    </td>
-                                     <td>
-                                        <label for="contractor">Contact 2</label>
-                                    </td>
-                                    <td>
-                                        <ul class="selector" id="contact_id2" title="Select a Contact">
-                                            <li title="">Choose</li>
-                                        </ul>
-                                    </td>
-                                </tr>                                				                
-				                
-				            </table>
-				        </fieldset>
-
-		                <input type="hidden" id="created_by" name="created_by" value="" />
-		            </form>
-		        </section>
-                
-                <aside>
-                    <div id="actions" class="topspace hidden">
-                        <h2>Actions</h2>
-                        <ul>
-                            <li><a href="#" id="btnCreateInspection" class="button">+ Inspection</a></li>
-                            <li><a href="#" id="btnDeleteSite" class="button alert">Delete</a></li>
-                        </ul>
-                    </div>                
-                
-                </aside>
-		    </div> <!--! end of site detail screen -->
-            
-            <!-- contact listing screen -->
-            <div id="contactList" class="hidden panel">                
-                <a id="btnAddContact" class="button right rightmargin" href="#">Add Contact</a>
-                <table id="tblContactListingHeader" class="listing">
-                    <thead>
-                        <tr>
-                            <th class="c.company_name">Company Name</th>
-                            <th class="c.first_name">First Name</th>
-                            <th class="c.last_name">Last Name</th>
-                        </tr>
-                    </thead>
-                </table>
-
-                <div id="contactScrollWrapper" class="scrollWrapper">
-
-                </div>
-            </div> <!--! end of contact listing -->    
-            
-            <!-- contact detail screen -->
-            <div id="contactDetails" class="hidden panel twocolumn">
-                <section>
-                    <form id="frmContactDetails" action="#" method="post">
-                        <a id="btnSaveContact" class="button right" href="#">Save</a>
-
-                        <fieldset>
-                            <table class="plain">
-                                <tr>
-                                    <td>
-                                        <label for="company_name">Company Name</label>
-                                    </td>
-                                    <td>
-                                        <input type="text" name="company_name" id="company_name" value="" class="required" tabindex="1" />
-                                    </td>
-                                    <td>
-                                        <label for="phone">Phone</label>
-                                    </td>
-                                    <td>
-                                        <input type="text" name="phone" id="phone" value="" class="" tabindex="11" />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <label for="first_name">First Name</label>
-                                    </td>
-                                    <td>
-                                        <input type="text" name="first_name" id="first_name" value="" class="required" tabindex="2" />
-                                    </td>
-                                    <td>
-                                        <label for="mobile">Mobile</label>
-                                    </td>
-                                    <td>
-                                        <input type="text" name="mobile" id="mobile" value="" class="" tabindex="12" />
-                                    </td>
-                                </tr>  
-                                <tr>
-                                    <td>
-                                        <label for="last_name">Last Name</label>
-                                    </td>
-                                    <td>
-                                        <input type="text" name="last_name" id="last_name" value="" class="required" tabindex="3" />
-                                    </td>
-                                    <td>
-                                        <label for="fax">Fax</label>
-                                    </td>
-                                    <td>
-                                        <input type="text" name="fax" id="fax" value="" class="" tabindex="13" />
-                                    </td>
-                                </tr>  
-                                <tr>
-                                    <td>
-                                        <label for="address1">Address 1</label>
-                                    </td>
-                                    <td>
-                                        <input type="text" name="address1" id="address1" value="" tabindex="4" />
-                                    </td>
-                                    <td>
-                                        <label for="email">Email</label>
-                                    </td>
-                                    <td>
-                                        <input type="text" name="email" id="email" value="" class="" tabindex="14" />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <label for="address2">Address 2</label>
-                                    </td>
-                                    <td>
-                                        <input type="text" name="address2" id="address2" value="" class="" tabindex="5" />
-                                    </td>
-                                    <td>
-                                        <label for="state">State</label>
-                                    </td>
-                                    <td>
-                                        <ul class="selector" id="state" title="Select a State">
-                                            <li title="">Choose</li>
-                                            <li title="VIC">VIC</li>
-                                            <li title="NSW">NSW</li>
-                                            <li title="ACT">ACT</li>
-                                            <li title="QLD">QLD</li>
-                                            <li title="NT">NT</li>
-                                            <li title="WA">WA</li>
-                                            <li title="SA">SA</li>
-                                            <li title="TAS">TAS</li>
-                                        </ul>
-                                    </td>
-                                </tr>
-                                <tr>
-                                     <td>
-                                        <label for="city">Suburb</label>
-                                    </td>
-                                    <td>
-                                        <input type="text" name="city" id="city" value="" class="" tabindex="6" />
-                                    </td>
-                                    <td>
-                                        <label for="country">Country</label>
-                                    </td>
-                                    <td>
-                                        <ul class="selector" id="country" title="Select a Country">
-                                            <li title="">Choose</li>
-                                            <li title="Australia">Australia</li>
-                                        </ul>
-                                    </td>                                    
-                                </tr>
-                                <tr>
-                                    <td style="vertical-align: top;">
-                                        <label for="postcode">Postcode</label>
-                                    </td>
-                                    <td style="vertical-align: top;">
-                                        <input type="text" name="postcode" id="postcode" value="" class="" maxlength="4" minlength="4" tabindex="7" />
-                                    </td>
-                                    <td>&nbsp;
-                                        
-                                    </td>
-                                    <td>
-                                        <input type="hidden" name="favourite" id="favourite" value="" class="ignore" />
-                                        <div id="favourite_toggle" class="left"></div>                                          
-                                    </td>
-                                </tr>                             
-                                
-                            </table>
-                        </fieldset>
-
-                        <input type="hidden" id="created_by" name="created_by" value="" />
-                    </form>
-                </section>
-                
-                <aside>
-                    <div id="actions" class="topspace hidden">
-                        <h2>Actions</h2>
-                        <ul>
-                            <li><a href="#" id="btnDeleteContact" class="button alert">Delete</a></li>
-                        </ul>
-                    </div>                
-                </aside>
-            </div> <!--! end of contact detail screen -->            
-                    
-            
-            <!-- my account screen -->
-            <div id="myAccount" class="hidden panel">
-                <section>
-                    <h2>Choose a Credit Pack to top up your account</h2>
-                    
-                    <div id="packageScrollWrapper" class="scrollWrapper">
-
-                    </div>
-                </section>
-                
-                <aside>
-                    <p><strong>Current credit balance:</strong> <span id="currentBalance"></span></p>
-                </aside>                
-                
-            </div> <!--! end of my account screen -->            
-
-            <!-- maintenance screen -->
-            <div id="maintenance" class="hidden panel">
-                <section>
-                    <table>
-                        <tr>
-                            <td>
-                            <label for="select_period">Delete photos older than</label>
-                            <select class="selector" name="select_period" id="select_period">
-                                <option value="30">30 days</option>
-                                <option value="90">90 days</option>
-                                <option value="-1">Choose date</option>                                                                
-                            </select>
-                            <div style="margin-bottom: 20px;"></div>
-                            </td> 
-                        </tr>
-                        <tr>
-                            <td>
-                            <input type="text" name="select_date" id="select_date" value=""/>
-                            </td>
-                        </tr>    
-                        <tr>
-                            <td><input id="delete_photo" type="submit" class="submit" value="Delete Photos" /></td>
-                        </tr>
-                    </table>
-                    
-                    
-                </section>              
-                
-            </div> <!--! end of maintenance screen -->      
-
+		    </div> <!--! end of builder detail screen -->
 
     	</div><!-- end content div -->
         

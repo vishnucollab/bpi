@@ -1256,6 +1256,16 @@ ul.historygallery{
     width: 560px;
 }
 
+#observationFS {
+    margin-top: 10px;
+}
+
+    #observationFS legend {
+        font-weight: bold;
+        margin: 0;
+        padding: 0;
+    }
+
 /* Reinspection */
 #reinspection {
     padding: 20px;
