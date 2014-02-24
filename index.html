@@ -550,11 +550,7 @@
                         <a href="#" id="btnFailed" class="failed"></a>
                         <span>Failed</span>
                     </div>
-                    
-                    <div class="reportNotes hidden reinspectOnly">
-                        To finalise this report, please preview it and then if you're satisfied, tap the "Finished" icon. You will then be able to send the report.
-                    </div>
-                    
+
                     <div class="btnContainer left" id="btnFinishedWrapper">
                         <a href="#" id="finished" class="finished"></a>
                         <span>Finished</span>
@@ -584,7 +580,7 @@
             
             <div id="photoWrapper" class="reveal-modal inspectionDetails">
                     <div style="background-color: #eee; border-radius: 5px 5px 0 0; height: 30px; font-weight: bold; padding-left: 5px;">Inspection photos</div>
-                    <div id="addPhoto-wrapper"><a href="#" id="addPhoto-btn">Add a photo</a></div>
+                    <div id="addPhoto-wrapper"><a href="#" id="addPhoto-btn">Take photo</a></div>
                     <div id="photoList"></div>
                     <a class="close-reveal-modal" style="font-size: 40px; color: red;">&#215;</a>
                     <div id="controlBtns">
@@ -609,7 +605,7 @@
                         <table id="tblRateListing" class="listing">
                 	        <tr>
                 		        <td>Brickwork</td>
-                		        <td><select name="" id="brickwork">
+                		        <td><select name="" id="brickwork" class="ratingSelect">
                 			        <option value="1" selected>1</option>
                 			        <option value="2">2</option>
                 			        <option value="3">3</option>
@@ -619,7 +615,7 @@
                 	        </tr>
                 	        <tr>
                 		        <td>Paint Quality</td>
-                		        <td><select name="" id="paint_quality">
+                		        <td><select name="" id="paint_quality" class="ratingSelect">
                 			        <option value="1" selected>1</option>
                 			        <option value="2">2</option>
                 			        <option value="3">3</option>
@@ -629,7 +625,7 @@
                 	        </tr>
                 	        <tr>
                 		        <td>Plaster Quality</td>
-                		        <td><select name="" id="plaster_quality">
+                		        <td><select name="" id="plaster_quality" class="ratingSelect">
                 			        <option value="1" selected>1</option>
                 			        <option value="2">2</option>
                 			        <option value="3">3</option>
@@ -639,7 +635,7 @@
                 	        </tr>
                 	        <tr>
                 		        <td>Interior Quality</td>
-                		        <td><select name="" id="interior_quality">
+                		        <td><select name="" id="interior_quality" class="ratingSelect">
                 			        <option value="1" selected>1</option>
                 			        <option value="2">2</option>
                 			        <option value="3">3</option>
@@ -649,7 +645,7 @@
                 	        </tr>
                 	        <tr>
                 		        <td>Exterior Quality</td>
-                		        <td><select name="" id="exterior_quality">
+                		        <td><select name="" id="exterior_quality" class="ratingSelect">
                 			        <option value="1" selected>1</option>
                 			        <option value="2">2</option>
                 			        <option value="3">3</option>
@@ -667,11 +663,7 @@
                 
                 <div class="bottomBtns">
                     <div class="btnContainer left">
-                        <a id="btnStep4Back" class="button left leftmargin gotoStep3" href="#">&lsaquo;&lsaquo; Back</a>
-                    </div>
-                    
-                    <div class="reportNotes">
-                        To finalise this report, please preview it and then if you're satisfied, tap the "Finished" icon. You will then be able to send the report.
+                        <a id="btnStep4Back" class="button left gotoStep3" href="#">&lsaquo;&lsaquo;&nbsp;Back</a>
                     </div>
                     
                     <div class="btnContainer left">
@@ -685,7 +677,7 @@
                     
                     <div class="btnContainer right">
                         <!-- <a id="btnStep3Email" class="button right rightmargin" href="#">Email</a> -->
-                        <a id="btnStep4Next" class="button right rightmargin" href="#">Done</a>
+                        <a id="btnStep4Next" class="button right rightmargin" href="#">Exit</a>
                     </div>
                 </div>
                 
@@ -694,11 +686,12 @@
 
 			<!-- inspection listing screen -->
 		    <div id="inspectionList" class="hidden panel">
-            <div class="bottomBtns">
-                <select name="" id="builder_id">
-                	<option value="">Choose</option>
-                </select>
-            </div>
+                <div class="bottomBtns bottomPadding">
+                    Builder: 
+                    <select name="builder_id" id="il_builder_id">
+                	    <option value="">Choose</option>
+                    </select>
+                </div>
                 
 			    <table id="tblInspectionListingHeader" class="listing">
 			        <thead>
@@ -708,8 +701,8 @@
 			                <th class="i.address">Address</th>
 			                <th class="b.name">Builder</th>
 			                <th class="i.report_type">Report Type</th>
-                            <th class="i.failed">Status</th>
-                            <th class="i.inspection_start">Action</th>
+                            <th>Reinspections</th>
+                            <th>Action</th>
 			            </tr>
 			        </thead>
 			    </table>
@@ -747,8 +740,6 @@
                             <option value="On Order">On Order</option>
                             <option value="Approved By CM">Approved By CM</option>
                         </select>
-                        <input type="hidden" name="inspectionitem_id" value="" class="ignore"/>
-                        <input type="hidden" name="reinspection_id" value="" class="ignore"/>
                     </div>
                     <input type="hidden" name="failed" value="" class="ignore" />
                     <input type="hidden" name="finalised" value="0" class="ignore" />
@@ -757,11 +748,11 @@
                 <div style="clear: both;"></div>
                 
                 <div class="bottomBtns">
-                    <div class="btnContainer left">
+                    <div id="reinspectionPassed" class="btnContainer left">
                         <a href="#" class="passed"></a>
                         <span>Passed</span>
                     </div>
-                    <div class="btnContainer left">
+                    <div id="reinspectionFailed" class="btnContainer left">
                         <a href="#" class="failed"></a>
                         <span>Failed</span>
                     </div>
@@ -849,16 +840,8 @@
                 <li><a id="navNewInspection" href="#">New Inspection</a></li>
  
                 <li><a id="navInspections" href="#">Inspections</a></li>
-                <!--<li><a id="navReinspect" href="#">Reinspect</a></li>-->
                 <li><a id="navBuilders" href="#">Builders</a></li>
                 <li><a id="navSync" class="active" href="#">Sync</a></li>
- <!--               <li><a id="navSites" href="#">Sites</a></li>
- 				<li><a id="navClients" href="#">Clients</a></li>
- 				<li><a id="navClients" href="#">Clients</a></li>
-                <li><a id="navContacts" href="#">Contacts</a></li>
-                <li><a id="navMyAccount" href="#">My Account</a></li>
-                <li><a id="navSync" class="active" href="#">Sync</a></li>
-                <li><a id="navMaintenance" href="#">Maintenance</a></li>-->
                 <li><a id="navLogout" href="#">Logout</a></li>
             </ul>
         </footer><!-- end global footer -->

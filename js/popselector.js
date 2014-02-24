@@ -512,10 +512,16 @@ var popselector = function(selector, heading)
 			// We've found a matching node.
 			// Get the text value of it.
 			var text = node.text();
+            
+            // Get the first element in the list
+            var first_element = $(this.selector + ' li:eq(0)');
 			
 			// Set the id and text of first option in the source selector so it's preselected.
-			$(this.selector + ' li:eq(0)').attr("title", value);
-			$(this.selector + ' li:eq(0)').text(text);
+			$(first_element).attr("title", value);
+			$(first_element).text(text);
+            
+            // Set to display block so the first element is showing.
+            $(first_element).css("display", "block");
 		}
 	}
 	

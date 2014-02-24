@@ -381,7 +381,23 @@ function DBUtils()
 								                              
 			}, self.DB_error_handler);          
 		});		
-	}		
+	}
+    
+    this.executeWithCBParam = function(sql, valueArray, callbackMethod, callbackParam)
+    {
+        this.db.transaction(function(transaction) 
+        { 
+            transaction.executeSql(sql, valueArray, function (transaction, result) 
+            {            
+                // Execute the callback method if there is one.
+                if(callbackMethod != null)
+                {
+                    callbackMethod(callbackParam);    
+                }
+                                                              
+            }, self.DB_error_handler);          
+        });        
+    }    		
 	
 	/***
 	* @desc loadSelect loads a recordset from a nominated database table
@@ -1107,7 +1123,7 @@ function DBUtils()
 				"'inspection_id' VARCHAR NOT NULL, " +
 				"'reinspection_date' DATE NOT NULL, " +
 				"'failed' INTEGER NOT NULL DEFAULT 0, " +
-                "'inspection_type' VARCHAR NOT NULL DEFAULT 'Original', " +
+                "'most_recent' INTEGER NOT NULL DEFAULT 0, " +
 				"'created_by' INTEGER NOT NULL DEFAULT 48, " + 
 				"'deleted' INTEGER NOT NULL DEFAULT 0, " + 
 				"'dirty' INTEGER NOT NULL DEFAULT 1)";
@@ -1123,6 +1139,14 @@ function DBUtils()
 				// Dirty index 
 				sql = "CREATE INDEX IF NOT EXISTS " + table_name + "_dirty ON " + table_name + " (dirty);";
 				self.execute(sql, null, null);
+                
+                // Inspection id index 
+                sql = "CREATE INDEX IF NOT EXISTS " + table_name + "_inspectionid ON " + table_name + " (inspection_id, deleted);";
+                self.execute(sql, null, null);  
+                
+                // Most Recent index 
+                sql = "CREATE INDEX IF NOT EXISTS " + table_name + "_mostrecent ON " + table_name + " (inspection_id, deleted, most_recent);";
+                self.execute(sql, null, null);                                
 				
 				// INSERT THE REGISTRY ENTRY
 				sql = "INSERT INTO app_tables (table_name, version) VALUES(?, ?);";

@@ -286,7 +286,7 @@ form.search
 /***********************************************************/
 #defectScrollWrapper
 {
-	height: 260px;
+	height: 210px;
 }
 /* 
 #tblDefectListingHeader
@@ -344,6 +344,15 @@ table td.delete
 	background-position: 0px 10px !important;
 	cursor: pointer !important
 }
+
+table td.nodelete
+{
+    width: 30px;
+    border: none !important;
+    cursor: default;
+    background-color: #FFFFFF !important;
+}
+
 #tblBuilderListingHeader th.delete, #tblBuilderListing td.delete
 {
     width: 30px !important;

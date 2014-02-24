@@ -847,6 +847,7 @@ aside textarea
 }
 #inspectionList .bottomBtns {
     padding-left: 40px;
+    padding-bottom: 20px;
 }
 #inspectionList #tblInspectionListing div.i-passed {
     width: 120px;
@@ -879,28 +880,33 @@ aside textarea
 }
 #inspectionList div.action {
     position: relative;
-    width: 100px;
+    width: 200px;
     height: 48px;
     line-height: 48px;
 }
-#inspectionList div.action>a.action, #inspectionList #historyReinspection a.action {
-    width: 100px;
+#inspectionList div.action > a.action, #inspectionList #historyReinspection a.action {
+    width: 80px;
     height: 48px;
     color: white;
+    display: block;
+    float: left;
     text-decoration: none;
-    position: absolute;
     border-radius: 10px;
     vertical-align: middle;
     text-align: center;
+    margin-right: 10px;
 }
+
 #historyReinspection td, #historyReinspection th {
     vertical-align: middle;
     text-align: center;
 }
-#inspectionList .action.failed{
+
+#inspectionList .action.reinspect {
     background: green;
 }
-#inspectionList .action.passed{
+
+#inspectionList .action.view{
     background: blue;
 }
 #inspectionList .bottomBtns a{
@@ -1051,23 +1057,23 @@ aside textarea
     margin-top: 20px;
 }
 #photoWrapper #addPhoto-wrapper>a#addPhoto-btn{
-    background: url("../images/camera.png") top left no-repeat;
+    background: url("../images/camera-75.png") top left no-repeat;
     right: 0px;
     width: 140px;
-    padding-left: 60px;
+    padding-left: 80px;
     position: absolute;
-    height: 100px;
+    height: 75px;
     text-decoration: none;
     color: black;
     font-weight: bold;
     font-size: 14pt;
 }
 .inspectionDetails a#btnCapturePhoto {
-    background: url("../images/camera.png") left top no-repeat;    
+    background: url("../images/camera-75.png") left top no-repeat;    
     right: 150px;
-    bottom: 10px;
-    height: 100px;
-    width: 100px;
+    bottom: -10px;
+    height: 75px;
+    width: 75px;
     position: absolute;
 }
 
@@ -1108,8 +1114,8 @@ aside textarea
 }
 
 .inspectionDetails #defectScrollWrapper{
-    margin-bottom: 15px;
     height: 247px;
+    overflow-x: hidden;
 }
 
 .inspectionDetails ul.gallery{

@@ -329,6 +329,7 @@ function App()
 		mainHeight = screenHeight - (navTopHeight + navFooterHeight);
         $(".panel").css("height", (mainHeight - 60) + "px");
         $(".scrollWrapper").css("height", (mainHeight - 200) + "px");
+        $("#defectScrollWrapper").css("height", (mainHeight - 340) + "px");
         $("#inspectionStep3 .scrollWrapper").css("height", (mainHeight - 280) + "px");
         $("#reinspectionScrollWrapper").css("height", (mainHeight - 326) + "px");
         
@@ -854,36 +855,16 @@ function App()
         
         return orientation; 
     }
+    
+    // Determines if a value is empty or not.
+    this.empty = function(v) {
+        if ((v == undefined) || (v == "") || (v == null)) {
+            return true;
+        }
+        
+        return false;
+    }
 };
-
-/**********************************************************
-SECTION: ABOUT
-***********************************************************/
-
-
-/***
-* Setup the about screen
-*/
-function setupAbout()
-{
-	objApp.context = "about";
-	objApp.showBackButton(true);
-	
-	// Set the top heading
-	$("#navTop h1").text("Billbot");	
-	
-	// Add the BillBot background image
-	$("#main").addClass("mainMenuBg");
-	
-	// Grab the mainMenu template and append it to the main canvas
-	$("#main").append($("#templates .aboutWrapper").html());
-	
-	$("#main #version").html(objApp.version + " " + objApp.versionStatus);
-	
-	// Resize the main menu width
-	//$(".about").css("width", (screen.width - 130) + "px");
-}
-
 
 /**********************************************************
 SECTION: MISC FUNCTIONS
@@ -947,3 +928,12 @@ function initTabs(selector)
 		$("#" + selector + " div.tab:eq(" + selectedTabIndex + ")").css("display", "block");		
 	});
 }
+
+$.assocArraySize = function(obj) {
+    // http://stackoverflow.com/a/6700/11236
+    var size = 0, key;
+    for (key in obj) {
+        if (obj.hasOwnProperty(key)) size++;
+    }
+    return size;
+};
