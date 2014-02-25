@@ -6,6 +6,7 @@
  * http://www.opensource.org/licenses/mit-license.php
 */
 
+var revealWindow = false;
 
 (function($) {
 
@@ -23,13 +24,23 @@
 
     $(document).on(eventType, '[data-reveal-id]', function (e) { 
         e.preventDefault();
+        
         var modalLocation = $(this).attr('data-reveal-id');
         $('#'+modalLocation).reveal($(this).data());
+        revealWindow = $('#'+modalLocation);
     });
 
 /*---------------------------
  Extend and Execute
 ----------------------------*/
+
+    $.fn.hideModal = function(options) {
+        var self        = this,
+        modal = $(self),
+        topMeasure  = parseInt(modal.css('top'));
+        $('.reveal-modal-bg').css({'display' : 'none'});      
+        modal.css({'visibility' : 'hidden', 'top' : topMeasure});
+    } 
 
     $.fn.reveal = function(options) {
         

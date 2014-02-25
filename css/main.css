@@ -783,9 +783,13 @@ aside textarea
     padding: 2px 5px;
 }
     
-#btnAddDefect, a.btnEditNotes, #btnStep3Email {
+#btnAddDefect, a.btnEditNotes, #btnStep3Email, #btnReportPhotos, #btnStep4Email {
     margin-left: 10px;
     top: 20px;
+}
+
+#btnStep4Back {
+    top: 10px;    
 }
 
 #btnStep3AddAnotherIssue{
@@ -895,6 +899,12 @@ aside textarea
     vertical-align: middle;
     text-align: center;
     margin-right: 10px;
+}
+
+#historyReinspection h2 {
+    color: #333333;
+    font-size: 14pt;
+    padding: 10px;
 }
 
 #historyReinspection td, #historyReinspection th {
@@ -1709,7 +1719,7 @@ table td {border-bottom: 0; border-top: 0}
 #btnAddBuilder {float: left; margin-left: 50px; padding: 10px 15px}
 
 #builderDetails label {float: none; display: block; padding: 0}
-#builderDetails fieldset {min-width: 300px !important; height: 300px; margin-right: 30px; border: 1px solid #222;}
+#builderDetails fieldset {min-width: 300px !important; height: 350px; margin-right: 30px; border: 1px solid #222;}
 
 #forgotpass_screen {max-width: 100%; height: 100%; }
 #frmForgetPass {padding-top: 30px; padding-left: 10px}

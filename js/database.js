@@ -1287,6 +1287,8 @@ function DBUtils()
 				"'photodata_tmb' VARCHAR, " +
 				"'photodata' VARCHAR, " +	
 				"'notes' VARCHAR, " +	
+                "'is_cover_photo' INTEGER NOT NULL DEFAULT 0 , " + 
+                "'is_report_photo' INTEGER NOT NULL DEFAULT 0 , " + 
 				"'created_by' INTEGER NOT NULL, " +				
 				//"'modified' TIMESTAMP NOT NULL, " +				
                 "'modified' TIMESTAMP, " +                

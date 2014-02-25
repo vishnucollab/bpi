@@ -18,6 +18,7 @@ function Sync()
 	this.noRefreshWarning = false;
 	this.silentMode = false;
 	this.callbackMethod = null;
+    this.photosUploaded = false;
 	
 	/***
 	* Setup the sync/account screen
@@ -27,7 +28,7 @@ function Sync()
 		// Default to standard sync
 		self.refreshSync = doRefresh; 
 		self.silentMode = false; 
-		self.callbackMethod = null;
+		self.callbackMethod = null;  
 		
 		if(doRefresh)
 		{
@@ -40,17 +41,18 @@ function Sync()
 
 		// Hide all panels
 		objApp.clearMain();
-		
-		// Set the main heading
-		objApp.setHeading("Data Sync");
-		objApp.setSubHeading("Send & Receive Inspection Data");
-		objApp.setNavActive("#navSync");
-		
-		// Show the sync screen.
-		$("#sync").removeClass("hidden"); 
-  		
-  		// Bind sync events
-  		this.bindEvents();			
+     
+    
+        // Set the main heading
+        objApp.setHeading("Data Sync");
+        objApp.setSubHeading("Send & Receive Inspection Data");
+        objApp.setNavActive("#navSync");
+        
+        // Show the sync screen.
+        $("#sync").removeClass("hidden"); 
+          
+        // Bind sync events
+        self.bindEvents();                
 	}
 	
 	/***
@@ -232,31 +234,17 @@ function Sync()
  				{
  					var isPhonegap = objApp.phonegapBuild;
                     
-                    setTimeout('objApp.objSync.uploadPhotos();', 200);
-                
-                    /*
- 					
- 					if(isPhonegap)
- 					{
- 						// When running under phonegap, before we send anything to the server, we must upload photos first.
- 						if(!self.silentMode) $("#accountMessage").text("Login OK.  Looking for photos to upload...");
- 						
-						
- 					}
- 					else
- 					{ 
- 						if(!self.silentMode) $("#accountMessage").text("Login OK.  Preparing data...");
- 						
- 						// Now proceed with sync.
- 						// Ask the database object to get all dirty data and to call the sendData method
- 						// in this object when done.
 
- 						objDBUtils.callbackMethod = objApp.objSync.sendData; 						
+ 					if(!self.silentMode) $("#accountMessage").text("Login OK.  Preparing data...");
  						
- 						// Do not send photos when not running under phonegap.
- 						setTimeout('objDBUtils.getDirtyData(1, 0);', 200);
-					}
-                    */
+ 					// Now proceed with sync.
+ 					// Ask the database object to get all dirty data and to call the sendData method
+ 					// in this object when done.
+
+ 					objDBUtils.callbackMethod = objApp.objSync.sendData; 						
+ 						
+ 					// Do not send photos when not running under phonegap.
+ 					setTimeout('objDBUtils.getDirtyData(1, 0);', 200);
 				}
 			}
 			else if(data.message == "INVALID")
@@ -300,7 +288,7 @@ function Sync()
 		parameters['password'] = localStorage.getItem("password");		
 		parameters['version'] = objApp.version;
 		parameters['data'] = objDBUtils.data;
-        parameters['anticache'] = Math.floor(Math.random() * 999999);
+        parameters['anticache'] = Math.floor(Math.random() * 999999);  
 		
 		var refreshSync = "false";
 		
@@ -318,7 +306,6 @@ function Sync()
 
 		$.post(objApp.apiURL + 'account/process_data/' + refreshSync, parameters , function(data)
 		{         		         
-		
 			// Remove / clear the data store temporarily in the DB object
 			objDBUtils.data = "";  
             
@@ -343,7 +330,7 @@ function Sync()
                     else
                     {
                         self.tableIdx = 0;
-                        self.removeDirtyFlags();
+                        self.uploadPhotos();
                     }
                 }
                 else
@@ -425,7 +412,7 @@ function Sync()
 						else
 						{
 							self.tableIdx = 0;
-							self.removeDirtyFlags();	
+							self.uploadPhotos();	
 						}							
 					}
 					else
@@ -662,35 +649,25 @@ function Sync()
 	
 	this.uploadPhotos = function()
 	{                 
-		// Define a method to start the sync - will be called when photo uploading is finished.
-		var startSync = function()
-		{
- 			if(!self.silentMode) $("#accountMessage").text("Preparing data...");
- 			
- 			// Now proceed with sync.
- 			// Ask the database object to get all dirty data and to call the sendData method
- 			// in this object when done.
- 			objDBUtils.callbackMethod = objApp.objSync.sendData; 						
- 			
- 			// Do not send photos when not running under phonegap.
- 			setTimeout('objDBUtils.getDirtyData(1, 0);', 200);			
-		}
-
-		// Get a recordset of photos with their dirty flags set
+        self.tableIndex = 0;  
+        
+        // Get a recordset of photos with their dirty flags set
 		var sql = "SELECT * " +
 			"FROM inspectionitemphotos " +
-			"WHERE dirty = ?";
+			"WHERE dirty = 1";
 
-		objDBUtils.loadRecordsSQL(sql, [1], function(param, items)
+		objDBUtils.loadRecordsSQL(sql, [], function(param, items)
 		{
 			if(!items)
 			{
-				startSync();
+                self.removeDirtyFlags();
 				return;
 			}
 			
 			var maxLoop = items.rows.length;
 			var r = 0;
+            
+            alert(maxLoop);
 			
 			var doNext = function()
 			{
@@ -717,6 +694,10 @@ function Sync()
 					params["photodata"] = photodata;
 					params["photodata_tmb"] = photodata_tmb;
 					params["notes"] = row.notes;
+                    params["is_cover_photo"] = row.is_cover_photo;
+                    params["is_report_photo"] = row.is_report_photo;
+                    
+                    console.log("IRP: " + row.is_report_photo);
 					
 					if(!self.silentMode) $("#accountMessage").text("Uploading photo " + (r + 1));
 					
@@ -729,7 +710,7 @@ function Sync()
 							return;
 						}
 						
-						// The photo uploaded OK
+						// The photo uploaded OK  
 						
 						// Set the dirty flag back to 0
 						var sql = "UPDATE inspectionitemphotos " + 
@@ -748,7 +729,7 @@ function Sync()
 							}
 							else
 							{
-								startSync();
+								self.removeDirtyFlags();
 							}							
 						});
 						
@@ -806,7 +787,7 @@ function Sync()
 			}
 			else
 			{
-				startSync();
+				self.removeDirtyFlags();
 			}			
 			
 		}, "");

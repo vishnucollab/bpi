@@ -643,3 +643,55 @@ div.pack a.button
 {
     width: 140px;
 }
+
+
+/* Report Photo Listing */
+#tblReportPhotoListing td {
+    vertical-align: middle;
+}
+
+#reportPhotos div.bottomBtns {
+    margin-top: 20px;
+}
+
+/* Send Report */
+fieldset legend {
+    font-weight: bold;
+    font-size: 14pt;
+}
+
+#emailReportWrapper {
+    padding: 20px;
+}
+
+    #emailReportWrapper legend {
+        margin: 0px 0 10px 0;
+    }
+
+    #emailReportWrapper label {
+        display: block;
+        font-weight: bold;
+        margin-top: 20px;
+    }
+
+    #emailReportWrapper ul {
+        list-style-type: none;
+        margin-top: 20px;
+    }
+
+        #emailReportWrapper ul li {
+            padding: 5px 0 0 10px;
+            clear: both;
+            
+        }
+        
+        #emailReportWrapper ul li input[type="checkbox"] {
+            float: left;
+        }
+        
+        #emailReportWrapper ul li label {
+            float: left;
+            margin-left: 10px;
+            margin-top: -5px;
+            display: block;
+        }

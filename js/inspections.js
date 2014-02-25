@@ -43,6 +43,7 @@ var Inspections = function()
     this.reinspectionKey = null;
     this.inspection = false;
     this.keySortArray = false;
+    this.MAX_REPORT_PHOTOS = 12;
     
 	var self = this;
     
@@ -288,7 +289,11 @@ var Inspections = function()
                 html += '<td><div class="action">';
                 
                 // Always have the view action
-                html += '<a href="#" class="action view" data-id="' + row.id + '">View</a>';
+                if(row.num_reinspections == 0) {
+                    html += '<a href="#" class="action view" data-id="' + row.id + '">View</a>';
+                } else {
+                    html += '<a href="#" data-reveal-id="historyReinspection" class="action view showhistory" data-id="' + row.id + '">View</a>';
+                }
                 
                 // If the inspection is finalised but failed, the user may reinspect it.
                 if((row.finalised == 1) && (row.failed == 1)) {
@@ -357,6 +362,12 @@ var Inspections = function()
                 e.preventDefault();
                 var inspection_id = $(this).attr('data-id');
                 var num_reinspections = $(this).attr("data-reinspections");
+                
+                // The view button may require the user to select from the inspection history window.
+                if($(this).hasClass("showhistory")) {
+                    self.loadHistoryReinspectionItems(inspection_id);
+                    return;
+                }
 
                 // Show the loading indicator
                 blockElement("#tblInspectionListing");
@@ -819,8 +830,6 @@ var Inspections = function()
             
             
         }, inspection_id);
-        
-        
         
         
         this.handleFinalised();
@@ -1414,6 +1423,9 @@ var Inspections = function()
         $("#reinspection a.passed").unbind();
         $("#reinspection a.failed").unbind();
         $('#reinspection select#rectified').unbind();
+        $("#btnReportPhotos").unbind();
+        $("#frmEmailTo").unbind();
+        $("a.sendEmailButton").unbind();
     }	
 	
 	/***
@@ -1422,7 +1434,8 @@ var Inspections = function()
 	*/
 	this.bindEvents = function()
 	{	
-		self.unbindEvents()
+		self.unbindEvents();
+        
         // show photoImage to photoList
         if (objApp.keys.inspection_id == "")
         {
@@ -1432,9 +1445,86 @@ var Inspections = function()
         {
             $('#btnCapturePhoto').attr('data-reveal-id', 'photoWrapper');
         }
+        
+        /* Send Email Form Events */
+        $("a.sendEmailButton").bind(objApp.touchEvent, function(e) {
+            e.preventDefault();    
+            self.resolveEmailReportRecipients();
+        });
+
+        
+        $("#frmEmailTo").submit(function(e) {
+            e.preventDefault();
+            
+            // Ensure recipients for the report are defined
+            var recipients = $("#emailTo").val();
+            if(objApp.empty(recipients)) {
+                alert("Please enter a recipient email address");
+                return;
+            }
+            
+            // Also ensure we have a valid inspection ID
+            var inspection_id = objApp.getKey("inspection_id");
+            if(objApp.empty(inspection_id)) {
+                alert("Invalid inspection ID");
+                return;
+            }
+            
+            blockElement($("#frmEmailTo"));
+            
+            // Load the inspection record
+            objDBUtils.loadRecord("inspections", inspection_id, function(param, inspection) {
+                if(!inspection) {
+                    alert("Error: Couldn't load inspection!");
+                    return;
+                }
+                
+                // Do a silent sync operation
+                objApp.objSync.startSyncSilent(function(success) {
+                    
+                    if(!success) {
+                        unblockElement($("#frmEmailTo"));
+                        alert("Sorry, a problem occurred whilst syncing your data to the server");
+                        return;
+                    } 
+                    
+                    // Invoke the API method to send the report
+                    var address = self.buildInspectionAddress(inspection);
+                    var user_email = localStorage.getItem("email");
+                    
+                    var params = {};
+                    params["email"] = user_email;
+                    params['password'] = localStorage.getItem("password");
+                    params["subject"] = inspection.report_type + " Inspection at " + address;
+                    params["recipients"] = recipients;
+                    params["from"] = user_email;
+                    params["inspectionid"] = inspection_id;
+                    params["message"] = "Please find attached the " + inspection.report_type + " inspection report for " + address;
+                    
+                    $.post(objApp.apiURL + "reports/send_inspection_report", params, function(data) {
+                        unblockElement($("#frmEmailTo"));
+                        
+                        if(data.status != "OK") {
+                            alert(data.message);
+                            return;
+                        }
+                        
+                        alert("The inspection was sent successfully");
+                        
+                        // Hide the reveal window.
+                        revealWindow.hideModal();
+                        
+                    }, "json");
+                });                
+                    
+                
+            }, "");
+        });
+        
         $("#inspection #report_type").bind('change', function(e)
         {
             e.preventDefault();
+            
             if($(this).val() == "Quality Inspection")
             {
                 objApp.setSubExtraHeading("Step 1 of 4", true);
@@ -1464,7 +1554,13 @@ var Inspections = function()
 		// add photoImage to photoList
         $(".inspectionDetails #addPhoto-wrapper #addPhoto-btn").bind(objApp.touchEvent, function(e)
 		{
-			e.preventDefault();
+            e.preventDefault();
+            
+            if(self.finalised == 1) {
+                alert("Sorry, this inspection has been finalised.  If you wish to add more photos, please un-finalise the inspection first");
+                return;
+            }
+            
 			// Get the current maximum photo sequence number for this inspection item
 			var sql = "SELECT MAX(seq_no) as seq_no " +
 				"FROM inspectionitemphotos " +
@@ -1869,7 +1965,7 @@ var Inspections = function()
         
         $(".inspectionDetails .preview").bind(objApp.touchEvent, function(e)
 		{
-			e.preventDefault();
+			e.preventDefault();     
 
 			// Show the loader graphic
 			blockElement(".inspectionDetails");
@@ -2195,6 +2291,7 @@ var Inspections = function()
   		{
             objApp.objInspection.checkSaveInspection();	
   		});
+        
         $(".inspectionDetails a#failed").click(function(e) {
             e.preventDefault();
             
@@ -2224,49 +2321,351 @@ var Inspections = function()
             }
         }); 
         
-               
-  		
-  		var objToggleFinalised = new toggleControl("toggleFinalised", "#frmInspectionDetails #finalised", "binary", "Finalised", function()
-  		{
-  			self.finalised = $("#finalised").val();
-  			self.setReadOnly();
-  			
-			// Update the finish time of the audit
-			var objDate = new Date();
-			var objTimePicker = new Timepicker();
-			$("#inspection #finish").val(objTimePicker.getTimeStr(objDate));  			
-  			if(objApp.context == "reinspections")
+        $("#btnReportPhotos").bind(objApp.touchEvent, function(e) {
+            e.preventDefault();
+            
+            self.showReportPhotos();    
+        });		
+	}
+    
+    this.showReportPhotos = function()
+    {
+        objApp.clearMain();
+        objApp.setSubHeading("Set Report Photos");
+        $("#reportPhotos").removeClass("hidden");
+        
+        // Unbind events
+        $("#btnReportPhotosBack").unbind();
+        $("#tblReportPhotoListing input").unbind();
+        
+        // Load the inspection photos (if any)
+        if(objApp.empty(objApp.getKey("inspection_id"))) {
+            alert("showReportPhotos - Invalid inspection");
+            return;
+        }
+
+        objDBUtils.orderBy = "seq_no ASC";
+        
+        var filters = [];
+        filters.push(new Array("inspection_id = '" + objApp.getKey("inspection_id") + "'"));
+        
+        objDBUtils.loadRecords('inspectionitemphotos', filters, function(param, items)
+        {
+            if(!items)
             {
-                $("#reinspection input#failed").val(1);
-                objApp.objInspection.checkUpdateInspection();
+                $("#reportPhotoList").html("<p>Sorry, this inspection currently has no photos.</p>");
+                return;
+            }
+            
+            // Loop through the items, building the output list as we go.
+            var maxLoop = items.rows.length;
+            var r = 0;
+            var num_items = 0;   
+            
+            var html = '<table id="tblReportPhotoListing" class="listing">';
+            
+            /**
+            * Shows the generated photo table listing HTML and also sets the table widths
+            * 
+            * @param {String} html  The HTML to be used for the table listing
+            */
+            var showPhotoHTML = function(html) {
+                // Finish the table HTML
+                html += '</table>';
+                                       
+                // Inject the HTML                                       
+                $("#reportPhotoList").html(html);
+                
+                // Set the listing table widths
+                var orientation = objApp.getOrientation();
+                var screenWidth = screen.width;
+                
+                if(orientation == "landscape") {
+                    screenWidth = screen.height;
+                }
+                
+                var tableWidth = screenWidth - 50;
+                
+                $("#reportPhotoList").css("width", tableWidth + 20 + "px");    
+                
+                var tableHeader = $("#tblReportPhotos");
+                var tableBody = $("#tblReportPhotoListing");
+                $(tableHeader).css("table-layout", "fixed");
+                $(tableBody).css("table-layout", "fixed");
+                $(tableHeader).css("width", tableWidth + "px");
+                $(tableBody).css("width", tableWidth + "px");
+                
+                tableWidth = tableWidth - 45;
+                
+                var average_width = Math.floor(tableWidth / 3);
+                average_width = average_width - 22;  // Take into account 10px padding left and right, 10 + 10 = 20, plus 1px border left and right
+
+                $(tableHeader).find("th:eq(0)").css("width", average_width + "px");
+                $(tableHeader).find("th:eq(1)").css("width", average_width + "px");
+                $(tableHeader).find("th:eq(2)").css("width", average_width + "px");
+                
+                $(tableBody).find("tr td:eq(0)").css("width", average_width + "px");  
+                $(tableBody).find("tr td:eq(1)").css("width", average_width + "px");  
+                $(tableBody).find("tr td:eq(2)").css("width", average_width + "px");     
+                
+                // Handle the event when the user changes the cover photo selection
+                $('#tblReportPhotoListing input[name="is_cover_photo"]').change(function() {
+                    // Get the ID of the selected photo
+                    var photo_id = $(this).val();
+                    
+                    blockElement("#frmReportPhotos");
+                    
+                    // Remove any existing is_cover_photo flags for this inspection
+                    var sql = "UPDATE inspectionitemphotos " +
+                        "SET is_cover_photo = 0, dirty = 1 " +
+                        "WHERE inspection_id = ? " +
+                        "AND deleted = 0";
+                        
+                    objDBUtils.execute(sql, [objApp.getKey("inspection_id")], function() {
+                        // Now set the new cover photo 
+                        
+                        sql = "UPDATE inspectionitemphotos " +
+                            "SET is_cover_photo = 1, dirty = 1 " +
+                            "WHERE id = ?";
+                            
+                        objDBUtils.execute(sql, [photo_id], function() {
+                            // All done   
+                            unblockElement("#frmReportPhotos");
+                        });                        
+                    });
+                }); 
+                
+                // Handle the event when the user clicks on a photo to add it to the report
+                $('#tblReportPhotoListing input[name="is_report_photo"]').change(function() {
+                    // Get the ID of the selected photo
+                    var photo_id = $(this).val();
+                    
+                    if($(this).is(":checked")) {
+                        // The user is wanting to add a photo to the report
+                        // First make sure there's not too many photos selected already
+                        var num_report_photos = $('#tblReportPhotoListing input[name="is_report_photo"]:checked').length;
+                        if(num_report_photos > self.MAX_REPORT_PHOTOS) {
+                            alert("Sorry, you may only select " + self.MAX_REPORT_PHOTOS + " photos to show on the report.  Please uncheck some other photos first.");
+                            $(this).removeAttr("checked");
+                            return;
+                        }  
+                        
+                        // Add the photo selection  
+                        sql = "UPDATE inspectionitemphotos " +
+                            "SET is_report_photo = 1, dirty = 1 " +
+                            "WHERE id = ?";
+                            
+                        blockElement("#frmReportPhotos");
+                            
+                        objDBUtils.execute(sql, [photo_id], function() {
+                            // All done   
+                            unblockElement("#frmReportPhotos");
+                        });                                              
+                        
+                        
+                    } else {
+                        // Remove the photo selection  
+                        sql = "UPDATE inspectionitemphotos " +
+                            "SET is_report_photo = 0, dirty = 1 " +
+                            "WHERE id = ?";
+                            
+                        blockElement("#frmReportPhotos");
+                            
+                        objDBUtils.execute(sql, [photo_id], function() {
+                            // All done   
+                            unblockElement("#frmReportPhotos");
+                        });                        
+                    }
+
+
+                    
+                    blockElement("#frmReportPhotos");
+                    
+                    // Remove any existing is_cover_photo flags for this inspection
+                    var sql = "UPDATE inspectionitemphotos " +
+                        "SET is_cover_photo = 0, dirty = 1 " +
+                        "WHERE inspection_id = ? " +
+                        "AND deleted = 0";
+                        
+                    objDBUtils.execute(sql, [objApp.getKey("inspection_id")], function() {
+                        // Now set the new cover photo 
+                        
+                        sql = "UPDATE inspectionitemphotos " +
+                            "SET is_cover_photo = 1, dirty = 1 " +
+                            "WHERE id = ?";
+                            
+                        objDBUtils.execute(sql, [photo_id], function() {
+                            // All done   
+                            unblockElement("#frmReportPhotos");
+                        });                        
+                    });
+                });                            
+            }
+            
+            if(objApp.phonegapBuild)
+            {
+                var fail = function(error)
+                {
+                    alert("loadPhotos::Caught error: " + error.code);
+                }
+                                                
+                // Request access to the file system
+                window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem)
+                {                
+                    // We have access to the file system.
+                    
+                    // Define the function to load the next image for phonegap builds.
+                    // The thumbnail image data is coming straight from the local file system                    
+                    var doNext = function()
+                    {
+                        var row = items.rows.item(r);                
+
+                        if(row.photodata != "")
+                        {
+                            // Define the file name that the thumbnail should have
+                            var file_name = row.id + "_thumb.jpg";        
+                            //var file_name = row.id;
+                            
+                            // Get permission to access the file entry
+                            fileSystem.root.getFile(file_name, {create: true}, function(fileEntry)
+                            {                    
+                                // Get access to the file object        
+                                fileEntry.file(function(file)
+                                {
+                                    // Create a file reader and read the file data.
+                                    var reader = new FileReader();
+
+                                    // When we've finished loading the file,
+                                    // build the HTML string and move to the next item
+                                    reader.onloadend = function(evt) 
+                                    {
+                                        html += '<tr>';
+                                        html += '<td><img width="150" height="100" src="data:image/jpeg;base64,' + evt.target.result + '" /></td>';
+                                        html += '<td><input type="radio" name="is_cover_photo" value="' + row.id + '" ';
+                                        
+                                        if(row.is_cover_photo == 1) {
+                                            html += 'checked="checked"' ;
+                                        }
+                                        
+                                        html += ' /></td>';
+                                        html += '<td><input type="checkbox" name="is_report_photo" value="' + row.id + '" ';
+                                        
+                                        if(row.is_report_photo == 1) {
+                                            html += 'checked="checked"' ;
+                                        }                                        
+                                        
+                                        html += ' /></td>';
+                                        html += '</tr>';
+                                        
+                                        num_items++;
+                                        
+                                        r++;
+                                        
+                                        if(r < maxLoop)                
+                                        {
+                                            doNext();
+                                        }
+                                        else
+                                        {
+                                            showPhotoHTML(html);
+                                        }                                                                                    
+                                    };
+                                    
+                                    reader.readAsText(file);                                
+                                }, fail);
+                                
+                                
+                            }, fail);
+                        }
+                        else
+                        {
+                            r++;
+                        
+                            if(r < maxLoop)                
+                            {
+                                doNext();
+                            }
+                            else
+                            {
+                                showPhotoHTML(html);
+                            }
+                        }                
+                    }
+                    
+                    if(r < maxLoop)                
+                    {
+                        doNext();
+                    }
+                    else
+                    {
+                        showPhotoHTML(html);
+                    }                    
+                    
+                }, fail);                                    
             }
             else
-                objApp.objInspection.checkSaveInspection();
-                 
-			setTimeout(function()
-			{
-				objApp.objInspection.loadInspectionItems();
-			}, 500);
-  		});
-  		
-  		// If the user is restricted, prevent them 
-  		if((self.restricted == 1) && (self.finalised == 1))
-  		{
-			objToggleFinalised.preventToggle = true;	
-			self.objToggleFailed.preventToggle = true;
-  		}
-  		
-  		if(self.finalised == 1)
-  		{
-			self.objToggleFailed.preventToggle = true;
-  		}  		
-  		
-  		// Render toggle controls
-  		$("#toggles").html("");
-  		objToggleNotes.render("#toggles");
-  		self.objToggleFailed.render("#toggles");
-  		objToggleFinalised.render("#toggles");  				
-	}
+            {
+                // Define the function to load the next image for non-phonegap builds
+                // The thumbnail image data is coming straight from the database in this case.
+                var doNext = function()
+                {
+                    var row = items.rows.item(r);
+
+                    if(row.photodata != "")
+                    {
+                        html += '<tr>';
+                        html += '<td><img width="150" height="100" src="data:image/jpeg;base64,' + row.photodata_tmb + '" /></td>';
+                        html += '<td><input type="radio" name="is_cover_photo" value="' + row.id + '" ';
+                        
+                        if(row.is_cover_photo == 1) {
+                            html += 'checked="checked"' ;
+                        }
+                        
+                        html += ' /></td>';
+                        html += '<td><input type="checkbox" name="is_report_photo" value="' + row.id + '" ';
+                        
+                        if(row.is_report_photo == 1) {
+                            html += 'checked="checked"' ;
+                        }                                        
+                        
+                        html += ' /></td>';
+                        html += '</tr>';                        
+                        
+                        num_items++;
+                    }
+                    
+                    r++;
+                    
+                    if(r < maxLoop)                
+                    {
+                        doNext();
+                    }
+                    else
+                    {
+                        showPhotoHTML(html);
+                    }                
+                }
+            }
+            
+            if(r < maxLoop)                
+            {
+                doNext();
+            }
+            else
+            {
+                showPhotoHTML(html);
+            }
+            
+        }, "");        
+        
+        
+        $("#btnReportPhotosBack").bind(objApp.touchEvent, function(e) {
+            e.preventDefault();
+            
+            self.showStep3(); 
+        });
+        
+    }
     
     
     this.updateExtraSubHeader = function()
@@ -2656,7 +3055,12 @@ var Inspections = function()
 							    	// build the HTML string and move to the next item
 									reader.onloadend = function(evt) 
 									{
-				    					html += '<li><div class="deletePhoto" rel="' + row.id + '"></div><a rel="' + row.id + '"><img width="90" height="60" src="data:image/jpeg;base64,' + evt.target.result + '" /></a><div class="imageNotes">' + row.notes + '</div></li>';
+                                        var delete_node = '<div class="deletePhoto" rel="' + row.id + '"></div>';
+                                        if(self.finalised == 1) {
+                                            delete_node = "";
+                                        } 
+                                        
+				    					html += '<li>' + delete_node + '<a rel="' + row.id + '"><img width="90" height="60" src="data:image/jpeg;base64,' + evt.target.result + '" /></a><div class="imageNotes">' + row.notes + '</div></li>';
 						    			num_items++;
 						    			
 										r++;
@@ -2714,7 +3118,12 @@ var Inspections = function()
 
 					if(row.photodata_tmb != "")
 					{
-				    	html += '<li><div class="deletePhoto" rel="' + row.id + '"></div><a rel="' + row.id + '"><img width="90" height="60" src="data:image/jpeg;base64,' + row.photodata_tmb + '" /></a><div class="imageNotes">' + row.notes + '</div></li>';
+                        var delete_node = '<div class="deletePhoto" rel="' + row.id + '"></div>';
+                        if(self.finalised == 1) {
+                            delete_node = "";
+                        }                         
+                        
+				    	html += '<li>' + delete_node + '<a rel="' + row.id + '"><img width="90" height="60" src="data:image/jpeg;base64,' + row.photodata_tmb + '" /></a><div class="imageNotes">' + row.notes + '</div></li>';
 					    num_items++;
 					}
 					
@@ -3197,62 +3606,116 @@ var Inspections = function()
 			
 		}, "");
 	}
-    // load history reinspection items
-    this.loadHistoryReinspectionItems = function()
+    
+    // When the user clicks on an inspection that has reinspections,  we show a modal 
+    // window so the user can select which inspection they wish to view.
+    this.loadHistoryReinspectionItems = function(inspection_id)
     {
+        // Clear the modal window HTML
+        $("#inspectionList #historyReinspection table tbody").html("");  
         
-        var sql = "SELECT ri.* " +
-				"FROM reinspections ri " +
-                "WHERE ri.inspection_id = ?" +
-                "ORDER BY ri.reinspection_date";
-        objDBUtils.loadRecordsSQL(sql, [objApp.keys.inspection_id], function(param, items)
-		{
-			if(!items)
-			{
-				// There were no items that match.
-				$("#inspectionList #historyReinspection").html("Sorry, no history is available.");
-                	
-			}
-			else
-			{
-				// Loop through the items, building the output list as we go.
-                var maxLoop = items.rows.length;
+        $("#inspectionList #historyReinspection a").unbind();
+        
+        var tbody = "";
+        
+        // Step 1 - we should always load the original inspection and show that first in the list
+        var sql = "SELECT i.* " +
+            "FROM inspections i " +
+            "WHERE i.id = ?";
+            
+        objDBUtils.loadRecordSQL(sql, [inspection_id], function(row) {
+            if(!row) {
+                alert("Couldn't load inspection record");
+                return;
+            }    
+            
+            tbody += '<tr>';
+            tbody += '<td>' + objApp.formatUserDate(objApp.isoDateStrToDate(row.inspection_date)) + '</td>';
+            tbody += '<td>Original Inspection</td>';
+            tbody += '<td>Failed</td>';    // Original inspection ALWAYS fails
+            
+            tbody += '<td><div class="action"><a href="#" class="action view original" data-id="' + row.id + '">View</a></div></td>';
+            tbody += '</tr>';
+            
+            // Step 2 - Also load any reinspections in sequence order
+            sql = "SELECT ri.* " +
+                "FROM reinspections ri " +
+                "WHERE ri.inspection_id = ? AND deleted = 0 " +
+                "ORDER BY ri.reinspection_date ASC";  
                 
-				var r = 0;
-                $("#inspectionList #historyReinspection").html("");
-				var html = '<div style="background-color: #eee; border-radius: 5px 5px 0 0;">Choose an inspection</div>';
-                    html += '<div><table style="width: 500px; height: 200px; margin: 10px 20px 20px 20px;"><tr>' +
-                            '<th>Date</th>' +
-                            '<th>Type</th>' +
-                            '<th>Action</th>' + 
-                            '</tr>';
-				for(r = 0; r < maxLoop; r++)
-				{
-				    var row = items.rows.item(r);
-                    html += '<tr rel="' + row.id + '">';
-                    html += '<td>' + row.reinspection_date + '</td>';
-                    html += '<td>' + row.inspection_type + '</td>';
-                    html += '<td><div class="action"><a href="#" class="action passed">View</a></div></td>';
-                    html += '</tr>';
-				    
-				}
-				
-				html += '</table></div>';
-                $("#inspectionList #historyReinspection").html(html);
+            objDBUtils.loadRecordsSQL(sql, [inspection_id], function(param, items) {
+                if(items) {
+                    var maxLoop = items.rows.length;
+                    
+                    var r = 0;
+
+                    for(r = 0; r < maxLoop; r++)
+                    {
+                        var row = items.rows.item(r);
+                        tbody += '<tr>';
+                        tbody += '<td>' + objApp.formatUserDate(objApp.isoDateStrToDate(row.reinspection_date)) + '</td>';
+                        tbody += '<td>Reinspection</td>';
+                        
+                        if(row.failed == 1) {
+                            tbody += '<td>Failed</td>';    
+                        } else {
+                            tbody += '<td>Passed</td>';    
+                        }
+                        
+                        tbody += '<td><div class="action"><a href="#" class="action view reinspection" data-id="' + row.id + '">View</a></div></td>';
+                        tbody += '</tr>';
+                    }                      
+                }
                 
-            }
-            // bind event
-             $("#historyReinspection td a.action").click(function(e)
-             {
-                e.preventDefault();
-                var parent = $(this).parent().parent().parent();
-                var id = parent.attr('rel');
-                $("#historyReinspection").css("visibility", "hidden");
-                self.loadReinspectionItems(id);
-             });
-         }, "");
-         
+                $("#inspectionList #historyReinspection table tbody").html(tbody);
+                
+                // Bind click even
+                $("#historyReinspection a.action").bind(objApp.touchEvent, function(e) {
+
+                    e.preventDefault();
+
+                    // inspection / reinspection id
+                    var id = $(this).attr('data-id');
+                    
+                    
+                    // Close the reveal window
+                    //$('#historyReinspection a.close-reveal-modal').click();
+                    $('#historyReinspection').trigger('reveal:close');
+                    
+                    revealWindow.hideModal();  // Note the revealWindow variable is defined in jquery.reveal.js - I added this in.
+
+                    // If it's a reinspection, show the reinspection screen, otherwise show the editInspection screen.
+                    if($(this).hasClass("reinspection")) {
+                        // Load the reinspection record
+                        objDBUtils.loadRecord("reinspections", id, function(param, reinspection) {
+                            if(!reinspection) {
+                                alert("Couldn't load the reinspection record!");
+                                return;
+                            }
+                            
+                            objApp.keys.inspection_id = reinspection.inspection_id;
+                            
+                            self.loadReinspectionItems(id);
+                        }, "");                        
+
+                    } else {
+                        // Load the inspection record
+                        objDBUtils.loadRecord("inspections", id, function(param, inspection) {
+                            if(!inspection) {
+                                alert("Couldn't load the inspection record!");
+                                return;
+                            }
+                            
+                            self.editInspection(inspection);
+                        }, "");
+                    }
+                });                
+                
+                
+            }, "")          
+        });
     }
+    
     this.loadHistoryPhotos = function(inspectitem_id)
     {
         objDBUtils.orderBy = "seq_no ASC";
@@ -4002,6 +4465,9 @@ var Inspections = function()
                     
                     // Set the inspection object.
                     self.inspection = inspection;
+                    
+                    // Set the report type
+                    objApp.keys.report_type = inspection.report_type;
 
                     // If we have an active inspection then show the coversheet notes button
                     if(self.finalised == 0) {
@@ -4437,138 +4903,160 @@ var Inspections = function()
             return;
         }
         
-        if(objApp.empty(objApp.keys.inspection_id)) {
-            alert("Inspections::loadReinspectionItems - Invalid inspection id");
-            return;
-        }             
-        
-        this.reinspectionKey = reinspection_id;
-        
-        // Unbind events
-        $('#tblReinspectionListing tr').unbind();
-        $('#reinspection select#rectified').unbind();
-        $("#reinspection a.passed").unbind();
-        $("#reinspection a.failed").unbind();
-        
-        // Clear the stage
-        objApp.clearMain();
-        
-        // Set the headinggs
-        objApp.setHeading("Blueprint Inspections");
-        objApp.setSubHeading("Reinspection");
-        objApp.setSubExtraHeading("", true);
-        
-        // Show the reinspection screen
-        $("#reinspection").removeClass("hidden");
-        
-		// Ensure a valid inspection id is set
-		if(objApp.keys.report_type == 'Handovers') {
-			$("#tblReinspectionHeader th").eq(3).show();
-		} else {
-			$("#tblReinspectionHeader th").eq(3).hide();
-		}
+        objDBUtils.loadRecord("reinspections", reinspection_id, function(param, reinspection) {
+            if(!reinspection) {
+                alert("Couldn't load the reinspection record!");
+                return;
+            }
+            
+            objApp.keys.inspection_id = reinspection.inspection_id;
+            self.reinspectionKey = reinspection_id;       
+            
+            // We also need to load the inspection record
+            
+            objDBUtils.loadRecord("inspections", reinspection.inspection_id, function(param, inspection) {
+                if(!inspection) {
+                    alert("Couldn't load the inspection record!");
+                    return;
+                }            
+            
+                objApp.keys.report_type = inspection.report_type;
 
-        // Initialise passed/failed indicators
-		$(".inspectionDetails .failed").removeClass('active');
-        $(".inspectionDetails .passed").removeClass('active');
-        
-        // Load the reinspection items
-        var sql = "SELECT ri.id, ii.seq_no, ii.location, ii.action, ii.observation, ri.rectified, ii.id, r.failed " +
-            "FROM inspectionitems ii " +
-            "INNER JOIN reinspectionitems ri ON ri.inspectionitem_id = ii.id " +
-            "INNER JOIN reinspections r ON r.id = ri.reinspection_id " +
-            "WHERE ii.deleted = 0 " +
-            "AND r.id = ? " +
-            "ORDER BY ii.seq_no ASC";
-            
-        $("#reinspectionScrollWrapper").html("");
-            
-        objApp.showHideSpinner(true, "#reinspection");
-        
-		objDBUtils.loadRecordsSQL(sql, [reinspection_id], function(param, items) {
-            objApp.showHideSpinner(false, "#reinspection");
-            
-			if(!items) {
-				return;	 
-            }			
-            
-			// Loop through the items and put them into the table.
-			var html = '<table id="tblReinspectionListing" class="listing">';
-				
-			var maxLoop = items.rows.length;
-			var r = 0;
-            
-			for(r = 0; r < maxLoop; r++) {
+                // Unbind events
+                $('#tblReinspectionListing tr').unbind();
+                $('#reinspection select#rectified').unbind();
+                $("#reinspection a.passed").unbind();
+                $("#reinspection a.failed").unbind();
                 
-			    var row = items.rows.item(r);
+                // Clear the stage
+                objApp.clearMain();
                 
-			    html += '<tr data-id="' + row.id + '">';
-			    html += '<td>' + row.seq_no + '</td>';
-                html += '<td>' + row.location + '</td>';
-			    html += '<td>' + row.observation + '</td>';
+                // Set the headinggs
+                objApp.setHeading("Blueprint Inspections");
+                objApp.setSubHeading("Reinspection");
+                objApp.setSubExtraHeading("", true);
                 
-				if(objApp.keys.report_type == 'Handovers') {
-					html += '<td>' + row.action + '</td>';
-				}
+                // Show the reinspection screen
+                $("#reinspection").removeClass("hidden");
                 
-			    html += '<td>' + row.rectified + '</td>';
-			    html += '</tr>';
-			}
-			
-			html += '</table>';
-				
-			$("#reinspectionScrollWrapper").html(html);
-            
-            if(objApp.keys.report_type == 'Handovers'){
-				self.setTableWidths2('tblReinspectionHeader', 'tblReinspectionListing', 5);
-			} else {
-				self.setTableWidths2('tblReinspectionHeader', 'tblReinspectionListing', 4);
-			}
-            
-			self.handleFinalised();
-			
-			if(objUtils.isMobileDevice())	    
-			{
-                self.scroller = new iScroll(document.querySelector("#reinspectionScrollWrapper"), { hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbarSm'});
-			}				 
+                // Ensure a valid inspection id is set
+                if(objApp.keys.report_type == 'Handovers') {
+                    $("#tblReinspectionHeader th").eq(3).show();
+                } else {
+                    $("#tblReinspectionHeader th").eq(3).hide();
+                }
 
-			// Handle the event when the user clicks on a row in the item table
-            $('#tblReinspectionListing tr').bind("click", function() {
-            
-                var reinspectionItemID = $(this).attr("data-id");  
-                self.reinspectionItemRow = $(this);
-            
-                var text = $(this).find("td:eq(0)").text() + ". ";
-                text += $(this).find("td:eq(1)").text() + ", ";
-                text += $(this).find("td:eq(2)").text();   
+                // Initialise passed/failed indicators
+                if(reinspection.failed == 1) {
+                    $(".inspectionDetails .failed").addClass('active');    
+                    $(".inspectionDetails .passed").removeClass('active');
+                } else {
+                    $(".inspectionDetails .failed").removeClass('active');    
+                    $(".inspectionDetails .passed").addClass('active');                
+                }
                 
-				if(objApp.keys.report_type == 'Handovers') {
-					var rectifiedText = $(this).find("td:eq(4)").text();
-				} else {
-					var rectifiedText = $(this).find("td:eq(3)").text();
-				}
+                // Load the reinspection items
+                var sql = "SELECT ri.id, ii.seq_no, ii.location, ii.action, ii.observation, ri.rectified, ii.id, r.failed " +
+                    "FROM inspectionitems ii " +
+                    "INNER JOIN reinspectionitems ri ON ri.inspectionitem_id = ii.id " +
+                    "INNER JOIN reinspections r ON r.id = ri.reinspection_id " +
+                    "WHERE ii.deleted = 0 " +
+                    "AND r.id = ? " +
+                    "ORDER BY ii.seq_no ASC";
+                    
+                $("#reinspectionScrollWrapper").html("");
+                    
+                objApp.showHideSpinner(true, "#reinspection");
                 
-                $('#reinspection select#rectified').val(rectifiedText);
-                $('#reinspection .infomation p').html(text);
-                $('#reinspection .infomation select#rectified').show();
-            });
+                objDBUtils.loadRecordsSQL(sql, [reinspection_id], function(param, items) {
+                    objApp.showHideSpinner(false, "#reinspection");
+                    
+                    if(!items) {
+                        return;     
+                    }            
+                    
+                    // Loop through the items and put them into the table.
+                    var html = '<table id="tblReinspectionListing" class="listing">';
+                        
+                    var maxLoop = items.rows.length;
+                    var r = 0;
+                    
+                    for(r = 0; r < maxLoop; r++) {
+                        
+                        var row = items.rows.item(r);
+                        
+                        html += '<tr data-id="' + row.id + '">';
+                        html += '<td>' + row.seq_no + '</td>';
+                        html += '<td>' + row.location + '</td>';
+                        html += '<td>' + row.observation + '</td>';
+                        
+                        if(objApp.keys.report_type == 'Handovers') {
+                            html += '<td>' + row.action + '</td>';
+                        }
+                        
+                        html += '<td>' + row.rectified + '</td>';
+                        html += '</tr>';
+                    }
+                    
+                    html += '</table>';
+                        
+                    $("#reinspectionScrollWrapper").html(html);
+                    
+                    if(objApp.keys.report_type == 'Handovers'){
+                        self.setTableWidths2('tblReinspectionHeader', 'tblReinspectionListing', 5);
+                    } else {
+                        self.setTableWidths2('tblReinspectionHeader', 'tblReinspectionListing', 4);
+                    }
+                    
+                    self.handleFinalised();
+                    
+                    if(objUtils.isMobileDevice())        
+                    {
+                        self.scroller = new iScroll(document.querySelector("#reinspectionScrollWrapper"), { hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbarSm'});
+                    }                 
+
+                    // Handle the event when the user clicks on a row in the item table
+                    $('#tblReinspectionListing tr').bind("click", function() {
+                    
+                        var reinspectionItemID = $(this).attr("data-id");  
+                        self.reinspectionItemRow = $(this);
+                    
+                        var text = $(this).find("td:eq(0)").text() + ". ";
+                        text += $(this).find("td:eq(1)").text() + ", ";
+                        text += $(this).find("td:eq(2)").text();   
+                        
+                        if(objApp.keys.report_type == 'Handovers') {
+                            var rectifiedText = $(this).find("td:eq(4)").text();
+                        } else {
+                            var rectifiedText = $(this).find("td:eq(3)").text();
+                        }
+                        
+                        $('#reinspection select#rectified').val(rectifiedText);
+                        $('#reinspection .infomation p').html(text);
+                        $('#reinspection .infomation select#rectified').show();
+                    });
+                        
+                    // Handle the event when the rectified status of the item is updated
+                    $('#reinspection select#rectified').bind("change", function() {
+                        
+                        var rectified_status = $(this).val();
+                        self.checkSaveRectifiedInspectionitem(rectified_status);
+                        
+                    });
+                    
+                    $("#reinspection a.passed").bind("click", function(){
+                        self.updateReinspectionPassFail(0);
+                    });
+                    
+                    $("#reinspection a.failed").bind("click", function(){
+                        self.updateReinspectionPassFail(1);
+                    });
+                });            
+                                
                 
-            // Handle the event when the rectified status of the item is updated
-            $('#reinspection select#rectified').bind("change", function() {
                 
-                var rectified_status = $(this).val();
-                self.checkSaveRectifiedInspectionitem(rectified_status);
-                
-            });
-            
-            $("#reinspection a.passed").bind("click", function(){
-                self.updateReinspectionPassFail(0);
-            });
-            
-            $("#reinspection a.failed").bind("click", function(){
-                self.updateReinspectionPassFail(1);
-            });
-        });
+            }, "");
+        }, ""); 
 	}
     
     // Update the reinspection and master inspection record with the new status
@@ -4578,7 +5066,7 @@ var Inspections = function()
         
         // Step 1 - Load the reinspection item
         var reinspectionID = this.reinspectionKey;
-        
+
         objDBUtils.loadRecord("reinspections", reinspectionID, function(rectified_status, reinspection) {
             if(!reinspection) {
                 alert("updateReinspectionPassFail - couldn't load reinspection");
@@ -4831,6 +5319,7 @@ var Inspections = function()
             $('#btnStep3AddAnotherIssue').addClass('hidden');
             $('#btnStep3Back').addClass('hidden');
             $('#keywords').addClass('hidden');
+            $("#btnReportPhotos").addClass("hidden");
             
             // Show the next button
             $('#btnStep3Next').removeClass('hidden');
@@ -4850,6 +5339,10 @@ var Inspections = function()
             $('#btnStep3Back').removeClass('hidden');
             $('#finished').removeClass('active');
             $('#keywords').removeClass('hidden');
+            
+            if(objApp.keys.report_type == "PCI") {
+                $("#btnReportPhotos").removeClass("hidden");
+            }
             
             $("#tblRateListing select.ratingSelect").removeAttr("readonly");
             $("#tblRateListing select.ratingSelect").removeAttr("disabled");            
@@ -5520,5 +6013,66 @@ var Inspections = function()
 			});					
 		});
         
+    }
+    
+    this.resolveEmailReportRecipients = function() {
+        var user_email = localStorage.getItem("email");
+        var builder_email = "";
+        
+        if(!self.inspection) {
+            alert("Invalid Inspection!");
+            return false;
+        }  
+        
+        $("#frmEmailTo input[type='checkbox']").unbind();
+        
+        blockElement("#frmEmailTo");
+        
+        objDBUtils.loadRecord("builders", self.inspection.builder_id, function(param, builder) {
+            unblockElement("#frmEmailTo");
+            
+            if(builder) {
+                builder_email = builder.email;
+            } 
+            
+            var determineRecipients = function() {
+                
+                var recipients = "";
+            
+                if($("#emailToMe").is(":checked")) {
+                    recipients += user_email;    
+                }
+                
+                if(($("#emailToBuilder").is(":checked")) && (!objApp.empty(builder_email))) {
+                    if(!objApp.empty(recipients)) {
+                        recipients += ",";
+                    }
+                    
+                    recipients += builder_email;
+                }
+                
+                $("#emailTo").val(recipients);
+            }
+            
+            determineRecipients();
+            
+            $("#frmEmailTo input[type='checkbox']").change(function() {
+                determineRecipients();    
+            });
+            
+        }, "");
+
+    }
+    
+    /**
+    * Given an inspection object, this method builds a property address string.
+    */
+    this.buildInspectionAddress = function(inspection) {
+        if(!inspection) {
+            return "";
+        }
+        
+        var result = "Lot " + inspection.lot_no + ", " + inspection.address + ", " + inspection.suburb;
+        return result;
     }						
 };

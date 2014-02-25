@@ -149,7 +149,7 @@ function App()
 		self.execute(sql, null, null);			
 		*/																			
 		
-		//var sql = "DELETE FROM inspections;";
+		//var sql = "UPDATE inspectionitemphotos SET dirty = 1;";
 		//objDBUtils.execute(sql, null, null);	
 		
 		//var sql = "DELETE FROM inspectionitemphotos WHERE seq_no = 3;";
