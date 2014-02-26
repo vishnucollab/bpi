@@ -1700,7 +1700,7 @@ table th, td {
     background: #eee; 
     overflow: hidden;
     padding: 10px!important;
-    white-space: nowrap;
+    /*white-space: nowrap;*/
     text-overflow: ellipsis;
 }
 
