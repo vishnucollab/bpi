@@ -11,7 +11,7 @@ function App()
 	var self = this;	// Create a reference to the object itself
 	//this.apiURL = "http://server.dream-fusion.net/simbqa/blueprint/api/";
 	//this.apiURL = "http://blue.print/BlueprintAPI/";
-	// this.apiURL = "http://projects.loc/simbqa/blueprint/api/";
+	// this.apiURL = "http://projects.loc/blueprintapi/";
     this.apiURL = "http://192.168.1.52/blueprint/api/";
 	this.phonegapBuild = false; 	// Set this to true when phonegap is the target
 	this.version = 13;				// Identifies the app version to the server
@@ -51,6 +51,7 @@ function App()
         "contact_id" : "",
 		"site_id" : "",
 		"inspection_id" : "",
+		"reinspection_id" : "",
 		"report_type" : "",
 		"inspection_item_id" : "",
 		"location" : "",
@@ -76,6 +77,7 @@ function App()
         this.keys.contact_id = "";
 		this.keys.site_id = "";
 		this.keys.inspection_id = "";
+		this.keys.reinspection_id = "";
 		this.keys.inspection_item_id = "";
 		this.keys.level = "";
 		this.keys.area = "";
@@ -386,6 +388,9 @@ function App()
             
             var inspection_id = localStorage.getItem("inspection_id");
 			self.objInspection.setReturnInspectionID(inspection_id);
+			
+			var reinspection_id = localStorage.getItem("reinspection_id");
+			self.objInspection.setReturnReinspectionID(reinspection_id);
 			
 			self.objInspection.showReinspection();
 			self.context = "reinspections";

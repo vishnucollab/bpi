@@ -65,6 +65,7 @@ var Inspections = function()
         if(!self.doingSave)
         {
             objDBUtils.loadSelect("builders", ["id","name"], "#inspectionList #il_builder_id", function(){
+                console.log('load builders suggession finish');
                 self.doingSave = false;
             }, "option"); 
         }
@@ -1560,6 +1561,7 @@ var Inspections = function()
             
 			self.current_table = "inspectionitemphotos";
 			self.current_key = "inspection_id";
+			console.log("###" + self.finalised);
             if(self.finalised == 1) {
 				// alert("Sorry, this inspection has been finalised.  If you wish to add more photos, please un-finalise the inspection first");
                 // return;
@@ -1575,6 +1577,8 @@ var Inspections = function()
 				
 			objDBUtils.loadRecordSQL(sql, [objApp.getKey(self.current_key)], function(row)
 			{
+			
+				console.log(row);
 				var seq_no = 1;  // Default sequence number to 1.
 				
 				if(row)
@@ -1604,11 +1608,13 @@ var Inspections = function()
 					    objImage.src = photoData;
                     }
 					
+					console.log('222');
 					//notes = "";
 
 					// When the image has loaded, setup the image marker object
 					objImage.onload = function() 
 					{
+						console.log('333');
  						// Resize the image so it's 600px wide  
 						objResizer = new imageResizer(objImage);
 						var imageData = objResizer.resize(600); 
@@ -1634,8 +1640,12 @@ var Inspections = function()
 							var check_table = "inspections";
 							if(self.current_table == "reinspectionitemphotos")
 								check_table = "reinspections";
+							console.log(objApp.getKey(self.current_key));
+							console.log(check_table);
+							console.log(self.current_key);
 							objDBUtils.loadRecord(check_table, objApp.getKey(self.current_key), function(param, row)
                             {
+								console.log(row);
                                 if(!row)
                                 {
                                     alert("The current inspection id is NOT valid");

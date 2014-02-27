@@ -37,6 +37,7 @@ function DBUtils()
 	this.tables.push(new Array('inspectionitems', 1.0));
 	this.tables.push(new Array('reinspectionitems', 1.0));
 	this.tables.push(new Array('inspectionitemphotos', 1.0));
+	this.tables.push(new Array('reinspectionitemphotos', 1.0));
     this.tables.push(new Array('users', 1.0));
     this.tables.push(new Array('contacts', 1.0));
     this.tables.push(new Array('contactsfavourites', 1.0));
@@ -1326,6 +1327,62 @@ function DBUtils()
 		});    
 	}
     
+	
+	/**********************************************
+	* REINSPECTION ITEM PHOTOS
+	*/	
+	this.createReinspectionitemphotos = function(table_number)
+	{
+		var table_name = this.tables[table_number][0];
+		var table_version = this.tables[table_number][1];    
+		
+		if(this.DB_DEBUG)
+			alert("CREATE " + table_name);
+		
+		var sql = "CREATE TABLE IF NOT EXISTS reinspectionitemphotos  (" +
+				"'id' VARCHAR PRIMARY KEY NOT NULL, " +
+				"'reinspection_id' VARCHAR NOT NULL, " +
+				"'seq_no' INTEGER NOT NULL, " +
+				"'photodata_tmb' VARCHAR, " +
+				"'photodata' VARCHAR, " +	
+				"'notes' VARCHAR, " +	
+				"'created_by' INTEGER NOT NULL, " +				
+                "'modified' TIMESTAMP, " +                
+				"'deleted' INTEGER NOT NULL DEFAULT 0 , " + 
+				"'dirty' INTEGER NOT NULL DEFAULT 1)";
+
+		this.db.transaction(function(transaction) 
+		{
+			transaction.executeSql(sql, null, function (transaction, result)
+			{
+				// Deleted index
+				sql = "CREATE INDEX IF NOT EXISTS " + table_name + "_deleted ON " + table_name + " (deleted);";
+				self.execute(sql, null, null);
+				
+				// Dirty index 
+				sql = "CREATE INDEX IF NOT EXISTS " + table_name + "_dirty ON " + table_name + " (dirty);";
+				self.execute(sql, null, null);
+				
+				// Client index 
+				sql = "CREATE INDEX IF NOT EXISTS " + table_name + "_reinspection ON " + table_name + " (reinspection_id, deleted);";
+				self.execute(sql, null, null);																					
+				
+				// INSERT THE REGISTRY ENTRY
+				sql = "INSERT INTO app_tables (table_name, version) VALUES(?, ?);";
+				transaction.executeSql(sql, [table_name, table_version], function (transaction, result)
+				{
+					if(this.DB_DEBUG)  
+						alert("INSERTED REGISTRY");
+			  
+		  			objDBUtils.checkNextTable(table_number);                
+			  
+		  		}, objDBUtils.DB_error_handler);
+
+			}, objDBUtils.DB_error_handler);
+		});    
+	}
+	
+	
     /**********************************************
     * USERS
     */    
