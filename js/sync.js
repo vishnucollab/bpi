@@ -79,83 +79,6 @@ function Sync()
 		objApp.objSync.refreshSync = true;
 	}
 	
-	this.archiveData = function()
-	{
-		// Get a recordset of inspectionitemphotos
-		var sql = "SELECT iip.* " +
-			"FROM inspectionitemphotos iip " +
-			"INNER JOIN inspection i ON iip.inspection_id = i.id " +
-			"WHERE i.finalised = 1 " +
-			"AND i.inspection_start < ? " +
-			"AND length(iip.photodata_tmb) > 0";
-			
-		// Figure out the unix time 14 days ago in milliseconds
-		var threshold = new Date().getTime();
-		threshold = threshold - ((86400 * 1000) * 14); 
-			
-		objDBUtils.loadRecordsSQL(sql, [threshold], function(param, items)
-		{
-			if(!items)
-			{
-				alert("There were no items to archive");
-				$("#frmSync #archive_data").removeAttr("checked");
-				self.startSync();
-				return;	
-			}
-			
-			var maxLoop = items.rows.length;
-			var r = 0;
-			var total_cleared = 0;
-			
-			var doNext = function()
-			{
-				var row = items.rows.item(r);
-				var tmb_data = row.photodata_tmb;
-				
-				if(row.photodata_tmb != "")
-				{
-					if(row.photodata_tmb != null)
-						total_cleared += row.photodata_tmb.length; 	
-				}
-				
-				if(row.photodata != "")
-				{
-					if(row.photodata != null)
-						total_cleared += row.photodata.length; 						
-				}
-				
-				sql = "UPDATE inspectionitemphotos " +
-					"SET photodata_tmb = '', photodata = '' " +
-					"WHERE id = ?";
-					
-				objDBUtils.execute(sql, [row.id], function()
-				{
-					r++;
-					
-					if(r < maxLoop)
-					{
-						doNext();
-					}
-					else
-					{
-						alert("Task completed.  Cleared: " + Math.floor(total_cleared / 1024) + " Kb");	
-						$("#frmSync #archive_data").removeAttr("checked");
-						self.startSync();						
-					}					
-				});					
-			}
-			
-			if(r < maxLoop)
-			{
-				alert("Please wait.. Clearing " + maxLoop + " records.  This may take some time.");
-				doNext();
-			}								
-			
-			
-		}, "");
-			 
-	}	
-	
 	this.startSyncSilent = function(callbackMethod)
 	{
 		self.silentMode = true;
@@ -174,18 +97,7 @@ function Sync()
 			{
 				alert("Please enter a valid email address and your password.  Your password should be at least 5 characters long.");
 				return;
-			}
-			
-            /*
-			if($("#frmSync #archive_data").is(":checked"))
-			{
-				if(!confirm("Warning, you are about to archive your old photos.  This will remove inspection photos from your iPad that are more than 2 weeks old.  Are you sure you want to do this?'"))
-					return;
-					
-				self.archiveData();
-				return;
 			}	
-            */		
 			
 			if(($("#frmSync #refresh_sync").is(":checked")) && (!objApp.objSync.noRefreshWarning))
 			{
@@ -330,7 +242,7 @@ function Sync()
                     else
                     {
                         self.tableIdx = 0;
-                        self.uploadPhotos();
+                        self.uploadPhotos("inspection");
                     }
                 }
                 else
@@ -412,7 +324,7 @@ function Sync()
 						else
 						{
 							self.tableIdx = 0;
-							self.uploadPhotos();	
+							self.uploadPhotos("inspection");	
 						}							
 					}
 					else
@@ -647,27 +559,38 @@ function Sync()
 		return parameters;		
 	}
 	
-	this.uploadPhotos = function()
+	this.uploadPhotos = function(photo_type)
 	{                 
-        self.tableIndex = 0;  
+        self.tableIndex = 0; 
+        
+        var table = "inspectionitemphotos";
+        if(photo_type == "reinspection") {
+            table = "reinspectionitemphotos";
+        }
         
         // Get a recordset of photos with their dirty flags set
 		var sql = "SELECT * " +
-			"FROM inspectionitemphotos " +
+			"FROM " + table + " " +
 			"WHERE dirty = 1";
 
 		objDBUtils.loadRecordsSQL(sql, [], function(param, items)
 		{
 			if(!items)
 			{
-                self.removeDirtyFlags();
+                // If we're done with uploading inspection photos,
+                // now upload reinspection photos
+                if(photo_type == "inspection") {
+                    self.uploadPhotos("reinspection");
+                } else {
+                    // If we're done with reinspection photos, finish up.
+                    self.removeDirtyFlags();
+                }
+                
 				return;
 			}
 			
 			var maxLoop = items.rows.length;
 			var r = 0;
-            
-            alert(maxLoop);
 			
 			var doNext = function()
 			{
@@ -688,17 +611,23 @@ function Sync()
 					
 					// Add item details
 					params["id"] = row.id;
-					params["inspection_id"] = row.inspection_id;
 					params["seq_no"] = row.seq_no;
 					params["deleted"] = row.deleted;
 					params["photodata"] = photodata;
 					params["photodata_tmb"] = photodata_tmb;
 					params["notes"] = row.notes;
-                    params["is_cover_photo"] = row.is_cover_photo;
-                    params["is_report_photo"] = row.is_report_photo;
+                    params["photo_type"] = photo_type;
                     
-                    console.log("IRP: " + row.is_report_photo);
-					
+                    // The normal inspection table has the cover photo and report photos fields.
+                    if(photo_type == "inspection") {
+                        params["inspection_id"] = row.inspection_id;
+                        params["is_cover_photo"] = row.is_cover_photo;
+                        params["is_report_photo"] = row.is_report_photo;
+                    } else {
+                        params["reinspection_id"] = row.reinspection_id;                        
+                    }
+                    
+
 					if(!self.silentMode) $("#accountMessage").text("Uploading photo " + (r + 1));
 					
 					// Invoke the upload
@@ -713,7 +642,7 @@ function Sync()
 						// The photo uploaded OK  
 						
 						// Set the dirty flag back to 0
-						var sql = "UPDATE inspectionitemphotos " + 
+						var sql = "UPDATE " + table + " " + 
 							"SET dirty = 0 " + 
 							"WHERE id = ?";
 							
@@ -729,7 +658,14 @@ function Sync()
 							}
 							else
 							{
-								self.removeDirtyFlags();
+                                // If we're done with uploading inspection photos,
+                                // now upload reinspection photos
+								if(photo_type == "inspection") {
+                                    self.uploadPhotos("reinspection");
+                                } else {
+                                    // If we're done with reinspection photos, finish up.
+                                    self.removeDirtyFlags();
+                                }
 							}							
 						});
 						
@@ -787,7 +723,14 @@ function Sync()
 			}
 			else
 			{
-				self.removeDirtyFlags();
+                // If we're done with uploading inspection photos,
+                // now upload reinspection photos
+                if(photo_type == "inspection") {
+                    self.uploadPhotos("reinspection");
+                } else {
+                    // If we're done with reinspection photos, finish up.
+                    self.removeDirtyFlags();
+                }
 			}			
 			
 		}, "");

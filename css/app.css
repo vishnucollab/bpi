@@ -644,6 +644,10 @@ div.pack a.button
     width: 140px;
 }
 
+#btnReinspectEmail {
+    top: 10px;
+}
+
 
 /* Report Photo Listing */
 #tblReportPhotoListing td {

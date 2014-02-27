@@ -478,6 +478,8 @@ var Inspections = function()
                 sql = "INSERT INTO reinspections(id, inspection_id, reinspection_date, failed, most_recent) VALUES(?,?,?,?,?)";
                 
                 objDBUtils.execute(sql, values, function(){
+                    
+                    objApp.keys.reinspection_id = reinspection_id;
 
                     // Now that the reinspections record has been created, now create the reinspection items, 
                     // using the base inspection items as the foundation.                    
@@ -1003,6 +1005,10 @@ var Inspections = function()
         self.numImgCurr = 0;
         self.inspection = false;
         
+        // Clear reinspection keys
+        self.reinspectionKey = "";
+        objApp.keys.reinspection_id = "";
+        
         $(".inspectionDetails #btnCapturePhoto .numImgCurr").text(self.numImgCurr);
         $('#frmInspectionDetails #lot_no').val('');
         $('#frmInspectionDetails #address').val('');
@@ -1117,6 +1123,10 @@ var Inspections = function()
 		self.lastKeyPress = null;
         self.isEditing = 1;
         self.inspection = inspection;
+        
+        // Clear reinspection related keys
+        self.reinspectionKey = "";
+        objApp.keys.reinspection_id = "";
         
         self.setStep(1);
 
@@ -1553,20 +1563,25 @@ var Inspections = function()
             self.loadPhotos();
         });
         
-		// add photoImage to photoList
+		// Handle the event when the user wants to take a photo.
         $(".inspectionDetails #addPhoto-wrapper #addPhoto-btn").bind(objApp.touchEvent, function(e)
 		{
             e.preventDefault();
             
+            // The user may NOT add photos to a finalised inspection.
+            if(self.finalised == 1) {
+                alert("Sorry, this inspection has been finalised.  If you wish to add more photos, please un-finalise the inspection first");
+                return;
+            }            
+            
 			self.current_table = "inspectionitemphotos";
 			self.current_key = "inspection_id";
-            if(self.finalised == 1) {
-				// alert("Sorry, this inspection has been finalised.  If you wish to add more photos, please un-finalise the inspection first");
-                // return;
+
+            if(!objApp.empty(objApp.getKey("reinspection_id"))) {
                 self.current_table = "reinspectionitemphotos";
-				self.current_key = "reinspection_id";
+                self.current_key = "reinspection_id";                
             }
-            
+
 			// Get the current maximum photo sequence number for this inspection item
 			var sql = "SELECT MAX(seq_no) as seq_no " +
 				"FROM " + self.current_table + " " +
@@ -2891,7 +2906,7 @@ var Inspections = function()
 
                 var filters = [];
                 filters.push(new Array("resource_type = 3"));
-                filters.push(new Array("name LIKE '%" + self.observation + "%'"));
+                filters.push(new Array("name LIKE '%" + objDBUtils.doubleApos(self.observation) + "%'"));
                 //filters.push(new Array("limit", 4));
                 
                 objDBUtils.loadSelect("resources", filters, "#frmDefectDetails #observation_suggestion", function()
@@ -2999,6 +3014,10 @@ var Inspections = function()
 		}
 	}
 	
+    /**
+    * Loads the inspection (or reinspection) photos
+    * and shows the popup window allowing the user to take more photos.
+    */
 	this.loadPhotos = function()
 	{
         if(objApp.getKey("inspection_id") == "" && objApp.getKey("reinspection_id") == "")
@@ -3006,9 +3025,17 @@ var Inspections = function()
 			$("#photoWrapper #photoList").html("<p>This item has no photos.</p>");
 			return;
 		}
-		
+        
+        if(!objApp.empty(objApp.getKey("reinspection_id"))) {
+            self.current_table = "reinspectionitemphotos";
+            self.current_key = "reinspection_id";                
+        } else {
+            self.current_table = "inspectionitemphotos";
+            self.current_key = "inspection_id";             
+        }        
+
 		objDBUtils.orderBy = "seq_no ASC";
-		
+
 		var filters = [];
 		filters.push(new Array(self.current_key + " = '" + objApp.getKey(self.current_key) + "'"));
         
@@ -4921,7 +4948,8 @@ var Inspections = function()
             }
             
             objApp.keys.inspection_id = reinspection.inspection_id;
-            self.reinspectionKey = reinspection_id;       
+            self.reinspectionKey = reinspection_id;    
+            self.finalised = 0;   
             
             // We also need to load the inspection record
             
@@ -4932,6 +4960,7 @@ var Inspections = function()
                 }            
             
                 objApp.keys.report_type = inspection.report_type;
+                self.inspection = inspection;
 
                 // Unbind events
                 $('#tblReinspectionListing tr').unbind();
@@ -5068,7 +5097,26 @@ var Inspections = function()
                 
             }, "");
         }, ""); 
+        
+        // Update the photo icon with the correct number of photos.
+        this.refreshReinspectionPhotoCount(reinspection_id);
 	}
+    
+    /**
+    * Updates the reinspection photo count.
+    */
+    this.refreshReinspectionPhotoCount = function(reinspection_id) {
+        objDBUtils.countTableRows("reinspectionitemphotos", "reinspection_id = ? AND deleted = 0", [reinspection_id], function(row) {
+            if(!row) {
+                alert("Unable to load reinspection photo count");
+                return;
+            }    
+            
+            var num_photos = row.num_items;
+            
+            $("#reinspection #btnCapturePhoto div.numImgCurr").html(num_photos);
+        });
+    }
     
     // Update the reinspection and master inspection record with the new status
 	this.updateReinspectionPassFail = function(failed)
@@ -5209,7 +5257,7 @@ var Inspections = function()
 	}
     
     this.addNewObservationSuggession = function()
-	{
+	{                                    
 		// get the value the user has entered for the new item
 		var new_value = $("#observation").val();
 		
@@ -6036,7 +6084,6 @@ var Inspections = function()
         var builder_email = "";
         
         if(!self.inspection) {
-            alert("Invalid Inspection!");
             return false;
         }  
         

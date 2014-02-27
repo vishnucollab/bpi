@@ -809,6 +809,7 @@ aside textarea
 }
 #inspectionStep2 textarea {
     width: 252px;
+    height: 150px;
 }
 #inspectionStep3 #breadcrumbs{
     width: 70%;

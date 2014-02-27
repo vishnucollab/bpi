@@ -151,7 +151,7 @@ function App()
 		self.execute(sql, null, null);			
 		*/																			
 		
-		//var sql = "UPDATE inspectionitemphotos SET dirty = 1;";
+		//var sql = "UPDATE reinspectionitemphotos SET dirty = 1;";
 		//objDBUtils.execute(sql, null, null);	
 		
 		//var sql = "DELETE FROM inspectionitemphotos WHERE seq_no = 3;";
@@ -251,7 +251,7 @@ function App()
 					{
 						// Default to the add new inspection screen.
 						//self.objInspection.addNewInspection();
-						self.objBuilders.setupBuilders(); 	
+						self.objInspection.setupInspections(); 	
 					}
 				}
 			}
