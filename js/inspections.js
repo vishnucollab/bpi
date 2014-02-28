@@ -2054,6 +2054,8 @@ var Inspections = function()
 
                             var downloadURL = "https://docs.google.com/viewer?url=" + objApp.apiURL + "reports/print_report/" + objApp.keys.report_type + '/' + objApp.keys.inspection_id + "?token=" + token;
                             
+                            alert(downloadURL);
+                            
                             if(objApp.phonegapBuild) {
                                 var ref = window.open(downloadURL, '_blank', 'location=yes');                           
                             } else {
@@ -5650,6 +5652,8 @@ var Inspections = function()
                     
 					
 					    var downloadURL = "https://docs.google.com/viewer?url=" + objApp.apiURL + "reports/inspection/" + objApp.keys.inspection_id + "?token=" + token;
+                        
+                        alert(downloadURL);
                         
 					    if(objApp.phonegapBuild) {
                             var ref = window.open(downloadURL, '_blank', 'location=yes');  						
