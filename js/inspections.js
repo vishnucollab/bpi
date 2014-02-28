@@ -364,7 +364,7 @@ var Inspections = function()
                 e.preventDefault();
                 var inspection_id = $(this).attr('data-id');
                 var num_reinspections = $(this).attr("data-reinspections");
-                
+
                 // The view button may require the user to select from the inspection history window.
                 if($(this).hasClass("showhistory")) {
                     self.loadHistoryReinspectionItems(inspection_id);
@@ -3011,7 +3011,7 @@ var Inspections = function()
             return;
             
 		// Flag all related photo records as deleted.
-		var sql = "UPDATE inspectionitemphotos " +
+		var sql = "UPDATE " + this.current_table + " " +
 			"SET deleted = 1, dirty = 1 " +
 			"WHERE id = ?";
 			
@@ -3066,6 +3066,7 @@ var Inspections = function()
 
 		var filters = [];
 		filters.push(new Array(self.current_key + " = '" + objApp.getKey(self.current_key) + "'"));
+        filters.push(new Array("deleted", 0));
         
 		objDBUtils.loadRecords(self.current_table, filters, function(param, items)
 		{
@@ -3120,7 +3121,7 @@ var Inspections = function()
 							    	// build the HTML string and move to the next item
 									reader.onloadend = function(evt) 
 									{
-                                        var delete_node = '<div class="deletePhoto" rel="' + row.id + '"></div>';
+                                        var delete_node = '<div class="deletePhoto" data-id="' + row.id + '"></div>';
                                         if(self.finalised == 1) {
                                             delete_node = "";
                                         } 
@@ -3183,7 +3184,7 @@ var Inspections = function()
 
 					if(row.photodata_tmb != "")
 					{
-                        var delete_node = '<div class="deletePhoto" rel="' + row.id + '"></div>';
+                        var delete_node = '<div class="deletePhoto" data-id="' + row.id + '"></div>';
                         if(self.finalised == 1) {
                             delete_node = "";
                         }                         
@@ -3493,6 +3494,7 @@ var Inspections = function()
 					
 				}, photoID);
 			});
+            
             $("#photoWrapper .deletePhoto").bind(objApp.touchEvent, function(e)
 			{					
 				e.preventDefault();
@@ -3502,7 +3504,9 @@ var Inspections = function()
     				return false;
     			}
                 
-    			self.deleteImage($(this).attr('rel'));
+                var photoID = $(this).attr("data-id");
+                
+    			self.deleteImage(photoID);
             });									
 		}	
         var itemsArr = [];
@@ -3679,7 +3683,7 @@ var Inspections = function()
         // Clear the modal window HTML
         $("#inspectionList #historyReinspection table tbody").html("");  
         
-        $("#inspectionList #historyReinspection a").unbind();
+        $("#historyReinspection a.action").unbind();
         
         var tbody = "";
         
@@ -3738,7 +3742,7 @@ var Inspections = function()
                 $("#historyReinspection a.action").bind(objApp.touchEvent, function(e) {
 
                     e.preventDefault();
-
+                    
                     // inspection / reinspection id
                     var id = $(this).attr('data-id');
                     objApp.keys.reinspection_id = id;
