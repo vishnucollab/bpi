@@ -5652,7 +5652,7 @@ var Inspections = function()
 					    var downloadURL = objApp.apiURL + "reports/inspection/" + objApp.keys.inspection_id + "?token=" + token;
 					    
 					    if(objApp.phonegapBuild) {
-                            var ref = window.open(downloadURL, '_blank', 'location=yes');  						
+                            var ref = window.open("https://docs.google.com/viewer?url=" + downloadURL, '_blank', 'location=yes');  						
 					    } else {
 						    $.download(downloadURL, [], "post");
 					    }
