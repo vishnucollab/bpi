@@ -2051,12 +2051,12 @@ var Inspections = function()
                             }
                             
                             var token = data.message;
+                            var report_type = objApp.keys.report_type.replace(" ", "%20");
 
-                            var downloadURL = "https://docs.google.com/viewer?url=" + objApp.apiURL + "reports/print_report/" + objApp.keys.report_type + '/' + objApp.keys.inspection_id + "?token=" + token;
-                            
-                            alert(downloadURL);
-                            
+                            var downloadURL = objApp.apiURL + "reports/print_report/" + report_type + '/' + objApp.keys.inspection_id + "?token=" + token;
+
                             if(objApp.phonegapBuild) {
+                                downloadURL = "https://docs.google.com/viewer?url=" + downloadURL;
                                 var ref = window.open(downloadURL, '_blank', 'location=yes');                           
                             } else {
                                 $.download(downloadURL, [], "post");
@@ -5614,61 +5614,7 @@ var Inspections = function()
 			
 			$("#printModal").hide();
 		});
-		
-		$("#downloadReport").bind(objApp.touchEvent, function(e)
-		{
-			e.preventDefault();
-			
-			// Show the loader graphic
-			blockElement("#printModal");
-			
-			objApp.objSync.startSyncSilent(function(success)
-			{
-				if(success)
-				{
-					// The silent sync has completed successfully.
-					// We can now launch the report.
-					unblockElement("#printModal");
-                    
-                    // Create a token
-                    var params = {};
-                    params["email"] = localStorage.getItem("email");
-                    params["password"] = localStorage.getItem("password");
-                    
-                    var url = objApp.apiURL + "account/create_token/" + Math.floor(Math.random() * 99999);
-                    blockElement("#printModal");
-                    
-                    $.post(url, params, function(data)
-                    {
-                        unblockElement("#printModal"); 
-                        
-                        if(data.status != "OK")
-                        {
-                            alert("Unable to create access token");
-                            return;
-                        }
-                        
-                        var token = data.message;                   
-                    
-					
-					    var downloadURL = "https://docs.google.com/viewer?url=" + objApp.apiURL + "reports/inspection/" + objApp.keys.inspection_id + "?token=" + token;
-                        
-                        alert(downloadURL);
-                        
-					    if(objApp.phonegapBuild) {
-                            var ref = window.open(downloadURL, '_blank', 'location=yes');  						
-					    } else {
-						    $.download(downloadURL, [], "post");
-					    }
-                    }, "JSON");
-				}
-				else
-				{
-					unblockElement("#printModal");
-					alert("Sorry, something went wrong whilst syncing your data back to the Blueprint server.  Please try again later.");
-				}
-			});
-		});	
+        
 		
 		$("#sendReport").bind(objApp.touchEvent, function(e)
 		{
