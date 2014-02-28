@@ -29,6 +29,10 @@ hr { display: block; height: 1px; border: 0; border-top: 1px solid #ccc; margin:
 
 input, select, ul { vertical-align: middle; }
 
+input[type="submit"], input[type="button"] {
+    -webkit-appearance: none;
+}
+
 /*@font-face {
     font-family: 'PTSansCaptionBold';
     src: url('fonts/PTC75F-webfont.eot');
@@ -958,7 +962,7 @@ aside textarea
 .inspectionDetails .bottomBtns {
     width: 100%;
     position: absolute;
-    bottom: 30px;
+    bottom: 40px;
 }
     
     .inspectionDetails .bottomBtns a{

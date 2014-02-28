@@ -294,7 +294,7 @@ function DBUtils()
 				// This record could not be found
 				if(result.rows.length == 0)
 				{
-					callbackmethod_name(param, false);
+                    callbackmethod_name(param, false);
 				}
 				else
 				{
@@ -1320,7 +1320,7 @@ function DBUtils()
 				//"'modified' TIMESTAMP NOT NULL, " +				
                 "'modified' TIMESTAMP, " +                
 				"'deleted' INTEGER NOT NULL DEFAULT 0 , " + 
-				"'dirty' INTEGER NOT NULL DEFAULT 1)";
+				"'dirty' INTEGER NOT NULL DEFAULT 0)";
 
 		this.db.transaction(function(transaction) 
 		{
@@ -1375,7 +1375,7 @@ function DBUtils()
 				"'created_by' INTEGER NOT NULL, " +				
                 "'modified' TIMESTAMP, " +                
 				"'deleted' INTEGER NOT NULL DEFAULT 0 , " + 
-				"'dirty' INTEGER NOT NULL DEFAULT 1)";
+				"'dirty' INTEGER NOT NULL DEFAULT 0)";
 
 		this.db.transaction(function(transaction) 
 		{

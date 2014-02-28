@@ -558,8 +558,8 @@ var Inspections = function()
         var average_width = Math.floor(tableWidth / 6);
         average_width = average_width - 22;  // Take into account 10px padding left and right, 10 + 10 = 20, plus 1px border left and right
         
-        var width_col1 = average_width - 100; 
-        var width_col2 = average_width + 100;
+        var width_col1 = average_width - 60; 
+        var width_col2 = average_width + 60;
         
         $(tableHeader).find("th:eq(0)").css("width", "30px");    // Delete icon column
         $(tableHeader).find("th:eq(1)").css("width", width_col1 + "px");  
@@ -796,12 +796,26 @@ var Inspections = function()
         
         objApp.clearMain();
         
-        if(this.inspection) {      
-            $("#brickwork").val(this.inspection.brickwork);
-            $("#paint_quality").val(this.inspection.paint_quality);
-            $("#plaster_quality").val(this.inspection.plaster_quality);
-            $("#interior_quality").val(this.inspection.interior_quality);
-            $("#exterior_quality").val(this.inspection.exterior_quality);
+        if(this.inspection) {     
+            if(!objApp.empty(this.inspection.brickwork)) {
+                $("#brickwork").val(this.inspection.brickwork);
+            }
+            
+            if(!objApp.empty(this.inspection.paint_quality)) {
+                $("#paint_quality").val(this.inspection.paint_quality);
+            }
+            
+            if(!objApp.empty(this.inspection.plaster_quality)) {
+                $("#plaster_quality").val(this.inspection.plaster_quality);
+            }
+            
+            if(!objApp.empty(this.inspection.interior_quality)) { 
+                $("#interior_quality").val(this.inspection.interior_quality);
+            }
+            
+            if(!objApp.empty(this.inspection.exterior_quality)) {
+                $("#exterior_quality").val(this.inspection.exterior_quality);
+            }
         }
         
         $("#inspectionStep4").removeClass("hidden");
@@ -1647,8 +1661,10 @@ var Inspections = function()
                             // Make sure the current inspection id is valid - there seems to be a bug sometimes when the id is corrupted
 							
 							var check_table = "inspections";
-							if(self.current_table == "reinspectionitemphotos")
+							if(self.current_table == "reinspectionitemphotos") {
 								check_table = "reinspections";
+                            }
+                            
 							objDBUtils.loadRecord(check_table, objApp.getKey(self.current_key), function(param, row)
                             {
                                 if(!row)
@@ -1664,9 +1680,14 @@ var Inspections = function()
                                 if(!objApp.phonegapBuild)
                                 {
                                     // Save the image data and notes back to the database
-                                    var sql = "INSERT INTO " + self.current_table + "(id, " + self.current_key + ", seq_no, photodata_tmb, photodata, notes, created_by) " +
-                                        "VALUES(?, ?, ?, ?, ?, ?, ?)";
-                                    var values = [new_id, objApp.getKey(self.current_key), seq_no, thumbData, imageData, notes, user_id];
+                                    var sql = "INSERT INTO " + self.current_table + "(id, " + self.current_key + ", seq_no, photodata_tmb, photodata, notes, created_by, dirty) " +
+                                        "VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
+                                        
+                                    var values = [new_id, objApp.getKey(self.current_key), seq_no, thumbData, imageData, notes, user_id, "1"];
+                                    
+                                    console.log(sql);
+                                    console.log(values);
+                                    
             
                                     objDBUtils.execute(sql, values, function()
                                     {
@@ -1708,9 +1729,10 @@ var Inspections = function()
                                                                 var uri = fileEntry.toURI();
                                                                 
                                                                 // Save the image data and notes back to the database
-                                                                var sql = "INSERT INTO " + self.current_table + "(id, " + self.current_key + ", seq_no, photodata_tmb, photodata, notes, created_by) " +
-                                                                    "VALUES(?, ?, ?, ?, ?, ?, ?)";
-                                                                var values = [new_id, objApp.getKey(self.current_key), seq_no, uri_thumb, uri, notes, user_id];
+                                                                var sql = "INSERT INTO " + self.current_table + "(id, " + self.current_key + ", seq_no, photodata_tmb, photodata, notes, created_by, dirty) " +
+                                                                    "VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
+                                                                    
+                                                                var values = [new_id, objApp.getKey(self.current_key), seq_no, uri_thumb, uri, notes, user_id, "1"];
                                         
                                                                 objDBUtils.execute(sql, values, function()
                                                                 {
@@ -1776,6 +1798,10 @@ var Inspections = function()
 				}
 			});
 		});
+        
+        $("#btnDone.close-reveal-modal").bind(objApp.touchEvent, function(e) {
+            revealWindow.hideModal(); 
+        });
 		
 		// Figure out if this inspection is currently finalised or not.
 		self.finalised = $("#frmInspectionDetails #finalised").val();
@@ -1930,7 +1956,7 @@ var Inspections = function()
         $(".inspectionDetails .passed, .inspectionDetails .failed").bind(objApp.touchEvent, function(e)
 		{
 			e.preventDefault();
-            
+
             if (self.finalised == 1) {
                 return false;
             }
@@ -2317,7 +2343,7 @@ var Inspections = function()
             objApp.objInspection.checkSaveInspection();	
   		});
         
-        $(".inspectionDetails a#failed").click(function(e) {
+        $(".inspectionDetails a#failed").bind(objApp.touchEvent, function(e) {
             e.preventDefault();
             
             if(self.finalised == 0) {
@@ -2332,7 +2358,7 @@ var Inspections = function()
             }
         });
         
-        $(".inspectionDetails a#passed").click(function(e) {
+        $(".inspectionDetails a#passed").bind(objApp.touchEvent, function(e) {
             e.preventDefault();
             
             if(self.finalised == 0) {
@@ -4278,8 +4304,8 @@ var Inspections = function()
         blockElement("#frmReinspection");
         
         // Step 1 - Load the reinspection item
-        var reinspectionItemID = $(this.reinspectionItemRow).attr("data-id");
-        
+        var reinspectionItemID = $(this.reinspectionItemRow).attr("data-id").trim();
+
         objDBUtils.loadRecord("reinspectionitems", reinspectionItemID, function(rectified_status, reinspectionItem) {
             if(!reinspectionItem) {
                 alert("checkSaveRectifiedInspectionitem - couldn't load reinspection item");
@@ -4996,7 +5022,7 @@ var Inspections = function()
                 }
                 
                 // Load the reinspection items
-                var sql = "SELECT ri.id, ii.seq_no, ii.location, ii.action, ii.observation, ri.rectified, ii.id, r.failed " +
+                var sql = "SELECT ri.id, ii.seq_no, ii.location, ii.action, ii.observation, ri.rectified, r.failed " +
                     "FROM inspectionitems ii " +
                     "INNER JOIN reinspectionitems ri ON ri.inspectionitem_id = ii.id " +
                     "INNER JOIN reinspections r ON r.id = ri.reinspection_id " +
@@ -5084,11 +5110,11 @@ var Inspections = function()
                         
                     });
                     
-                    $("#reinspection a.passed").bind("click", function(){
+                    $("#reinspection a.passed").bind(objApp.touchEvent, function(){
                         self.updateReinspectionPassFail(0);
                     });
                     
-                    $("#reinspection a.failed").bind("click", function(){
+                    $("#reinspection a.failed").bind(objApp.touchEvent, function(){
                         self.updateReinspectionPassFail(1);
                     });
                 });            

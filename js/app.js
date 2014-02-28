@@ -9,12 +9,12 @@
 function App() 
 {
 	var self = this;	// Create a reference to the object itself
-	//this.apiURL = "http://server.dream-fusion.net/simbqa/blueprint/api/";
+	this.apiURL = "http://blueprint.simb.com.au/api/";
 	//this.apiURL = "http://blue.print/BlueprintAPI/";
 	// this.apiURL = "http://projects.loc/blueprintapi/";
-    this.apiURL = "http://192.168.1.52/blueprint/api/";
+    //this.apiURL = "http://192.168.1.52/blueprint/api/";
 	this.phonegapBuild = false; 	// Set this to true when phonegap is the target
-	this.version = 13;				// Identifies the app version to the server
+	this.version = 14;				// Identifies the app version to the server
 	this.versionStatus = "Production";
 	this.localMode = false;
 	this.context = "";

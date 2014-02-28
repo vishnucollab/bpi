@@ -562,7 +562,7 @@ function Sync()
 	this.uploadPhotos = function(photo_type)
 	{                 
         self.tableIndex = 0; 
-        
+
         var table = "inspectionitemphotos";
         if(photo_type == "reinspection") {
             table = "reinspectionitemphotos";
