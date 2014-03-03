@@ -692,6 +692,10 @@ fieldset legend {
         #emailReportWrapper ul li input[type="checkbox"] {
             float: left;
         }
+		
+		#emailReportWrapper input[type="text"] {
+            margin-bottom: 0;
+        }
         
         #emailReportWrapper ul li label {
             float: left;
@@ -699,3 +703,8 @@ fieldset legend {
             margin-top: -5px;
             display: block;
         }
+		
+		#emailReportWrapper #attach_inspection_images {
+            margin-bottom: 20px;
+        }
+		

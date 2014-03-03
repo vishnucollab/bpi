@@ -1477,11 +1477,10 @@ var Inspections = function()
             e.preventDefault();    
             self.resolveEmailReportRecipients();
         });
-
         
         $("#frmEmailTo").submit(function(e) {
             e.preventDefault();
-            
+			
             // Ensure recipients for the report are defined
             var recipients = $("#emailTo").val();
             if(objApp.empty(recipients)) {
@@ -1525,6 +1524,7 @@ var Inspections = function()
                     params["recipients"] = recipients;
                     params["from"] = user_email;
                     params["inspectionid"] = inspection_id;
+                    params["attach_inspection_images"] = $('#frmEmailTo #attach_inspection_images').is(":checked")
                     params["message"] = "Please find attached the " + inspection.report_type + " inspection report for " + address;
                     
                     $.post(objApp.apiURL + "reports/send_inspection_report", params, function(data) {
@@ -6067,7 +6067,7 @@ var Inspections = function()
             return false;
         }  
         
-        $("#frmEmailTo input[type='checkbox']").unbind();
+        $("#frmEmailTo ul#list_email input[type='checkbox']").unbind();
         
         blockElement("#frmEmailTo");
         
@@ -6099,7 +6099,7 @@ var Inspections = function()
             
             determineRecipients();
             
-            $("#frmEmailTo input[type='checkbox']").change(function() {
+            $("#frmEmailTo ul#list_email input[type='checkbox']").change(function() {
                 determineRecipients();    
             });
             
