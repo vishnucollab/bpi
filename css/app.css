@@ -648,6 +648,11 @@ div.pack a.button
     top: 10px;
 }
 
+#btnReinspectDelete {
+    top: 10px;
+    margin-left: 10px;
+}
+
 
 /* Report Photo Listing */
 #tblReportPhotoListing td {

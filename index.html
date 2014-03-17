@@ -85,7 +85,7 @@
     
 	</script>
 
-    <script src="phonegap.js"></script>
+    <!--<script src="phonegap.js"></script>-->
     
     <script type="text/javascript" src="js/json.js"></script>
     <script type="text/javascript" src="js/jquery.js"></script>
@@ -524,6 +524,7 @@
             <!-- inspection step 3 screen -->
 		    <div id="inspectionStep3" class="inspectionDetails hidden panel">
                 <a id="btnStep3AddAnotherIssue" class="button left leftmargin gotoStep2" href="#">Add Another Issue</a>
+                <a id="btnStep3DeleteInspection" class="button warning left leftmargin" href="#">Delete Inspection</a>
                 <div id="searchItemsContainer"><input type="text" id="keywords" placeholder="Enter your keywords" /></div>
                 <table id="tblDefectListingHeader" class="listing">
 	                <thead>
@@ -808,6 +809,7 @@
                     </div>
                     
                     <a id="btnReinspectEmail" class="button left sendEmailButton" href="#" data-reveal-id="emailReportWrapper">Email Inspection</a>
+                    <a id="btnReinspectDelete" class="button left warning" href="#">Delete Reinspection</a>
                     
                     <div class="btnContainer right">
                         <!-- <a id="btnStep3Email" class="button right rightmargin" href="#">Email</a> -->

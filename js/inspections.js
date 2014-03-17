@@ -782,6 +782,20 @@ var Inspections = function()
             
             self.setNoteButtonContentIndicators();
             
+            $("#btnStep3DeleteInspection").unbind();
+            $("#btnStep3DeleteInspection").bind(objApp.touchEvent, function(e) {
+                if(confirm("Are you sure you wish to delete this inspection?")) {
+                    var sql = "UPDATE inspections " +
+                              "SET deleted = 1, dirty = 1 " +
+                              "WHERE id = ?";
+                              
+                    objDBUtils.execute(sql, [objApp.getKey("inspection_id")], null);
+                    
+                    self.setupInspections();
+                }   
+            });
+            
+            
         }, inspection_id);            
     }
     
@@ -1685,10 +1699,6 @@ var Inspections = function()
                                         
                                     var values = [new_id, objApp.getKey(self.current_key), seq_no, thumbData, imageData, notes, user_id, "1"];
                                     
-                                    console.log(sql);
-                                    console.log(values);
-                                    
-            
                                     objDBUtils.execute(sql, values, function()
                                     {
                                         // The photo was saved.
@@ -1856,12 +1866,54 @@ var Inspections = function()
 			return false;
 		});
         
+        /**
+        * Handle the event when the user hits the NExt button on the stage 2 event tracking
+        */
         $(".inspectionDetails #btnStep2Next").bind(objApp.touchEvent, function(e) {
 			e.preventDefault();
 
-            self.saveDefect();
+            self.saveDefect(function() {
+                
+                // Update the finish time of the audit
+                var objDate = new Date();
+                var objTimePicker = new Timepicker();
+                $("#inspection #finish").val(objTimePicker.getTimeStr(objDate));
+                
+                blockElement("#frmDefectDetails");
+                
+                self.checkSaveInspection(); 
+                self.loadInspectionItems();
+                self.loadPhotos();
+                
+                // Get the number of defects associated with this inspection
+                var sql = "SELECT COUNT(*) as num_defects " +
+                    "FROM inspectionitems " +
+                    "WHERE inspection_id = ? AND deleted = 0";
+                    
+                objDBUtils.loadRecordSQL(sql, [objApp.keys.inspection_id], function(row)
+                {
+                    if(row)
+                    {
+                        // Now update the parent inspection record with the defect count.
+                        var num_defects = row.num_defects;
+                        
+                        sql = "UPDATE inspections " +
+                            "SET num_defects = ? " +
+                            "WHERE id = ?";
+                            
+                        objDBUtils.execute(sql, [num_defects, objApp.keys.inspection_id], function()
+                        {
+                            unblockElement("#frmDefectDetails");
+                            self.doingSave = false;
+                            
+                            self.showStep3();                                   
+                        });
+                    }
+                });
+   
+            });
 
-            self.showStep3();
+            
             
 			return false;
 		});
@@ -2193,24 +2245,32 @@ var Inspections = function()
 		$("#btnAddDefect").bind(objApp.touchEvent, function(e)
 		{
 			e.preventDefault();
-            // if(objApp.getKey("inspection_item_id") != "")
-			{
-				self.saveDefect(function(){
-                    $("#inspectionStep2 textarea#observation").val('');
-                    $("#inspectionStep2 ul#popAction li:first-child").text('Choose');
-                    // Clear all defect related keys
-                    objApp.keys.inspection_item_id = "";
-                    objApp.keys.observation = '';
-                    objApp.keys.action = '';
-                    // When adding a new defect, hide the delete defect button
-                    $("#btnDeleteDefect").css("visibility", "hidden");
+
+			self.saveDefect(function(){
+                $("#inspectionStep2 textarea#observation").val('');
+                $("#inspectionStep2 ul#popAction li:first-child").text('Choose');
+                // Clear all defect related keys
+                objApp.keys.inspection_item_id = "";
+                objApp.keys.observation = '';
+                objApp.keys.action = '';
+                // When adding a new defect, hide the delete defect button
+                $("#btnDeleteDefect").css("visibility", "hidden");
+                
+                // Increment the sequence number
+                var seq_no = $("#frmDefectDetails #seq_no").val();
+                if(seq_no == "") {
+                    seq_no = 1;
+                } else {
+                    seq_no = seq_no * 1;
+                    seq_no++;
                     
-                    // Initialise defect form.
-                    self.initDefectForm(null, false);
-                });
-			}
-            
-			
+                    $("#frmDefectDetails #seq_no").val(seq_no);
+                }
+                
+                // Initialise defect form.
+                //self.initDefectForm(null, false);
+            });
+
 			return false;
 		});
 		
@@ -2461,6 +2521,10 @@ var Inspections = function()
                 $(tableBody).find("tr td:eq(1)").css("width", average_width + "px");  
                 $(tableBody).find("tr td:eq(2)").css("width", average_width + "px");     
                 
+                if(objUtils.isMobileDevice()) {
+                    var scroller = new iScroll(document.querySelector("#reportPhotoList"), { hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar'});
+                }
+                
                 // Handle the event when the user changes the cover photo selection
                 $('#tblReportPhotoListing input[name="is_cover_photo"]').change(function() {
                     // Get the ID of the selected photo
@@ -2482,7 +2546,9 @@ var Inspections = function()
                             "WHERE id = ?";
                             
                         objDBUtils.execute(sql, [photo_id], function() {
-                            // All done   
+                            // All done
+                            
+                               
                             unblockElement("#frmReportPhotos");
                         });                        
                     });
@@ -2914,8 +2980,7 @@ var Inspections = function()
 		});
         
         objDBUtils.orderBy = "";
-	
-		
+        		
 		// If the ipad has scrolled to show the notes field,
 		// make sure we scroll back down after the user has finished typing.
 		
@@ -2944,7 +3009,7 @@ var Inspections = function()
                     }
                 }, 'td');
 		});
-		              
+		                                                                        
 		
 		
 		self.setReadOnly();
@@ -3664,8 +3729,7 @@ var Inspections = function()
                     }
 					
 				    // Setup touchScroll if applicable
-					if(objUtils.isMobileDevice())	    
-					{
+					if(objUtils.isMobileDevice()) {
 					    var scroller = new iScroll(document.querySelector("#historyModal #historyList"), { hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar'});
 					}									
 				}
@@ -4130,27 +4194,38 @@ var Inspections = function()
 	*/
 	this.saveDefect = function(callback)
 	{
-		// Make sure we have valid values for all defect pop lists
+        // Make sure we have valid values for all defect pop lists
 		var location =	self.objPopLocation.getText();
 		var action = self.objPopAction.getText();
-		var observation =  $("#frmDefectDetails #observation").val();  
-		
+		var observation =  $("#frmDefectDetails #observation").val(); 
+
    		if((location == "") || (location.toUpperCase() == "CHOOSE") || observation == "")
    		{
 			$("#inspectionStep2 textarea#observation").val('');
             $("#inspectionStep2 ul#popAction li:first-child").text('Choose');
+            
+            if((callback != undefined) && (callback != "")) {
+                callback()
+            }
+            
 			return;
    		}
    		else
    		{
 			$("#frmDefectDetails #location").val(location);	
    		}
+        
    		if(objApp.keys.report_type == 'Handovers')
 		{
 			if((action == "") || (action.toUpperCase() == "CHOOSE"))
 			{
 				$("#inspectionStep2 textarea#observation").val('');
                 $("#inspectionStep2 ul#popAction li:first-child").text('Choose');
+                
+                if((callback != undefined) && (callback != "")) {
+                    callback()
+                }
+                
 				return;
 			} 
 			else
@@ -4170,78 +4245,32 @@ var Inspections = function()
 		
 		blockElement("#frmDefectDetails");
 		
-		// Invoke the autoSave method after a short delay.
-		setTimeout(function()
+		objDBUtils.autoSave("inspectionitems", objApp.getKey("inspection_item_id"), "frmDefectDetails", function(new_id)
 		{
-			objDBUtils.autoSave("inspectionitems", objApp.getKey("inspection_item_id"), "frmDefectDetails", function(new_id)
+            unblockElement("#frmDefectDetails");
+            
+			// If the id was not set and we just did an update, get the id
+			if(objApp.getKey("inspection_item_id") == "")
 			{
-				// If the id was not set and we just did an update, get the id
-				if(objApp.getKey("inspection_item_id") == "")
-				{
-                    objApp.keys.inspection_item_id = new_id;
-				}
-				
-				self.inAudit = true;
-				
-				if(self.restricted == 0)
-				{
-					// Show the delete defect button
-					$("#btnDeleteDefect").css("visibility", "visible");
-				}
-				
-				$("#photoWrapper").removeClass("hidden");
-				self.loadPhotos();
-				
-				// self.loadHistory(level, area, issue, detail);
-				
-				// Update the finish time of the audit
-				var objDate = new Date();
-				var objTimePicker = new Timepicker();
-				$("#inspection #finish").val(objTimePicker.getTimeStr(objDate));
-				
-				// Save the inspection
-				self.checkSaveInspection();				
-				
-				// Get the number of defects associated with this inspection
-				var sql = "SELECT COUNT(*) as num_defects " +
-				    "FROM inspectionitems " +
-				    "WHERE inspection_id = ? AND deleted = 0";
-				    
-				objDBUtils.loadRecordSQL(sql, [objApp.keys.inspection_id], function(row)
-				{
-					if(row)
-					{
-						// Now update the parent inspection record with the defect count.
-						var num_defects = row.num_defects;
-						
-						sql = "UPDATE inspections " +
-							"SET num_defects = ? " +
-							"WHERE id = ?";
-							
-						objDBUtils.execute(sql, [num_defects, objApp.keys.inspection_id], function()
-						{
-							unblockElement("#frmDefectDetails");
-							
-							// Show the client options modal
-							setTimeout(function()
-							{		    		
-  								// The defect was added / saved OK. 
-  								// Reload the inspection item listing
-  								self.loadInspectionItems();
-  								self.doingSave = false;
-                                
-                                //Save Observation Suggestions
-                                self.addNewObservationSuggession();
-                                if(callback)
-                                    callback();
-							}, 200);									
-						});
-					}
-				});	
+                objApp.keys.inspection_item_id = new_id;
+			}
+			
+			self.inAudit = true;
+			
+			if(self.restricted == 0)
+			{
+				// Show the delete defect button
+				$("#btnDeleteDefect").css("visibility", "visible");
+			}
+			
+			$("#photoWrapper").removeClass("hidden");
+            
+            self.addNewObservationSuggession();
 
-                
-			});	
-		}, 250);  		
+            if((callback != undefined) && (callback != "")) {
+                callback()
+            }
+		});	  		
 	}
 	
 	/***
@@ -4393,7 +4422,6 @@ var Inspections = function()
                       "VALUES(?,?,?,?,?)";
                 values = [primaryKey, inspection_id, reinspection_date, failed, "Reinspection"];
                 objDBUtils.execute(sql, values, function(){
-                    console.log("Insert reinspection success");
                     self.reinspectionKey = primaryKey;
                 });
             }
@@ -4410,6 +4438,8 @@ var Inspections = function()
         $("#reinspection input#failed").removeClass("ignore");
         // $("#reinspection input#finalised").removeClass("ignore");
         $("#reinspection select#rectified").addClass("ignore");
+        alert("HERE");
+        
 	    setTimeout(function()
 	    {
 			objDBUtils.autoSave("inspections", objApp.keys.inspection_id, "frmReinspection", function()
@@ -4439,14 +4469,10 @@ var Inspections = function()
                 $("#reinspection input#failed").addClass("ignore");
                 $("#reinspection input#finalised").addClass("ignore");
                 $("#reinspection select#rectified").removeClass("ignore");
-                self.doingSave = false;
-			    
-			    // Show the client options modal
-			    			
+
 			});	
 	    }, 250);
     }
-    
     
 	/***
 	* checkSaveInspection
@@ -5132,6 +5158,20 @@ var Inspections = function()
         
         // Update the photo icon with the correct number of photos.
         this.refreshReinspectionPhotoCount(reinspection_id);
+        
+        $("#btnReinspectDelete").unbind();
+        $("#btnReinspectDelete").bind(objApp.touchEvent, function(e) {
+            if(confirm("Are you sure you wish to delete this Reinspection?")) {
+                var sql = "UPDATE reinspections " +
+                          "SET deleted = 1, dirty = 1 " +
+                          "WHERE id = ?";
+                          
+                objDBUtils.execute(sql, [objApp.getKey("reinspection_id")], null);
+                
+                self.setupInspections();
+            }   
+        });
+        
 	}
     
     /**
@@ -5164,17 +5204,22 @@ var Inspections = function()
                 return false;
             }
             
+            var currentdate = new Date(); 
+            var curdate = currentdate.getFullYear() + "-"
+                        + (currentdate.getMonth()+1)  + "-" 
+                        + currentdate.getDate();
+            
             // Step 2 - Update the reinspection record
             var sql = "UPDATE reinspections " +
-                "SET failed = ? " +
+                "SET failed = ?, reinspection_date = ?, dirty = ? " +
                 "WHERE id = ?";
                 
-            objDBUtils.execute(sql, [failed, reinspectionID], function() {
+            objDBUtils.execute(sql, [failed, curdate, 1, reinspectionID], function() {
                 // Update the primary inspection record
                 
                 // Step 3 - Update the inspection record
                 var sql = "UPDATE inspections " +
-                    "SET failed = ? " +
+                    "SET failed = ?, dirty = 1 " +
                     "WHERE id = ?";
                     
                 objDBUtils.execute(sql, [failed, reinspection.inspection_id], function() {
@@ -5196,7 +5241,7 @@ var Inspections = function()
         
         var sql = "UPDATE reinspections SET failed = ? WHERE id = ?";
         objDBUtils.execute(sql, [failed, self.reinspectionKey], function(){
-            console.log("Update reinspection success");
+
         });
     }
     
@@ -5296,7 +5341,6 @@ var Inspections = function()
 		// if there is no value, do nothing
 		if(new_value == "")
 		{
-			console.log("Please enter the name of the item that you would like to add in the text box");
 			return;
 		}
         
