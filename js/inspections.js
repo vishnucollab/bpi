@@ -2266,6 +2266,8 @@ var Inspections = function()
                     $("#frmDefectDetails #seq_no").val(seq_no);
                 }
                 
+                $("#frmDefectDetails #observation_suggestion").empty();
+                
                 // Initialise defect form.
                 //self.initDefectForm(null, false);
             });
@@ -2962,6 +2964,7 @@ var Inspections = function()
 		
 		$('#frmDefectDetails #observation').bind('keyup', function(e)
 		{
+            setTimeout(function() {
                 objDBUtils.orderBy = "";
                 self.observation = $('#frmDefectDetails textarea#observation').val().trim();
 				$("#frmDefectDetails #observation_suggestion").empty();
@@ -2972,6 +2975,8 @@ var Inspections = function()
                 }
                 
                 $("#observationFS").show();
+                
+                
 
                 var filters = [];
                 filters.push(new Array("resource_type = 3"));
@@ -2984,6 +2989,7 @@ var Inspections = function()
                         scroller = new iScroll('observationWrapper', { hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar'});
                     }
                 }, 'td');
+            }, 350);
 		});
 		                                                                        
 		
@@ -6041,6 +6047,7 @@ var Inspections = function()
 					params["from"] = "noreply@Blueprintapp.com";
 					params["message"] = emailMessage;
 					params["inspectionid"] = objApp.keys.inspection_id;
+                    params["reinspectionid"] = objApp.keys.reinspection_id;
                     
                     // For authentication params
                     params["email"] = localStorage.getItem("email");
