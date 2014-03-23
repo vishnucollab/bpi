@@ -79,6 +79,16 @@ label.error
 	display: none !important;
 }
 
+input[type="checkbox"] {
+    width: 35px;
+    height: 35px;
+}
+
+input[type="radio"] {
+    width: 35px;
+    height: 35px;
+}
+
 /* TABS */
 ul.tabs
 {
