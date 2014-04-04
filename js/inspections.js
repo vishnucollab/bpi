@@ -1518,6 +1518,8 @@ var Inspections = function()
                 return;
             }
             
+            var reinspection_id = objApp.getKey("reinspection_id");
+            
             blockElement($("#frmEmailTo"));
             
             // Load the inspection record
@@ -1543,10 +1545,11 @@ var Inspections = function()
                     var params = {};
                     params["email"] = user_email;
                     params['password'] = localStorage.getItem("password");
-                    params["subject"] = inspection.report_type + " Inspection at " + address;
+                    params["subject"] = inspection.report_type + " at " + address;
                     params["recipients"] = recipients;
                     params["from"] = user_email;
                     params["inspectionid"] = inspection_id;
+                    params["reinspectionid"] = reinspection_id;
                     params["attach_inspection_images"] = $('#frmEmailTo #attach_inspection_images').is(":checked")
                     params["message"] = "Please find attached the " + inspection.report_type + " inspection report for " + address;
                     
@@ -6154,7 +6157,7 @@ var Inspections = function()
             return "";
         }
         
-        var result = "Lot " + inspection.lot_no + ", " + inspection.address + ", " + inspection.suburb;
+        var result = "Lot " + inspection.lot_no.trim() + ", " + inspection.address.trim() + ", " + inspection.suburb.trim();
         return result;
     }						
 };
