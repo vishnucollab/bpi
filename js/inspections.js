@@ -47,6 +47,13 @@ var Inspections = function()
 	
 	this.current_table = "inspectionitemphotos";
 	this.current_key = "inspection_id";
+	
+	this.current_key = "inspection_id";
+	this.default_notes =	"All exposed concrete will need cleaning & colour sealing prior to handover.\n"+
+							"All appliances will need installing prior to handover.\n"+
+							"All landscaping will need finishing prior to handover.\n"+
+							"Please ensure all light globes are installed.\n"+
+							"All window& door tracks will need cleaning & greasing.\n";
     
 	var self = this;
     
@@ -1044,7 +1051,8 @@ var Inspections = function()
         $('#frmInspectionDetails #postcode').val('');
         $('#frmInspectionDetails #weather').val('');
         $('#frmInspectionDetails #client_info').val('');
-        $("#inspection #notes").val("");
+		
+        $("#inspection #notes").val(self.default_notes);
         
         // Hide the camera button until the inspection is created.
         $(".inspectionDetails #btnCapturePhoto").hide();
@@ -1211,7 +1219,8 @@ var Inspections = function()
         $("#inspection #address").val(inspection.address);
         $("#inspection #suburb").val(inspection.suburb);
         $("#inspection #postcode").val(inspection.postcode);
-        $("#inspection #notes").val(inspection.notes);
+		inspection.notes = self.default_notes;
+		$("#inspection #notes").val(self.default_notes);
         $("#inspection #client_info").val(inspection.client_info);
         
         if (inspection.failed)
@@ -2147,6 +2156,9 @@ var Inspections = function()
                 alert("Please create new inspection");
                 return;
             }
+			
+			console.log("Here : ");
+			console.log($("#inspection #notes").val());
             var objNoteModal = new noteModal("Coversheet Notes", $("#inspection #notes").val(), function(notes)
 			{
 				// The user has updated the notes value.
