@@ -49,11 +49,14 @@ var Inspections = function()
 	this.current_key = "inspection_id";
 	
 	this.current_key = "inspection_id";
+    
 	this.default_notes =	"All exposed concrete will need cleaning & colour sealing prior to handover.\n"+
 							"All appliances will need installing prior to handover.\n"+
 							"All landscaping will need finishing prior to handover.\n"+
 							"Please ensure all light globes are installed.\n"+
-							"All window& door tracks will need cleaning & greasing.\n";
+							"All window& door tracks will need cleaning & greasing.\n" +
+                            "Ensure all fire rating items are complete, if required.\n" +
+                            "Ensure council assets are cleaned prior to handover.";
     
 	var self = this;
     
@@ -186,7 +189,7 @@ var Inspections = function()
         
         // Remove previously bound events
         $("#inspectionScrollWrapper").unbind();
-        
+
         // Remove any existing items in the list.
         $("#inspectionScrollWrapper").html("");      
         
@@ -657,6 +660,8 @@ var Inspections = function()
         self.setStep(1);
         objApp.clearMain();
         
+        $("#report_type").unbind();
+        
         // If we do not have an active inspection
         if(objApp.keys.inspection_id == "") {
             // hide the coversheet notes button.
@@ -689,6 +694,10 @@ var Inspections = function()
                 //$("a.btnEditNotes").hide(); 
             }
         }
+
+        $("#report_type").change(function() {
+            self.setDefaultNotes();          
+        });
         
     }
     
@@ -842,6 +851,20 @@ var Inspections = function()
         $("#inspectionStep4").removeClass("hidden");
         
         self.setTableWidths2('tblRateListingHeader', 'tblRateListing', 2, 500);
+    }
+    
+    // Sets the default notes if no notes have been entered.
+    this.setDefaultNotes = function()
+    {
+        // If the current note value is empty and if this is not a Quality inspection,
+        // set the default notes.
+        if($("#inspection #notes").val() == "") {
+            report_type = $("#report_type").val();        
+
+            if(report_type != "Quality Inspection") {
+                $("#inspection #notes").val(self.default_notes); 
+            }
+        }        
     }
     
     this.showReinspection = function()
@@ -1051,8 +1074,6 @@ var Inspections = function()
         $('#frmInspectionDetails #postcode').val('');
         $('#frmInspectionDetails #weather').val('');
         $('#frmInspectionDetails #client_info').val('');
-		
-        $("#inspection #notes").val(self.default_notes);
         
         // Hide the camera button until the inspection is created.
         $(".inspectionDetails #btnCapturePhoto").hide();
@@ -1219,8 +1240,7 @@ var Inspections = function()
         $("#inspection #address").val(inspection.address);
         $("#inspection #suburb").val(inspection.suburb);
         $("#inspection #postcode").val(inspection.postcode);
-		inspection.notes = self.default_notes;
-		$("#inspection #notes").val(self.default_notes);
+		$("#inspection #notes").val(inspection.notes);
         $("#inspection #client_info").val(inspection.client_info);
         
         if (inspection.failed)
@@ -2154,16 +2174,17 @@ var Inspections = function()
         
         $('.btnEditNotes').bind(objApp.touchEvent, function(e){
             e.preventDefault();
-            if (objApp.keys.inspection_id == "")
-            {
+            
+            if (objApp.keys.inspection_id == "") {
                 alert("Please create new inspection");
                 return;
             }
+            
+            // If the current note value is empty and if this is not a Quality inspection,
+            // set the default notes.
+            self.setDefaultNotes();
 			
-			console.log("Here : ");
-			console.log($("#inspection #notes").val());
-            var objNoteModal = new noteModal("Coversheet Notes", $("#inspection #notes").val(), function(notes)
-			{
+            var objNoteModal = new noteModal("Coversheet Notes", $("#inspection #notes").val(), function(notes) {
 				// The user has updated the notes value.
 				// Update the toggle (and therefore the form) with the new value.
 				$("#inspection #notes").val(notes);
