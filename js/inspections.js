@@ -2538,7 +2538,12 @@ var Inspections = function()
                 $(tableBody).find("tr td:eq(2)").css("width", average_width + "px");     
                 
                 if(objUtils.isMobileDevice()) {
-                    var scroller = new iScroll(document.querySelector("#reportPhotoList"), { hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar'});
+                    var scroller = new iScroll(document.querySelector("#reportPhotoList"), { hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar', useTransform: true, zoom: false, onBeforeScrollStart: function (e) {
+                        var target = e.target;
+                        while (target.nodeType != 1) target = target.parentNode;
+                        if (target.tagName != 'SELECT' && target.tagName != 'INPUT' && target.tagName != 'TEXTAREA')
+                            e.preventDefault();
+                        }});
                 }
                 
                 // Handle the event when the user changes the cover photo selection
