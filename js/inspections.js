@@ -861,7 +861,7 @@ var Inspections = function()
         if($("#inspection #notes").val() == "") {
             report_type = $("#report_type").val();        
 
-            if(report_type != "Quality Inspection") {
+            if(report_type == "Quality Inspection") {
                 $("#inspection #notes").val(self.default_notes); 
             }
         }        
