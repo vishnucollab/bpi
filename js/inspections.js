@@ -659,9 +659,7 @@ var Inspections = function()
     {
         self.setStep(1);
         objApp.clearMain();
-        
-        $("#report_type").unbind();
-        
+
         // If we do not have an active inspection
         if(objApp.keys.inspection_id == "") {
             // hide the coversheet notes button.
@@ -694,11 +692,6 @@ var Inspections = function()
                 //$("a.btnEditNotes").hide(); 
             }
         }
-
-        $("#report_type").change(function() {
-            self.setDefaultNotes();          
-        });
-        
     }
     
     this.showStep2 = function(inspectionItem)
@@ -859,7 +852,7 @@ var Inspections = function()
         // If the current note value is empty and if this is not a Quality inspection,
         // set the default notes.
         if($("#inspection #notes").val() == "") {
-            report_type = $("#report_type").val();        
+            report_type = $("#report_type").val();  
 
             if(report_type == "Quality Inspection") {
                 $("#inspection #notes").val(self.default_notes); 
@@ -1156,6 +1149,9 @@ var Inspections = function()
 		}
         
         $("#inspectionStep4 #emailTo").val("");
+        $("#inspection #notes").val("");
+
+        self.setDefaultNotes();        
 		
 		// Show the inspection screen.
 		$("#inspection").removeClass("hidden");  
@@ -1495,6 +1491,7 @@ var Inspections = function()
         $("#btnReportPhotos").unbind();
         $("#frmEmailTo").unbind();
         $("a.sendEmailButton").unbind();
+        $("#report_type").unbind();
     }	
 	
 	/***
@@ -1611,6 +1608,10 @@ var Inspections = function()
             $('#inspection .btnEditNotes').show();
             
         });
+        
+        $("#report_type").change(function() {
+            self.setDefaultNotes();          
+        });        
         
         $(".inspectionDetails #btnCapturePhoto").bind(objApp.touchEvent, function(e)
 		{
