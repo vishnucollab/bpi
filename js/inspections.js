@@ -59,6 +59,7 @@ var Inspections = function()
                             "Ensure council assets are cleaned prior to handover.";
     
 	var self = this;
+    var user_email = localStorage.getItem("email");
     
 	$(".inspectionDetails #btnCapturePhoto").append('<div class="numImgCurr">' + self.numImgCurr + '</div>');
     
@@ -1524,6 +1525,8 @@ var Inspections = function()
             // Ensure recipients for the report are defined
             var recipients = $("#emailTo").val();
             if(objApp.empty(recipients)) {
+                self.resolveEmailReportRecipients();
+
                 alert("Please enter a recipient email address");
                 return;
             }
@@ -2850,7 +2853,24 @@ var Inspections = function()
         {
             self.objPopDetail.removeOption(ID);
         });
-    }           
+    }
+    this.setObservationFilters = function(){
+        objDBUtils.orderBy = "";
+        self.observation = $('#frmDefectDetails textarea#observation').val().trim();
+        $("#frmDefectDetails #observation_suggestion").empty();
+
+        if(self.observation == '') {
+            return false;
+            $("#observationFS").hide();
+        }
+
+        $("#observationFS").show();
+
+        self.filters = [];
+        //filters.push(new Array("limit", 4));
+        self.filters.push(new Array("resource_type = 3"));
+        self.filters.push(new Array("name LIKE '%" + objDBUtils.doubleApos(self.observation) + "%'"));
+    }
 	
 	/***
 	* initDefectForm
@@ -3007,38 +3027,26 @@ var Inspections = function()
 		$('#frmDefectDetails #observation').bind('keyup', function(e)
 		{
             setTimeout(function() {
-                objDBUtils.orderBy = "";
-                self.observation = $('#frmDefectDetails textarea#observation').val().trim();
-				$("#frmDefectDetails #observation_suggestion").empty();
-                
-                if(self.observation == '') {
-                    return false;
-                    $("#observationFS").hide();
+                self.setObservationFilters();
+                if(e.which=='32'){ // if user pressed "space" button
+                    self.searchObservations();
                 }
-                
-                $("#observationFS").show();
-                
-                
-
-                var filters = [];
-                filters.push(new Array("resource_type = 3"));
-                filters.push(new Array("name LIKE '%" + objDBUtils.doubleApos(self.observation) + "%'"));
-                //filters.push(new Array("limit", 4));
-                
-                objDBUtils.loadSelect("resources", filters, "#frmDefectDetails #observation_suggestion", function()
-                {
-                    if(objUtils.isMobileDevice()) {
-                        scroller = new iScroll('observationWrapper', { hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar'});
-                    }
-                }, 'td');
             }, 350);
 		});
-		                                                                        
-		
-		
 		self.setReadOnly();
 	}
-	
+    $("#searchObservation").bind(objApp.touchEvent, function(e) {
+       self.setObservationFilters();
+       self.searchObservations();
+    });
+	this.searchObservations = function(){
+        objDBUtils.loadSelect("resources", self.filters, "#frmDefectDetails #observation_suggestion", function()
+        {
+            if(objUtils.isMobileDevice()) {
+                scroller = new iScroll('observationWrapper', { hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar'});
+            }
+        }, 'td');
+    }
 	/***
 	* Delete the specified inspection item (defect)
 	* We need to delete all related inspection item photos, and then the inspection item itself
@@ -5556,7 +5564,7 @@ var Inspections = function()
 			}					
 		}
 	}
-	
+
 	/***
 	* The showPrintModal method is called when the user taps on the print icon
 	*/
@@ -6129,7 +6137,8 @@ var Inspections = function()
     }
     
     this.resolveEmailReportRecipients = function() {
-        var user_email = localStorage.getItem("email");
+
+        var office_email = 'rod@blueprint-qa.com';
         var builder_email = "";
         
         if(!self.inspection) {
@@ -6149,10 +6158,10 @@ var Inspections = function()
             
             var determineRecipients = function() {
                 
-                var recipients = "";
-            
-                if($("#emailToMe").is(":checked")) {
-                    recipients += user_email;    
+                var recipients = user_email;
+
+                if($("#emailToOffice").is(":checked")) {
+                    recipients += "," + office_email;
                 }
                 
                 if(($("#emailToBuilder").is(":checked")) && (!objApp.empty(builder_email))) {

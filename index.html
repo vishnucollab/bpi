@@ -496,6 +496,12 @@
                                     <input type="hidden" id="action" name="action" value="" />
                                 </td>
                         	</tr>
+                            <tr>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <a class="button left" id="searchObservation" href="#">Search</a>
+                                </td>
+                            </tr>
                         </table>
                     </fieldset> 
                            
@@ -908,14 +914,14 @@
                 <legend>Email Report To</legend>
                 
                 <ul id="list_email">
-                    <li><input type="checkbox" id="emailToMe" value="1" checked="checked" /> <label for="emailToMe">Me</label></li>
+                    <li><input type="checkbox" id="emailToOffice" value="1"  /> <label for="emailToMe">Office</label></li>
                     <li><input type="checkbox" id="emailToBuilder" value="1" /> <label for="emailToBuilder">Builder</label></li>
                 </ul>
                 
                 <div class="clear"></div>
                 
                 <label for="emailTo">Recipients</label>
-                <input type="text" id="emailTo" name="emailTo" value="" />   
+                <input type="text" disabled="disabled" id="emailTo" name="emailTo" value="" />
                 
 				<ul>
 					<li><input type="checkbox" id="attach_inspection_images" value="0" /> <label for="attach_inspection_images">Attach Inspection Images</label></li>
