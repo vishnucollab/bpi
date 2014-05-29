@@ -347,6 +347,7 @@ var Inspections = function()
 			// Bind click event to list items
             
             $("#tblInspectionListing td.delete").bind("click", function(e) {
+
                 self.is_change_order = true;
 				e.preventDefault();
 				var inspection_item_id = $(this).parent().attr("rel");
@@ -355,7 +356,7 @@ var Inspections = function()
 
 				
                 var item_name = $(parent).find("td:eq(2)").text();
-                
+
                 if(confirm("Are you sure you wish to delete this inspection for " + item_name))
                 {
                     var sql = "UPDATE inspections " +
@@ -363,7 +364,8 @@ var Inspections = function()
                               "WHERE id = ?";
                               
                     objDBUtils.execute(sql, [inspection_item_id], null);
-                    
+
+
                     self.doInspectionSearch();
                 }
                     
@@ -1905,6 +1907,11 @@ var Inspections = function()
         * Handle the event when the user hits the NExt button on the stage 2 event tracking
         */
         $(".inspectionDetails #btnStep2Next").bind(objApp.touchEvent, function(e) {
+            if($('#observation').val().trim()==''){
+               alert('Please insert the observation');
+                return;
+            }
+
 			e.preventDefault();
 
             self.saveDefect(function() {
@@ -2283,6 +2290,10 @@ var Inspections = function()
 		*/
 		$("#btnAddDefect").bind(objApp.touchEvent, function(e)
 		{
+            if($('#observation').val().trim()==''){
+                alert('Please insert the observation');
+                return;
+            }
 			e.preventDefault();
 
 			self.saveDefect(function(){
@@ -3095,7 +3106,10 @@ var Inspections = function()
 					}
 				});				
 			});				
-		});	
+		});
+      // two time doing arrow down functionality to update wrong tag ID's
+        self.handleMoveInspectionItem(item_id, 'down');
+        self.handleMoveInspectionItem(item_id, 'down');
 	}
     
     /***
@@ -4843,7 +4857,7 @@ var Inspections = function()
                     if($(this).hasClass("up")) {
                         direction = "up";
                     }
-                    
+
                     self.handleMoveInspectionItem(inspection_item_id, direction);
                 });
                 
@@ -4992,12 +5006,9 @@ var Inspections = function()
         var new_seq_no = 0;
         var counter = 0;
         var num_keys = $.assocArraySize(this.keySortArray);
-        
         var sql = "UPDATE inspectionitems " +
             "SET seq_no = ?, dirty = 1 " +
             "WHERE id = ?";
-                
-        
         for(var key in this.keySortArray) {
             var inspection_item_id = this.keySortArray[key];
             
@@ -5019,7 +5030,7 @@ var Inspections = function()
         // Reload table
         //        
     }
-    
+
     
     /**
     * Loads the reinspections screen.
