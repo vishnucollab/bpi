@@ -459,34 +459,48 @@ var Inspections = function()
         // Load the original inspection
         objDBUtils.loadRecord("inspections", inspection_id, function(inspection_id, row)
         {
+            var Reinspectionnotes = row.notes;
             if(!row) {
                 alert("Sorry, the inspection could not be loaded.  Please report this error.");
                 return;
             }
+           // console.debug('row',row,'inspection',inspection_id);
+            var Reinspectionnotes = row.notes;
             $('#btnReinspectNotes').bind(objApp.touchEvent,function(e){
-                objDBUtils.loadRecord("reinspections", inspection_id, function(inspection_id, Reinspectrow)
+                objDBUtils.loadRecord("reinspections", objApp.keys.reinspection_id, function(reinspection_id, reinspectrow)
                 {
-                    console.debug(Reinspectrow);
+                  if(reinspectrow.notes !="" || reinspectrow.notes != null){
+                       console.debug(reinspectrow.notes);
+                       console.debug('reinspect',reinspectrow);
+                       Reinspectionnotes = reinspectrow.notes;
+                   }
+                    console.debug('reinspect',reinspectrow);
+{
+                       Reinspectionnotes = reinspectrow.notes;
+                   }
                 },inspection_id);
                 // If the current note value is empty and if this is not a Quality inspection,
                 // set the default notes.
-                self.setDefaultNotes();
+               // self.setDefaultNotes();
 
-                var objNoteModal = new noteModal("Reinspection Notes", row.notes, function(notes) {
+                var objNoteModal = new noteModal("Reinspection Notes", Reinspectionnotes, function(notes) {
+                    console.debug($('#txtNoteModal').val());
                     // The user has updated the notes value.
                     // Update the toggle (and therefore the form) with the new value.
-                    $("#inspection #notes").val(row.notes);
-                    self.setNoteButtonContentIndicators();
-                    objApp.objInspection.checkSaveInspection();
+                    if($('#txtNoteModal').val().trim() !=''){
+                       var notes = $('#txtNoteModal').val().trim();
+                       var sql = 'UPDATE reinspections SET notes = ? ,dirty = 1 WHERE inspection_id = ? AND deleted=0';
+                       var values = [notes,inspection_id];
+                        objDBUtils.execute(sql,values, function(){
+                            //console.debug('data',data);
+                        },"");
+                    }
+
+                    //$("#inspection #notes").val(Reinspectionnotes);
+                   // self.setNoteButtonContentIndicators();
+                    //objApp.objInspection.checkSaveInspection();
             });
 
-                objNoteModal.show();
-
-                if(self.finalised == 1)
-                {
-                    objNoteModal.setReadOnly();
-                }
-            });
            //console.debug(row);return;
             objApp.keys.inspection_id = inspection_id;
             objApp.keys.report_type = row.report_type;
@@ -503,7 +517,6 @@ var Inspections = function()
                 "WHERE inspection_id = ? AND deleted = 0";
 
             objDBUtils.execute(sql, [inspection_id], function() {
-
                 // Create a new reinspections record, setting the most recent flag
                 var currentdate = new Date();
                 var curdate = currentdate.getFullYear() + "-"
@@ -511,9 +524,9 @@ var Inspections = function()
                                 + currentdate.getDate();
 
                 var reinspection_id = objDBUtils.makeInsertKey(objApp.sync_prefix);
-                var values = [reinspection_id, inspection_id, curdate, 1, 1,row.notes];
+                var values = [reinspection_id, inspection_id, curdate, 1, 1];
 
-                sql = "INSERT INTO reinspections(id, inspection_id, reinspection_date, failed, most_recent,notes) VALUES(?,?,?,?,?,?)";
+                sql = "INSERT INTO reinspections(id, inspection_id, reinspection_date, failed, most_recent) VALUES(?,?,?,?,?)";
 
                 objDBUtils.execute(sql, values, function(){
 
