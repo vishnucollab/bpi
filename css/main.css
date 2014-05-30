@@ -1008,6 +1008,12 @@ aside textarea
     height: 49px;
     left: 5px;
 }
+.inspectionDetails .bottomBtns .weather{
+    background: url('../images/weather.png') top center no-repeat;
+    width: 44px;
+    height: 49px;
+    left: 5px;
+}
 
 .inspectionDetails .bottomBtns .finished {
     background: url('../images/passed.png') top center no-repeat;

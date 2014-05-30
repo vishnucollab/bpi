@@ -404,12 +404,13 @@ var Inspections = function()
             
             // Handle the event when the user clicks on the REINSPECT button.
             $("#tblInspectionListing a.reinspect").click(function(e)  {
+
                 e.preventDefault();
-                var inspection_id = $(this).attr('data-id'); 
-                
+                var inspection_id = $(this).attr('data-id');
+
                 self.startReinspection(inspection_id);               
-            });            
-            
+            });
+
             
 			$("#tblInspectionListingHeader th").unbind();				
 			
@@ -462,40 +463,64 @@ var Inspections = function()
                 alert("Sorry, the inspection could not be loaded.  Please report this error.");
                 return;
             }
-            
+            $('#btnReinspectNotes').bind(objApp.touchEvent,function(e){
+                objDBUtils.loadRecord("reinspections", inspection_id, function(inspection_id, Reinspectrow)
+                {
+                    console.debug(Reinspectrow);
+                },inspection_id);
+                // If the current note value is empty and if this is not a Quality inspection,
+                // set the default notes.
+                self.setDefaultNotes();
+
+                var objNoteModal = new noteModal("Reinspection Notes", row.notes, function(notes) {
+                    // The user has updated the notes value.
+                    // Update the toggle (and therefore the form) with the new value.
+                    $("#inspection #notes").val(row.notes);
+                    self.setNoteButtonContentIndicators();
+                    objApp.objInspection.checkSaveInspection();
+            });
+
+                objNoteModal.show();
+
+                if(self.finalised == 1)
+                {
+                    objNoteModal.setReadOnly();
+                }
+            });
+           //console.debug(row);return;
             objApp.keys.inspection_id = inspection_id;
             objApp.keys.report_type = row.report_type;
-            
+
             var inspection_property = "Lot " + row.lot_no + ", " + row.address + ", " + row.suburb;
-            
+
             if(!confirm("You are about to start a reinspection for property '" + inspection_property + "'.  Are you sure you wish to continue?")) {
                 return;
             }
-            
+
             // Clear all "most recent" flags in the reinspections table
             var sql = "UPDATE reinspections " +
-                "SET most_recent = 0, dirty = 1 " + 
+                "SET most_recent = 0, dirty = 1 " +
                 "WHERE inspection_id = ? AND deleted = 0";
-                
+
             objDBUtils.execute(sql, [inspection_id], function() {
 
                 // Create a new reinspections record, setting the most recent flag
-                var currentdate = new Date(); 
+                var currentdate = new Date();
                 var curdate = currentdate.getFullYear() + "-"
-                                + (currentdate.getMonth()+1)  + "-" 
+                                + (currentdate.getMonth()+1)  + "-"
                                 + currentdate.getDate();
-                                
+
                 var reinspection_id = objDBUtils.makeInsertKey(objApp.sync_prefix);
-                var values = [reinspection_id, inspection_id, curdate, 1, 1];
-                
-                sql = "INSERT INTO reinspections(id, inspection_id, reinspection_date, failed, most_recent) VALUES(?,?,?,?,?)";
-                
+                var values = [reinspection_id, inspection_id, curdate, 1, 1,row.notes];
+
+                sql = "INSERT INTO reinspections(id, inspection_id, reinspection_date, failed, most_recent,notes) VALUES(?,?,?,?,?,?)";
+
                 objDBUtils.execute(sql, values, function(){
-                    
+
                     objApp.keys.reinspection_id = reinspection_id;
 
-                    // Now that the reinspections record has been created, now create the reinspection items, 
-                    // using the base inspection items as the foundation.                    
+                    // Now that the reinspections record has been created, now create the reinspection items,
+                    // using the base inspection items as the foundation.
                     sql = "SELECT * FROM inspectionitems WHERE inspection_id = ? AND deleted = 0";
                     objDBUtils.loadRecordsSQL(sql, [inspection_id], function(param, items) {
                         if(!items)
@@ -509,31 +534,31 @@ var Inspections = function()
 
                         for(r = 0; r < maxLoop; r++) {
 
-                            var row = items.rows.item(r);  
-                            
+                            var row = items.rows.item(r);
+
                             sql = "INSERT INTO reinspectionitems(id,reinspection_id, inspectionitem_id, rectified) " +
                                   "VALUES(?,?,?,?)";
-                                  
+
                             var reinspection_item_id = objDBUtils.makeInsertKey(objApp.sync_prefix) + r;
-                            
+
                             var values = [reinspection_item_id, reinspection_id, row.id, row.rectified];
-                            
+
                             var last_item = (r == (maxLoop - 1));
-                            
+
                             objDBUtils.executeWithCBParam(sql, values, function(finished) {
-                                
+
                                 // See if the last reinspection item has been copied in.
                                 if(finished) {
                                     // Open the reinspection page for this reinspection
                                     self.loadReinspectionItems(reinspection_id);
                                 }
                             }, last_item);
-                        }    
+                        }
 
-                    },"");                    
-                    
-                    
-                });                
+                    },"");
+
+
+                });
      
             });
 
@@ -6151,47 +6176,47 @@ var Inspections = function()
 
         var office_email = 'rod@blueprint-qa.com';
         var builder_email = "";
-        
+
         if(!self.inspection) {
             return false;
-        }  
-        
+        }
+
         $("#frmEmailTo ul#list_email input[type='checkbox']").unbind();
-        
+
         blockElement("#frmEmailTo");
-        
+
         objDBUtils.loadRecord("builders", self.inspection.builder_id, function(param, builder) {
             unblockElement("#frmEmailTo");
-            
+
             if(builder) {
                 builder_email = builder.email;
-            } 
-            
+            }
+
             var determineRecipients = function() {
-                
+
                 var recipients = user_email;
 
                 if($("#emailToOffice").is(":checked")) {
                     recipients += "," + office_email;
                 }
-                
+
                 if(($("#emailToBuilder").is(":checked")) && (!objApp.empty(builder_email))) {
                     if(!objApp.empty(recipients)) {
                         recipients += ",";
                     }
-                    
+
                     recipients += builder_email;
                 }
-                
+
                 $("#emailTo").val(recipients);
             }
-            
+
             determineRecipients();
-            
+
             $("#frmEmailTo ul#list_email input[type='checkbox']").change(function() {
-                determineRecipients();    
+                determineRecipients();
             });
-            
+
         }, "");
 
     }
