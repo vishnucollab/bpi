@@ -1134,6 +1134,7 @@ function DBUtils()
 			}, objDBUtils.DB_error_handler);
 		});    
 	}
+    
 	/**********************************************
 	* INSPECTIONS
 	*/	
@@ -1190,17 +1191,8 @@ function DBUtils()
 
 			}, objDBUtils.DB_error_handler);
 		});
-        var sql = "CREATE TABLE IF NOT EXISTS reinspections  (" +
-            "'id' VARCHAR PRIMARY KEY NOT NULL, " +
-            "'inspection_id' VARCHAR NOT NULL, " +
-            "'reinspection_date' DATE NOT NULL, " +
-            "'failed' INTEGER NOT NULL DEFAULT 0, " +
-            "'most_recent' INTEGER NOT NULL DEFAULT 0, " +
-            "'created_by' INTEGER NOT NULL DEFAULT 48, " +
-            "'deleted' INTEGER NOT NULL DEFAULT 0, " +
-            "'weather' VARCHAR NULL ," +
-            "'notes' TEXT  NULL";
     }
+    
 	/**********************************************
 	* INSPECTION ITEMS
 	*/	
@@ -1261,6 +1253,7 @@ function DBUtils()
 			}, objDBUtils.DB_error_handler);
 		});    
 	}
+    
 	/**********************************************
 	* REINSPECTION ITEMS
 	*/	
