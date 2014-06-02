@@ -451,39 +451,12 @@ var Inspections = function()
             		
 	    }, "");
 	}
-    $('#btnReinspectNotes').bind(objApp.touchEvent,function(e){
-        var inspection_id = "SOu2Y1401069578903";
-        objDBUtils.loadRecord("reinspections", objApp.keys.reinspection_id, function(reinspection_id, reinspectrow)
-        {
-            if(reinspectrow.notes != null){
-                objNoteModal.setValue("");
-                objNoteModal.setValue(reinspectrow.notes);  
-            }
-            
-        },inspection_id);
-        var objNoteModal = new noteModal("Reinspection Notes", self.reinspectionNotes, function(notes) {
-            var sql = 'UPDATE reinspections SET notes = ? WHERE inspection_id = ?';
-            objDBUtils.execute(sql, [notes,inspection_id],null);
-        });
-        objNoteModal.show();
 
-        if(self.finalised == 1)
-        {
-            objNoteModal.setReadOnly();
-        }
-    });
     /**
     * Creates a new reinspection after confirming with the user.
     */
     this.startReinspection = function(inspection_id)
     {
-        $('#btnRWSave').bind(objApp.touchEvent,function(e){
-            e.preventDefault();
-           var weather = $('#reinspectWeatherInput').val();
-           var sql = "UPDATE reinspections SET weather = ? WHERE inspection_id = ?";
-            objDBUtils.execute(sql,[weather,inspection_id],null);
-            revealWindow.hideModal();
-        });
         // Load the original inspection
         objDBUtils.loadRecord("inspections", inspection_id, function(inspection_id, row)
         {
@@ -502,6 +475,8 @@ var Inspections = function()
             if(!confirm("You are about to start a reinspection for property '" + inspection_property + "'.  Are you sure you wish to continue?")) {
                 return;
             }
+            
+            blockElement("#inspectionList");
 
             // Clear all "most recent" flags in the reinspections table
             var sql = "UPDATE reinspections " +
@@ -517,11 +492,11 @@ var Inspections = function()
 
                 var reinspection_id = objDBUtils.makeInsertKey(objApp.sync_prefix);
                 var values = [reinspection_id, inspection_id, curdate, 1, 1,self.reinspectionNotes];
-
+                
                 sql = "INSERT INTO reinspections(id, inspection_id, reinspection_date, failed, most_recent,notes) VALUES(?,?,?,?,?,?)";
 
                 objDBUtils.execute(sql, values, function(){
-
+                    
                     objApp.keys.reinspection_id = reinspection_id;
 
                     // Now that the reinspections record has been created, now create the reinspection items,
@@ -543,7 +518,7 @@ var Inspections = function()
 
                             sql = "INSERT INTO reinspectionitems(id,reinspection_id, inspectionitem_id, rectified) " +
                                   "VALUES(?,?,?,?)";
-
+                                  
                             var reinspection_item_id = objDBUtils.makeInsertKey(objApp.sync_prefix) + r;
 
                             var values = [reinspection_item_id, reinspection_id, row.id, row.rectified];
@@ -554,6 +529,7 @@ var Inspections = function()
 
                                 // See if the last reinspection item has been copied in.
                                 if(finished) {
+                                    unblockElement("#inspectionList");
                                     // Open the reinspection page for this reinspection
                                     self.loadReinspectionItems(reinspection_id);
                                 }
@@ -3905,6 +3881,7 @@ var Inspections = function()
                             }
                             
                             objApp.keys.inspection_id = reinspection.inspection_id;
+                            self.reinspectionNotes = reinspection.notes;
                             
                             self.loadReinspectionItems(id);
                         }, "");                        
@@ -5099,7 +5076,9 @@ var Inspections = function()
                 $('#reinspection select#rectified').unbind();
                 $("#reinspection a.passed").unbind();
                 $("#reinspection a.failed").unbind();
-                
+                $('#btnReinspectNotes').unbind();
+                $('#btnRWSave').unbind();
+                                
                 // Clear the stage
                 objApp.clearMain();
                 
@@ -5223,10 +5202,37 @@ var Inspections = function()
                     $("#reinspection a.failed").bind(objApp.touchEvent, function(){
                         self.updateReinspectionPassFail(1);
                     });
+                    
+                    $('#btnRWSave').bind(objApp.touchEvent,function(e){
+                        e.preventDefault();
+                    
+                        var weather = $('#reinspectWeatherInput').val();
+                        
+                        var sql = "UPDATE reinspections SET weather = ?, dirty = 1 WHERE id = ?";
+                        objDBUtils.execute(sql,[weather,objApp.keys.reinspection_id],null);
+                        
+                        revealWindow.hideModal();
+                    }); 
+                    
+                    $('#btnReinspectNotes').bind(objApp.touchEvent,function(e){
+
+                        var objNoteModal = new noteModal("Reinspection Notes", self.reinspectionNotes, function(notes) {
+                            self.reinspectionNotes = notes; // Update the self object with the current notes value
+                            
+                            // Update the database too.
+                            var sql = 'UPDATE reinspections SET notes = ?, dirty = 1 WHERE id = ?';
+                            objDBUtils.execute(sql, [notes, reinspection_id], null);
+                            
+                        });
+                        
+                        objNoteModal.show();
+
+                        if(self.finalised == 1)
+                        {
+                            objNoteModal.setReadOnly();
+                        }
+                    });                                       
                 });            
-                                
-                
-                
             }, "");
         }, ""); 
         
@@ -6100,7 +6106,7 @@ var Inspections = function()
 				$("#emailMessage").focus();
 				return;
                 */
-                emailMessage = "Hi there, please find attached a JetQuo inspection report for: <br/><br/>" +
+                emailMessage = "Hi there, please find attached a Blueprint inspection report for: <br/><br/>" +
                                 "   Client: " + self.objPopBuilders.getText() + "<br/>" +
                                 "   Site: " + self.objPopSites.getText() + "<br/>" +
                                 "   Inspection Date: " + $("#inspection #inspection_date").val() + "<br/>" +
