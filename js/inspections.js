@@ -452,7 +452,7 @@ var Inspections = function()
 	    }, "");
 	}
     $('#btnReinspectNotes').bind(objApp.touchEvent,function(e){
-        var inspection_id = "SOu2Y1401069578903";
+        var inspection_id = objApp.getKey("inspection_id");
         objDBUtils.loadRecord("reinspections", objApp.keys.reinspection_id, function(reinspection_id, reinspectrow)
         {
             if(reinspectrow.notes != null){
