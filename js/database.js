@@ -1144,8 +1144,18 @@ function DBUtils()
 		
 		if(this.DB_DEBUG)
 			alert("CREATE " + table_name);
-		
-				"'dirty' INTEGER NOT NULL DEFAULT 1)" +
+            
+        var sql = "CREATE TABLE IF NOT EXISTS reinspections  (" +
+                "'id' VARCHAR PRIMARY KEY NOT NULL, " +    
+                "'inspection_id' VARCHAR NOT NULL, " +
+                "'reinspection_date' DATE NOT NULL, " +
+                "'failed' INTEGER NOT NULL DEFAULT 0, " +
+                "'most_recent' INTEGER NOT NULL DEFAULT 0, " +
+                "'weather' VARCHAR NULL ," +
+                "'notes' TEXT  NULL, " +
+                "'created_by' INTEGER NOT NULL DEFAULT 48, " + 
+                "'deleted' INTEGER NOT NULL DEFAULT 0, " + 
+                "'dirty' INTEGER NOT NULL DEFAULT 1)";
 
 		this.db.transaction(function(transaction)
 		{
