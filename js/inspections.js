@@ -39,6 +39,7 @@ var Inspections = function()
 	this.builder_id = "";
 	this.inAudit = false;
     this.reinspectionItemRow;
+    this.reinspectionNotes;
 	this.numImgCurr = 0;
     this.reinspectionKey = null;
     this.inspection = false;
@@ -450,58 +451,49 @@ var Inspections = function()
             		
 	    }, "");
 	}
-    
+    $('#btnReinspectNotes').bind(objApp.touchEvent,function(e){
+        var inspection_id = "SOu2Y1401069578903";
+        objDBUtils.loadRecord("reinspections", objApp.keys.reinspection_id, function(reinspection_id, reinspectrow)
+        {
+            if(reinspectrow.notes != null){
+                objNoteModal.setValue("");
+                objNoteModal.setValue(reinspectrow.notes);  
+            }
+            
+        },inspection_id);
+        var objNoteModal = new noteModal("Reinspection Notes", self.reinspectionNotes, function(notes) {
+            var sql = 'UPDATE reinspections SET notes = ? WHERE inspection_id = ?';
+            objDBUtils.execute(sql, [notes,inspection_id],null);
+        });
+        objNoteModal.show();
+
+        if(self.finalised == 1)
+        {
+            objNoteModal.setReadOnly();
+        }
+    });
     /**
     * Creates a new reinspection after confirming with the user.
     */
     this.startReinspection = function(inspection_id)
     {
+        $('#btnRWSave').bind(objApp.touchEvent,function(e){
+            e.preventDefault();
+           var weather = $('#reinspectWeatherInput').val();
+           var sql = "UPDATE reinspections SET weather = ? WHERE inspection_id = ?";
+            objDBUtils.execute(sql,[weather,inspection_id],null);
+            revealWindow.hideModal();
+        });
         // Load the original inspection
         objDBUtils.loadRecord("inspections", inspection_id, function(inspection_id, row)
         {
-            var Reinspectionnotes = row.notes;
             if(!row) {
                 alert("Sorry, the inspection could not be loaded.  Please report this error.");
                 return;
             }
-           // console.debug('row',row,'inspection',inspection_id);
-            var Reinspectionnotes = row.notes;
-            $('#btnReinspectNotes').bind(objApp.touchEvent,function(e){
-                objDBUtils.loadRecord("reinspections", objApp.keys.reinspection_id, function(reinspection_id, reinspectrow)
-                {
-                  if(reinspectrow.notes !="" || reinspectrow.notes != null){
-                       console.debug(reinspectrow.notes);
-                       console.debug('reinspect',reinspectrow);
-                       Reinspectionnotes = reinspectrow.notes;
-                   }
-                    console.debug('reinspect',reinspectrow);
-{
-                       Reinspectionnotes = reinspectrow.notes;
-                   }
-                },inspection_id);
-                // If the current note value is empty and if this is not a Quality inspection,
-                // set the default notes.
-               // self.setDefaultNotes();
 
-                var objNoteModal = new noteModal("Reinspection Notes", Reinspectionnotes, function(notes) {
-                    console.debug($('#txtNoteModal').val());
-                    // The user has updated the notes value.
-                    // Update the toggle (and therefore the form) with the new value.
-                    if($('#txtNoteModal').val().trim() !=''){
-                       var notes = $('#txtNoteModal').val().trim();
-                       var sql = 'UPDATE reinspections SET notes = ? ,dirty = 1 WHERE inspection_id = ? AND deleted=0';
-                       var values = [notes,inspection_id];
-                        objDBUtils.execute(sql,values, function(){
-                            //console.debug('data',data);
-                        },"");
-                    }
+            self.reinspectionNotes = row.notes;
 
-                    //$("#inspection #notes").val(Reinspectionnotes);
-                   // self.setNoteButtonContentIndicators();
-                    //objApp.objInspection.checkSaveInspection();
-            });
-
-           //console.debug(row);return;
             objApp.keys.inspection_id = inspection_id;
             objApp.keys.report_type = row.report_type;
 
@@ -524,9 +516,9 @@ var Inspections = function()
                                 + currentdate.getDate();
 
                 var reinspection_id = objDBUtils.makeInsertKey(objApp.sync_prefix);
-                var values = [reinspection_id, inspection_id, curdate, 1, 1];
+                var values = [reinspection_id, inspection_id, curdate, 1, 1,self.reinspectionNotes];
 
-                sql = "INSERT INTO reinspections(id, inspection_id, reinspection_date, failed, most_recent) VALUES(?,?,?,?,?)";
+                sql = "INSERT INTO reinspections(id, inspection_id, reinspection_date, failed, most_recent,notes) VALUES(?,?,?,?,?,?)";
 
                 objDBUtils.execute(sql, values, function(){
 
@@ -576,9 +568,10 @@ var Inspections = function()
             });
 
             
-        }, inspection_id);         
+        }, inspection_id);
+
     }
-    
+
     /***
     * Sets the listing table column widths (headers and cells)
     * as required.

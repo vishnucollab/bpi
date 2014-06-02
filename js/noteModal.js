@@ -231,5 +231,8 @@ var noteModal = function(heading, notes, saveMethod)
 		{      
 			window.scrollTo(0, 1);
 		}		
-	}			
+	}
+    this.setValue = function(value){
+        $("#noteModal #txtNoteModal").val(value);
+    }
 };
