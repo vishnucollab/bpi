@@ -5202,6 +5202,10 @@ var Inspections = function()
                     $("#reinspection a.failed").bind(objApp.touchEvent, function(){
                         self.updateReinspectionPassFail(1);
                     });
+
+                    $("#Reinspectweather").bind(objApp.touchEvent, function(){
+                        $('#reinspectWeatherInput').val(reinspection.weather);
+                    });
                     
                     $('#btnRWSave').bind(objApp.touchEvent,function(e){
                         e.preventDefault();
