@@ -62,5 +62,45 @@ var dbUpgrader = function()
             }
         }
     }
+    this.inspections = function(old_version, new_version)
+    {
+        while(old_version < new_version)
+        {
+            // Incremement the vesion
+            old_version =  old_version + .1 ;
 
+            switch(old_version)
+            {
+                case 1.1:
+
+                    // Do 1.1 upgrade
+                    // Execute SQL to add the new columns here
+                    var sql = "ALTER TABLE inspections ADD COLUMN 'min_roof_tiles' SMALLINT(6) DEFAULT 0";
+                    objDBUtils.execute(sql, null, null);
+
+                    var sql = "ALTER TABLE inspections ADD COLUMN 'min_ridge_tiles' SMALLINT(6) DEFAULT 0";
+                    objDBUtils.execute(sql, null, null);
+
+                    var sql = "ALTER TABLE inspections ADD COLUMN 'touch_up_paint' SMALLINT(6) DEFAULT 0";
+                    objDBUtils.execute(sql, null, null);
+
+                    var sql = "ALTER TABLE inspections ADD COLUMN 'min_flooring_tiles' SMALLINT(6) DEFAULT 0";
+                    objDBUtils.execute(sql, null, null);
+
+                    var sql = "ALTER TABLE inspections ADD COLUMN 'grout_samples' SMALLINT(6) DEFAULT 0";
+                    objDBUtils.execute(sql, null, null);
+
+                    var sql = "ALTER TABLE inspections ADD COLUMN 'barrel_code' SMALLINT(6) DEFAULT 0";
+                    objDBUtils.execute(sql, null, null);
+
+                    sql = "UPDATE app_tables SET version = ? WHERE table_name = ?";
+                    objDBUtils.execute(sql, [1.1, 'inspections'], null);
+                    // Upgrade complete
+                    break;
+
+                default:
+                    break;
+            }
+        }
+    }
 };

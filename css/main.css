@@ -1745,3 +1745,53 @@ footer span {float: right; margin: 15px; font-weight: bold}
 form.search input[type="text"] {
     width: 250px;
 }
+
+a.yesno_enabled
+{
+    background: #5391cd;
+    border: 1px solid #444444;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    color: #fff;
+    cursor: pointer;
+    display: block;
+    font-family: 'PTSansBold', sans-serif;
+    font-size: 18px;
+    font-weight: normal;
+    line-height: 1em;
+    margin: 0 0 0px;
+    padding: 10px 60px;
+    text-align: center;
+    text-decoration: none;
+    text-shadow: #007b87 0px 1px 0;
+    text-transform: none;
+}
+
+a.yesno_enabled:hover {
+    background: #4072A3;
+}
+
+a.yesno_disabled
+{
+    background: #B6B6B6;
+    border: 1px solid #444444;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    color: #000;
+    cursor: pointer;
+    display: block;
+    font-family: 'PTSansBold', sans-serif;
+    font-size: 18px;
+    font-weight: normal;
+    line-height: 1em;
+    margin: 0 0 0px;
+    padding: 10px 60px;
+    text-align: center;
+    text-decoration: none;
+    text-shadow: #FFFFFF 0px 1px 0;
+    text-transform: none;
+}
+
+a.yesno_disabled:hover {
+    background: #9B9B9B;
+}
