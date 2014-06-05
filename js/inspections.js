@@ -1695,6 +1695,11 @@ var Inspections = function()
                 objApp.setSubExtraHeading("Step 1 of 3", true);
                 objApp.keys.report_type = $(this).val();
             }
+
+            if($(this).val() == "Tower & Unit PCI")
+            {
+                $("#btnCapturePhoto").hide();
+            }
             
             $('#inspection .btnEditNotes').show();
             
@@ -4829,7 +4834,10 @@ var Inspections = function()
                     }
                     
                     // Show the camera button
-                    $(".inspectionDetails #btnCapturePhoto").show();
+                    if($("#report_type").val() != "Tower & Unit PCI")
+                    {
+                        $(".inspectionDetails #btnCapturePhoto").show();
+                    }
                     
                     // Show the next button
                     $(".inspectionDetails #btnStep1Next").show();                       
@@ -5757,7 +5765,7 @@ var Inspections = function()
             $('#finished').removeClass('active');
             $('#keywords').removeClass('hidden');
             
-            if(objApp.keys.report_type == "PCI") {
+            if(objApp.keys.report_type == "House & Land PCI") {
                 $("#btnReportPhotos").removeClass("hidden");
             }
             
