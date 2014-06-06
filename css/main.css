@@ -443,9 +443,9 @@ a#btnCreateUser, a#backtoLog
 
 /*a#btnCreateUser:hover
 {
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#e3f58b), color-stop(100%,#7bcd24)); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(top, #e3f58b 0%, #7bcd24 100%); /* Chrome10+,Safari5.1+ */
-    background: linear-gradient(top, #e3f58b 0%, #7bcd24 100%); /* W3C */    
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#e3f58b), color-stop(100%,#7bcd24)); /* Chrome,Safari4+
+    background: -webkit-linear-gradient(top, #e3f58b 0%, #7bcd24 100%); /* Chrome10+,Safari5.1+
+    background: linear-gradient(top, #e3f58b 0%, #7bcd24 100%); /* W3C
     -webkit-box-shadow: inset 0px 0px 15px 0px rgba(227, 245, 139, .9); box-shadow: inset 0px 0px 15px 0px rgba(227, 245, 139, .9); 
     text-shadow: #f0f7cb 0px -1px 0;        
 }
@@ -1089,8 +1089,22 @@ aside textarea
     font-weight: bold;
     font-size: 14pt;
 }
+#addPhotoFromGallery{
+    font-size: 14pt;
+    background: url("../images/ipad_tablet.png") top left no-repeat;
+    right: 20px;
+    background-size: 88px;
+    width: 115px;
+    padding-left: 88px;
+    position: absolute;
+    height: 100px;
+    text-decoration: none;
+    color: black;
+    font-weight: bold;
+    top: 135px;
+}
 .inspectionDetails a#btnCapturePhoto {
-    background: url("../images/camera-75.png") left top no-repeat;    
+    background: url("../images/camera-75.png") left top no-repeat;
     right: 150px;
     bottom: -10px;
     height: 75px;
