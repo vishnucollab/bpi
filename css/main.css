@@ -1795,3 +1795,15 @@ a.yesno_disabled
 a.yesno_disabled:hover {
     background: #9B9B9B;
 }
+
+.inspectionDetails .bottomBtns .email {
+    background: url('../images/mail.png') top center no-repeat;
+    width: 75px;
+    height: 49px;
+    left: 5px;
+}
+
+#btnStep3Email { top: 0; }
+#btnStep3Email span {
+    bottom: -10px;
+}

@@ -782,14 +782,14 @@ var Inspections = function()
             if(inspection.report_type == "Quality Inspection")
             {
                 objApp.setSubExtraHeading("Step 3 of 5", true);
-                $('#inspectionStep3 > .bottomBtns > a#btnStep3Email').hide();
+                $('#inspectionStep3 > .bottomBtns > #btnStep3Email').hide();
                 $('#inspectionStep3 > .bottomBtns > .btnContainer.right > a#btnStep3Next').html('Next');
                 $('#inspectionStep4 > .bottomBtns > .btnContainer.right > a#btnStep4Next').html('Next');
             }
             else
             {
                 objApp.setSubExtraHeading("Step 3 of 3", true);
-                $('#inspectionStep3 > .bottomBtns > a#btnStep3Email').show();
+                $('#inspectionStep3 > .bottomBtns > #btnStep3Email').show();
                 $('#inspectionStep3 > .bottomBtns > .btnContainer.right > a#btnStep3Next').html('Exit');
             }
             
