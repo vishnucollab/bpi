@@ -654,12 +654,11 @@ div.pack a.button
     width: 140px;
 }
 
-#btnReinspectEmail {
+#btnReinspectEmail,#btnReinspectNotes,#btnReinspectDelete {
     top: 10px;
 }
 
-#btnReinspectDelete {
-    top: 10px;
+#btnReinspectDelete,#btnReinspectEmail {
     margin-left: 10px;
 }
 
@@ -721,5 +720,9 @@ fieldset legend {
 		
 		#emailReportWrapper #attach_inspection_images {
             margin-bottom: 20px;
+        }
+
+        #reinspectionWeatherWrapper{
+            padding: 20px;
         }
 		

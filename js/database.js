@@ -32,8 +32,8 @@ function DBUtils()
 	this.tables.push(new Array('app_tables', 1.0));
 	this.tables.push(new Array('builders', 1.0));
 	this.tables.push(new Array('resources', 1.0));
-	this.tables.push(new Array('inspections', 1.0));
-	this.tables.push(new Array('reinspections', 1.0));
+	this.tables.push(new Array('inspections', 1.1));
+	this.tables.push(new Array('reinspections', 1.1));
 	this.tables.push(new Array('inspectionitems', 1.0));
 	this.tables.push(new Array('reinspectionitems', 1.0));
 	this.tables.push(new Array('inspectionitemphotos', 1.0));
@@ -1091,7 +1091,13 @@ function DBUtils()
 				"'client_info' VARCHAR, " +
 				"'notes' TEXT, " +
 				"'initials' VARCHAR NOT NULL, " +
-				"'created_by' INTEGER NOT NULL, " + 
+                "'min_roof_tiles' SMALLINT(6) DEFAULT 0, " +
+                "'min_ridge_tiles' SMALLINT(6) DEFAULT 0, " +
+                "'touch_up_paint' SMALLINT(6) DEFAULT 0, " +
+                "'min_flooring_tiles' SMALLINT(6) DEFAULT 0, " +
+                "'grout_samples' SMALLINT(6) DEFAULT 0, " +
+                "'barrel_code' SMALLINT(6) DEFAULT 0, " +
+                "'created_by' INTEGER NOT NULL, " +
 				"'deleted' INTEGER NOT NULL DEFAULT 0 , " + 
 				"'dirty' INTEGER NOT NULL DEFAULT 1)";
 
@@ -1134,6 +1140,7 @@ function DBUtils()
 			}, objDBUtils.DB_error_handler);
 		});    
 	}
+    
 	/**********************************************
 	* INSPECTIONS
 	*/	
@@ -1144,51 +1151,54 @@ function DBUtils()
 		
 		if(this.DB_DEBUG)
 			alert("CREATE " + table_name);
-		
-		var sql = "CREATE TABLE IF NOT EXISTS reinspections  (" +
-				"'id' VARCHAR PRIMARY KEY NOT NULL, " +	
-				"'inspection_id' VARCHAR NOT NULL, " +
-				"'reinspection_date' DATE NOT NULL, " +
-				"'failed' INTEGER NOT NULL DEFAULT 0, " +
+            
+        var sql = "CREATE TABLE IF NOT EXISTS reinspections  (" +
+                "'id' VARCHAR PRIMARY KEY NOT NULL, " +    
+                "'inspection_id' VARCHAR NOT NULL, " +
+                "'reinspection_date' DATE NOT NULL, " +
+                "'failed' INTEGER NOT NULL DEFAULT 0, " +
                 "'most_recent' INTEGER NOT NULL DEFAULT 0, " +
-				"'created_by' INTEGER NOT NULL DEFAULT 48, " + 
-				"'deleted' INTEGER NOT NULL DEFAULT 0, " + 
-				"'dirty' INTEGER NOT NULL DEFAULT 1)";
+                "'weather' VARCHAR NULL ," +
+                "'notes' TEXT  NULL, " +
+                "'created_by' INTEGER NOT NULL DEFAULT 48, " + 
+                "'deleted' INTEGER NOT NULL DEFAULT 0, " + 
+                "'dirty' INTEGER NOT NULL DEFAULT 1)";
 
-		this.db.transaction(function(transaction) 
+		this.db.transaction(function(transaction)
 		{
 			transaction.executeSql(sql, null, function (transaction, result)
 			{
 				// Deleted index
 				sql = "CREATE INDEX IF NOT EXISTS " + table_name + "_deleted ON " + table_name + " (deleted);";
 				self.execute(sql, null, null);
-				
-				// Dirty index 
+
+				// Dirty index
 				sql = "CREATE INDEX IF NOT EXISTS " + table_name + "_dirty ON " + table_name + " (dirty);";
 				self.execute(sql, null, null);
-                
-                // Inspection id index 
+
+                // Inspection id index
                 sql = "CREATE INDEX IF NOT EXISTS " + table_name + "_inspectionid ON " + table_name + " (inspection_id, deleted);";
-                self.execute(sql, null, null);  
-                
-                // Most Recent index 
+                self.execute(sql, null, null);
+
+                // Most Recent index
                 sql = "CREATE INDEX IF NOT EXISTS " + table_name + "_mostrecent ON " + table_name + " (inspection_id, deleted, most_recent);";
-                self.execute(sql, null, null);                                
-				
+                self.execute(sql, null, null);
+
 				// INSERT THE REGISTRY ENTRY
 				sql = "INSERT INTO app_tables (table_name, version) VALUES(?, ?);";
 				transaction.executeSql(sql, [table_name, table_version], function (transaction, result)
 				{
-					if(this.DB_DEBUG)  
+					if(this.DB_DEBUG)
 						alert("INSERTED REGISTRY");
-			  
-		  			objDBUtils.checkNextTable(table_number);                
-			  
+
+		  			objDBUtils.checkNextTable(table_number);
+
 		  		}, objDBUtils.DB_error_handler);
 
 			}, objDBUtils.DB_error_handler);
-		});    
-	}
+		});
+    }
+    
 	/**********************************************
 	* INSPECTION ITEMS
 	*/	
@@ -1249,6 +1259,7 @@ function DBUtils()
 			}, objDBUtils.DB_error_handler);
 		});    
 	}
+    
 	/**********************************************
 	* REINSPECTION ITEMS
 	*/	

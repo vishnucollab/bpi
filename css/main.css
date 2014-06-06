@@ -443,9 +443,9 @@ a#btnCreateUser, a#backtoLog
 
 /*a#btnCreateUser:hover
 {
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#e3f58b), color-stop(100%,#7bcd24)); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(top, #e3f58b 0%, #7bcd24 100%); /* Chrome10+,Safari5.1+ */
-    background: linear-gradient(top, #e3f58b 0%, #7bcd24 100%); /* W3C */    
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#e3f58b), color-stop(100%,#7bcd24)); /* Chrome,Safari4+
+    background: -webkit-linear-gradient(top, #e3f58b 0%, #7bcd24 100%); /* Chrome10+,Safari5.1+
+    background: linear-gradient(top, #e3f58b 0%, #7bcd24 100%); /* W3C
     -webkit-box-shadow: inset 0px 0px 15px 0px rgba(227, 245, 139, .9); box-shadow: inset 0px 0px 15px 0px rgba(227, 245, 139, .9); 
     text-shadow: #f0f7cb 0px -1px 0;        
 }
@@ -1008,6 +1008,12 @@ aside textarea
     height: 49px;
     left: 5px;
 }
+.inspectionDetails .bottomBtns .weather{
+    background: url('../images/weather.png') top center no-repeat;
+    width: 44px;
+    height: 49px;
+    left: 5px;
+}
 
 .inspectionDetails .bottomBtns .finished {
     background: url('../images/passed.png') top center no-repeat;
@@ -1083,8 +1089,22 @@ aside textarea
     font-weight: bold;
     font-size: 14pt;
 }
+#addPhotoFromGallery{
+    font-size: 14pt;
+    background: url("../images/ipad_tablet.png") top left no-repeat;
+    right: 20px;
+    background-size: 88px;
+    width: 115px;
+    padding-left: 88px;
+    position: absolute;
+    height: 100px;
+    text-decoration: none;
+    color: black;
+    font-weight: bold;
+    top: 135px;
+}
 .inspectionDetails a#btnCapturePhoto {
-    background: url("../images/camera-75.png") left top no-repeat;    
+    background: url("../images/camera-75.png") left top no-repeat;
     right: 150px;
     bottom: -10px;
     height: 75px;
@@ -1738,4 +1758,66 @@ footer span {float: right; margin: 15px; font-weight: bold}
 
 form.search input[type="text"] {
     width: 250px;
+}
+
+a.yesno_enabled
+{
+    background: #5391cd;
+    border: 1px solid #444444;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    color: #fff;
+    cursor: pointer;
+    display: block;
+    font-family: 'PTSansBold', sans-serif;
+    font-size: 18px;
+    font-weight: normal;
+    line-height: 1em;
+    margin: 0 0 0px;
+    padding: 10px 60px;
+    text-align: center;
+    text-decoration: none;
+    text-shadow: #007b87 0px 1px 0;
+    text-transform: none;
+}
+
+a.yesno_enabled:hover {
+    background: #4072A3;
+}
+
+a.yesno_disabled
+{
+    background: #B6B6B6;
+    border: 1px solid #444444;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    color: #000;
+    cursor: pointer;
+    display: block;
+    font-family: 'PTSansBold', sans-serif;
+    font-size: 18px;
+    font-weight: normal;
+    line-height: 1em;
+    margin: 0 0 0px;
+    padding: 10px 60px;
+    text-align: center;
+    text-decoration: none;
+    text-shadow: #FFFFFF 0px 1px 0;
+    text-transform: none;
+}
+
+a.yesno_disabled:hover {
+    background: #9B9B9B;
+}
+
+.inspectionDetails .bottomBtns .email {
+    background: url('../images/mail.png') top center no-repeat;
+    width: 75px;
+    height: 49px;
+    left: 5px;
+}
+
+#btnStep3Email { top: 0; }
+#btnStep3Email span {
+    bottom: -10px;
 }

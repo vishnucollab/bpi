@@ -2,7 +2,7 @@
 <widget xmlns = "http://www.w3.org/ns/widgets"
         xmlns:gap = "http://phonegap.com/ns/1.0"
         id = "com.simb.Blueprint"
-        version = "1.0.0">
+        version = "1.0.1">
     <name>Blueprint</name>
 
     <description>
@@ -22,6 +22,7 @@
     <preference name="webviewbounce" value="false" />
     
     <plugin name="InAppBrowser" value="CDVInAppBrowser" />
+    <plugin name="Camera" value="CDVCamera" />
 
     <icon src="icon.png" />
     <icon src="res/icon/ios/launcher72.png" gap:platform="ios" width="72" height="72" />
