@@ -388,7 +388,8 @@
                             <td><label for="report_type">Report Type</label></td>
                             <td>
                              <select name="report_type" id="report_type">
-                                <option value="PCI">PCI</option>
+                                <option value="House & Land PCI">House & Land PCI</option>
+                                <option value="Tower & Unit PCI">Tower & Unit PCI</option>
                                 <option value="Quality Inspection">Quality Inspection</option>
                                 <option value="Handovers">Handovers</option>
                             </select>
@@ -569,9 +570,12 @@
                     </div>
                     
                     <a class="button left btnEditNotes" href="#">Inspection Notes</a>
-                    
-                    <a id="btnStep3Email" class="button left sendEmailButton" href="#" data-reveal-id="emailReportWrapper">Email Inspection</a>
-                    
+
+                    <div class="btnContainer left " id="btnStep3Email">
+                        <a href="#" id="preview" class="email sendEmailButton" data-reveal-id="emailReportWrapper"></a>
+                        <span>Email Inspection</span>
+                    </div>
+
                     <a id="btnReportPhotos" class="button left hidden" href="javascript:void(0);">Set Report Photos</a>
                     
                     <div class="btnContainer right">
@@ -754,7 +758,10 @@
                         <span>Preview</span>
                     </div>
 
-                    <a id="btnStep5Email" class="button left sendEmailButton" href="#" data-reveal-id="emailReportWrapper">Email Inspection</a>
+                    <div class="btnContainer left " id="btnStep3Email">
+                        <a href="#" id="preview" class="email sendEmailButton" data-reveal-id="emailReportWrapper"></a>
+                        <span>Email Inspection</span>
+                    </div>
 
                     <div class="btnContainer right">
                         <a id="btnStep5Next" class="button right rightmargin" href="#">Exit</a>
@@ -860,6 +867,7 @@
                             <option value="Improvement Made">Improvement Made</option>
                             <option value="On Order">On Order</option>
                             <option value="Approved By CM">Approved By CM</option>
+                            <option value="NA">NA</option>
                         </select>
                     </div>
                     <input type="hidden" name="failed" value="" class="ignore" />
@@ -887,7 +895,10 @@
                         <span>Weather</span>
                     </div>
                     <a id="btnReinspectNotes" class="button left btnEditReinspectNotes" href="#">Coversheet Notes</a>
-                    <a id="btnReinspectEmail" class="button left sendEmailButton" href="#" data-reveal-id="emailReportWrapper">Email Inspection</a>
+                    <div class="btnContainer left " id="btnStep3Email">
+                        <a href="#" id="preview" class="email sendEmailButton" data-reveal-id="emailReportWrapper"></a>
+                        <span>Email Inspection</span>
+                    </div>
                     <a id="btnReinspectDelete" class="button left warning" href="#">Delete Reinspection</a>
                     
                     <div class="btnContainer right">

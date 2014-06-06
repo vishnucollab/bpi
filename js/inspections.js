@@ -782,14 +782,14 @@ var Inspections = function()
             if(inspection.report_type == "Quality Inspection")
             {
                 objApp.setSubExtraHeading("Step 3 of 5", true);
-                $('#inspectionStep3 > .bottomBtns > a#btnStep3Email').hide();
+                $('#inspectionStep3 > .bottomBtns > #btnStep3Email').hide();
                 $('#inspectionStep3 > .bottomBtns > .btnContainer.right > a#btnStep3Next').html('Next');
                 $('#inspectionStep4 > .bottomBtns > .btnContainer.right > a#btnStep4Next').html('Next');
             }
             else
             {
                 objApp.setSubExtraHeading("Step 3 of 3", true);
-                $('#inspectionStep3 > .bottomBtns > a#btnStep3Email').show();
+                $('#inspectionStep3 > .bottomBtns > #btnStep3Email').show();
                 $('#inspectionStep3 > .bottomBtns > .btnContainer.right > a#btnStep3Next').html('Exit');
             }
             
@@ -1695,6 +1695,11 @@ var Inspections = function()
             {
                 objApp.setSubExtraHeading("Step 1 of 3", true);
                 objApp.keys.report_type = $(this).val();
+            }
+
+            if($(this).val() == "Tower & Unit PCI")
+            {
+                $("#btnCapturePhoto").hide();
             }
             
             $('#inspection .btnEditNotes').show();
@@ -4861,7 +4866,10 @@ var Inspections = function()
                     }
                     
                     // Show the camera button
-                    $(".inspectionDetails #btnCapturePhoto").show();
+                    if($("#report_type").val() != "Tower & Unit PCI")
+                    {
+                        $(".inspectionDetails #btnCapturePhoto").show();
+                    }
                     
                     // Show the next button
                     $(".inspectionDetails #btnStep1Next").show();                       
@@ -5789,7 +5797,7 @@ var Inspections = function()
             $('#finished').removeClass('active');
             $('#keywords').removeClass('hidden');
             
-            if(objApp.keys.report_type == "PCI") {
+            if(objApp.keys.report_type == "House & Land PCI") {
                 $("#btnReportPhotos").removeClass("hidden");
             }
             
