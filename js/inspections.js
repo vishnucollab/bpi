@@ -1206,7 +1206,6 @@ var Inspections = function()
 		var user_id = localStorage.getItem("user_id");
 		var email = localStorage.getItem("email");
 		var initials = localStorage.getItem("initials");
-
 		if((first_name == null) || (first_name == "") || (last_name == null) || (last_name == "") ||
 			(email == null) || (email == "") || (user_id == null) || (user_id == "") || (initials == null) || (initials == ""))
 		{
@@ -1351,7 +1350,6 @@ var Inspections = function()
 		var last_name = localStorage.getItem("last_name");
 		var user_id = localStorage.getItem("user_id");
 		var email = localStorage.getItem("email");
-
 		if((first_name == null) || (first_name == "") || (last_name == null) || (last_name == "") ||
 			(email == null) || (email == "") || (user_id == null) || (user_id == ""))
 		{
@@ -1650,7 +1648,6 @@ var Inspections = function()
                     // Invoke the API method to send the report
                     var address = self.buildInspectionAddress(inspection);
                     var user_email = localStorage.getItem("email");
-
                     var params = {};
                     params["email"] = user_email;
                     params['password'] = localStorage.getItem("password");
@@ -2362,7 +2359,6 @@ var Inspections = function()
                     var params = {};
                     params["email"] = localStorage.getItem("email");
                     params["password"] = localStorage.getItem("password");
-
                     var url = objApp.apiURL + "account/create_token/" + Math.floor(Math.random() * 99999);
                     blockElement(".inspectionDetails");
 
@@ -5864,7 +5860,6 @@ var Inspections = function()
 		var clientEmail = "";
 		var clientContactEmail = "";
 		var siteContactEmail = "";
-		
 		// Load the client email address details
 		var sql = "SELECT c.*, s.address1 as site_address1, s.address2 as site_address2, s.external_email as site_external_email " +
 			"FROM clients c " + 
@@ -5883,7 +5878,6 @@ var Inspections = function()
 			clientEmail = client.email;
 			clientContactEmail = client.external_email;
 			siteContactEmail = client.site_external_email;
-			
 			var addressStr = client.site_address1;
 			if((addressStr != "") && (client.site_address2 != ""))
 			{
@@ -5896,12 +5890,12 @@ var Inspections = function()
 		
 		var refreshSendTo = function()
 		{
-			var csv = "";
+			var csv = userEmail;
 			
-			if($("#printModal #sendToMe").val() == 1)
+			/*if($("#printModal #sendToMe").val() == 1)
 			{
 				csv += userEmail;	
-			}
+			}*/
 			
 			if($("#printModal #sendToClient").val() == 1)
 			{
@@ -6420,7 +6414,7 @@ var Inspections = function()
 
         var office_email = 'rod@blueprint-qa.com';
         var builder_email = "";
-
+        var user_email = localStorage.getItem("email");
         if(!self.inspection) {
             return false;
         }
@@ -6439,7 +6433,6 @@ var Inspections = function()
             var determineRecipients = function() {
 
                 var recipients = user_email;
-
                 if($("#emailToOffice").is(":checked")) {
                     recipients += "," + office_email;
                 }
