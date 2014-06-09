@@ -1714,7 +1714,7 @@ var Inspections = function()
                         }
                     }, rec);
                 }
-                loadAddressBookList();
+                self.loadAddressBookList();
                 // Do a silent sync operation
                 objApp.objSync.startSyncSilent(function(success) {
 
