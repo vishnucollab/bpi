@@ -1483,6 +1483,47 @@ var Inspections = function()
         
         self.objPopState.preselect(objApp.keys.state); 
 	}
+
+
+    this.loadAddressBookList = function()
+    {
+        var sql = "SELECT * FROM address_book WHERE deleted = 0 ORDER BY email ASC";
+
+        var values = new Array();
+
+        objDBUtils.loadRecordsSQL(sql, values, function(param, emails)
+        {
+            if(emails) {
+                // Build the HTML for the email listing
+                var html = '';
+
+                var maxLoop = emails.rows.length;
+                var r = 0;
+
+                // Loop through all of the emails in the recordset.
+                for(r = 0; r < maxLoop; r++)
+                {
+                    // Get the current row
+                    var row = emails.rows.item(r);
+
+                    html += '<li><input type="checkbox" id="' + row.id + '" value="' + row.id + '">';
+                    html += '<label for="' + row.id + '">' + row.email + '</label></li>';
+                }
+
+
+                // Insert the HTML into the scrolling wrapper.
+                $("#emailList").html(html);
+                setTimeout(function()
+                {
+                    if(objUtils.isMobileDevice())
+                    {
+                        self.scroller = new iScroll('emailListWrapper', { hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar'});
+                    }
+                }, 500);
+            }
+
+        }, "");
+    }
 	
 	/***
 	* handleBuilderChanged is called when the user changes the selected
@@ -1603,7 +1644,8 @@ var Inspections = function()
         
         /* Send Email Form Events */
         $("a.sendEmailButton").bind(objApp.touchEvent, function(e) {
-            e.preventDefault();    
+            e.preventDefault();
+            self.loadAddressBookList();
             self.resolveEmailReportRecipients();
         });
         
@@ -1636,7 +1678,34 @@ var Inspections = function()
                     alert("Error: Couldn't load inspection!");
                     return;
                 }
-                
+                var recipientsArr = recipients.split(",");
+                for ( var i=0; i < recipientsArr.length; i++) {
+                    var rec = recipientsArr[i].toLowerCase().trim(" ");
+
+                    var values = [rec];
+                    // Make sure this email doesn't already exist
+                    var sql = "SELECT * " +
+                        "FROM address_book " +
+                        "WHERE email = ? " +
+                        "AND deleted = 0";
+
+
+                    objDBUtils.loadRecordSQL2(sql, values, function(resource, email)
+                    {
+                        if(!resource)
+                        {
+                            var primaryKey = objDBUtils.makeInsertKey(objApp.sync_prefix);
+
+                            var sql = "INSERT INTO " +
+                                "address_book(id, email) " +
+                                "VALUES(?,?)";
+                            var values = [primaryKey, email];
+
+                            objDBUtils.execute(sql, values, function(){});
+                        }
+                    }, rec);
+                }
+                loadAddressBookList();
                 // Do a silent sync operation
                 objApp.objSync.startSyncSilent(function(success) {
                     
@@ -1649,7 +1718,8 @@ var Inspections = function()
                     // Invoke the API method to send the report
                     var address = self.buildInspectionAddress(inspection);
                     var user_email = localStorage.getItem("email");
-                    
+
+
                     var params = {};
                     params["email"] = user_email;
                     params['password'] = localStorage.getItem("password");
@@ -6430,12 +6500,25 @@ var Inspections = function()
                     recipients += builder_email;
                 }
 
+                $('#emailList input[type=checkbox]').each(function () {
+                    if( $(this).is(":checked") ) {
+                        if(!objApp.empty(recipients)) {
+                            recipients += ",";
+                        }
+
+                        recipients += $("label[for='"+$(this).val()+"']").text();
+                    }
+                });
+
                 $("#emailTo").val(recipients);
             }
 
             determineRecipients();
 
             $("#frmEmailTo ul#list_email input[type='checkbox']").change(function() {
+                determineRecipients();
+            });
+            $("#emailList input[type=checkbox]").change(function() {
                 determineRecipients();
             });
 

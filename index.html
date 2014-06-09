@@ -568,9 +568,11 @@
                         <a href="#" id="preview" class="preview"></a>
                         <span>Preview</span>
                     </div>
-                    
-                    <a class="button left btnEditNotes" href="#">Inspection Notes</a>
 
+                    <div class="btnContainer left " id="btnEditNotes">
+                        <a href="#" class="notes btnEditNotes"></a>
+                        <span>Inspection notes</span>
+                    </div>
                     <div class="btnContainer left " id="btnStep3Email">
                         <a href="#" id="preview" class="email sendEmailButton" data-reveal-id="emailReportWrapper"></a>
                         <span>Email Inspection</span>
@@ -990,28 +992,35 @@
     
     <div id="emailReportWrapper" class="reveal-modal">
         <a class="close-reveal-modal" style="font-size: 40px; color: red;">&#215;</a>
-        <form id="frmEmailTo" name="frmEmailTo" action="#" method="post">
-            <fieldset>
-                <legend>Email Report To</legend>
-                
-                <ul id="list_email">
-                    <li><input type="checkbox" id="emailToOffice" value="1"  /> <label for="emailToMe">Office</label></li>
-                    <li><input type="checkbox" id="emailToBuilder" value="1" /> <label for="emailToBuilder">Builder</label></li>
-                </ul>
-                
-                <div class="clear"></div>
-                
-                <label for="emailTo">Recipients</label>
-                <input type="text" disabled="disabled" id="emailTo" name="emailTo" value="" />
-                
-				<ul>
-					<li><input type="checkbox" id="attach_inspection_images" value="0" /> <label for="attach_inspection_images">Attach Inspection Images</label></li>
-				</ul>
-				
-				<div class="clear"></div>
-                <input type="submit" value="Send &gt;&gt;" />             
-            </fieldset>
-        </form>
+        <div class="left" style="width: 420px;">
+            <form id="frmEmailTo" name="frmEmailTo" action="#" method="post">
+                <fieldset>
+                    <legend>Email Report To</legend>
+
+                    <ul id="list_email">
+                        <li><input type="checkbox" id="emailToOffice" value="1"  /> <label for="emailToMe">Office</label></li>
+                        <li><input type="checkbox" id="emailToBuilder" value="1" /> <label for="emailToBuilder">Builder</label></li>
+                    </ul>
+
+                    <div class="clear"></div>
+
+                    <label for="emailTo">Recipients</label>
+                    <input type="text" id="emailTo" name="emailTo" value="" />
+
+                    <ul>
+                        <li><input type="checkbox" id="attach_inspection_images" value="0" /> <label for="attach_inspection_images">Attach Inspection Images</label></li>
+                    </ul>
+
+                    <div class="clear"></div>
+                    <input type="submit" value="Send &gt;&gt;" />
+                </fieldset>
+            </form>
+        </div>
+        <div class="right" style="width: 270px;" id="emailListWrapper">
+            <ul id="emailList" title="Select Email">
+
+            </ul>
+        </div>
     </div>
 
     <div id="reinspectionWeatherWrapper" class="reveal-modal">

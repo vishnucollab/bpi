@@ -680,6 +680,15 @@ fieldset legend {
 
 #emailReportWrapper {
     padding: 20px;
+    width: 700px;
+    margin-left: -350px;
+}
+
+#emailListWrapper {
+    width: 270px;
+    height: 345px;
+    overflow-y: scroll;
+    margin-top:15px;
 }
 
     #emailReportWrapper legend {
