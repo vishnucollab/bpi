@@ -1818,9 +1818,8 @@ a.yesno_disabled:hover {
 }
 
 #btnStep3Email, #btnEditNotes { top: 0; }
-#btnStep3Email span, #btnEditNotes span {
-    bottom: -10px;
-}
+#btnStep3Email span { left: 20px; }
+#btnEditNotes span { left: 10px; }
 
 .inspectionDetails .bottomBtns .btnEditNotes a.btnNotes {
     background: url('../images/notes.png') top center no-repeat;

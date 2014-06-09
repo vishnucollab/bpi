@@ -654,7 +654,7 @@ div.pack a.button
     width: 140px;
 }
 
-#btnReinspectEmail,#btnReinspectNotes,#btnReinspectDelete {
+#btnReinspectEmail, #btnReinspectDelete {
     top: 10px;
 }
 
