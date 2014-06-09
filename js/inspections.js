@@ -928,6 +928,14 @@ var Inspections = function()
             if(!objApp.empty(this.inspection.exterior_quality)) {
                 $("#exterior_quality").val(this.inspection.exterior_quality);
             }
+
+            var brickwork = parseInt($('#inspectionStep5 #brickwork').val());
+            var paintQuality = parseInt($('#inspectionStep5 #paint_quality').val());
+            var plasterQuality = parseInt($('#inspectionStep5 #plaster_quality').val());
+            var interiorQuality = parseInt($('#inspectionStep5 #interior_quality').val());
+            var exteriorQuality = parseInt($('#inspectionStep5 #exterior_quality').val());
+            var total = brickwork + paintQuality + plasterQuality + interiorQuality + exteriorQuality;
+            $('#inspectionStep5 #total').text(total + '/25');
         }
 
         $("#inspectionStep5").removeClass("hidden");
@@ -2697,13 +2705,13 @@ var Inspections = function()
 
         var SaveRateTotalInspections = function()
         {
-            var brickwork = parseInt($('#inspectionStep4 #brickwork').val());
-            var paintQuality = parseInt($('#inspectionStep4 #paint_quality').val());
-            var plasterQuality = parseInt($('#inspectionStep4 #plaster_quality').val());
-            var interiorQuality = parseInt($('#inspectionStep4 #interior_quality').val());
-            var exteriorQuality = parseInt($('#inspectionStep4 #exterior_quality').val());
+            var brickwork = parseInt($('#inspectionStep5 #brickwork').val());
+            var paintQuality = parseInt($('#inspectionStep5 #paint_quality').val());
+            var plasterQuality = parseInt($('#inspectionStep5 #plaster_quality').val());
+            var interiorQuality = parseInt($('#inspectionStep5 #interior_quality').val());
+            var exteriorQuality = parseInt($('#inspectionStep5 #exterior_quality').val());
             var total = brickwork + paintQuality + plasterQuality + interiorQuality + exteriorQuality;
-            $('#inspectionStep4 #total').text(total + '/25');
+            $('#inspectionStep5 #total').text(total + '/25');
         }
 
         $("#rateScrollWrapper #brickwork").change(function(){
