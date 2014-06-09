@@ -463,8 +463,12 @@
                 </form>
                 
                 <div id="controlBtns">
-                <a class="button left btnEditNotes" href="#">Coversheet Notes</a>
-                <a id="btnCapturePhoto" data-reveal-id="photoWrapper" class="right" href="#"></a>
+                <div class="btnContainer left btnEditNotes" id="btnEditNotes">
+                    <a href="#" class="btnNotes "></a>
+                    <span>Inspection Notes</span>
+                </div>
+
+                    <a id="btnCapturePhoto" data-reveal-id="photoWrapper" class="right" href="#"></a>
                 <a id="btnStep1Next" class="button right rightmargin" href="#">Next &rsaquo;&rsaquo;</a>
                 </div>
 		    </div> <!--! end of inspection details screen wrapper -->
@@ -524,7 +528,11 @@
                     <a id="btnCapturePhoto" data-reveal-id="photoWrapper" class="right" href="#"></a>
                     <a id="btnStep2Back" class="button left leftmargin gotoStep1" href="#">&lsaquo;&lsaquo; Back</a>
                     <a id="btnStep2Next" class="button right rightmargin" href="#">Next &rsaquo;&rsaquo;</a>
-                    <a class="button left btnEditNotes" href="#">Coversheet Notes</a>
+                    <div class="btnContainer left btnEditNotes" id="btnEditNotes">
+                        <a href="#" class="btnNotes "></a>
+                        <span>Inspection Notes</span>
+                    </div>
+
                 </div>
 		    </div> <!--! end of inspection step 2 screen wrapper -->
             
@@ -569,9 +577,9 @@
                         <span>Preview</span>
                     </div>
 
-                    <div class="btnContainer left " id="btnEditNotes">
-                        <a href="#" class="notes btnEditNotes"></a>
-                        <span>Inspection notes</span>
+                    <div class="btnContainer left btnEditNotes" id="btnEditNotes">
+                        <a href="#" class="btnNotes "></a>
+                        <span>Inspection Notes</span>
                     </div>
                     <div class="btnContainer left " id="btnStep3Email">
                         <a href="#" id="preview" class="email sendEmailButton" data-reveal-id="emailReportWrapper"></a>
@@ -896,7 +904,11 @@
                         <a href="#" id="Reinspectweather" class="weather" data-reveal-id="reinspectionWeatherWrapper"></a>
                         <span>Weather</span>
                     </div>
-                    <a id="btnReinspectNotes" class="button left btnEditReinspectNotes" href="#">Coversheet Notes</a>
+
+                    <div class="btnContainer left btnEditNotes" id="btnEditNotes">
+                        <a href="#" class="btnNotes " id="btnReinspectNotes"></a>
+                        <span>Coversheet Notes</span>
+                    </div>
                     <div class="btnContainer left " id="btnStep3Email">
                         <a href="#" id="preview" class="email sendEmailButton" data-reveal-id="emailReportWrapper"></a>
                         <span>Email Inspection</span>

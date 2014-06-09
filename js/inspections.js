@@ -673,7 +673,7 @@ var Inspections = function()
         // If we do not have an active inspection
         if(objApp.keys.inspection_id == "") {
             // hide the coversheet notes button.
-            $("a.btnEditNotes").hide();         
+            $("div.btnEditNotes").hide();
             $("a.btnEditClientNotes").hide();
             $("a.btnEditPrivateNotes").hide();
         }
@@ -690,7 +690,7 @@ var Inspections = function()
         {
             objApp.setSubHeading("Create a New Inspection");
             
-            $("a.btnEditNotes").show();
+            $("div.btnEditNotes").show();
             
             if(($("#inspection #report_type").val() == "Quality Inspection") || (objApp.keys.report_type == "Quality Inspection"))
             {
@@ -699,7 +699,7 @@ var Inspections = function()
             else
             {
                 objApp.setSubExtraHeading("Step 1 of 3", true);
-                //$("a.btnEditNotes").hide(); 
+                //$("div.btnEditNotes").hide();
             }
         }
     }
@@ -710,7 +710,7 @@ var Inspections = function()
         
 		// Set the main heading
         objApp.setSubHeading("Add Issues");
-        $("a.btnEditNotes").show(); 
+        $("div.btnEditNotes").show();
         
         if(($("#inspection #report_type").val() == "Quality Inspection") || (objApp.keys.report_type == "Quality Inspection")) {
             objApp.setSubExtraHeading("Step 2 of 5", true);
@@ -793,7 +793,7 @@ var Inspections = function()
                 $('#inspectionStep3 > .bottomBtns > .btnContainer.right > a#btnStep3Next').html('Exit');
             }
 
-            $("a.btnEditNotes").show();
+            $("div.btnEditNotes").show();
 
             self.handleFinalised();
 
@@ -1168,7 +1168,7 @@ var Inspections = function()
         $("a#failed").addClass('active');
 
         // Make sure the coversheet notes button is hidden.
-        $("a.btnEditNotes").hide();
+        $("div.btnEditNotes").hide();
         $("a.btnEditClientNotes").hide();
         $("a.btnEditPrivateNotes").hide();
         $("#inspection #includeclientnotesonreport").val("0");
@@ -1414,7 +1414,7 @@ var Inspections = function()
         // If each note field has a value, add an asterix to the related button
         // caption to indicate a value.
         var noteFields = {};
-        noteFields["notes"] = "btnEditNotes";
+        //noteFields["notes"] = "btnEditNotes";
         noteFields["privatenotes"] = "btnEditPrivateNotes";
         noteFields["clientnotes"] = "btnEditClientNotes";
 
@@ -1678,7 +1678,7 @@ var Inspections = function()
                     alert("Error: Couldn't load inspection!");
                     return;
                 }
-<<<<<<< HEAD
+
                 var recipientsArr = recipients.split(",");
                 for ( var i=0; i < recipientsArr.length; i++) {
                     var rec = recipientsArr[i].toLowerCase().trim(" ");
@@ -1707,9 +1707,6 @@ var Inspections = function()
                     }, rec);
                 }
                 loadAddressBookList();
-=======
-
->>>>>>> 59ba5fd3b6933f84df92eb78e6244ef3933e6502
                 // Do a silent sync operation
                 objApp.objSync.startSyncSilent(function(success) {
 
@@ -1722,11 +1719,6 @@ var Inspections = function()
                     // Invoke the API method to send the report
                     var address = self.buildInspectionAddress(inspection);
                     var user_email = localStorage.getItem("email");
-<<<<<<< HEAD
-
-
-=======
->>>>>>> 59ba5fd3b6933f84df92eb78e6244ef3933e6502
                     var params = {};
                     params["email"] = user_email;
                     params['password'] = localStorage.getItem("password");
@@ -4755,9 +4747,9 @@ var Inspections = function()
 
                 // If we have an active inspection then show the coversheet notes button
                 if(self.finalised == 0) {
-                    $("a.btnEditNotes").show();
+                    $("div.btnEditNotes").show();
                 } else {
-                    $("a.btnEditNotes").hide();
+                    $("div.btnEditNotes").hide();
 
                 }
 
@@ -4810,11 +4802,11 @@ var Inspections = function()
 
                 // If we have an active inspection then show the coversheet notes button
                 if(self.finalised == 0) {
-                    $("a.btnEditNotes").show();
+                    $("div.btnEditNotes").show();
                     $("a.btnEditClientNotes").show();
                     $("a.btnEditPrivateNotes").show();
                 } else {
-                    $("a.btnEditNotes").hide();
+                    $("div.btnEditNotes").hide();
                     $("a.btnEditClientNotes").hide();
                     $("a.btnEditPrivateNotes").hide();
                 }
@@ -4924,11 +4916,11 @@ var Inspections = function()
 
                     // If we have an active inspection then show the coversheet notes button
                     if(self.finalised == 0) {
-                        $("a.btnEditNotes").show();
+                        $("div.btnEditNotes").show();
                         $("a.btnEditClientNotes").show();
                         $("a.btnEditPrivateNotes").show();
                     } else {
-                        $("a.btnEditNotes").hide();
+                        $("div.btnEditNotes").hide();
                         $("a.btnEditClientNotes").hide();
                         $("a.btnEditPrivateNotes").hide();
                     }
@@ -5836,7 +5828,7 @@ var Inspections = function()
             $(".inspectionDetails .finished").addClass('active');
 
             // Hide the buttons etc
-            $("a.btnEditNotes").hide();
+            $("div.btnEditNotes").hide();
 
             $('#btnStep3AddAnotherIssue').addClass('hidden');
             $('#btnStep3Back').addClass('hidden');
@@ -5856,7 +5848,7 @@ var Inspections = function()
             $(".inspectionDetails .finished").removeClass('active');
 
             // Show the buttons etc
-            $("a.btnEditNotes").show();
+            $("div.btnEditNotes").show();
             $('#btnStep3AddAnotherIssue').removeClass('hidden');
             $('#btnStep3Back').removeClass('hidden');
             $('#finished').removeClass('active');
