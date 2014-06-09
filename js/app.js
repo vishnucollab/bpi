@@ -9,11 +9,11 @@
 function App() 
 {
 	var self = this;	// Create a reference to the object itself
-	this.apiURL = "http://blueprint.simb.com.au/api/";
+	this.apiURL = "http://localhost/nycran/blueprintapi/";
 	//this.apiURL = "http://blue.print/BlueprintAPI/";
 	// this.apiURL = "http://projects.loc/blueprintapi/";
     //this.apiURL = "http://192.168.1.52/blueprint/api/";
-	this.phonegapBuild = true; 	// Set this to true when phonegap is the target
+	this.phonegapBuild = false; 	// Set this to true when phonegap is the target
 	this.version = 19;				// Identifies the app version to the server
 	this.versionStatus = "Production";
 	this.localMode = false;
@@ -155,7 +155,10 @@ function App()
 		//objDBUtils.execute(sql, null, null);	
 		
 		//var sql = "DELETE FROM inspectionitemphotos WHERE seq_no = 3;";
-		//objDBUtils.execute(sql, null, null);		
+		//objDBUtils.execute(sql, null, null);
+
+        //var sql = "DELETE FROM address_book;";
+        //objDBUtils.execute(sql, null, null);
 	}
 	
 	this.scrollTop = function()
