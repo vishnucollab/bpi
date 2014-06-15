@@ -673,7 +673,7 @@ var Inspections = function()
         // If we do not have an active inspection
         if(objApp.keys.inspection_id == "") {
             // hide the coversheet notes button.
-            $("a.btnEditNotes").hide();         
+            $("div.btnEditNotes").hide();
             $("a.btnEditClientNotes").hide();
             $("a.btnEditPrivateNotes").hide();
         }
@@ -690,7 +690,7 @@ var Inspections = function()
         {
             objApp.setSubHeading("Create a New Inspection");
             
-            $("a.btnEditNotes").show();
+            $("div.btnEditNotes").show();
             
             if(($("#inspection #report_type").val() == "Quality Inspection") || (objApp.keys.report_type == "Quality Inspection"))
             {
@@ -699,7 +699,7 @@ var Inspections = function()
             else
             {
                 objApp.setSubExtraHeading("Step 1 of 3", true);
-                //$("a.btnEditNotes").hide(); 
+                //$("div.btnEditNotes").hide();
             }
         }
     }
@@ -710,7 +710,7 @@ var Inspections = function()
         
 		// Set the main heading
         objApp.setSubHeading("Add Issues");
-        $("a.btnEditNotes").show(); 
+        $("div.btnEditNotes").show();
         
         if(($("#inspection #report_type").val() == "Quality Inspection") || (objApp.keys.report_type == "Quality Inspection")) {
             objApp.setSubExtraHeading("Step 2 of 5", true);
@@ -793,7 +793,7 @@ var Inspections = function()
                 $('#inspectionStep3 > .bottomBtns > .btnContainer.right > a#btnStep3Next').html('Exit');
             }
 
-            $("a.btnEditNotes").show();
+            $("div.btnEditNotes").show();
 
             self.handleFinalised();
 
@@ -928,6 +928,14 @@ var Inspections = function()
             if(!objApp.empty(this.inspection.exterior_quality)) {
                 $("#exterior_quality").val(this.inspection.exterior_quality);
             }
+
+            var brickwork = parseInt($('#inspectionStep5 #brickwork').val());
+            var paintQuality = parseInt($('#inspectionStep5 #paint_quality').val());
+            var plasterQuality = parseInt($('#inspectionStep5 #plaster_quality').val());
+            var interiorQuality = parseInt($('#inspectionStep5 #interior_quality').val());
+            var exteriorQuality = parseInt($('#inspectionStep5 #exterior_quality').val());
+            var total = brickwork + paintQuality + plasterQuality + interiorQuality + exteriorQuality;
+            $('#inspectionStep5 #total').text(total + '/25');
         }
 
         $("#inspectionStep5").removeClass("hidden");
@@ -1168,7 +1176,7 @@ var Inspections = function()
         $("a#failed").addClass('active');
 
         // Make sure the coversheet notes button is hidden.
-        $("a.btnEditNotes").hide();
+        $("div.btnEditNotes").hide();
         $("a.btnEditClientNotes").hide();
         $("a.btnEditPrivateNotes").hide();
         $("#inspection #includeclientnotesonreport").val("0");
@@ -1414,7 +1422,7 @@ var Inspections = function()
         // If each note field has a value, add an asterix to the related button
         // caption to indicate a value.
         var noteFields = {};
-        noteFields["notes"] = "btnEditNotes";
+        //noteFields["notes"] = "btnEditNotes";
         noteFields["privatenotes"] = "btnEditPrivateNotes";
         noteFields["clientnotes"] = "btnEditClientNotes";
 
@@ -1481,6 +1489,46 @@ var Inspections = function()
 
         self.objPopState.preselect(objApp.keys.state);
 	}
+
+    this.loadAddressBookList = function()
+    {
+        var sql = "SELECT * FROM address_book WHERE deleted = 0 ORDER BY email ASC";
+
+        var values = new Array();
+
+        objDBUtils.loadRecordsSQL(sql, values, function(param, emails)
+        {
+            if(emails) {
+                // Build the HTML for the email listing
+                var html = '';
+
+                var maxLoop = emails.rows.length;
+                var r = 0;
+
+                // Loop through all of the emails in the recordset.
+                for(r = 0; r < maxLoop; r++)
+                {
+                    // Get the current row
+                    var row = emails.rows.item(r);
+
+                    html += '<li><input type="checkbox" id="' + row.id + '" value="' + row.id + '">';
+                    html += '<label for="' + row.id + '">' + row.email + '</label></li>';
+                }
+
+
+                // Insert the HTML into the scrolling wrapper.
+                $("#emailList").html(html);
+                setTimeout(function()
+                {
+                    if(objUtils.isMobileDevice())
+                    {
+                        self.scroller = new iScroll('emailListWrapper', { hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar'});
+                    }
+                }, 500);
+            }
+
+        }, "");
+    }
 
 	/***
 	* handleBuilderChanged is called when the user changes the selected
@@ -1603,6 +1651,9 @@ var Inspections = function()
         /* Send Email Form Events */
         $("a.sendEmailButton").bind(objApp.touchEvent, function(e) {
             e.preventDefault();
+
+            self.loadAddressBookList();
+
             self.resolveEmailReportRecipients();
         });
 
@@ -1636,6 +1687,34 @@ var Inspections = function()
                     return;
                 }
 
+                var recipientsArr = recipients.split(",");
+                for ( var i=0; i < recipientsArr.length; i++) {
+                    var rec = recipientsArr[i].toLowerCase().trim(" ");
+
+                    var values = [rec];
+                    // Make sure this email doesn't already exist
+                    var sql = "SELECT * " +
+                        "FROM address_book " +
+                        "WHERE email = ? " +
+                        "AND deleted = 0";
+
+
+                    objDBUtils.loadRecordSQL2(sql, values, function(resource, email)
+                    {
+                        if(!resource)
+                        {
+                            var primaryKey = objDBUtils.makeInsertKey(objApp.sync_prefix);
+
+                            var sql = "INSERT INTO " +
+                                "address_book(id, email) " +
+                                "VALUES(?,?)";
+                            var values = [primaryKey, email];
+
+                            objDBUtils.execute(sql, values, function(){});
+                        }
+                    }, rec);
+                }
+                self.loadAddressBookList();
                 // Do a silent sync operation
                 objApp.objSync.startSyncSilent(function(success) {
 
@@ -2626,13 +2705,13 @@ var Inspections = function()
 
         var SaveRateTotalInspections = function()
         {
-            var brickwork = parseInt($('#inspectionStep4 #brickwork').val());
-            var paintQuality = parseInt($('#inspectionStep4 #paint_quality').val());
-            var plasterQuality = parseInt($('#inspectionStep4 #plaster_quality').val());
-            var interiorQuality = parseInt($('#inspectionStep4 #interior_quality').val());
-            var exteriorQuality = parseInt($('#inspectionStep4 #exterior_quality').val());
+            var brickwork = parseInt($('#inspectionStep5 #brickwork').val());
+            var paintQuality = parseInt($('#inspectionStep5 #paint_quality').val());
+            var plasterQuality = parseInt($('#inspectionStep5 #plaster_quality').val());
+            var interiorQuality = parseInt($('#inspectionStep5 #interior_quality').val());
+            var exteriorQuality = parseInt($('#inspectionStep5 #exterior_quality').val());
             var total = brickwork + paintQuality + plasterQuality + interiorQuality + exteriorQuality;
-            $('#inspectionStep4 #total').text(total + '/25');
+            $('#inspectionStep5 #total').text(total + '/25');
         }
 
         $("#rateScrollWrapper #brickwork").change(function(){
@@ -4676,9 +4755,9 @@ var Inspections = function()
 
                 // If we have an active inspection then show the coversheet notes button
                 if(self.finalised == 0) {
-                    $("a.btnEditNotes").show();
+                    $("div.btnEditNotes").show();
                 } else {
-                    $("a.btnEditNotes").hide();
+                    $("div.btnEditNotes").hide();
 
                 }
 
@@ -4731,11 +4810,11 @@ var Inspections = function()
 
                 // If we have an active inspection then show the coversheet notes button
                 if(self.finalised == 0) {
-                    $("a.btnEditNotes").show();
+                    $("div.btnEditNotes").show();
                     $("a.btnEditClientNotes").show();
                     $("a.btnEditPrivateNotes").show();
                 } else {
-                    $("a.btnEditNotes").hide();
+                    $("div.btnEditNotes").hide();
                     $("a.btnEditClientNotes").hide();
                     $("a.btnEditPrivateNotes").hide();
                 }
@@ -4845,11 +4924,11 @@ var Inspections = function()
 
                     // If we have an active inspection then show the coversheet notes button
                     if(self.finalised == 0) {
-                        $("a.btnEditNotes").show();
+                        $("div.btnEditNotes").show();
                         $("a.btnEditClientNotes").show();
                         $("a.btnEditPrivateNotes").show();
                     } else {
-                        $("a.btnEditNotes").hide();
+                        $("div.btnEditNotes").hide();
                         $("a.btnEditClientNotes").hide();
                         $("a.btnEditPrivateNotes").hide();
                     }
@@ -5757,7 +5836,7 @@ var Inspections = function()
             $(".inspectionDetails .finished").addClass('active');
 
             // Hide the buttons etc
-            $("a.btnEditNotes").hide();
+            $("div.btnEditNotes").hide();
 
             $('#btnStep3AddAnotherIssue').addClass('hidden');
             $('#btnStep3Back').addClass('hidden');
@@ -5777,7 +5856,7 @@ var Inspections = function()
             $(".inspectionDetails .finished").removeClass('active');
 
             // Show the buttons etc
-            $("a.btnEditNotes").show();
+            $("div.btnEditNotes").show();
             $('#btnStep3AddAnotherIssue').removeClass('hidden');
             $('#btnStep3Back').removeClass('hidden');
             $('#finished').removeClass('active');
@@ -6445,12 +6524,25 @@ var Inspections = function()
                     recipients += builder_email;
                 }
 
+                $('#emailList input[type=checkbox]').each(function () {
+                    if( $(this).is(":checked") ) {
+                        if(!objApp.empty(recipients)) {
+                            recipients += ",";
+                        }
+
+                        recipients += $("label[for='"+$(this).val()+"']").text();
+                    }
+                });
+
                 $("#emailTo").val(recipients);
             }
 
             determineRecipients();
 
             $("#frmEmailTo ul#list_email input[type='checkbox']").change(function() {
+                determineRecipients();
+            });
+            $("#emailList input[type=checkbox]").change(function() {
                 determineRecipients();
             });
 

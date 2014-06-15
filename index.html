@@ -462,9 +462,13 @@
                     <textarea id="notes" name="notes" class="hidden"></textarea>
                 </form>
                 
-                <div id="controlBtns">
-                <a class="button left btnEditNotes" href="#">Coversheet Notes</a>
-                <a id="btnCapturePhoto" data-reveal-id="photoWrapper" class="right" href="#"></a>
+                <div id="controlBtns" class="bottomBtns">
+                <div class="btnContainer left btnEditNotes" id="btnEditNotes">
+                    <a href="#" class="btnNotes "></a>
+                    <span>Notes</span>
+                </div>
+
+                    <a id="btnCapturePhoto" data-reveal-id="photoWrapper" class="right" href="#"></a>
                 <a id="btnStep1Next" class="button right rightmargin" href="#">Next &rsaquo;&rsaquo;</a>
                 </div>
 		    </div> <!--! end of inspection details screen wrapper -->
@@ -520,11 +524,15 @@
 		            <input type="hidden" id="hash" name="hash" value="" />
 		        </form>
                 
-                <div id="controlBtns">
+                <div id="controlBtns" class="bottomBtns" >
                     <a id="btnCapturePhoto" data-reveal-id="photoWrapper" class="right" href="#"></a>
                     <a id="btnStep2Back" class="button left leftmargin gotoStep1" href="#">&lsaquo;&lsaquo; Back</a>
                     <a id="btnStep2Next" class="button right rightmargin" href="#">Next &rsaquo;&rsaquo;</a>
-                    <a class="button left btnEditNotes" href="#">Coversheet Notes</a>
+                    <div class="btnContainer left btnEditNotes" id="btnEditNotes">
+                        <a href="#" class="btnNotes "></a>
+                        <span>Notes</span>
+                    </div>
+
                 </div>
 		    </div> <!--! end of inspection step 2 screen wrapper -->
             
@@ -568,12 +576,14 @@
                         <a href="#" id="preview" class="preview"></a>
                         <span>Preview</span>
                     </div>
-                    
-                    <a class="button left btnEditNotes" href="#">Inspection Notes</a>
 
+                    <div class="btnContainer left btnEditNotes" id="btnEditNotes">
+                        <a href="#" class="btnNotes "></a>
+                        <span>Notes</span>
+                    </div>
                     <div class="btnContainer left " id="btnStep3Email">
                         <a href="#" id="preview" class="email sendEmailButton" data-reveal-id="emailReportWrapper"></a>
-                        <span>Email Inspection</span>
+                        <span>Email</span>
                     </div>
 
                     <a id="btnReportPhotos" class="button left hidden" href="javascript:void(0);">Set Report Photos</a>
@@ -760,7 +770,7 @@
 
                     <div class="btnContainer left " id="btnStep3Email">
                         <a href="#" id="preview" class="email sendEmailButton" data-reveal-id="emailReportWrapper"></a>
-                        <span>Email Inspection</span>
+                        <span>Email</span>
                     </div>
 
                     <div class="btnContainer right">
@@ -894,10 +904,14 @@
                         <a href="#" id="Reinspectweather" class="weather" data-reveal-id="reinspectionWeatherWrapper"></a>
                         <span>Weather</span>
                     </div>
-                    <a id="btnReinspectNotes" class="button left btnEditReinspectNotes" href="#">Coversheet Notes</a>
+
+                    <div class="btnContainer left btnEditNotes" id="btnEditNotes">
+                        <a href="#" class="btnNotes " id="btnReinspectNotes"></a>
+                        <span>Notes</span>
+                    </div>
                     <div class="btnContainer left " id="btnStep3Email">
                         <a href="#" id="preview" class="email sendEmailButton" data-reveal-id="emailReportWrapper"></a>
-                        <span>Email Inspection</span>
+                        <span>Email</span>
                     </div>
                     <a id="btnReinspectDelete" class="button left warning" href="#">Delete Reinspection</a>
                     
@@ -993,28 +1007,35 @@
     
     <div id="emailReportWrapper" class="reveal-modal">
         <a class="close-reveal-modal" style="font-size: 40px; color: red;">&#215;</a>
-        <form id="frmEmailTo" name="frmEmailTo" action="#" method="post">
-            <fieldset>
-                <legend>Email Report To</legend>
-                
-                <ul id="list_email">
-                    <li><input type="checkbox" id="emailToOffice" value="1"  /> <label for="emailToMe">Office</label></li>
-                    <li><input type="checkbox" id="emailToBuilder" value="1" /> <label for="emailToBuilder">Builder</label></li>
-                </ul>
-                
-                <div class="clear"></div>
-                
-                <label for="emailTo">Recipients</label>
-                <input type="text" disabled="disabled" id="emailTo" name="emailTo" value="" />
-                
-				<ul>
-					<li><input type="checkbox" id="attach_inspection_images" value="0" /> <label for="attach_inspection_images">Attach Inspection Images</label></li>
-				</ul>
-				
-				<div class="clear"></div>
-                <input type="submit" value="Send &gt;&gt;" />             
-            </fieldset>
-        </form>
+        <div class="left" style="width: 420px;">
+            <form id="frmEmailTo" name="frmEmailTo" action="#" method="post">
+                <fieldset>
+                    <legend>Email Report To</legend>
+
+                    <ul id="list_email">
+                        <li><input type="checkbox" id="emailToOffice" value="1"  /> <label for="emailToMe">Office</label></li>
+                        <li><input type="checkbox" id="emailToBuilder" value="1" /> <label for="emailToBuilder">Builder</label></li>
+                    </ul>
+
+                    <div class="clear"></div>
+
+                    <label for="emailTo">Recipients</label>
+                    <input type="text" id="emailTo" name="emailTo" value="" />
+
+                    <ul>
+                        <li><input type="checkbox" id="attach_inspection_images" value="0" /> <label for="attach_inspection_images">Attach Inspection Images</label></li>
+                    </ul>
+
+                    <div class="clear"></div>
+                    <input type="submit" value="Send &gt;&gt;" />
+                </fieldset>
+            </form>
+        </div>
+        <div class="right" style="width: 270px;" id="emailListWrapper">
+            <ul id="emailList" title="Select Email">
+
+            </ul>
+        </div>
     </div>
 
     <div id="reinspectionWeatherWrapper" class="reveal-modal">

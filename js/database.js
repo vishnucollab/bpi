@@ -30,6 +30,7 @@ function DBUtils()
 	// Define the Blueprint database tables and versions
 	this.tables = new Array();
 	this.tables.push(new Array('app_tables', 1.0));
+    this.tables.push(new Array('address_book', 1.0));
 	this.tables.push(new Array('builders', 1.0));
 	this.tables.push(new Array('resources', 1.0));
 	this.tables.push(new Array('inspections', 1.1));
@@ -333,7 +334,37 @@ function DBUtils()
 				}                   
 			}, self.DB_error_handler);          
 		});            
-	}	
+	}
+
+    /***
+     * @desc loadRecordSQL executes the specified query and returns the resulting row
+     * this time with support for proper enclosures.
+     */
+    this.loadRecordSQL2 = function(sql, values_array, callbackmethod, param)
+    {
+        if((sql == "") || (sql == null))
+        {
+            alert("DBUtils::loadRecordSQL - No sql query passed");
+            return false;
+        }
+
+        this.db.transaction(function(transaction)
+        {
+            transaction.executeSql(sql, values_array, function (transaction, result)
+            {
+                // This record could not be found
+                if(result.rows.length == 0)
+                {
+                    callbackmethod(false, param);
+                }
+                else
+                {
+                    var row = result.rows.item(0);
+                    callbackmethod(row, param);
+                }
+            }, self.DB_error_handler);
+        });
+    }
 	
 	/***
 	* @desc deleteRecord deletes a specific record from a nominated database table
@@ -858,7 +889,58 @@ function DBUtils()
 			transaction.executeSql(sql, null, function (transaction, result) {self.checkTables(1)}, self.DB_error_handler);
 		});
 	}
-	
+
+    /**********************************************
+     * ADDRESS_BOOK
+     */
+    this.createAddress_book = function(table_number)
+    {
+        if(this.DB_DEBUG)
+            alert("CREATE ADDRESS BOOK");
+
+        var table_name = this.tables[table_number][0];
+        var table_version = this.tables[table_number][1];
+
+
+        var sql = "CREATE TABLE IF NOT EXISTS address_book (" +
+            "'id' VARCHAR PRIMARY KEY NOT NULL, " +
+            "'email' VARCHAR NOT NULL, " +
+            "'created_by' INTEGER NULL DEFAULT NULL, " +
+            "'deleted' INTEGER NOT NULL DEFAULT 0 , " +
+            "'dirty' INTEGER NOT NULL DEFAULT 1)";
+
+        this.db.transaction(function(transaction)
+        {
+            transaction.executeSql(sql, null, function (transaction, result)
+            {
+                // Create indexes
+
+                // Deleted index
+                sql = "CREATE INDEX IF NOT EXISTS " + table_name + "_deleted ON " + table_name + " (deleted);";
+                self.execute(sql, null, null);
+
+                // Dirty index
+                sql = "CREATE INDEX IF NOT EXISTS " + table_name + "_dirty ON " + table_name + " (dirty);";
+                self.execute(sql, null, null);
+
+                // Createdby index
+                sql = "CREATE INDEX IF NOT EXISTS " + table_name + "_createdby ON " + table_name + " (created_by, deleted);";
+                self.execute(sql, null, null);
+
+                // INSERT THE REGISTRY ENTRY
+                sql = "INSERT INTO app_tables (table_name, version) VALUES(?, ?);";
+                transaction.executeSql(sql, [table_name, table_version], function (transaction, result)
+                {
+                    if(this.DB_DEBUG)
+                        alert("INSERTED REGISTRY");
+
+                    self.checkNextTable(table_number);
+
+                }, self.DB_error_handler);
+            }, self.DB_error_handler);
+        });
+    }
+
 	/**********************************************
 	* BUILDERS
 	*/
