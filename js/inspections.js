@@ -5527,6 +5527,8 @@ var Inspections = function()
 
                         var sql = "UPDATE reinspections SET weather = ?, dirty = 1 WHERE id = ?";
                         objDBUtils.execute(sql,[weather,objApp.keys.reinspection_id],null);
+                        
+                        reinspection.weather = weather;
 
                         revealWindow.hideModal();
                     });
