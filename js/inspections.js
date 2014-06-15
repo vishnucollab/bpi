@@ -2099,6 +2099,15 @@ var Inspections = function()
         * Handle the event when the user hits the NExt button on the stage 2 event tracking
         */
         $(".inspectionDetails #btnStep2Next").bind(objApp.touchEvent, function(e) {
+            // If the user has attempted to add a new defect, ensure they have entered an observation
+            // and then save the defect.  If no location is selected, just go straight to the next item.
+            var currentLocation = self.objPopLocation.getValue();
+            if(currentLocation == "") {
+                // No location selected, go straight to step 3.
+                self.showStep3();    
+            }
+            
+            
             if($('#observation').val().trim()==''){
                alert('Please insert the observation');
                 return;
