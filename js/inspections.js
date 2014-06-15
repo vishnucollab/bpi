@@ -1628,6 +1628,7 @@ var Inspections = function()
         $("#frmEmailTo").unbind();
         $("a.sendEmailButton").unbind();
         $("#report_type").unbind();
+        $('#frmDefectDetails #observation').unbind();
     }
 
 	/***
@@ -3357,8 +3358,8 @@ var Inspections = function()
 		$('#frmDefectDetails #observation').bind('keyup', function(e)
 		{
             setTimeout(function() {
-                self.setObservationFilters();
                 if(e.which=='32'){ // if user pressed "space" button
+                    self.setObservationFilters();
                     self.searchObservations();
                 }
             }, 350);
