@@ -2108,7 +2108,6 @@ var Inspections = function()
                 return;    
             }
             
-            
             if($('#observation').val().trim()==''){
                alert('Please insert the observation');
                return;
