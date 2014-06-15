@@ -1522,7 +1522,14 @@ var Inspections = function()
                 {
                     if(objUtils.isMobileDevice())
                     {
-                        self.scroller = new iScroll('emailListWrapper', { hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar'});
+                        self.scroller = new iScroll(document.querySelector("#emailListWrapper"), { hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar', useTransform: true, zoom: false, onBeforeScrollStart: function (e) {
+                            var target = e.target;
+                            while (target.nodeType != 1) target = target.parentNode;
+                            if (target.tagName != 'SELECT' && target.tagName != 'INPUT' && target.tagName != 'TEXTAREA')
+                                e.preventDefault();
+                            }}
+                        );                        
+                        
                     }
                 }, 500);
             }
@@ -1989,7 +1996,6 @@ var Inspections = function()
                             var i, path, len;
                            for (i = 0, len = imageData.length; i < len; i += 1) {
                             var imageData1 = imageData[i].fullPath;
-                                alert(len+' image added');
                                 editPhoto2(imageData1);
                                 photo();
                             }
@@ -2899,7 +2905,8 @@ var Inspections = function()
                         while (target.nodeType != 1) target = target.parentNode;
                         if (target.tagName != 'SELECT' && target.tagName != 'INPUT' && target.tagName != 'TEXTAREA')
                             e.preventDefault();
-                        }});
+                        }}
+                    );
                 }
 
                 // Handle the event when the user changes the cover photo selection
@@ -5517,7 +5524,16 @@ var Inspections = function()
                     });
 
                     $("#Reinspectweather").bind(objApp.touchEvent, function(){
-                        $('#reinspectWeatherInput').val(reinspection.weather);
+                        
+                        // Load the current reinspection record
+                        objDBUtils.loadRecord("reinspections", self.reinspectionKey, function(param, reinspection) {
+                            if(!reinspection) {
+                                alert("Couldn't load the reinspection record!");
+                                return;
+                            } else {
+                                $('#reinspectWeatherInput').val(reinspection.weather);
+                            } 
+                        }, "");         
                     });
 
                     $('#btnRWSave').bind(objApp.touchEvent,function(e){
@@ -5872,7 +5888,7 @@ var Inspections = function()
             $('#finished').removeClass('active');
             $('#keywords').removeClass('hidden');
 
-            if(objApp.keys.report_type == "PCI") {
+            if(objApp.keys.report_type == "House & Land PCI") {
                 $("#btnReportPhotos").removeClass("hidden");
             }
             
