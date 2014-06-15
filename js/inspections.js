@@ -1628,6 +1628,7 @@ var Inspections = function()
         $("#frmEmailTo").unbind();
         $("a.sendEmailButton").unbind();
         $("#report_type").unbind();
+        $('#frmDefectDetails #observation').unbind();
     }
 
 	/***
@@ -2104,13 +2105,13 @@ var Inspections = function()
             var currentLocation = self.objPopLocation.getValue();
             if(currentLocation == "") {
                 // No location selected, go straight to step 3.
-                self.showStep3();    
+                self.showStep3();
+                return;    
             }
-            
             
             if($('#observation').val().trim()==''){
                alert('Please insert the observation');
-                return;
+               return;
             }
 
 			e.preventDefault();
@@ -3357,8 +3358,8 @@ var Inspections = function()
 		$('#frmDefectDetails #observation').bind('keyup', function(e)
 		{
             setTimeout(function() {
-                self.setObservationFilters();
                 if(e.which=='32'){ // if user pressed "space" button
+                    self.setObservationFilters();
                     self.searchObservations();
                 }
             }, 350);
