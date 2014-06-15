@@ -2104,13 +2104,14 @@ var Inspections = function()
             var currentLocation = self.objPopLocation.getValue();
             if(currentLocation == "") {
                 // No location selected, go straight to step 3.
-                self.showStep3();    
+                self.showStep3();
+                return;    
             }
             
             
             if($('#observation').val().trim()==''){
                alert('Please insert the observation');
-                return;
+               return;
             }
 
 			e.preventDefault();
