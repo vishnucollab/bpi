@@ -98,6 +98,14 @@ var dbUpgrader = function()
                     // Upgrade complete
                     break;
 
+                case 1.2:
+                    var sql = "ALTER TABLE 'inspections' CHANGE 'barrel_code' 'barrel_code' TEXT NULL DEFAULT NULL";
+                    objDBUtils.execute(sql, null, null);
+                    sql = "UPDATE app_tables SET version = ? WHERE table_name = ?";
+                    objDBUtils.execute(sql, [1.1, 'inspections'], null);
+                    // Upgrade complete
+                    break;
+
                 default:
                     break;
             }

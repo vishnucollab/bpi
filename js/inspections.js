@@ -779,12 +779,20 @@ var Inspections = function()
                 $("#btnFinishedWrapper").show();
             }
             
-            if(inspection.report_type == "Quality Inspection")
+            if(inspection.report_type == "Quality Inspection" && objApp.keys.reinspection_id == "")
             {
                 objApp.setSubExtraHeading("Step 3 of 5", true);
                 $('#inspectionStep3 > .bottomBtns > a#btnStep3Email').hide();
                 $('#inspectionStep3 > .bottomBtns > .btnContainer.right > a#btnStep3Next').html('Next');
                 $('#inspectionStep4 > .bottomBtns > .btnContainer.right > a#btnStep4Next').html('Next');
+            }
+            else if(inspection.report_type == "Quality Inspection" && objApp.keys.reinspection_id != "") {
+                objApp.setSubExtraHeading("Step 3 of 4", true);
+                $('#inspectionStep3 > .bottomBtns > a#btnStep3Email').hide();
+                $('#inspectionStep3 > .bottomBtns > .btnContainer.right > a#btnStep3Next').html('Next');
+                $('#inspectionStep4 > .bottomBtns > .btnContainer.right > a#btnStep4Next').html('Done');
+                $('#reinspection > .bottomBtns > .btnContainer.right > a#btnStep3Next').html('Next');
+                $('#reinspection > .bottomBtns > .btnContainer.right > a#btnStep4Next').html('Done');
             }
             else
             {
@@ -826,7 +834,12 @@ var Inspections = function()
         // Set the main heading
         var inspection_property = "Lot " + self.inspection.lot_no + ", " + self.inspection.address + ", " + self.inspection.suburb;
         objApp.setSubHeading("Materials to be left on site");
-        objApp.setSubExtraHeading("Step 4 of 5", true);
+        if(self.inspection.report_type == "Quality Inspection" && objApp.keys.reinspection_id != "") {
+            objApp.setSubExtraHeading("Step 4 of 4", true);
+
+        } else {
+            objApp.setSubExtraHeading("Step 4 of 5", true);
+        }
 
         objApp.clearMain();
 
@@ -880,16 +893,8 @@ var Inspections = function()
                 $("#btnGroutSamplesNo").removeClass("yesno_disabled").addClass("yesno_enabled");
                 $("#grout_samples").val("0");
             }
+            $("#barrel_code").val(this.inspection.barrel_code);
 
-            if(this.inspection.barrel_code == 1) {
-                $("#btnBarrelCodeYes").removeClass("yesno_disabled").addClass("yesno_enabled");
-                $("#btnBarrelCodeNo").removeClass("yesno_enabled").addClass("yesno_disabled");
-                $("#barrel_code").val("1");
-            } else if(this.inspection.barrel_code == 0) {
-                $("#btnBarrelCodeYes").removeClass("yesno_enabled").addClass("yesno_disabled");
-                $("#btnBarrelCodeNo").removeClass("yesno_disabled").addClass("yesno_enabled");
-                $("#barrel_code").val("0");
-            }
         }
 
         $("#inspectionStep4").removeClass("hidden");
@@ -2177,7 +2182,7 @@ var Inspections = function()
 
             e.preventDefault();
 
-            if(objApp.keys.report_type == 'Quality Inspection') {
+            if(objApp.keys.report_type == 'Quality Inspection' && objApp.keys.reinspection_id == "") {
                 self.showStep5();
             }
             else {
@@ -2307,20 +2312,7 @@ var Inspections = function()
             return false;
         });
 
-        $("#btnBarrelCodeYes").bind(objApp.touchEvent, function(e)
-        {
-            $("#btnBarrelCodeYes").removeClass("yesno_disabled").addClass("yesno_enabled");
-            $("#btnBarrelCodeNo").removeClass("yesno_enabled").addClass("yesno_disabled");
-            $("#barrel_code").val("1");
-            return false;
-        });
-        $("#btnBarrelCodeNo").bind(objApp.touchEvent, function(e)
-        {
-            $("#btnBarrelCodeYes").removeClass("yesno_enabled").addClass("yesno_disabled");
-            $("#btnBarrelCodeNo").removeClass("yesno_disabled").addClass("yesno_enabled");
-            $("#barrel_code").val("0");
-            return false;
-        });
+
 
 
         $(".inspectionDetails #tblDefectListingHeader th").bind(objApp.touchEvent, function(e)
@@ -2505,14 +2497,24 @@ var Inspections = function()
             // set the default notes.
             self.setDefaultNotes();
 
-            var objNoteModal = new noteModal("Coversheet Notes", $("#inspection #notes").val(), function(notes) {
-				// The user has updated the notes value.
-				// Update the toggle (and therefore the form) with the new value.
-				$("#inspection #notes").val(notes);
-                self.setNoteButtonContentIndicators();
-				objApp.objInspection.checkSaveInspection();
-			});
+            if (objApp.keys.reinspection_id == "") {
+                var objNoteModal = new noteModal("Coversheet Notes", $("#inspection #notes").val(), function(notes) {
+                    // The user has updated the notes value.
+                    // Update the toggle (and therefore the form) with the new value.
+                    $("#inspection #notes").val(notes);
+                    self.setNoteButtonContentIndicators();
 
+                    if (objApp.keys.reinspection_id != "") {
+                        var sql = 'UPDATE reinspections SET notes = ?, dirty = 1 WHERE id = ?';
+                        objDBUtils.execute(sql, [notes, objApp.keys.reinspection_id], null);
+                    }
+                    else if(objApp.keys.inspection_id != "")
+                    {
+                        var sql = 'UPDATE inspections SET notes = ?, dirty = 1 WHERE id = ?';
+                        objDBUtils.execute(sql, [notes, objApp.keys.inspection_id], null);
+                    }
+                });
+            }
 			objNoteModal.show();
 
 			if(self.finalised == 1)
@@ -5409,6 +5411,15 @@ var Inspections = function()
                     $(".inspectionDetails .passed").addClass('active');
                 }
 
+                if(inspection.report_type == "Quality Inspection" && objApp.keys.reinspection_id != "") {
+                    objApp.setSubExtraHeading("Step 3 of 4", true);
+                    $('#inspectionStep3 > .bottomBtns > a#btnStep3Email').hide();
+                    $('#inspectionStep3 > .bottomBtns > .btnContainer.right > a#btnStep3Next').html('Next');
+                    $('#inspectionStep4 > .bottomBtns > .btnContainer.right > a#btnStep4Next').html('Done');
+                    $('#reinspection > .bottomBtns > .btnContainer.right > a#btnStep3Next').html('Next');
+                    $('#reinspection > .bottomBtns > .btnContainer.right > a#btnStep4Next').html('Done');
+                }
+
                 // Load the reinspection items
                 var sql = "SELECT ri.id, ii.seq_no, ii.location, ii.action, ii.observation, ri.rectified, r.failed " +
                     "FROM inspectionitems ii " +
@@ -5507,7 +5518,20 @@ var Inspections = function()
                     });
 
                     $("#Reinspectweather").bind(objApp.touchEvent, function(){
-                        $('#reinspectWeatherInput').val(reinspection.weather);
+                        var sql = "SELECT weather " +
+                            "FROM reinspections " +
+                            "WHERE id = ? " +
+                            "AND deleted = 0";
+
+                        objDBUtils.loadRecordSQL(sql, [objApp.keys.reinspection_id], function(row)
+                        {
+                            if(row)
+                            {
+                                weather = row.weather;
+                                $('#reinspectWeatherInput').val(weather);
+                            }
+                        });
+
                     });
 
                     $('#btnRWSave').bind(objApp.touchEvent,function(e){
@@ -5862,7 +5886,7 @@ var Inspections = function()
             $('#finished').removeClass('active');
             $('#keywords').removeClass('hidden');
 
-            if(objApp.keys.report_type == "PCI") {
+            if(objApp.keys.report_type == "House & Land PCI") {
                 $("#btnReportPhotos").removeClass("hidden");
             }
             
