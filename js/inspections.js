@@ -1527,7 +1527,14 @@ var Inspections = function()
                 {
                     if(objUtils.isMobileDevice())
                     {
-                        self.scroller = new iScroll('emailListWrapper', { hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar'});
+                        self.scroller = new iScroll(document.querySelector("#emailListWrapper"), { hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar', useTransform: true, zoom: false, onBeforeScrollStart: function (e) {
+                            var target = e.target;
+                            while (target.nodeType != 1) target = target.parentNode;
+                            if (target.tagName != 'SELECT' && target.tagName != 'INPUT' && target.tagName != 'TEXTAREA')
+                                e.preventDefault();
+                            }}
+                        );                        
+                        
                     }
                 }, 500);
             }
@@ -1633,6 +1640,7 @@ var Inspections = function()
         $("#frmEmailTo").unbind();
         $("a.sendEmailButton").unbind();
         $("#report_type").unbind();
+        $('#frmDefectDetails #observation').unbind();
     }
 
 	/***
@@ -1993,7 +2001,6 @@ var Inspections = function()
                             var i, path, len;
                            for (i = 0, len = imageData.length; i < len; i += 1) {
                             var imageData1 = imageData[i].fullPath;
-                                alert(len+' image added');
                                 editPhoto2(imageData1);
                                 photo();
                             }
@@ -2104,9 +2111,18 @@ var Inspections = function()
         * Handle the event when the user hits the NExt button on the stage 2 event tracking
         */
         $(".inspectionDetails #btnStep2Next").bind(objApp.touchEvent, function(e) {
+            // If the user has attempted to add a new defect, ensure they have entered an observation
+            // and then save the defect.  If no location is selected, just go straight to the next item.
+            var currentLocation = self.objPopLocation.getValue();
+            if(currentLocation == "") {
+                // No location selected, go straight to step 3.
+                self.showStep3();
+                return;    
+            }
+            
             if($('#observation').val().trim()==''){
                alert('Please insert the observation');
-                return;
+               return;
             }
 
 			e.preventDefault();
@@ -2891,7 +2907,8 @@ var Inspections = function()
                         while (target.nodeType != 1) target = target.parentNode;
                         if (target.tagName != 'SELECT' && target.tagName != 'INPUT' && target.tagName != 'TEXTAREA')
                             e.preventDefault();
-                        }});
+                        }}
+                    );
                 }
 
                 // Handle the event when the user changes the cover photo selection
@@ -3350,8 +3367,8 @@ var Inspections = function()
 		$('#frmDefectDetails #observation').bind('keyup', function(e)
 		{
             setTimeout(function() {
-                self.setObservationFilters();
                 if(e.which=='32'){ // if user pressed "space" button
+                    self.setObservationFilters();
                     self.searchObservations();
                 }
             }, 350);
@@ -5518,20 +5535,15 @@ var Inspections = function()
                     });
 
                     $("#Reinspectweather").bind(objApp.touchEvent, function(){
-                        var sql = "SELECT weather " +
-                            "FROM reinspections " +
-                            "WHERE id = ? " +
-                            "AND deleted = 0";
-
-                        objDBUtils.loadRecordSQL(sql, [objApp.keys.reinspection_id], function(row)
-                        {
-                            if(row)
-                            {
-                                weather = row.weather;
-                                $('#reinspectWeatherInput').val(weather);
-                            }
-                        });
-
+                        // Load the current reinspection record
+                        objDBUtils.loadRecord("reinspections", self.reinspectionKey, function(param, reinspection) {
+                            if(!reinspection) {
+                                alert("Couldn't load the reinspection record!");
+                                return;
+                            } else {
+                                $('#reinspectWeatherInput').val(reinspection.weather);
+                            } 
+                        }, "");
                     });
 
                     $('#btnRWSave').bind(objApp.touchEvent,function(e){
