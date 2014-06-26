@@ -35,10 +35,16 @@ var dbUpgrader = function()
 	}	
     this.reinspections = function(old_version, new_version)
     {
+        console.log("DOING REINSPECTIONS TABLE UPDATE: " + old_version + "," + new_version);
         while(old_version < new_version)
         {
             // Incremement the vesion
             old_version =  old_version + .1 ;
+            
+            // Force 1 decimal place
+            old_version = old_version.toFixed(1) * 1;
+            
+            console.log("REINSPECTIONS OLD VERSION: " + old_version);
 
             switch(old_version)
             {
