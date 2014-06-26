@@ -57,6 +57,33 @@ var dbUpgrader = function()
                     // Upgrade complete
                     break;
 
+                case 1.2:
+
+                    // Do 1.2 upgrade
+                    // Execute SQL to add the new columns here
+                    var sql = "ALTER TABLE reinspections ADD COLUMN 'min_roof_tiles' SMALLINT(6) DEFAULT 0";
+                    objDBUtils.execute(sql, null, null);
+
+                    var sql = "ALTER TABLE reinspections ADD COLUMN 'min_ridge_tiles' SMALLINT(6) DEFAULT 0";
+                    objDBUtils.execute(sql, null, null);
+
+                    var sql = "ALTER TABLE reinspections ADD COLUMN 'touch_up_paint' SMALLINT(6) DEFAULT 0";
+                    objDBUtils.execute(sql, null, null);
+
+                    var sql = "ALTER TABLE reinspections ADD COLUMN 'min_flooring_tiles' SMALLINT(6) DEFAULT 0";
+                    objDBUtils.execute(sql, null, null);
+
+                    var sql = "ALTER TABLE reinspections ADD COLUMN 'grout_samples' SMALLINT(6) DEFAULT 0";
+                    objDBUtils.execute(sql, null, null);
+
+                    var sql = "ALTER TABLE reinspections ADD COLUMN 'barrel_code' SMALLINT(6) DEFAULT 0";
+                    objDBUtils.execute(sql, null, null);
+
+                    sql = "UPDATE app_tables SET version = ? WHERE table_name = ?";
+                    objDBUtils.execute(sql, [1.2, 'reinspections'], null);
+                    // Upgrade complete
+                    break;
+
                 default:
                     break;
             }

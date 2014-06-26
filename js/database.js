@@ -34,7 +34,7 @@ function DBUtils()
 	this.tables.push(new Array('builders', 1.0));
 	this.tables.push(new Array('resources', 1.0));
 	this.tables.push(new Array('inspections', 1.2));
-	this.tables.push(new Array('reinspections', 1.1));
+	this.tables.push(new Array('reinspections', 1.2));
 	this.tables.push(new Array('inspectionitems', 1.0));
 	this.tables.push(new Array('reinspectionitems', 1.0));
 	this.tables.push(new Array('inspectionitemphotos', 1.0));
@@ -1242,6 +1242,12 @@ function DBUtils()
                 "'most_recent' INTEGER NOT NULL DEFAULT 0, " +
                 "'weather' VARCHAR NULL ," +
                 "'notes' TEXT  NULL, " +
+                "'min_roof_tiles' SMALLINT(6) DEFAULT 0, " +
+                "'min_ridge_tiles' SMALLINT(6) DEFAULT 0, " +
+                "'touch_up_paint' SMALLINT(6) DEFAULT 0, " +
+                "'min_flooring_tiles' SMALLINT(6) DEFAULT 0, " +
+                "'grout_samples' SMALLINT(6) DEFAULT 0, " +
+                "'barrel_code' TEXT DEFAULT NULL, " +
                 "'created_by' INTEGER NOT NULL DEFAULT 48, " + 
                 "'deleted' INTEGER NOT NULL DEFAULT 0, " + 
                 "'dirty' INTEGER NOT NULL DEFAULT 1)";
