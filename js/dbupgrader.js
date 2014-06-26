@@ -40,6 +40,7 @@ var dbUpgrader = function()
         {
             // Incremement the vesion
             old_version =  old_version + .1 ;
+            console.log("REINSPECTIONS OLD VERSION: " + old_version);
 
             switch(old_version)
             {

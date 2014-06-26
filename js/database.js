@@ -786,7 +786,11 @@ function DBUtils()
 						// Invoke the database upgrader to apply
 						// the appropriate upgrades
 						objUpgrader = new dbUpgrader();
-						objUpgrader[table_name](result.rows.item(0).version, table_version);
+                        
+                        var old_version = result.rows.item(0).version * 1;
+                        var new_version = table_version * 1;
+                        
+						objUpgrader[table_name](old_version, new_version);
 					}
 					
 					self.checkNextTable(table_number);                          
