@@ -35,6 +35,7 @@ var dbUpgrader = function()
 	}	
     this.reinspections = function(old_version, new_version)
     {
+        console.log("DOING REINSPECTIONS TABLE UPDATE: " + old_version + "," + new_version);
         while(old_version < new_version)
         {
             // Incremement the vesion
