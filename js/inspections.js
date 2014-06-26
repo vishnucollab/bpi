@@ -491,9 +491,13 @@ var Inspections = function()
                                 + currentdate.getDate();
 
                 var reinspection_id = objDBUtils.makeInsertKey(objApp.sync_prefix);
-                var values = [reinspection_id, inspection_id, curdate, 1, 1,self.reinspectionNotes];
+                var values = [reinspection_id, inspection_id, curdate, 1, 1,self.reinspectionNotes,
+                row.min_roof_tiles, row.min_ridge_tiles, row.touch_up_paint, row.min_flooring_tiles, row.grout_samples,
+                row.barrel_code];
                 
-                sql = "INSERT INTO reinspections(id, inspection_id, reinspection_date, failed, most_recent,notes) VALUES(?,?,?,?,?,?)";
+                sql = "INSERT INTO reinspections(id, inspection_id, reinspection_date, failed, most_recent,notes, " +
+                    "min_roof_tiles, min_ridge_tiles, touch_up_paint, min_flooring_tiles, grout_samples, barrel_code) " +
+                    "VALUES(?,?,?,?,?,?,?,?,?,?,?,?)";
 
                 objDBUtils.execute(sql, values, function(){
                     
