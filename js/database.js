@@ -33,8 +33,8 @@ function DBUtils()
     this.tables.push(new Array('address_book', 1.0));
 	this.tables.push(new Array('builders', 1.0));
 	this.tables.push(new Array('resources', 1.0));
-	this.tables.push(new Array('inspections', 1.1));
-	this.tables.push(new Array('reinspections', 1.1));
+	this.tables.push(new Array('inspections', 1.2));
+	this.tables.push(new Array('reinspections', 1.2));
 	this.tables.push(new Array('inspectionitems', 1.0));
 	this.tables.push(new Array('reinspectionitems', 1.0));
 	this.tables.push(new Array('inspectionitemphotos', 1.0));
@@ -786,7 +786,11 @@ function DBUtils()
 						// Invoke the database upgrader to apply
 						// the appropriate upgrades
 						objUpgrader = new dbUpgrader();
-						objUpgrader[table_name](result.rows.item(0).version, table_version);
+                        
+                        var old_version = result.rows.item(0).version * 1;
+                        var new_version = table_version * 1;
+                        
+						objUpgrader[table_name](old_version, new_version);
 					}
 					
 					self.checkNextTable(table_number);                          
@@ -1178,7 +1182,7 @@ function DBUtils()
                 "'touch_up_paint' SMALLINT(6) DEFAULT 0, " +
                 "'min_flooring_tiles' SMALLINT(6) DEFAULT 0, " +
                 "'grout_samples' SMALLINT(6) DEFAULT 0, " +
-                "'barrel_code' SMALLINT(6) DEFAULT 0, " +
+                "'barrel_code' TEXT DEFAULT NULL, " +
                 "'created_by' INTEGER NOT NULL, " +
 				"'deleted' INTEGER NOT NULL DEFAULT 0 , " + 
 				"'dirty' INTEGER NOT NULL DEFAULT 1)";
@@ -1242,6 +1246,12 @@ function DBUtils()
                 "'most_recent' INTEGER NOT NULL DEFAULT 0, " +
                 "'weather' VARCHAR NULL ," +
                 "'notes' TEXT  NULL, " +
+                "'min_roof_tiles' SMALLINT(6) DEFAULT 0, " +
+                "'min_ridge_tiles' SMALLINT(6) DEFAULT 0, " +
+                "'touch_up_paint' SMALLINT(6) DEFAULT 0, " +
+                "'min_flooring_tiles' SMALLINT(6) DEFAULT 0, " +
+                "'grout_samples' SMALLINT(6) DEFAULT 0, " +
+                "'barrel_code' TEXT DEFAULT NULL, " +
                 "'created_by' INTEGER NOT NULL DEFAULT 48, " + 
                 "'deleted' INTEGER NOT NULL DEFAULT 0, " + 
                 "'dirty' INTEGER NOT NULL DEFAULT 1)";
