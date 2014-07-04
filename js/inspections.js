@@ -2578,9 +2578,9 @@ var Inspections = function()
                             var report_type = objApp.keys.report_type.replace(" ", "%20");
 
                             var downloadURL = objApp.apiURL + "reports/print_report/" + report_type + '/' + encodeURIComponent(objApp.keys.inspection_id) + '/' + encodeURIComponent(objApp.keys.reinspection_id) + "?token=" + token;
-
+                            
                             if(objApp.phonegapBuild) {
-                                downloadURL = "https://docs.google.com/viewer?url=" + downloadURL;
+                                downloadURL = "https://docs.google.com/viewer?url=" + encodeURIComponent(downloadURL);
                                 var ref = window.open(downloadURL, '_blank', 'location=yes');
                             } else {
                                 $.download(downloadURL, [], "post");
