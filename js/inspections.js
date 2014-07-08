@@ -2695,12 +2695,6 @@ var Inspections = function()
             self.checkSaveInspection();
         });
 
-        $("body").on("click", "#frmDefectDetails #observation_suggestion tr td" , function() {
-			var selectedTxt = $(this).text();
-            $('#frmDefectDetails #observation').val(selectedTxt);
-        });
-
-
         $('.btnEditPrivateNotes').bind(objApp.touchEvent, function(e){
             e.preventDefault();
 
@@ -2757,6 +2751,10 @@ var Inspections = function()
                     $("#frmDefectDetails #seq_no").val(seq_no);
                 }
 
+                // Remove event binding
+                $("#frmDefectDetails #observation_suggestion tr td").unbind();
+                
+                // Clear the
                 $("#frmDefectDetails #observation_suggestion").empty();
 
                 // Initialise defect form.
@@ -3322,6 +3320,7 @@ var Inspections = function()
         //filters.push(new Array("limit", 4));
         self.filters.push(new Array("resource_type = 3"));
         self.filters.push(new Array("name LIKE '%" + objDBUtils.doubleApos(self.observation) + "%'"));
+        self.filters.push(new Array("limit", 20));
     }
 
 	/***
@@ -3475,6 +3474,9 @@ var Inspections = function()
 
 		// If the ipad has scrolled to show the notes field,
 		// make sure we scroll back down after the user has finished typing.
+        
+        // Unbind the search observation key event.
+        $("#frmDefectDetails #observation").unbind();
 
 		$('#frmDefectDetails #observation').bind('keyup', function(e)
 		{
@@ -3487,13 +3489,28 @@ var Inspections = function()
 		});
 		self.setReadOnly();
 	}
+    
+    // Unbind the search observation touch event.
+    $("#searchObservation").unbind();
+    
     $("#searchObservation").bind(objApp.touchEvent, function(e) {
        self.setObservationFilters();
        self.searchObservations();
     });
+    
 	this.searchObservations = function(){
+        // Remove any previously bound events.
+        $("#frmDefectDetails #observation_suggestion tr td").unbind();
+        
         objDBUtils.loadSelect("resources", self.filters, "#frmDefectDetails #observation_suggestion", function()
         {
+            // Bind the click event after search
+            $("#frmDefectDetails #observation_suggestion tr td").click(function() {
+                var selectedTxt = $(this).text();
+                $('#frmDefectDetails #observation').val(selectedTxt);
+                console.log("Different Binding");
+            });            
+            
             if(objUtils.isMobileDevice()) {
                 scroller = new iScroll('observationWrapper', { hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar'});
             }

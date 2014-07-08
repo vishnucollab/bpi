@@ -1,6 +1,6 @@
 /***
 * @author: Andrew Chapman
-* @copyright: SIMB Pty Ltd 2010 - 2011
+* @copyright: SIMB Pty Ltd 2010 - 2014
 * 
 * Need to show defect level notes
 * Need to show more than 3 images on a report
@@ -15,7 +15,7 @@ function App()
 	//this.apiURL = "http://blue.print/BlueprintAPI/";
 	//this.apiURL = "http://projects.loc/blueprintapi/";
     //this.apiURL = "http://192.168.1.52/blueprint/api/";
-	this.phonegapBuild = true; 	// Set this to true when phonegap is the target
+	this.phonegapBuild = false; 	// Set this to true when phonegap is the target
 	this.version = 1.12;				// Identifies the app version to the server
 	this.versionStatus = "Production";
 	this.localMode = false;
