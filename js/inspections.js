@@ -175,7 +175,7 @@ var Inspections = function()
 	* taking into consideration any user entered search terms.  
 	*/
 	this.doInspectionSearch = function()
-	{   
+	{  
         self.unbindEvents();
         
         objApp.showHideSpinner(true, "#inspectionList");
@@ -450,6 +450,8 @@ var Inspections = function()
 			});
             		
 	    }, "");
+
+        self.bindEvents();
 	}
 
     /**
@@ -1887,13 +1889,11 @@ var Inspections = function()
         $(".inspectionDetails #addPhoto-wrapper #addPhoto-btn, #addPhotoFromGallery").bind(objApp.touchEvent, function(e)
 		{
             e.preventDefault();
-
            // The user may NOT add photos to a finalised inspection.
             if(self.finalised == 1) {
                 alert("Sorry, this inspection has been finalised.  If you wish to add more photos, please un-finalise the inspection first");
                 return;
             }
-
 			self.current_table = "inspectionitemphotos";
 			self.current_key = "inspection_id";
 
@@ -1907,7 +1907,6 @@ var Inspections = function()
 				"FROM " + self.current_table + " " +
 				"WHERE " + self.current_key + " = ? " +
 				"AND deleted = 0";
-
 			objDBUtils.loadRecordSQL(sql, [objApp.getKey(self.current_key)], function(row)
 			{
 				var seq_no = 1;  // Default sequence number to 1.
@@ -1923,7 +1922,6 @@ var Inspections = function()
 
 					seq_no += 1;
 				}
-
 				var editPhoto2 = function(photoData)
 				{
 					// Setup a new image object, using the photo data as the image source
