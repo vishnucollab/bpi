@@ -1575,7 +1575,7 @@ var Inspections = function()
         self.objPopState.preselect(objApp.keys.state);
 	}
 
-    this.loadAddressBookList = function()
+    this.loadAddressBookList = function(callback)
     {
         var sql = "SELECT * FROM address_book WHERE deleted = 0 ORDER BY email ASC";
 
@@ -1616,6 +1616,9 @@ var Inspections = function()
                         );                        
                         
                     }
+                    // if((callback != undefined) && (callback != "")) {
+                        callback();
+                    // }
                 }, 500);
             }
 
@@ -1846,6 +1849,69 @@ var Inspections = function()
 
                     }, "json");
                 });
+
+
+            }, "");
+        });
+
+
+        $("#frmEmailAdressBooks").submit(function(e) {
+            e.preventDefault();
+
+            // Ensure we have a valid email
+            var newEmail = $("#newEmail").val();
+            if(objApp.empty(newEmail)) {
+
+                alert("Please enter a valid email address");
+                return;
+            }
+
+            // Also ensure we have a valid inspection ID
+            var inspection_id = objApp.getKey("inspection_id");
+            if(objApp.empty(inspection_id)) {
+                alert("Invalid inspection ID");
+                return;
+            }
+
+            var reinspection_id = objApp.getKey("reinspection_id");
+
+            blockElement($("#frmEmailAdressBooks"));
+
+            // Load the inspection record
+            objDBUtils.loadRecord("inspections", inspection_id, function(param, inspection) {
+                if(!inspection) {
+                    alert("Error: Couldn't load inspection!");
+                    return;
+                }
+
+                var values = [newEmail];
+
+                // Make sure this email doesn't already exist
+                var sql = "SELECT * " +
+                    "FROM address_book " +
+                    "WHERE email = ? " +
+                    "AND deleted = 0";
+
+                objDBUtils.loadRecordSQL2(sql, values, function(resource, email)
+                {
+                    if(!resource)
+                    {
+                        var primaryKey = objDBUtils.makeInsertKey(objApp.sync_prefix);
+
+                        var sql = "INSERT INTO " +
+                            "address_book(id, email) " +
+                            "VALUES(?,?)";
+                        var values = [primaryKey, email];
+
+                        objDBUtils.execute(sql, values, function(){
+                            unblockElement($("#frmEmailAdressBooks"));
+                            self.loadAddressBookList(function(){
+                                $('#' + primaryKey).prop('checked', true);
+                                self.resolveEmailReportRecipients();
+                            });
+                        });
+                    }
+                }, newEmail);
 
 
             }, "");

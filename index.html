@@ -150,7 +150,7 @@
 
 		objFilters.init();
 
-		//objDBUtils.dropAllTables(0);
+		// objDBUtils.dropAllTables(0);
 		//localStorage.setItem("sync_email", "");
 		//localStorage.setItem("sync_password", "");
 
@@ -1004,7 +1004,7 @@
     
     <div id="emailReportWrapper" class="reveal-modal">
         <a class="close-reveal-modal" style="font-size: 40px; color: red;">&#215;</a>
-        <div class="left" style="width: 420px;">
+        <div class="right" style="width: 520px;">
             <form id="frmEmailTo" name="frmEmailTo" action="#" method="post">
                 <fieldset>
                     <legend>Email Report To</legend>
@@ -1028,10 +1028,31 @@
                 </fieldset>
             </form>
         </div>
-        <div class="right" style="width: 270px;" id="emailListWrapper">
+        <div class="left">
+
+        <label>Add Recipients From Address Book</label>
+        
+        <div class="left" style="width: 370px;" id="emailListWrapper">
             <ul id="emailList" title="Select Email">
 
             </ul>
+        </div>
+
+        <div class="clear"></div>
+
+        <form id="frmEmailAdressBooks" name="frmEmailAdressBook" action="#" method="post">
+            <fieldset>
+
+                <div class="clear"></div>
+
+                <label for="newEmail">Add new email address:</label>
+                <input type="text" id="newEmail" name="newEmail" value="" style="width: 300px; margin-bottom: 20px;"/>
+
+                <div class="clear"></div>
+                <input type="submit" value="Add" />
+            </fieldset>
+        </form>
+
         </div>
     </div>
 
