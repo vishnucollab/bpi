@@ -698,12 +698,11 @@ var Inspections = function()
             
             $("div.btnEditNotes").show();
             
-            if(($("#inspection #report_type").val() == "Quality Inspection") || (objApp.keys.report_type == "Quality Inspection"))
-            {
+            if(($("#inspection #report_type").val() == "Quality Inspection") || (objApp.keys.report_type == "Quality Inspection")) {
                 objApp.setSubExtraHeading("Step 1 of 5", true);
-            }
-            else
-            {
+            } else if (($("#inspection #report_type").val() == "Fix / Plaster Inspection") || (objApp.keys.report_type == "Fix / Plaster Inspection")) {
+                objApp.setSubExtraHeading("Step 1 of 4", true);
+            } else {
                 objApp.setSubExtraHeading("Step 1 of 3", true);
                 //$("div.btnEditNotes").hide();
             }
@@ -720,7 +719,8 @@ var Inspections = function()
         
         if(($("#inspection #report_type").val() == "Quality Inspection") || (objApp.keys.report_type == "Quality Inspection")) {
             objApp.setSubExtraHeading("Step 2 of 5", true);
-            
+        } else if(($("#inspection #report_type").val() == "Fix / Plaster Inspection") || (objApp.keys.report_type == "Fix / Plaster Inspection")) {    
+            objApp.setSubExtraHeading("Step 2 of 4", true);
         } else {
             objApp.setSubExtraHeading("Step 2 of 3", true);
         }
@@ -779,29 +779,38 @@ var Inspections = function()
             objApp.setSubHeading("Review Inspection @ " + inspection_property);  
             
             // If this a 5 step inspection, hide the finalisation buttons on step 3
-            if(inspection.report_type == "Quality Inspection") {
+            if((inspection.report_type == "Quality Inspection") || (inspection.report_type == "Fix / Plaster Inspection")) {
                 $("#btnFinishedWrapper").hide();
             } else {
                 $("#btnFinishedWrapper").show();
             }
             
-            if(inspection.report_type == "Quality Inspection" && objApp.keys.reinspection_id == "")
-            {
+            if(inspection.report_type == "Quality Inspection" && objApp.keys.reinspection_id == "") {
                 objApp.setSubExtraHeading("Step 3 of 5", true);
                 $('#inspectionStep3 > .bottomBtns > a#btnStep3Email').hide();
                 $('#inspectionStep3 > .bottomBtns > .btnContainer.right > a#btnStep3Next').html('Next');
                 $('#inspectionStep4 > .bottomBtns > .btnContainer.right > a#btnStep4Next').html('Next');
-            }
-            else if(inspection.report_type == "Quality Inspection" && objApp.keys.reinspection_id != "") {
+            }  else if(inspection.report_type == "Quality Inspection" && objApp.keys.reinspection_id != "") {
                 objApp.setSubExtraHeading("Step 3 of 4", true);
                 $('#inspectionStep3 > .bottomBtns > a#btnStep3Email').hide();
                 $('#inspectionStep3 > .bottomBtns > .btnContainer.right > a#btnStep3Next').html('Next');
                 $('#inspectionStep4 > .bottomBtns > .btnContainer.right > a#btnStep4Next').html('Done');
                 $('#reinspection > .bottomBtns > .btnContainer.right > a#btnStep3Next').html('Next');
                 $('#reinspection > .bottomBtns > .btnContainer.right > a#btnStep4Next').html('Done');
-            }
-            else
-            {
+                
+            } else if(inspection.report_type == "Fix / Plaster Inspection" && objApp.keys.reinspection_id == "") {
+                objApp.setSubExtraHeading("Step 3 of 4", true);
+                $('#inspectionStep3 > .bottomBtns > a#btnStep3Email').hide();
+                $('#inspectionStep3 > .bottomBtns > .btnContainer.right > a#btnStep3Next').html('Next');
+                $('#inspectionStep4 > .bottomBtns > .btnContainer.right > a#btnStep4Next').html('Next');
+            } else if(inspection.report_type == "Fix / Plaster Inspection" && objApp.keys.reinspection_id != "") {
+                objApp.setSubExtraHeading("Step 3 of 4", true);
+                $('#inspectionStep3 > .bottomBtns > a#btnStep3Email').hide();
+                $('#inspectionStep3 > .bottomBtns > .btnContainer.right > a#btnStep3Next').html('Next');
+                $('#inspectionStep4 > .bottomBtns > .btnContainer.right > a#btnStep4Next').html('Done');
+                $('#reinspection > .bottomBtns > .btnContainer.right > a#btnStep3Next').html('Next');
+                $('#reinspection > .bottomBtns > .btnContainer.right > a#btnStep4Next').html('Done');                
+            } else {
                 objApp.setSubExtraHeading("Step 3 of 3", true);
                 $('#inspectionStep3 > .bottomBtns > a#btnStep3Email').show();
                 $('#inspectionStep3 > .bottomBtns > .btnContainer.right > a#btnStep3Next').html('Exit');
@@ -840,28 +849,15 @@ var Inspections = function()
         // Set the main heading
         var inspection_property = "Lot " + self.inspection.lot_no + ", " + self.inspection.address + ", " + self.inspection.suburb;
         objApp.setSubHeading("Materials to be left on site");
-        if(self.inspection.report_type == "Quality Inspection" && objApp.keys.reinspection_id != "") {
+        if((self.inspection.report_type == "Quality Inspection"   && objApp.keys.reinspection_id != "") || 
+            self.inspection.report_type == "Fix / Plaster Inspection") {
             objApp.setSubExtraHeading("Step 4 of 4", true);
-
         } else {
             objApp.setSubExtraHeading("Step 4 of 5", true);
         }
 
         objApp.clearMain();
-/*
-        if($(this).hasClass("reinspection")) {
-            // Load the reinspection record
-            objDBUtils.loadRecord("reinspections", id, function(param, reinspection) {
-                if(!reinspection) {
-                    alert("Couldn't load the reinspection record!");
-                    return;
-                }
 
-                objApp.keys.inspection_id = reinspection.inspection_id;
-                self.reinspectionNotes = reinspection.notes;
-
-                self.loadReinspectionItems(id);
-            }, ""); */
         if(objApp.keys.reinspection_id != "") {
 
             objDBUtils.loadRecord("reinspections", objApp.keys.reinspection_id, function(param, reinspection) {
@@ -976,6 +972,13 @@ var Inspections = function()
             $("#barrel_code").val(this.inspection.barrel_code);
 
         }
+        
+        if(this.inspection.report_type == "Fix / Plaster Inspection") {
+            $('#inspectionStep4 > .bottomBtns > .btnContainer.right > a#btnStep4Next').html('Exit');
+        } else {
+            alert(inspection.report_type);
+            $('#inspectionStep4 > .bottomBtns > .btnContainer.right > a#btnStep4Next').html('Next &rsaquo;&rsaquo;');
+        }
 
         $("#inspectionStep4").removeClass("hidden");
 
@@ -1036,7 +1039,7 @@ var Inspections = function()
         if($("#inspection #notes").val() == "") {
             report_type = $("#report_type").val();
 
-            if(report_type == "Quality Inspection") {
+            if((report_type == "Quality Inspection") || (report_type == "Fix / Plaster Inspection")) {
                 $("#inspection #notes").val(self.default_notes);
             }
         }
@@ -2323,7 +2326,7 @@ var Inspections = function()
 		{
 			e.preventDefault();
 
-            if(objApp.keys.report_type == 'Quality Inspection') {
+            if((objApp.keys.report_type == 'Quality Inspection') || (objApp.keys.report_type == 'Fix / Plaster Inspection')) {
                 self.showStep4();
             }
             else {
@@ -2643,8 +2646,15 @@ var Inspections = function()
                             }
 
                             var token = data.message;
-                            var report_type = objApp.keys.report_type.replace(" ", "%20");
-
+                            
+                            var report_type = objApp.keys.report_type.trim();
+                            
+                            if(report_type == "Fix / Plaster Inspection") {
+                                report_type = "Fix";
+                            } else {
+                               report_type = report_type.replace(" ", "%20").trim(); 
+                            }                            
+                            
                             var downloadURL = objApp.apiURL + "reports/print_report/" + report_type + '/' + encodeURIComponent(objApp.keys.inspection_id) + '/' + encodeURIComponent(objApp.keys.reinspection_id) + "?token=" + token;
                             
                             if(objApp.phonegapBuild) {
@@ -5625,7 +5635,8 @@ var Inspections = function()
                     $(".inspectionDetails .passed").addClass('active');
                 }
 
-                if(inspection.report_type == "Quality Inspection" && objApp.keys.reinspection_id != "") {
+                if((inspection.report_type == "Quality Inspection" && objApp.keys.reinspection_id != "") ||
+                    (inspection.report_type == "Fix / Plaster Inspection")) {
                     objApp.setSubExtraHeading("Step 3 of 4", true);
                     $('#inspectionStep3 > .bottomBtns > a#btnStep3Email').hide();
                     $('#inspectionStep3 > .bottomBtns > .btnContainer.right > a#btnStep3Next').html('Next');
