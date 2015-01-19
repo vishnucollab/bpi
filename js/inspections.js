@@ -1619,9 +1619,10 @@ var Inspections = function()
                         );                        
                         
                     }
-                    // if((callback != undefined) && (callback != "")) {
+                    
+                    if(callback != undefined) {
                         callback();
-                    // }
+                    }
                 }, 500);
             }
 
