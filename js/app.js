@@ -11,12 +11,12 @@ function App()
 	var self = this;	// Create a reference to the object itself
 	//this.apiURL = "http://localhost/nycran/blueprintapi/";
 	//this.apiURL = "http://qa.simb.com.au/blueprint/api/";  
-    this.apiURL = "http://blueprint.simb.com.au/api/";
+    //this.apiURL = "http://blueprint.simb.com.au/api/";
 	//this.apiURL = "http://blue.print/BlueprintAPI/";
 	//this.apiURL = "http://projects.loc/blueprintapi/";
-    //this.apiURL = "http://192.168.1.52/blueprint/api/";
-	this.phonegapBuild = true; 	// Set this to true when phonegap is the target
-	this.version = 1.13;				// Identifies the app version to the server
+    this.apiURL = "http://192.168.1.52/blueprint/api/";
+	this.phonegapBuild = false; 	// Set this to true when phonegap is the target
+	this.version = 1.14;				// Identifies the app version to the server
 	this.versionStatus = "Production";
 	this.localMode = false;
 	this.context = "";
@@ -874,6 +874,11 @@ function App()
         
         return false;
     }
+    
+    this.validateEmail = function(email) { 
+        var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        return re.test(email);
+    } 
 };
 
 /**********************************************************

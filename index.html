@@ -84,7 +84,7 @@
     } 
     
 	</script>
-
+    
     <script src="phonegap.js"></script>
 
     <script type="text/javascript" src="js/json.js"></script>
@@ -1004,7 +1004,33 @@
     
     <div id="emailReportWrapper" class="reveal-modal">
         <a class="close-reveal-modal" style="font-size: 40px; color: red;">&#215;</a>
-        <div class="right" style="width: 520px;">
+        
+        <div class="left">
+            <label>Add Recipients From Address Book</label>
+            
+            <div class="left" style="width: 370px;" id="emailListWrapper">
+                <ul id="emailList" title="Select Email">
+
+                </ul>
+            </div>
+
+            <div class="clear"></div>
+
+            <form id="frmEmailAdressBooks" name="frmEmailAdressBook" action="#" method="post">
+                <fieldset>
+
+                    <div class="clear"></div>
+
+                    <label for="newEmail">Add new email address:</label>
+                    <input type="text" id="newEmail" name="newEmail" value="" style="width: 300px; margin-bottom: 20px;"/>
+
+                    <div class="clear"></div>
+                    <input type="submit" value="Add" />
+                </fieldset>
+            </form>
+        </div>        
+        
+        <div class="right" style="width: 420px;">
             <form id="frmEmailTo" name="frmEmailTo" action="#" method="post">
                 <fieldset>
                     <legend>Email Report To</legend>
@@ -1017,7 +1043,7 @@
                     <div class="clear"></div>
 
                     <label for="emailTo">Recipients</label>
-                    <input type="text" id="emailTo" name="emailTo" value="" />
+                    <textarea id="emailTo" name="emailTo"></textarea>
 
                     <ul>
                         <li><input type="checkbox" id="attach_inspection_images" value="0" /> <label for="attach_inspection_images">Attach Inspection Images</label></li>
@@ -1027,32 +1053,6 @@
                     <input type="submit" value="Send &gt;&gt;" />
                 </fieldset>
             </form>
-        </div>
-        <div class="left">
-
-        <label>Add Recipients From Address Book</label>
-        
-        <div class="left" style="width: 370px;" id="emailListWrapper">
-            <ul id="emailList" title="Select Email">
-
-            </ul>
-        </div>
-
-        <div class="clear"></div>
-
-        <form id="frmEmailAdressBooks" name="frmEmailAdressBook" action="#" method="post">
-            <fieldset>
-
-                <div class="clear"></div>
-
-                <label for="newEmail">Add new email address:</label>
-                <input type="text" id="newEmail" name="newEmail" value="" style="width: 300px; margin-bottom: 20px;"/>
-
-                <div class="clear"></div>
-                <input type="submit" value="Add" />
-            </fieldset>
-        </form>
-
         </div>
     </div>
 

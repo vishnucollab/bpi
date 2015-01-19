@@ -1589,17 +1589,20 @@ var Inspections = function()
 
                 var maxLoop = emails.rows.length;
                 var r = 0;
+                var addressOptions = [];
 
                 // Loop through all of the emails in the recordset.
                 for(r = 0; r < maxLoop; r++)
                 {
                     // Get the current row
                     var row = emails.rows.item(r);
-
-                    html += '<li><input type="checkbox" id="' + row.id + '" value="' + row.id + '">';
-                    html += '<label for="' + row.id + '">' + row.email + '</label></li>';
+                    var email = row.email.trim();
+                    
+                    if(objApp.validateEmail(email)) {
+                        html += '<li><input type="checkbox" id="' + row.id + '" value="' + row.id + '">';
+                        html += '<label for="' + row.id + '">' + row.email + '</label></li>';                        
+                    }
                 }
-
 
                 // Insert the HTML into the scrolling wrapper.
                 $("#emailList").html(html);
