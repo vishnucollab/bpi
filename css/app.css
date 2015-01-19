@@ -229,9 +229,9 @@ form.search
 {
 	overflow-y: auto;
 	/*height: 560px;*/
-	padding: 0px;
+	padding: 0px;     
 	/*width: 660px;*/
-}
+}  
 
 #tblInspectionListingHeader th
 {

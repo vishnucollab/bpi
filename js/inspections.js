@@ -340,7 +340,7 @@ var Inspections = function()
             {
                 if(objUtils.isMobileDevice())        
                 {
-                    self.scroller = new iScroll('inspectionScrollWrapper', { hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar'});
+                    self.scroller = new IScroll('#inspectionScrollWrapper', { click: true, hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar'});
                 }
             }, 500);            
 			
@@ -1613,7 +1613,7 @@ var Inspections = function()
                 {
                     if(objUtils.isMobileDevice())
                     {
-                        self.scroller = new iScroll(document.querySelector("#emailListWrapper"), { hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar', useTransform: true, zoom: false, onBeforeScrollStart: function (e) {
+                        self.scroller = new IScroll(document.querySelector("#emailListWrapper"), { click: true, hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar', useTransform: true, zoom: false, onBeforeScrollStart: function (e) {
                             var target = e.target;
                             while (target.nodeType != 1) target = target.parentNode;
                             if (target.tagName != 'SELECT' && target.tagName != 'INPUT' && target.tagName != 'TEXTAREA')
@@ -3090,7 +3090,7 @@ var Inspections = function()
                 $(tableBody).find("tr td:eq(2)").css("width", average_width + "px");
 
                 if(objUtils.isMobileDevice()) {
-                    var scroller = new iScroll(document.querySelector("#reportPhotoList"), { hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar', useTransform: true, zoom: false, onBeforeScrollStart: function (e) {
+                    var scroller = new IScroll(document.querySelector("#reportPhotoList"), { click: true, hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar', useTransform: true, zoom: false, onBeforeScrollStart: function (e) {
                         var target = e.target;
                         while (target.nodeType != 1) target = target.parentNode;
                         if (target.tagName != 'SELECT' && target.tagName != 'INPUT' && target.tagName != 'TEXTAREA')
@@ -3590,7 +3590,7 @@ var Inspections = function()
             });            
             
             if(objUtils.isMobileDevice()) {
-                scroller = new iScroll('observationWrapper', { hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar'});
+                scroller = new iScroll('observationWrapper', { click: true, hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar'});
             }
         }, 'td');
     }
@@ -4312,7 +4312,7 @@ var Inspections = function()
 
 				    // Setup touchScroll if applicable
 					if(objUtils.isMobileDevice()) {
-					    var scroller = new iScroll(document.querySelector("#historyModal #historyList"), { hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar'});
+					    var scroller = new IScroll(document.querySelector("#historyModal #historyList"), { click: true, hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar'});
 					}
 				}
 
@@ -5252,7 +5252,7 @@ var Inspections = function()
 		{
 			return;
 		}
-
+        
         this.keySortArray = {};
 
 		var listDeleteMode = true;
@@ -5378,10 +5378,11 @@ var Inspections = function()
 					self.setTableWidths2('tblDefectListingHeader', 'tblDefectListing', 4);
                 }
 
-				if(objUtils.isMobileDevice())
-			    {
-                    self.scroller = new iScroll(document.querySelector("#defectScrollWrapper"), { hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbarSm'});
-				}
+				//if(objUtils.isMobileDevice())
+			    //{
+                alert("HERE");
+                    self.scroller = new IScroll(document.querySelector("#defectScrollWrapper"), { click: true, hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbarSm'});
+				//}
 
 				// Bind the move up / move down arrow button events
                 $("#tblDefectListing span.arrow").bind("click", function(e) {
@@ -5702,7 +5703,7 @@ var Inspections = function()
 
                     if(objUtils.isMobileDevice())
                     {
-                        self.scroller = new iScroll(document.querySelector("#reinspectionScrollWrapper"), { hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbarSm'});
+                        self.scroller = new IScroll(document.querySelector("#reinspectionScrollWrapper"), { click: true, hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbarSm'});
                     }
 
                     // Handle the event when the user clicks on a row in the item table

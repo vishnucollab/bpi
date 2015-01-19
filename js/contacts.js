@@ -168,7 +168,7 @@ var Contacts = function()
 			
 			    if(objUtils.isMobileDevice())	    
 		        {
-                    self.scroller = new iScroll('contactScrollWrapper', { hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar'});
+                    self.scroller = new IScroll('#contactScrollWrapper', { click: true, hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar'});
 			    }
             }, 1000);
 			

@@ -198,7 +198,7 @@ var Clients = function()
 			
 			    if(objUtils.isMobileDevice())	    
 		        {
-                    self.scroller = new iScroll('clientScrollWrapper', { hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar'});
+                    self.scroller = new IScroll('#clientScrollWrapper', { click: true, hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar'});
 			    }
             }, 1000);
 			
@@ -515,7 +515,7 @@ var Clients = function()
 		    // If this is a mobile device, setup TouchScroll on the list area.
 			if(objUtils.isMobileDevice())
 			{      
-				this.scroller = new iScroll(document.querySelector("#clientSites #listing"), { hScrollbar: false, vScrollbar: false, scrollbarClass: 'myScrollbar'});
+				this.scroller = new IScroll(document.querySelector("#clientSites #listing"), { click: true, hScrollbar: false, vScrollbar: false, scrollbarClass: 'myScrollbar'});
                 //var scroller = new TouchScroll(document.querySelector("#clientSites #listing"), {elastic: true});
 			}
 			
