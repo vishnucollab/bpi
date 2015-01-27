@@ -26,6 +26,8 @@ var Inspections = function()
 	this.lastKeyPress = null;
 	this.doingSave = false; 
     this.scroller = null;
+    this.last_scroller_x = -1;
+    this.last_scroller_y = -1;
     
     this.currentStep = 0;
     this.isEditing = 0;
@@ -2286,7 +2288,7 @@ var Inspections = function()
                 blockElement("#frmDefectDetails");
 
                 self.checkSaveInspection();
-                self.loadInspectionItems();
+                // self.loadInspectionItems();
                 self.loadPhotos();
 
                 // Get the number of defects associated with this inspection
@@ -5378,11 +5380,17 @@ var Inspections = function()
 					self.setTableWidths2('tblDefectListingHeader', 'tblDefectListing', 4);
                 }
 
-				//if(objUtils.isMobileDevice())
-			    //{
-                alert("HERE");
+				// if(objUtils.isMobileDevice())
+			    {
                     self.scroller = new IScroll(document.querySelector("#defectScrollWrapper"), { click: true, hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbarSm'});
-				//}
+				    
+                    if(self.last_scroller_y != -1)
+                    {
+                        self.scroller.scrollTo(self.last_scroller_x, self.last_scroller_y);
+                        self.last_scroller_x = -1;
+                        self.last_scroller_y = -1;
+                    }
+                }
 
 				// Bind the move up / move down arrow button events
                 $("#tblDefectListing span.arrow").bind("click", function(e) {
@@ -5400,6 +5408,13 @@ var Inspections = function()
                 });
 
                 $('#tblDefectListing a.edit_issue_btn').bind('click', function(e){
+
+                    
+                    // if(objUtils.isMobileDevice())
+                    {
+                        self.last_scroller_x = self.scroller.x;
+                        self.last_scroller_y = self.scroller.y;
+                    }
                     e.preventDefault();
                     if(self.is_change_order)
                     {
