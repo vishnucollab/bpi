@@ -847,6 +847,7 @@ var Inspections = function()
     this.showStep4 = function()
     {
         self.setStep(4);
+        
 
         // Set the main heading
         var inspection_property = "Lot " + self.inspection.lot_no + ", " + self.inspection.address + ", " + self.inspection.suburb;
@@ -973,18 +974,18 @@ var Inspections = function()
             }
             $("#barrel_code").val(this.inspection.barrel_code);
 
-        }
+        } 
         
         if(this.inspection.report_type == "Fix / Plaster Inspection") {
             $('#inspectionStep4 > .bottomBtns > .btnContainer.right > a#btnStep4Next').html('Exit');
         } else {
-            alert(inspection.report_type);
             $('#inspectionStep4 > .bottomBtns > .btnContainer.right > a#btnStep4Next').html('Next &rsaquo;&rsaquo;');
         }
 
         $("#inspectionStep4").removeClass("hidden");
 
         self.setTableWidths2('tblRateListingHeader', 'tblRateListing', 2, 500);
+        
     }
 
     this.showStep5 = function()
