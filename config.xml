@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <widget xmlns = "http://www.w3.org/ns/widgets"
         xmlns:gap = "http://phonegap.com/ns/1.0"
-        id = "au.com.simb.Blueprint"
-        version = "1.14">
+        id = "com.simb.Blueprint"
+        version = "1.15">
     <name>Blueprint</name>
 
     <description>

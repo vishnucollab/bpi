@@ -26,6 +26,8 @@ var Inspections = function()
 	this.lastKeyPress = null;
 	this.doingSave = false; 
     this.scroller = null;
+    this.last_scroller_x = -1;
+    this.last_scroller_y = -1;
     
     this.currentStep = 0;
     this.isEditing = 0;
@@ -340,7 +342,7 @@ var Inspections = function()
             {
                 if(objUtils.isMobileDevice())        
                 {
-                    self.scroller = new iScroll('inspectionScrollWrapper', { hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar'});
+                    self.scroller = new IScroll('#inspectionScrollWrapper', { click: true, hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar'});
                 }
             }, 500);            
 			
@@ -698,12 +700,11 @@ var Inspections = function()
             
             $("div.btnEditNotes").show();
             
-            if(($("#inspection #report_type").val() == "Quality Inspection") || (objApp.keys.report_type == "Quality Inspection"))
-            {
+            if(($("#inspection #report_type").val() == "Quality Inspection") || (objApp.keys.report_type == "Quality Inspection")) {
                 objApp.setSubExtraHeading("Step 1 of 5", true);
-            }
-            else
-            {
+            } else if (($("#inspection #report_type").val() == "Fix / Plaster Inspection") || (objApp.keys.report_type == "Fix / Plaster Inspection")) {
+                objApp.setSubExtraHeading("Step 1 of 4", true);
+            } else {
                 objApp.setSubExtraHeading("Step 1 of 3", true);
                 //$("div.btnEditNotes").hide();
             }
@@ -720,7 +721,8 @@ var Inspections = function()
         
         if(($("#inspection #report_type").val() == "Quality Inspection") || (objApp.keys.report_type == "Quality Inspection")) {
             objApp.setSubExtraHeading("Step 2 of 5", true);
-            
+        } else if(($("#inspection #report_type").val() == "Fix / Plaster Inspection") || (objApp.keys.report_type == "Fix / Plaster Inspection")) {    
+            objApp.setSubExtraHeading("Step 2 of 4", true);
         } else {
             objApp.setSubExtraHeading("Step 2 of 3", true);
         }
@@ -779,29 +781,38 @@ var Inspections = function()
             objApp.setSubHeading("Review Inspection @ " + inspection_property);  
             
             // If this a 5 step inspection, hide the finalisation buttons on step 3
-            if(inspection.report_type == "Quality Inspection") {
+            if((inspection.report_type == "Quality Inspection") || (inspection.report_type == "Fix / Plaster Inspection")) {
                 $("#btnFinishedWrapper").hide();
             } else {
                 $("#btnFinishedWrapper").show();
             }
             
-            if(inspection.report_type == "Quality Inspection" && objApp.keys.reinspection_id == "")
-            {
+            if(inspection.report_type == "Quality Inspection" && objApp.keys.reinspection_id == "") {
                 objApp.setSubExtraHeading("Step 3 of 5", true);
                 $('#inspectionStep3 > .bottomBtns > a#btnStep3Email').hide();
                 $('#inspectionStep3 > .bottomBtns > .btnContainer.right > a#btnStep3Next').html('Next');
                 $('#inspectionStep4 > .bottomBtns > .btnContainer.right > a#btnStep4Next').html('Next');
-            }
-            else if(inspection.report_type == "Quality Inspection" && objApp.keys.reinspection_id != "") {
+            }  else if(inspection.report_type == "Quality Inspection" && objApp.keys.reinspection_id != "") {
                 objApp.setSubExtraHeading("Step 3 of 4", true);
                 $('#inspectionStep3 > .bottomBtns > a#btnStep3Email').hide();
                 $('#inspectionStep3 > .bottomBtns > .btnContainer.right > a#btnStep3Next').html('Next');
                 $('#inspectionStep4 > .bottomBtns > .btnContainer.right > a#btnStep4Next').html('Done');
                 $('#reinspection > .bottomBtns > .btnContainer.right > a#btnStep3Next').html('Next');
                 $('#reinspection > .bottomBtns > .btnContainer.right > a#btnStep4Next').html('Done');
-            }
-            else
-            {
+                
+            } else if(inspection.report_type == "Fix / Plaster Inspection" && objApp.keys.reinspection_id == "") {
+                objApp.setSubExtraHeading("Step 3 of 4", true);
+                $('#inspectionStep3 > .bottomBtns > a#btnStep3Email').hide();
+                $('#inspectionStep3 > .bottomBtns > .btnContainer.right > a#btnStep3Next').html('Next');
+                $('#inspectionStep4 > .bottomBtns > .btnContainer.right > a#btnStep4Next').html('Next');
+            } else if(inspection.report_type == "Fix / Plaster Inspection" && objApp.keys.reinspection_id != "") {
+                objApp.setSubExtraHeading("Step 3 of 4", true);
+                $('#inspectionStep3 > .bottomBtns > a#btnStep3Email').hide();
+                $('#inspectionStep3 > .bottomBtns > .btnContainer.right > a#btnStep3Next').html('Next');
+                $('#inspectionStep4 > .bottomBtns > .btnContainer.right > a#btnStep4Next').html('Done');
+                $('#reinspection > .bottomBtns > .btnContainer.right > a#btnStep3Next').html('Next');
+                $('#reinspection > .bottomBtns > .btnContainer.right > a#btnStep4Next').html('Done');                
+            } else {
                 objApp.setSubExtraHeading("Step 3 of 3", true);
                 $('#inspectionStep3 > .bottomBtns > a#btnStep3Email').show();
                 $('#inspectionStep3 > .bottomBtns > .btnContainer.right > a#btnStep3Next').html('Exit');
@@ -840,28 +851,15 @@ var Inspections = function()
         // Set the main heading
         var inspection_property = "Lot " + self.inspection.lot_no + ", " + self.inspection.address + ", " + self.inspection.suburb;
         objApp.setSubHeading("Materials to be left on site");
-        if(self.inspection.report_type == "Quality Inspection" && objApp.keys.reinspection_id != "") {
+        if((self.inspection.report_type == "Quality Inspection"   && objApp.keys.reinspection_id != "") || 
+            self.inspection.report_type == "Fix / Plaster Inspection") {
             objApp.setSubExtraHeading("Step 4 of 4", true);
-
         } else {
             objApp.setSubExtraHeading("Step 4 of 5", true);
         }
 
         objApp.clearMain();
-/*
-        if($(this).hasClass("reinspection")) {
-            // Load the reinspection record
-            objDBUtils.loadRecord("reinspections", id, function(param, reinspection) {
-                if(!reinspection) {
-                    alert("Couldn't load the reinspection record!");
-                    return;
-                }
 
-                objApp.keys.inspection_id = reinspection.inspection_id;
-                self.reinspectionNotes = reinspection.notes;
-
-                self.loadReinspectionItems(id);
-            }, ""); */
         if(objApp.keys.reinspection_id != "") {
 
             objDBUtils.loadRecord("reinspections", objApp.keys.reinspection_id, function(param, reinspection) {
@@ -976,6 +974,13 @@ var Inspections = function()
             $("#barrel_code").val(this.inspection.barrel_code);
 
         }
+        
+        if(this.inspection.report_type == "Fix / Plaster Inspection") {
+            $('#inspectionStep4 > .bottomBtns > .btnContainer.right > a#btnStep4Next').html('Exit');
+        } else {
+            alert(inspection.report_type);
+            $('#inspectionStep4 > .bottomBtns > .btnContainer.right > a#btnStep4Next').html('Next &rsaquo;&rsaquo;');
+        }
 
         $("#inspectionStep4").removeClass("hidden");
 
@@ -1036,7 +1041,7 @@ var Inspections = function()
         if($("#inspection #notes").val() == "") {
             report_type = $("#report_type").val();
 
-            if(report_type == "Quality Inspection") {
+            if((report_type == "Quality Inspection") || (report_type == "Fix / Plaster Inspection")) {
                 $("#inspection #notes").val(self.default_notes);
             }
         }
@@ -1589,17 +1594,20 @@ var Inspections = function()
 
                 var maxLoop = emails.rows.length;
                 var r = 0;
+                var addressOptions = [];
 
                 // Loop through all of the emails in the recordset.
                 for(r = 0; r < maxLoop; r++)
                 {
                     // Get the current row
                     var row = emails.rows.item(r);
-
-                    html += '<li><input type="checkbox" id="' + row.id + '" value="' + row.id + '">';
-                    html += '<label for="' + row.id + '">' + row.email + '</label></li>';
+                    var email = row.email.trim();
+                    
+                    if(objApp.validateEmail(email)) {
+                        html += '<li><input type="checkbox" id="' + row.id + '" value="' + row.id + '">';
+                        html += '<label for="' + row.id + '">' + row.email + '</label></li>';                        
+                    }
                 }
-
 
                 // Insert the HTML into the scrolling wrapper.
                 $("#emailList").html(html);
@@ -1607,7 +1615,7 @@ var Inspections = function()
                 {
                     if(objUtils.isMobileDevice())
                     {
-                        self.scroller = new iScroll(document.querySelector("#emailListWrapper"), { hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar', useTransform: true, zoom: false, onBeforeScrollStart: function (e) {
+                        self.scroller = new IScroll(document.querySelector("#emailListWrapper"), { click: true, hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar', useTransform: true, zoom: false, onBeforeScrollStart: function (e) {
                             var target = e.target;
                             while (target.nodeType != 1) target = target.parentNode;
                             if (target.tagName != 'SELECT' && target.tagName != 'INPUT' && target.tagName != 'TEXTAREA')
@@ -1616,9 +1624,10 @@ var Inspections = function()
                         );                        
                         
                     }
-                    // if((callback != undefined) && (callback != "")) {
+                    
+                    if(callback != undefined) {
                         callback();
-                    // }
+                    }
                 }, 500);
             }
 
@@ -2279,7 +2288,7 @@ var Inspections = function()
                 blockElement("#frmDefectDetails");
 
                 self.checkSaveInspection();
-                self.loadInspectionItems();
+                // self.loadInspectionItems();
                 self.loadPhotos();
 
                 // Get the number of defects associated with this inspection
@@ -2319,7 +2328,7 @@ var Inspections = function()
 		{
 			e.preventDefault();
 
-            if(objApp.keys.report_type == 'Quality Inspection') {
+            if((objApp.keys.report_type == 'Quality Inspection') || (objApp.keys.report_type == 'Fix / Plaster Inspection')) {
                 self.showStep4();
             }
             else {
@@ -2639,8 +2648,15 @@ var Inspections = function()
                             }
 
                             var token = data.message;
-                            var report_type = objApp.keys.report_type.replace(" ", "%20");
-
+                            
+                            var report_type = objApp.keys.report_type.trim();
+                            
+                            if(report_type == "Fix / Plaster Inspection") {
+                                report_type = "Fix";
+                            } else {
+                               report_type = report_type.replace(" ", "%20").trim(); 
+                            }                            
+                            
                             var downloadURL = objApp.apiURL + "reports/print_report/" + report_type + '/' + encodeURIComponent(objApp.keys.inspection_id) + '/' + encodeURIComponent(objApp.keys.reinspection_id) + "?token=" + token;
                             
                             if(objApp.phonegapBuild) {
@@ -3076,7 +3092,7 @@ var Inspections = function()
                 $(tableBody).find("tr td:eq(2)").css("width", average_width + "px");
 
                 if(objUtils.isMobileDevice()) {
-                    var scroller = new iScroll(document.querySelector("#reportPhotoList"), { hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar', useTransform: true, zoom: false, onBeforeScrollStart: function (e) {
+                    var scroller = new IScroll(document.querySelector("#reportPhotoList"), { click: true, hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar', useTransform: true, zoom: false, onBeforeScrollStart: function (e) {
                         var target = e.target;
                         while (target.nodeType != 1) target = target.parentNode;
                         if (target.tagName != 'SELECT' && target.tagName != 'INPUT' && target.tagName != 'TEXTAREA')
@@ -3576,7 +3592,7 @@ var Inspections = function()
             });            
             
             if(objUtils.isMobileDevice()) {
-                scroller = new iScroll('observationWrapper', { hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar'});
+                scroller = new iScroll('observationWrapper', { click: true, hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar'});
             }
         }, 'td');
     }
@@ -4298,7 +4314,7 @@ var Inspections = function()
 
 				    // Setup touchScroll if applicable
 					if(objUtils.isMobileDevice()) {
-					    var scroller = new iScroll(document.querySelector("#historyModal #historyList"), { hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar'});
+					    var scroller = new IScroll(document.querySelector("#historyModal #historyList"), { click: true, hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar'});
 					}
 				}
 
@@ -5238,7 +5254,7 @@ var Inspections = function()
 		{
 			return;
 		}
-
+        
         this.keySortArray = {};
 
 		var listDeleteMode = true;
@@ -5364,10 +5380,17 @@ var Inspections = function()
 					self.setTableWidths2('tblDefectListingHeader', 'tblDefectListing', 4);
                 }
 
-				if(objUtils.isMobileDevice())
+				// if(objUtils.isMobileDevice())
 			    {
-                    self.scroller = new iScroll(document.querySelector("#defectScrollWrapper"), { hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbarSm'});
-				}
+                    self.scroller = new IScroll(document.querySelector("#defectScrollWrapper"), { click: true, hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbarSm'});
+				    
+                    if(self.last_scroller_y != -1)
+                    {
+                        self.scroller.scrollTo(self.last_scroller_x, self.last_scroller_y);
+                        self.last_scroller_x = -1;
+                        self.last_scroller_y = -1;
+                    }
+                }
 
 				// Bind the move up / move down arrow button events
                 $("#tblDefectListing span.arrow").bind("click", function(e) {
@@ -5385,6 +5408,13 @@ var Inspections = function()
                 });
 
                 $('#tblDefectListing a.edit_issue_btn').bind('click', function(e){
+
+                    
+                    // if(objUtils.isMobileDevice())
+                    {
+                        self.last_scroller_x = self.scroller.x;
+                        self.last_scroller_y = self.scroller.y;
+                    }
                     e.preventDefault();
                     if(self.is_change_order)
                     {
@@ -5621,7 +5651,8 @@ var Inspections = function()
                     $(".inspectionDetails .passed").addClass('active');
                 }
 
-                if(inspection.report_type == "Quality Inspection" && objApp.keys.reinspection_id != "") {
+                if((inspection.report_type == "Quality Inspection" && objApp.keys.reinspection_id != "") ||
+                    (inspection.report_type == "Fix / Plaster Inspection")) {
                     objApp.setSubExtraHeading("Step 3 of 4", true);
                     $('#inspectionStep3 > .bottomBtns > a#btnStep3Email').hide();
                     $('#inspectionStep3 > .bottomBtns > .btnContainer.right > a#btnStep3Next').html('Next');
@@ -5687,7 +5718,7 @@ var Inspections = function()
 
                     if(objUtils.isMobileDevice())
                     {
-                        self.scroller = new iScroll(document.querySelector("#reinspectionScrollWrapper"), { hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbarSm'});
+                        self.scroller = new IScroll(document.querySelector("#reinspectionScrollWrapper"), { click: true, hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbarSm'});
                     }
 
                     // Handle the event when the user clicks on a row in the item table
