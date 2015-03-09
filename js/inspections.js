@@ -3098,14 +3098,9 @@ var Inspections = function()
                 $(tableBody).find("tr td:eq(2)").css("width", average_width + "px");
 
                 if(objUtils.isMobileDevice()) {
-                    var scroller = new IScroll(document.querySelector("#reportPhotoList"), { click: true, hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar', useTransform: true, zoom: false, onBeforeScrollStart: function (e) {
-                        var target = e.target;
-                        while (target.nodeType != 1) target = target.parentNode;
-                        if (target.tagName != 'SELECT' && target.tagName != 'INPUT' && target.tagName != 'TEXTAREA')
-                            e.preventDefault();
-                        }}
-                    );
+                    var scroller = new IScroll('#reportPhotoList', { hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar', tap: true});                  
                 }
+                
 
                 // Handle the event when the user changes the cover photo selection
                 $('#tblReportPhotoListing input[name="is_cover_photo"]').change(function() {
@@ -3175,7 +3170,7 @@ var Inspections = function()
                         objDBUtils.execute(sql, [photo_id], function() {
                             // All done
                             unblockElement("#frmReportPhotos");
-                        });
+                        });  
                     }
                 });
             }

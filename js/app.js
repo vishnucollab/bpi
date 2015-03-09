@@ -16,7 +16,7 @@ function App()
 	//this.apiURL = "http://projects.loc/blueprintapi/";
     //this.apiURL = "http://192.168.1.52/blueprint/api/";
 	this.phonegapBuild = true; 	// Set this to true when phonegap is the target
-	this.version = 1.21;				// Identifies the app version to the server
+	this.version = 1.22;				// Identifies the app version to the server
 	this.versionStatus = "Production";
 	this.localMode = false;
 	this.context = "";
@@ -317,7 +317,7 @@ function App()
 		var navTopHeight = 40;
 		var navFooterHeight = 50; 
 		var mainHeight = 0; 
-		var screenWidth = screen.width;
+		var screenWidth = screen.width; 
         
 		// Set the main div height - all the content goes here
 		screenHeight = getAvailableHeight();
