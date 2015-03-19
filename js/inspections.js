@@ -68,9 +68,8 @@ var Inspections = function()
     
 	this.setupInspections = function()
 	{
-		// Clear the main screen area
+        // Clear the main screen area
 		objApp.clearMain();
-        self.unbindEvents();
         objDBUtils.orderBy = "";
         $("#inspectionList .bottomBtns").find("a").removeClass("active");
         $("#inspectionList #il_builder_id").empty();
@@ -96,19 +95,6 @@ var Inspections = function()
         
         $("form.search input").val("");
         $("form.search").show();      
-        
-        $("#inspectionList #btnAddInspection").unbind();
-        
-        $("#inspectionList #btnAddInspection").bind(objApp.touchEvent, function()
-        {
-             objApp.cleanup();
-             self.setReturnInspectionID("");
-             self.addNewInspection(); 
-             objApp.context = "inspection";
-             
-             return false;
-        });          
-	    
 
 	    // Initialise filters
 		objFilters.filterScreen = "inspections";
@@ -138,38 +124,8 @@ var Inspections = function()
 
 		// Do the client search
 		self.doInspectionSearch();
-        
-        $("form.search").unbind();
-        
-        $('#inspectionList .btnContainer a#passed').click(function() {
-            if (!$(this).hasClass("active"))
-            {
-                $(this).parent().parent().find("a#failed.active").removeClass("active");
-                $(this).addClass("active");
-                self.doInspectionSearch();
-            }
-        });
-        
-        $('#inspectionList .btnContainer a#failed').click(function() {
-            if (!$(this).hasClass("active"))
-            {
-                $(this).parent().parent().find("a#passed.active").removeClass("active");
-                $(this).addClass("active");
-                self.doInspectionSearch();
-            } 
-        });
-        
-        $("form.search input").keyup(function() {
-            self.doInspectionSearch();    
-        });
-        
-        $("#inspectionList #il_builder_id").change(function(){
-            self.doInspectionSearch();
-        });
-        
-        
-        self.bindEvents();
-        
+
+        this.unbindEvents();        
 	}
     
 	/***
@@ -178,21 +134,26 @@ var Inspections = function()
 	*/
 	this.doInspectionSearch = function()
 	{  
-        self.unbindEvents();
-        
         objApp.showHideSpinner(true, "#inspectionList");
             
 		// Remove the triangle from the table header cells
 		$("#tblInspectionListingHeader th .triangle").remove();
-		
-		$("#tblInspectionListingHeader th").unbind();
-		// $("#tblInspectionListing tr").unbind();
+        
+        // Kill iScroll if it already exists
+        if(this.scroller) {
+            this.scroller.destroy();
+            this.scroller = null;
+        }
+
+        // Remove previously bound events
+        $("#inspectionScrollWrapper").unbind();
+        $("#tblInspectionListingHeader th").unbind();
+        $("#tblInspectionListing a.reinspect").unbind();            
+        $("#tblInspectionListing a.view").unbind();            
+        $("#tblInspectionListing td.delete").unbind();         
 		
 		// Inject the triangle
 		$("#tblInspectionListingHeader th[class='" + self.sortBy + "']").append('<span class="triangle ' + self.sortDir + '"></span>');	
-        
-        // Remove previously bound events
-        $("#inspectionScrollWrapper").unbind();
 
         // Remove any existing items in the list.
         $("#inspectionScrollWrapper").html("");      
@@ -346,9 +307,8 @@ var Inspections = function()
                 }
             }, 500);            
 			
-		    
+
 			// Bind click event to list items
-            
             $("#tblInspectionListing td.delete").bind("click", function(e) {
 
                 self.is_change_order = true;
@@ -373,7 +333,6 @@ var Inspections = function()
                 }
                     
             });
-
             
             // Handle the event when the user clicks on the VIEW button.
             $("#tblInspectionListing a.view").click(function(e)  {
@@ -413,9 +372,6 @@ var Inspections = function()
 
                 self.startReinspection(inspection_id);               
             });
-
-            
-			$("#tblInspectionListingHeader th").unbind();				
 			
 			$("#tblInspectionListingHeader th").bind(objApp.touchEvent, function(e)
 			{
@@ -452,8 +408,6 @@ var Inspections = function()
 			});
             		
 	    }, "");
-
-        self.bindEvents();
 	}
 
     /**
@@ -1347,7 +1301,9 @@ var Inspections = function()
 		// Show the inspection screen.
 		$("#inspection").removeClass("hidden");
 		// Bind events to UI objects
-		this.bindEvents();
+        
+        console.log("BIND 3")
+		this.unbindEvents();
 		// Setup client and site popselectors
 		this.setupPopselectors();
 	}
@@ -1474,7 +1430,8 @@ var Inspections = function()
 		$("#inspection").removeClass("hidden");
 
 		// Bind events to UI objects
-		this.bindEvents();
+        console.log("BIND 4")
+		this.unbindEvents();
 
 		// Setup client and site popselectors
 		this.setupPopselectors();
@@ -1590,6 +1547,12 @@ var Inspections = function()
         var sql = "SELECT * FROM address_book WHERE deleted = 0 ORDER BY email ASC";
 
         var values = new Array();
+        
+        // Kill iScroll if it already exists
+        if(this.scroller) {
+            this.scroller.destroy();
+            this.scroller = null;
+        }        
 
         objDBUtils.loadRecordsSQL(sql, values, function(param, emails)
         {
@@ -1692,6 +1655,7 @@ var Inspections = function()
 
     this.unbindEvents = function()
     {
+        console.log("IN UNBIND EVENTS");
         // Unbind any previously bound events.
 		$("#btnAddDefect").unbind();
 		$("#inspection #inspection_date").unbind();
@@ -1738,6 +1702,11 @@ var Inspections = function()
         $("a.sendEmailButton").unbind();
         $("#report_type").unbind();
         $('#frmDefectDetails #observation').unbind();
+        $("#inspectionList #btnAddInspection").unbind();
+        
+        setTimeout(function() {
+            self.bindEvents();
+        }, 500)
     }
 
 	/***
@@ -1746,7 +1715,7 @@ var Inspections = function()
 	*/
 	this.bindEvents = function()
 	{
-		self.unbindEvents();
+		console.log("IN BIND EVENTS");
 
         // show photoImage to photoList
         if (objApp.keys.inspection_id == "")
@@ -1766,6 +1735,44 @@ var Inspections = function()
 
             self.resolveEmailReportRecipients();
         });
+        
+        $("form.search").unbind();
+        
+        $('#inspectionList .btnContainer a#passed').click(function() {
+            if (!$(this).hasClass("active"))
+            {
+                $(this).parent().parent().find("a#failed.active").removeClass("active");
+                $(this).addClass("active");
+                self.doInspectionSearch();
+            }
+        });
+        
+        $('#inspectionList .btnContainer a#failed').click(function() {
+            if (!$(this).hasClass("active"))
+            {
+                $(this).parent().parent().find("a#passed.active").removeClass("active");
+                $(this).addClass("active");
+                self.doInspectionSearch();
+            } 
+        });
+        
+        $("form.search input").keyup(function() {
+            self.doInspectionSearch();    
+        });
+        
+        $("#inspectionList #il_builder_id").change(function(){
+            self.doInspectionSearch();
+        }); 
+        
+        $("#inspectionList #btnAddInspection").bind(objApp.touchEvent, function()
+        {
+             objApp.cleanup();
+             self.setReturnInspectionID("");
+             self.addNewInspection(); 
+             objApp.context = "inspection";
+             
+             return false;
+        });                  
 
         $("#frmEmailTo").submit(function(e) {
             e.preventDefault();
@@ -1787,6 +1794,8 @@ var Inspections = function()
             }
 
             var reinspection_id = objApp.getKey("reinspection_id");
+            
+            alert("HERE 1")
 
             blockElement($("#frmEmailTo"));
 
@@ -1796,6 +1805,8 @@ var Inspections = function()
                     alert("Error: Couldn't load inspection!");
                     return;
                 }
+                
+                alert("HERE 2")
 
                 var recipientsArr = recipients.split(",");
                 for ( var i=0; i < recipientsArr.length; i++) {
@@ -1824,9 +1835,17 @@ var Inspections = function()
                         }
                     }, rec);
                 }
+                
+                alert("HERE 3")
+                
                 self.loadAddressBookList();
+                
+                alert("HERE 5")
+                
                 // Do a silent sync operation
                 objApp.objSync.startSyncSilent(function(success) {
+                    
+                    alert("HERE 6")
 
                     if(!success) {
                         unblockElement($("#frmEmailTo"));
@@ -1847,9 +1866,16 @@ var Inspections = function()
                     params["reinspectionid"] = reinspection_id;
                     params["attach_inspection_images"] = $('#frmEmailTo #attach_inspection_images').is(":checked")
                     params["message"] = "Please find attached the " + inspection.report_type + " inspection report for " + address;
+                    
+                    alert("HERE 7")
 
-                    $.post(objApp.apiURL + "reports/send_inspection_report", params, function(data) {
+                    $.post(objApp.apiURL + "reports/send_inspection_report", params, function(response) {
+                        
+                        alert(response);
+                        
                         unblockElement($("#frmEmailTo"));
+                        
+                        var data = JSON.parse(response);
 
                         if(data.status != "OK") {
                             alert(data.message);
@@ -1861,7 +1887,7 @@ var Inspections = function()
                         // Hide the reveal window.
                         revealWindow.hideModal();
 
-                    }, "json");
+                    }, "");
                 });
 
 
@@ -3061,6 +3087,12 @@ var Inspections = function()
             var showPhotoHTML = function(html) {
                 // Finish the table HTML
                 html += '</table>';
+                
+                // Kill iScroll if it already exists
+                if(this.scroller) {
+                    this.scroller.destroy();
+                    this.scroller = null;
+                }                
 
                 // Inject the HTML
                 $("#reportPhotoList").html(html);
@@ -3098,7 +3130,7 @@ var Inspections = function()
                 $(tableBody).find("tr td:eq(2)").css("width", average_width + "px");
 
                 if(objUtils.isMobileDevice()) {
-                    var scroller = new IScroll('#reportPhotoList', { hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar', tap: true});                  
+                    self.scroller = new IScroll('#reportPhotoList', { hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar', tap: true});                  
                 }
                 
 
@@ -3583,6 +3615,12 @@ var Inspections = function()
         // Remove any previously bound events.
         $("#frmDefectDetails #observation_suggestion tr td").unbind();
         
+        // Kill iScroll if it already exists
+        if(this.scroller) {
+            this.scroller.destroy();
+            this.scroller = null;
+        }        
+        
         objDBUtils.loadSelect("resources", self.filters, "#frmDefectDetails #observation_suggestion", function()
         {
             // Bind the click event after search
@@ -3593,7 +3631,7 @@ var Inspections = function()
             });            
             
             if(objUtils.isMobileDevice()) {
-                scroller = new iScroll('observationWrapper', { click: true, hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar'});
+                self.scroller = new iScroll('observationWrapper', { click: true, hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar'});
             }
         }, 'td');
     }
@@ -4213,6 +4251,12 @@ var Inspections = function()
 		{
 			return;
 		}
+        
+        // Kill iScroll if it already exists
+        if(this.scroller) {
+            this.scroller.destroy();
+            this.scroller = null;
+        }        
 
         $("#historyModal #historyList").html('');
         $('#history_im_notes').html('');
@@ -4315,7 +4359,7 @@ var Inspections = function()
 
 				    // Setup touchScroll if applicable
 					if(objUtils.isMobileDevice()) {
-					    var scroller = new IScroll(document.querySelector("#historyModal #historyList"), { click: true, hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar'});
+					    self.scroller = new IScroll(document.querySelector("#historyModal #historyList"), { click: true, hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar'});
 					}
 				}
 
@@ -4329,6 +4373,9 @@ var Inspections = function()
     // window so the user can select which inspection they wish to view.
     this.loadHistoryReinspectionItems = function(inspection_id)
     {
+        // Set the correct inspectionID into the keys object
+        objApp.keys.inspection_id = inspection_id;
+        
         // Clear the modal window HTML
         $("#inspectionList #historyReinspection table tbody").html("");
 
@@ -4391,7 +4438,7 @@ var Inspections = function()
                 $("#historyReinspection a.action").bind(objApp.touchEvent, function(e) {
 
                     e.preventDefault();
-
+                    
                     // inspection / reinspection id
                     var id = $(this).attr('data-id');
                     objApp.keys.reinspection_id = id;
@@ -5279,6 +5326,12 @@ var Inspections = function()
 		$("#defectScrollWrapper").unbind();
 		$("#tblDefectListing td").unbind();
 		$("#tblDefectListing a.edit_issue_btn").unbind();
+        
+        // Kill iScroll if it already exists
+        if(this.scroller) {
+            this.scroller.destroy();
+            this.scroller = null;
+        }        
 
 		// Load the inspection items records
 		//objDBUtils.orderBy = self.itemSortBy + " " + self.itemSortDir; //"seq_no DESC";
@@ -5595,6 +5648,12 @@ var Inspections = function()
             alert("Inspections::loadReinspectionItems - Invalid reinspection id");
             return;
         }
+        
+        // Kill iScroll if it already exists
+        if(this.scroller) {
+            this.scroller.destroy();
+            this.scroller = null;
+        }        
 
         objDBUtils.loadRecord("reinspections", reinspection_id, function(param, reinspection) {
             if(!reinspection) {

@@ -102,6 +102,12 @@ var Builders = function()
         // Remove previously bound events
         $("#builderScrollWrapper").unbind();
         
+        // Kill iScroll if it already exists
+        if(this.scroller) {
+            this.scroller.destroy();
+            this.scroller = null;
+        }        
+        
         // Remove any existing items in the list.
         $("#builderScrollWrapper").html("");                
 		
