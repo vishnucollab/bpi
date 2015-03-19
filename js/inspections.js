@@ -1794,8 +1794,6 @@ var Inspections = function()
             }
 
             var reinspection_id = objApp.getKey("reinspection_id");
-            
-            alert("HERE 1")
 
             blockElement($("#frmEmailTo"));
 
@@ -1806,8 +1804,6 @@ var Inspections = function()
                     return;
                 }
                 
-                alert("HERE 2")
-
                 var recipientsArr = recipients.split(",");
                 for ( var i=0; i < recipientsArr.length; i++) {
                     var rec = recipientsArr[i].toLowerCase().trim(" ");
@@ -1836,17 +1832,12 @@ var Inspections = function()
                     }, rec);
                 }
                 
-                alert("HERE 3")
-                
                 self.loadAddressBookList();
                 
-                alert("HERE 5")
-                
+
                 // Do a silent sync operation
                 objApp.objSync.startSyncSilent(function(success) {
                     
-                    alert("HERE 6")
-
                     if(!success) {
                         unblockElement($("#frmEmailTo"));
                         alert("Sorry, a problem occurred whilst syncing your data to the server");
@@ -1887,7 +1878,9 @@ var Inspections = function()
                         // Hide the reveal window.
                         revealWindow.hideModal();
 
-                    }, "");
+                    }, "").fail(function() {
+                        alert( "error" );
+                    })
                 });
 
 
