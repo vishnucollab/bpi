@@ -1191,6 +1191,7 @@ var Inspections = function()
 	this.addNewInspection = function()
 	{
 		// Clear the main screen area
+        objApp.clearKeys();
 		objApp.clearMain();
         objApp.cleanup();
 		self.inAudit = false;
