@@ -70,6 +70,11 @@ var Inspections = function()
 	{
         // Clear the main screen area
 		objApp.clearMain();
+        
+        // Ensure all keys are cleared
+        objApp.clearKeys();
+        this.inspection = false;
+        
         objDBUtils.orderBy = "";
         $("#inspectionList .bottomBtns").find("a").removeClass("active");
         $("#inspectionList #il_builder_id").empty();
@@ -148,10 +153,10 @@ var Inspections = function()
         // Remove previously bound events
         $("#inspectionScrollWrapper").unbind();
         $("#tblInspectionListingHeader th").unbind();
-        $("#tblInspectionListing a.reinspect").unbind();            
+        //$("#tblInspectionListing a.reinspect").unbind();            
         $("#tblInspectionListing a.view").unbind();            
-        $("#tblInspectionListing td.delete").unbind();         
-		
+        $("#tblInspectionListing td.delete").unbind(); 
+
 		// Inject the triangle
 		$("#tblInspectionListingHeader th[class='" + self.sortBy + "']").append('<span class="triangle ' + self.sortDir + '"></span>');	
 
@@ -273,9 +278,11 @@ var Inspections = function()
                 }
                 
                 // If the inspection is finalised but failed, the user may reinspect it.
+                /*
                 if((row.finalised == 1) && (row.failed == 1)) {
                     html += '<a href="#" class="action reinspect" data-id="' + row.id + '">Reinspect</a>';
                 }
+                */
                 
                 // If the inspection is finalised, the user needs to be able to do a reinspection.
 
@@ -369,6 +376,8 @@ var Inspections = function()
 
                 e.preventDefault();
                 var inspection_id = $(this).attr('data-id');
+                
+                console.log("HERE");
 
                 self.startReinspection(inspection_id);               
             });
@@ -415,26 +424,28 @@ var Inspections = function()
     */
     this.startReinspection = function(inspection_id)
     {
+        if(!confirm("You are about to start a reinspection.  Are you sure you wish to continue?")) {
+            return;
+        } 
+        
+        blockElement("#content");       
+        
         // Load the original inspection
         objDBUtils.loadRecord("inspections", inspection_id, function(inspection_id, row)
         {
             if(!row) {
                 alert("Sorry, the inspection could not be loaded.  Please report this error.");
+                unblockElement("#content");
                 return;
             }
 
             self.reinspectionNotes = row.notes;
-
             objApp.keys.inspection_id = inspection_id;
             objApp.keys.report_type = row.report_type;
+            self.inspection = row;
 
             var inspection_property = "Lot " + row.lot_no + ", " + row.address + ", " + row.suburb;
 
-            if(!confirm("You are about to start a reinspection for property '" + inspection_property + "'.  Are you sure you wish to continue?")) {
-                return;
-            }
-            
-            blockElement("#inspectionList");
 
             // Clear all "most recent" flags in the reinspections table
             var sql = "UPDATE reinspections " +
@@ -468,6 +479,7 @@ var Inspections = function()
                         if(!items)
                         {
                             alert("Sorry, an error occurred whilst trying to create the reinspection items.  Please report this error");
+                            unblockElement("#content");
                             return;
                         }
 
@@ -491,7 +503,7 @@ var Inspections = function()
 
                                 // See if the last reinspection item has been copied in.
                                 if(finished) {
-                                    unblockElement("#inspectionList");
+                                    unblockElement("#content");
                                     // Open the reinspection page for this reinspection
                                     self.loadReinspectionItems(reinspection_id);
                                 }
@@ -720,6 +732,10 @@ var Inspections = function()
         self.setStep(3);
         objApp.clearMain();
         
+        // Hide the reinspect button until we check the finalised state of the inspection.
+        $("div.btnReinspect").hide();
+        $("a.btnReinspect").unbind();
+        
         $("#inspectionStep3").removeClass("hidden");
         
         // Load the inspection object
@@ -793,6 +809,10 @@ var Inspections = function()
 
                     self.setupInspections();
                 }
+            });
+            
+            $("a.btnReinspect").bind(objApp.touchEvent, function(e) {
+                self.startReinspection(objApp.getKey("inspection_id"));   
             });
 
 
@@ -6152,6 +6172,7 @@ var Inspections = function()
             $('#btnStep3Back').addClass('hidden');
             $('#keywords').addClass('hidden');
             $("#btnReportPhotos").addClass("hidden");
+            $("div.btnReinspect").show();
 
             // Show the next button
             $('#btnStep3Next').removeClass('hidden');
@@ -6176,6 +6197,8 @@ var Inspections = function()
                 $("#btnReportPhotos").removeClass("hidden");
             }
             
+            $("div.btnReinspect").hide();
+            
             $("#tblRateListing select.ratingSelect").removeAttr("readonly");
             $("#tblRateListing select.ratingSelect").removeAttr("disabled");            
         }   
@@ -6195,7 +6218,10 @@ var Inspections = function()
         if(self.finalised == 1)
 		{            
             self.objPopBuilders.readOnly = true;
-			self.objToggleFailed.preventToggle = true;
+            
+            if(self.objToggleFailed != null) {
+			    self.objToggleFailed.preventToggle = true;
+            }
 			
 			if(self.objPopLocation != null ) self.objPopLocation.readOnly = true;
 			if(self.objPopAction != null ) self.objPopAction.readOnly = true;

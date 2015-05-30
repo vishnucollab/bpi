@@ -1829,3 +1829,12 @@ a.yesno_disabled:hover {
     top: 0;
     background-size: auto 100%;
 }
+
+.inspectionDetails .bottomBtns a.btnReinspect {
+    background: url('../images/icon-reinspect-sm.png') top center no-repeat;
+    width: 50px;
+    height: 45px;
+    left: 5px;
+    top: 0;
+    background-size: auto 100%;
+}
