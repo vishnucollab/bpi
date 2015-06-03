@@ -12,6 +12,7 @@ var Inspections = function()
 	// Inspection level pop selectors
 	this.objPopBuilders = null;
 	this.objPopState = null;
+    this.doingSearch = false;
 	
 	// Defect level pop selectors.
 	this.objPopLocation = null;
@@ -70,6 +71,8 @@ var Inspections = function()
 	{
         // Clear the main screen area
 		objApp.clearMain();
+        this.doingSearch = false;
+        this.lastKeyPress == null;
         
         // Ensure all keys are cleared
         objApp.clearKeys();
@@ -140,6 +143,7 @@ var Inspections = function()
 	this.doInspectionSearch = function()
 	{  
         objApp.showHideSpinner(true, "#inspectionList");
+        this.doingSearch = true;
             
 		// Remove the triangle from the table header cells
 		$("#tblInspectionListingHeader th .triangle").remove();
@@ -225,10 +229,11 @@ var Inspections = function()
 	    objDBUtils.loadRecordsSQL(sql, values, function(param, items)
 	    {
 			objApp.showHideSpinner(false, "#inspectionList");
-            
+
             if(!items)
             {
-				return;	 
+				self.doingSearch = false;
+                return;	 
             }
 		    
 			var html = '<table id="tblInspectionListing" class="listing">';
@@ -372,6 +377,7 @@ var Inspections = function()
 			});
             
             // Handle the event when the user clicks on the REINSPECT button.
+            /*
             $("#tblInspectionListing a.reinspect").click(function(e)  {
 
                 e.preventDefault();
@@ -381,9 +387,9 @@ var Inspections = function()
 
                 self.startReinspection(inspection_id);               
             });
+            */
 			
-			$("#tblInspectionListingHeader th").bind(objApp.touchEvent, function(e)
-			{
+			$("#tblInspectionListingHeader th").bind(objApp.touchEvent, function(e) {
 				e.preventDefault();
                 
                 if (!$(this).is('[class]')) {
@@ -415,6 +421,8 @@ var Inspections = function()
 				
 				self.doInspectionSearch();
 			});
+            
+            self.doingSearch = false;
             		
 	    }, "");
 	}
@@ -735,7 +743,7 @@ var Inspections = function()
         // Hide the reinspect button until we check the finalised state of the inspection.
         $("div.btnReinspect").hide();
         $("a.btnReinspect").unbind();
-        
+
         $("#inspectionStep3").removeClass("hidden");
         
         // Load the inspection object
@@ -1464,7 +1472,7 @@ var Inspections = function()
 
 		// Show the Add Defect button.
 		$("#btnAddDefect").removeClass("hidden");
-
+                  
         self.setStep(3);
         self.showStep3();
 	}
@@ -1724,6 +1732,7 @@ var Inspections = function()
         $("#report_type").unbind();
         $('#frmDefectDetails #observation').unbind();
         $("#inspectionList #btnAddInspection").unbind();
+        $("form.search input").unbind();
         
         setTimeout(function() {
             self.bindEvents();
@@ -1736,8 +1745,6 @@ var Inspections = function()
 	*/
 	this.bindEvents = function()
 	{
-		console.log("IN BIND EVENTS");
-
         // show photoImage to photoList
         if (objApp.keys.inspection_id == "")
         {
@@ -1778,7 +1785,19 @@ var Inspections = function()
         });
         
         $("form.search input").keyup(function() {
-            self.doInspectionSearch();    
+            
+            self.lastKeyPress = new Date();
+            
+            setTimeout(function() {
+                
+                var now = new Date();
+                var diff = now - self.lastKeyPress;
+                 
+                if((diff > 1500) && (!self.doingSearch)) {   
+                    self.lastKeyPress = new Date();
+                    self.doInspectionSearch();
+                };                      
+            }, 2000);            
         });
         
         $("#inspectionList #il_builder_id").change(function(){
