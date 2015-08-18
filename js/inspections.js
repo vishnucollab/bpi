@@ -6,7 +6,6 @@ OBJECT: INSPECTIONS
 * @project: Blueprint Inspections iPad App
 * @author: Andrew Chapman
 */
-
 var Inspections = function()                              
 {
 	// Inspection level pop selectors
@@ -1733,6 +1732,7 @@ var Inspections = function()
         $('#frmDefectDetails #observation').unbind();
         $("#inspectionList #btnAddInspection").unbind();
         $("form.search input").unbind();
+        $("select[name='builder_id']").unbind();
         
         setTimeout(function() {
             self.bindEvents();
