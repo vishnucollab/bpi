@@ -1838,3 +1838,18 @@ a.yesno_disabled:hover {
     top: 0;
     background-size: auto 100%;
 }
+
+.inspectionDetails .bottomBtns a.btnViewChart {
+    background: url('../images/chart-icon.png') top center no-repeat;
+    width: 48px;
+    height: 48px;
+    left: 5px;
+    top: 0;
+    background-size: auto 100%;
+}
+
+.inspectionDetails .btnViewChart span{margin-left: 5px;}
+#frmEmailTo ul.select2-selection__rendered{margin-top: 5px;}
+#frmEmailTo ul.select2-selection__rendered li{margin: 5px 5px 5px 0;padding: 0 5px 0 5px;float: left;clear: none;}
+#frmEmailTo .select2-selection--multiple{border-color:#bbbbbb;}
+#frmEmailTo .select2-container{min-width: 800px;}

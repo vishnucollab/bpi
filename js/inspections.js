@@ -63,6 +63,8 @@ var Inspections = function()
     
 	var self = this;
     var user_email = localStorage.getItem("email");
+    var locations = {};
+    var email_options = {};
     
 	$(".inspectionDetails #btnCapturePhoto").append('<div class="numImgCurr">' + self.numImgCurr + '</div>');
     
@@ -1572,7 +1574,7 @@ var Inspections = function()
 
     this.loadAddressBookList = function(callback)
     {
-        var sql = "SELECT * FROM address_book WHERE deleted = 0 ORDER BY email ASC";
+        var sql = "SELECT * FROM address_book WHERE deleted = 0 GROUP BY email ORDER BY email ASC";
 
         var values = new Array();
         
@@ -1591,22 +1593,26 @@ var Inspections = function()
                 var maxLoop = emails.rows.length;
                 var r = 0;
                 var addressOptions = [];
-
+                
+                
                 // Loop through all of the emails in the recordset.
                 for(r = 0; r < maxLoop; r++)
                 {
                     // Get the current row
                     var row = emails.rows.item(r);
-                    var email = row.email.trim();
+                    var email = row.email.trim();                   
                     
                     if(objApp.validateEmail(email)) {
-                        html += '<li><input type="checkbox" id="' + row.id + '" value="' + row.id + '">';
-                        html += '<label for="' + row.id + '">' + row.email + '</label></li>';                        
+                        //html += '<li><input type="checkbox" id="' + row.id + '" value="' + row.id + '">';
+                        //html += '<label for="' + row.id + '">' + row.email + '</label></li>';        
+                        email_options[row.id] = email;                 
                     }
                 }
 
                 // Insert the HTML into the scrolling wrapper.
-                $("#emailList").html(html);
+               // $("#emailList").html(html);
+
+                
                 setTimeout(function()
                 {
                     if(objUtils.isMobileDevice())
@@ -1728,6 +1734,7 @@ var Inspections = function()
         $("#btnReportPhotos").unbind();
         $("#frmEmailTo").unbind();
         $("a.sendEmailButton").unbind();
+        $("a.btnViewChart").unbind();
         $("#report_type").unbind();
         $('#frmDefectDetails #observation').unbind();
         $("#inspectionList #btnAddInspection").unbind();
@@ -5325,7 +5332,8 @@ var Inspections = function()
 	* and shows them in the items table
 	 */
 	this.loadInspectionItems = function()
-	{
+	{  
+	    locations = {};
 		// Ensure a valid inspection id is set
 		if(objApp.keys.inspection_id == "")
 		{
@@ -5381,8 +5389,9 @@ var Inspections = function()
 		objDBUtils.loadRecords("inspectionitems", filters, function(param, items)
 		{
 		    unblockElement(".inspectionDetails");
-			$("#defectScrollWrapper").html("");
+			$("#defectScrollWrapper").html("");            
 
+            
 			if(!items)
 			{
 				// Handle no items
@@ -5391,7 +5400,7 @@ var Inspections = function()
 			{
 				// Loop through the items and put them into the table.
 				var html = '<table id="tblDefectListing" class="listing">';
-
+               
 				var maxLoop = items.rows.length;
 
                 self.numberOfIssues = 0;
@@ -5404,7 +5413,7 @@ var Inspections = function()
 			    {
 			        var row = items.rows.item(r);
                     var seq_no = row.seq_no;
-
+                    
                     // Store the current sequence order of the row so we can quickly sort the
                     // items on move up / move down event.
                     self.keySortArray[sq] = row.id;
@@ -5433,7 +5442,17 @@ var Inspections = function()
                                 html += '<span class="arrow up"></span><span class="arrow down"></span></td>';
 			            }
                     }
-
+                    
+                    var key = row.location.trim();
+                    if(locations.hasOwnProperty(key) )
+                    {
+                        locations[key] += 1;                         
+                    }
+                    else
+                    {
+                        locations[key] = 1; 
+                    }
+                    
                     html += '<td>' + row.location + '</td>';
 			        html += '<td>' + row.observation + '</td>';
 
@@ -5450,6 +5469,27 @@ var Inspections = function()
                         self.numberOfAcknowledgements++;
                     }
 				}
+                
+                if(!jQuery.isEmptyObject(locations))
+                {                    
+                    var data = new google.visualization.DataTable();                    
+                      data.addColumn('string', 'Location');
+                      data.addColumn('number', 'Quantity');
+                      
+                    $.each( locations, function( key, value ) {                     
+                        data.addRow([key, value]);
+                    });
+
+                    var options = {
+                        title: '',
+                        width: '100%',
+                        height: '100%',     
+                        pieSliceText: 'percentage',               
+                    };    
+                    
+                    chart.draw(data, options);                   
+                }
+
 
 				html += '</table>';
 
@@ -5607,6 +5647,7 @@ var Inspections = function()
 
 			}
 		}, "");
+
 	}
 
     this.handleMoveInspectionItem = function(inspection_item_id, direction)
@@ -6867,18 +6908,41 @@ var Inspections = function()
             var determineRecipients = function() {
 
                 var recipients = user_email;
+                var old_recipients = $("#recipients").val();
+                
                 if($("#emailToOffice").is(":checked")) {
                     recipients += "," + office_email;
                 }
-
+                else
+                {
+                    if(old_recipients != null)
+                    {
+                        old_recipients = jQuery.grep(old_recipients, function(value) {
+                          return value != office_email;
+                        });                         
+                    }
+                   
+                }
+                
                 if(($("#emailToBuilder").is(":checked")) && (!objApp.empty(builder_email))) {
                     if(!objApp.empty(recipients)) {
                         recipients += ",";
                     }
 
                     recipients += builder_email;
+                                             
                 }
-
+                else
+                {
+                    if(old_recipients != null)
+                    {
+                        old_recipients = jQuery.grep(old_recipients, function(value) {
+                          return value != builder_email;
+                        });                         
+                    }
+                   
+                }                
+                /*
                 $('#emailList input[type=checkbox]').each(function () {
                     if( $(this).is(":checked") ) {
                         if(!objApp.empty(recipients)) {
@@ -6888,8 +6952,55 @@ var Inspections = function()
                         recipients += $("label[for='"+$(this).val()+"']").text();
                     }
                 });
+                */
+                if(old_recipients != null)
+                    var recipients_array = $.merge(old_recipients, recipients.split(','));
+                else
+                    var recipients_array = recipients.split(',');
+                    
+                var options = ""; 
+                
+                $.each( email_options, function( key, value ) {   
+                    if(jQuery.inArray(value, recipients_array) != -1) {   
+                        options += "<option value='"+value+"' selected>"+value+"</option>";
+                    }
+                    else
+                    {
+                        options += "<option value='"+value+"' >"+value+"</option>";
+                    }
+                })
+                
+                $("#recipients").html(options);
+                
+                $("#recipients").select2({
+                      tags: true,
+                      tokenSeparators: [',', ' '],
+                      createTag: function(params) {
+                            var email = params.term;
+                            if( objApp.validateEmail(email) ) {
+                                return {
+                                  id: email,
+                                  text: email
+                                };
+                            }
+                            
+                            return null;            
+                        }
+                }).on("change", function(e) {
+                  // mostly used event, fired to the original element when the value changes
+                  if($(this).val() == null)
+                  {
+                       $("#emailTo").val('');
+                  }
+                  else
+                  {
+                       var res = $(this).val().join(",");
+                       $("#emailTo").val(res);                    
+                  }
 
-                $("#emailTo").val(recipients);
+                })                
+                $("#recipients").trigger('change');                
+                
             }
 
             determineRecipients();
