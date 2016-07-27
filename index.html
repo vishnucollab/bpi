@@ -86,35 +86,8 @@
                 objApp.contacts.push({'value':contacts[i].emails[0], 'label':contacts[i].name + '( ' + contacts[i].name +' )'});
             }  
         }, function(contactError){
-            if (typeof navigator.ContactError != 'undefined'){
-                switch(contactError.code){
-                    case navigator.ContactError.UNKNOWN_ERROR:
-                        alert('Can not get contacts - UNKNOWN_ERROR');
-                    break;
-                    case navigator.ContactError.INVALID_ARGUMENT_ERROR:
-                        alert('Can not get contacts - INVALID_ARGUMENT_ERROR');
-                    break;
-                    case navigator.ContactError.TIMEOUT_ERROR:
-                        alert('Can not get contacts - TIMEOUT_ERROR');
-                    break;
-                    case navigator.ContactError.PENDING_OPERATION_ERROR:
-                        alert('Can not get contacts - PENDING_OPERATION_ERROR');
-                    break;
-                    case navigator.ContactError.IO_ERROR:
-                        alert('Can not get contacts - IO_ERROR');
-                    break;
-                    case navigator.ContactError.NOT_SUPPORTED_ERROR:
-                        alert('Can not get contacts - NOT_SUPPORTED_ERROR');
-                    break;
-                    case navigator.ContactError.PERMISSION_DENIED_ERROR:
-                        alert('Can not get contacts - PERMISSION_DENIED_ERROR');
-                    break;
-                    default:
-                        alert('Can not get contacts');
-                    break;
-                }
-            }
-            alert('Can not get contacts - Error Code: ' + contactError.code);
+            if (contactError.code == 20)
+            else
         });
     } 
     
