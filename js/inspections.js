@@ -2208,6 +2208,7 @@ var Inspections = function()
                 if(e.target.id=='addPhoto-btn'){
                     if(objApp.phonegapBuild)
                     {
+                        var use_image = 0;
                         // Invoke the camera API to allow the user to take a photo
                         var photo =function(){
                             var options = { limit: 1 };
@@ -2221,11 +2222,13 @@ var Inspections = function()
                             var imageData1 = imageData[i].fullPath;
                                 editPhoto2(imageData1);
                                 photo();
+                                use_image = 1;
                             }
                         }
 
                         function onFail(message) {
-                            alert('No captured image');
+                            if (!use_image)
+                                alert('No captured image');
                         }
 
                     }
