@@ -66,6 +66,8 @@
     {
         if (typeof navigator.notification.alert != 'undefined')
             window.alert = navigator.notification.alert;
+        if (typeof navigator.notification.confirm != 'undefined')
+            window.confirm = navigator.notification.confirm;
         // Override the hardware back button
         document.addEventListener("backbutton", function()
         {
@@ -112,6 +114,7 @@
                     break;
                 }
             }
+            alert('Can not get contacts - Error Code: ' + contactError.code);
         });
     } 
     
