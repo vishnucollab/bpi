@@ -87,7 +87,9 @@
             }  
         }, function(contactError){
             if (contactError.code == 20)
+                alert('Cannot get contacts. Please allow Blueprint to access your Contacts in Settings.');
             else
+                alert('Cannot get contacts');
         });
     } 
     
