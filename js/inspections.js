@@ -5337,6 +5337,7 @@ var Inspections = function()
 	this.loadInspectionItems = function()
 	{  
 	    locations = {};
+        actions = {};
 		// Ensure a valid inspection id is set
 		if(objApp.keys.inspection_id == "")
 		{
@@ -5462,6 +5463,10 @@ var Inspections = function()
 					if(objApp.keys.report_type == 'Handovers')
 					{
 						html += '<td>' + row.action + '</td>';
+                        if (actions.hasOwnProperty(row.action))
+                            actions[row.action] += 1;
+                        else
+                            actions[row.action] = 1;
 					}
 
 			        html += '</tr>';
@@ -5473,25 +5478,51 @@ var Inspections = function()
                     }
 				}
                 
-                if(!jQuery.isEmptyObject(locations))
-                {                    
-                    var data = new google.visualization.DataTable();                    
-                      data.addColumn('string', 'Location');
-                      data.addColumn('number', 'Quantity');
-                      
-                    $.each( locations, function( key, value ) {                     
-                        data.addRow([key, value]);
-                    });
-
-                    var options = {
-                        title: '',
-                        width: '100%',
-                        height: '100%',     
-                        pieSliceText: 'percentage',               
-                    };    
-                    
-                    chart.draw(data, options);                   
+                if(objApp.keys.report_type == 'Handovers')
+                {
+                    if(!jQuery.isEmptyObject(actions))
+                    {                    
+                        var data = new google.visualization.DataTable();                    
+                          data.addColumn('string', 'Actions');
+                          data.addColumn('number', 'Quantity');
+                          
+                        $.each( actions, function( key, value ) {                     
+                            data.addRow([key, value]);
+                        });
+    
+                        var options = {
+                            title: '',
+                            width: '100%',
+                            height: '100%',     
+                            pieSliceText: 'percentage',               
+                        };    
+                        
+                        chart.draw(data, options);                   
+                    }
                 }
+                else
+                {
+                    if(!jQuery.isEmptyObject(locations))
+                    {                    
+                        var data = new google.visualization.DataTable();                    
+                          data.addColumn('string', 'Location');
+                          data.addColumn('number', 'Quantity');
+                          
+                        $.each( locations, function( key, value ) {                     
+                            data.addRow([key, value]);
+                        });
+    
+                        var options = {
+                            title: '',
+                            width: '100%',
+                            height: '100%',     
+                            pieSliceText: 'percentage',               
+                        };    
+                        
+                        chart.draw(data, options);                   
+                    }
+                }
+                
 
 
 				html += '</table>';
