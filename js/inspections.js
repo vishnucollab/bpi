@@ -5494,7 +5494,7 @@ var Inspections = function()
                             title: '',
                             width: '100%',
                             height: '100%',     
-                            pieSliceText: 'percentage',               
+                            pieSliceText: 'value',               
                         };    
                         
                         chart.draw(data, options);                   
