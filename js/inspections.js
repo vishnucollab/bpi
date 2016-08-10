@@ -702,7 +702,6 @@ var Inspections = function()
             objApp.setSubExtraHeading("Step 2 of 3", true);
         }
         
-		if(objApp.keys.report_type == 'Handovers') {
 			$('#inspectionStep2 #frmDefectDetails tr#action_wrapper').show();
 		}
 		else {
@@ -4887,7 +4886,6 @@ var Inspections = function()
 			$("#frmDefectDetails #location").val(location);
    		}
 
-   		if(objApp.keys.report_type == 'Handovers')
 		{
 			if((action == "") || (action.toUpperCase() == "CHOOSE"))
 			{
@@ -4985,7 +4983,6 @@ var Inspections = function()
 	*/
 	this.checkAllSelected = function()
 	{
-		if(objApp.keys.report_type == 'Handovers')
 		{
 			// Are there selected values for ALL pop lists?
 			if((self.objPopLocation.getValue() != "")  && (self.objPopAction.getValue() != ""))
@@ -5036,7 +5033,6 @@ var Inspections = function()
                     unblockElement("#frmReinspection");
 
                     // Update the table row with the modified text
-                    if(objApp.keys.report_type == 'Handovers') {
                         $(self.reinspectionItemRow).find("td:eq(4)").text(rectified_status);
                     } else {
                         var rectifiedText = $(self.reinspectionItemRow).find("td:eq(3)").text(rectified_status);
@@ -5348,7 +5344,6 @@ var Inspections = function()
 
 		var listDeleteMode = true;
 
-		if(objApp.keys.report_type == 'Handovers')
 		{
 			$("#tblDefectListingHeader th").eq(4).show();
 		}
@@ -5460,13 +5455,12 @@ var Inspections = function()
                     html += '<td>' + row.location + '</td>';
 			        html += '<td>' + row.observation + '</td>';
 
-					if(objApp.keys.report_type == 'Handovers')
 					{
-						html += '<td>' + row.action + '</td>';
-                        if (actions.hasOwnProperty(row.action))
-                            actions[row.action] += 1;
-                        else
-                            actions[row.action] = 1;
+                            if (actions.hasOwnProperty(row.action))
+                                actions[row.action] += 1;
+                            else
+                                actions[row.action] = 1;
+                        }
 					}
 
 			        html += '</tr>';
@@ -5478,49 +5472,44 @@ var Inspections = function()
                     }
 				}
                 
-                if(objApp.keys.report_type == 'Handovers')
-                {
-                    if(!jQuery.isEmptyObject(actions))
-                    {                    
-                        var data = new google.visualization.DataTable();                    
-                          data.addColumn('string', 'Actions');
-                          data.addColumn('number', 'Quantity');
-                          
-                        $.each( actions, function( key, value ) {                     
-                            data.addRow([key, value]);
-                        });
-    
-                        var options = {
-                            title: '',
-                            width: '100%',
-                            height: '100%',     
-                            pieSliceText: 'value',               
-                        };    
-                        
-                        chart.draw(data, options);                   
-                    }
+                /* If have actions, so graph with actions, if not, show graph with locations */
+                if(!jQuery.isEmptyObject(actions))
+                {                    
+                    var data = new google.visualization.DataTable();                    
+                      data.addColumn('string', 'Actions');
+                      data.addColumn('number', 'Quantity');
+                      
+                    $.each( actions, function( key, value ) {                     
+                        data.addRow([key, value]);
+                    });
+
+                    var options = {
+                        title: '',
+                        width: '100%',
+                        height: '100%',     
+                        pieSliceText: 'value',               
+                    };    
+                    
+                    chart.draw(data, options);                   
                 }
-                else
-                {
-                    if(!jQuery.isEmptyObject(locations))
-                    {                    
-                        var data = new google.visualization.DataTable();                    
-                          data.addColumn('string', 'Location');
-                          data.addColumn('number', 'Quantity');
-                          
-                        $.each( locations, function( key, value ) {                     
-                            data.addRow([key, value]);
-                        });
-    
-                        var options = {
-                            title: '',
-                            width: '100%',
-                            height: '100%',     
-                            pieSliceText: 'percentage',               
-                        };    
-                        
-                        chart.draw(data, options);                   
-                    }
+                else if(!jQuery.isEmptyObject(locations))
+                {                    
+                    var data = new google.visualization.DataTable();                    
+                      data.addColumn('string', 'Location');
+                      data.addColumn('number', 'Quantity');
+                      
+                    $.each( locations, function( key, value ) {                     
+                        data.addRow([key, value]);
+                    });
+
+                    var options = {
+                        title: '',
+                        width: '100%',
+                        height: '100%',     
+                        pieSliceText: 'percentage',               
+                    };    
+                    
+                    chart.draw(data, options);                   
                 }
                 
 
@@ -5530,7 +5519,6 @@ var Inspections = function()
 				$("#defectScrollWrapper").html(html);
 
 
-				if(objApp.keys.report_type == 'Handovers') {
 					self.setTableWidths2('tblDefectListingHeader', 'tblDefectListing', 5);
                 }
 				else {
@@ -5800,7 +5788,6 @@ var Inspections = function()
                 $("#reinspection").removeClass("hidden");
 
                 // Ensure a valid inspection id is set
-                if(objApp.keys.report_type == 'Handovers') {
                     $("#tblReinspectionHeader th").eq(3).show();
                 } else {
                     $("#tblReinspectionHeader th").eq(3).hide();
@@ -5860,7 +5847,6 @@ var Inspections = function()
                         html += '<td>' + row.location + '</td>';
                         html += '<td>' + row.observation + '</td>';
 
-                        if(objApp.keys.report_type == 'Handovers') {
                             html += '<td>' + row.action + '</td>';
                         }
 
@@ -5872,7 +5858,6 @@ var Inspections = function()
 
                     $("#reinspectionScrollWrapper").html(html);
 
-                    if(objApp.keys.report_type == 'Handovers'){
                         self.setTableWidths2('tblReinspectionHeader', 'tblReinspectionListing', 5);
                     } else {
                         self.setTableWidths2('tblReinspectionHeader', 'tblReinspectionListing', 4);
@@ -5895,7 +5880,6 @@ var Inspections = function()
                         text += $(this).find("td:eq(1)").text() + ", ";
                         text += $(this).find("td:eq(2)").text();
 
-                        if(objApp.keys.report_type == 'Handovers') {
                             var rectifiedText = $(this).find("td:eq(4)").text();
                         } else {
                             var rectifiedText = $(this).find("td:eq(3)").text();
