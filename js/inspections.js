@@ -702,6 +702,7 @@ var Inspections = function()
             objApp.setSubExtraHeading("Step 2 of 3", true);
         }
         
+		if(objApp.keys.report_type == 'Handovers' || 1) {
 			$('#inspectionStep2 #frmDefectDetails tr#action_wrapper').show();
 		}
 		else {
@@ -4886,6 +4887,7 @@ var Inspections = function()
 			$("#frmDefectDetails #location").val(location);
    		}
 
+   		if(objApp.keys.report_type == 'Handovers' || 1)
 		{
 			if((action == "") || (action.toUpperCase() == "CHOOSE"))
 			{
@@ -4983,6 +4985,7 @@ var Inspections = function()
 	*/
 	this.checkAllSelected = function()
 	{
+		if(objApp.keys.report_type == 'Handovers' || 1)
 		{
 			// Are there selected values for ALL pop lists?
 			if((self.objPopLocation.getValue() != "")  && (self.objPopAction.getValue() != ""))
@@ -5033,6 +5036,7 @@ var Inspections = function()
                     unblockElement("#frmReinspection");
 
                     // Update the table row with the modified text
+                    if(objApp.keys.report_type == 'Handovers' || 1) {
                         $(self.reinspectionItemRow).find("td:eq(4)").text(rectified_status);
                     } else {
                         var rectifiedText = $(self.reinspectionItemRow).find("td:eq(3)").text(rectified_status);
@@ -5344,6 +5348,7 @@ var Inspections = function()
 
 		var listDeleteMode = true;
 
+		if(objApp.keys.report_type == 'Handovers' || 1)
 		{
 			$("#tblDefectListingHeader th").eq(4).show();
 		}
@@ -5455,7 +5460,11 @@ var Inspections = function()
                     html += '<td>' + row.location + '</td>';
 			        html += '<td>' + row.observation + '</td>';
 
+					if(objApp.keys.report_type == 'Handovers' || 1)
 					{
+					    html += '<td>' + row.action + '</td>';
+                        if (row.action)
+                        {
                             if (actions.hasOwnProperty(row.action))
                                 actions[row.action] += 1;
                             else
@@ -5519,6 +5528,7 @@ var Inspections = function()
 				$("#defectScrollWrapper").html(html);
 
 
+				if(objApp.keys.report_type == 'Handovers' || 1) {
 					self.setTableWidths2('tblDefectListingHeader', 'tblDefectListing', 5);
                 }
 				else {
@@ -5788,6 +5798,7 @@ var Inspections = function()
                 $("#reinspection").removeClass("hidden");
 
                 // Ensure a valid inspection id is set
+                if(objApp.keys.report_type == 'Handovers' || 1) {
                     $("#tblReinspectionHeader th").eq(3).show();
                 } else {
                     $("#tblReinspectionHeader th").eq(3).hide();
@@ -5847,6 +5858,7 @@ var Inspections = function()
                         html += '<td>' + row.location + '</td>';
                         html += '<td>' + row.observation + '</td>';
 
+                        if(objApp.keys.report_type == 'Handovers' || 1) {
                             html += '<td>' + row.action + '</td>';
                         }
 
@@ -5858,6 +5870,7 @@ var Inspections = function()
 
                     $("#reinspectionScrollWrapper").html(html);
 
+                    if(objApp.keys.report_type == 'Handovers' || 1){
                         self.setTableWidths2('tblReinspectionHeader', 'tblReinspectionListing', 5);
                     } else {
                         self.setTableWidths2('tblReinspectionHeader', 'tblReinspectionListing', 4);
@@ -5880,6 +5893,7 @@ var Inspections = function()
                         text += $(this).find("td:eq(1)").text() + ", ";
                         text += $(this).find("td:eq(2)").text();
 
+                        if(objApp.keys.report_type == 'Handovers' || 1) {
                             var rectifiedText = $(this).find("td:eq(4)").text();
                         } else {
                             var rectifiedText = $(this).find("td:eq(3)").text();
