@@ -5514,7 +5514,8 @@ var Inspections = function()
                     var options = {
                         title: '',
                         width: '100%',
-                        height: '100%',     
+                        height: '100%',   
+                        is3D: true,
                         pieSliceText: 'percentage',               
                     };    
                     

@@ -15,7 +15,8 @@
 	<link rel="stylesheet" type="text/css" media="screen" href="css/noteModal.css" />
     <link rel="stylesheet" type="text/css" media="screen" href="css/glDatePicker.flatwhite.css" />
     <link rel="stylesheet" type="text/css" media="screen" href="css/jquery-ui.css" />
-    <link rel="stylesheet" type="text/css" media="screen" href="css/select2.min.css" />        
+    <link rel="stylesheet" type="text/css" media="screen" href="css/select2.min.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="css/jquery.datepick.css" />          
 	<!-- Attach the Reveal CSS -->
     <link rel="stylesheet" href="css/reveal.css">
     <script src="js/jquery.js"></script>
@@ -116,6 +117,7 @@
 	<script type="text/javascript" src="js/login.js"></script>
     <script type="text/javascript" src="js/users.js"></script>
     <script type="text/javascript" src="js/builders.js"></script>
+    <script type="text/javascript" src="js/buildersReport.js"></script>
     <script type="text/javascript" src="js/contacts.js"></script>
 	<script type="text/javascript" src="js/sites.js"></script>
 	<script type="text/javascript" src="js/inspections.js"></script>
@@ -1030,7 +1032,41 @@
 		            </form>
 
 		    </div> <!--! end of builder detail screen -->
-
+            
+            
+            <!-- Builder report -->
+            <div id="builderReport" class="hidden panel twocolumn">
+                <div>
+                   
+                    <div class="left">
+                        <label for="builder_id">Builder</label>
+                        <select class="select2" id="builder_id" name="builder_id"></select>
+                    </div>
+                    
+                    <div class="left" style="padding-left: 15px;">
+                        <label>From</label>
+                        <input type="date" value="" id="date_from" />
+                    </div>
+                         
+                    <div class="left" style="padding-left: 15px;">
+                        <label>To</label>
+                        <input type="date"  value="" id="date_to" />
+                    </div>  
+                    <div class="clear"></div>                       
+                </div>    
+                <div>
+                    <a id="btnShowReport" class="button " style="display:inline-block;margin-top: 25px;" href="#">Report</a>
+                </div> 
+                <div id="builder_report_message"></div>
+                <div id="chart_wrapper" style="display: none;">           
+                    <div id="piechart2" style="width: 900px; height: 500px;"></div>
+                    
+                </div>      
+            </div>
+            
+            <!-- end Builder report -->
+            
+            
     	</div><!-- end content div -->
         
         <form class="search">
@@ -1043,6 +1079,7 @@
  
                 <li><a id="navInspections" href="#">Inspections</a></li>
                 <li><a id="navBuilders" href="#">Builders</a></li>
+                <li><a id="navBuildersReport" href="#">Builders Report</a></li>
                 <li><a id="navSync" class="active" href="#">Sync</a></li>
                 <li><a id="navLogout" href="#">Logout</a></li>
             </ul>
@@ -1143,6 +1180,26 @@
 
         chart.draw(data, options);
       }
+      
+      google.charts.setOnLoadCallback(drawChart2);
+      function drawChart2() {
+
+        var data = google.visualization.arrayToDataTable([
+          ['Report type', 'Quantity'],
+          ['General',     1]
+        ]);
+
+        var options = {
+            title: '',
+            width: '100%',
+            height: '100%',     
+            pieSliceText: 'percentage',          
+        };
+
+        chart2 = new google.visualization.PieChart(document.getElementById('piechart2'));
+
+        chart2.draw(data, options);
+      }      
     </script>
 	
 </body>
