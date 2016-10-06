@@ -474,7 +474,7 @@ function Sync()
 					        writer.onwriteend = function(evt) 
 					        {
 								// Get the file URI
-                                if (typeof LocalFileSystem == 'undefined') {
+                                if (typeof LocalFileSystem == 'undefined')
                                     var uri = fileEntry.fullPath;
                                 else
 								    var uri = fileEntry.toURI();
