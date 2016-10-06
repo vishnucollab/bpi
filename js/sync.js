@@ -472,7 +472,7 @@ function Sync()
 					        writer.onwriteend = function(evt) 
 					        {
 								// Get the file URI
-                                if (typeof LocalFileSystem == 'undefined')
+                                if (is_on_simulator)
                                     var uri = fileEntry.fullPath;
                                 else
 								    var uri = fileEntry.toURI();
@@ -498,7 +498,7 @@ function Sync()
 					        };
 							
 							// Write the thumbnail data to the file.
-                            if (typeof LocalFileSystem == 'undefined') {
+                            if (is_on_simulator) {
                                 writer.write(new Blob([tmb_data]));
                             } else {
                                 writer.write(tmb_data);
