@@ -3931,15 +3931,15 @@ var Inspections = function()
 						self.showPhotos(num_items, html);
 					}
 				}
-			}
-
-			if(r < maxLoop)
-			{
-				doNext();
-			}
-			else
-			{
-				self.showPhotos(num_items, html);
+                
+                if(r < maxLoop)
+    			{
+    				doNext();
+    			}
+    			else
+    			{
+    				self.showPhotos(num_items, html);
+    			}
 			}
 
 		}, "");
@@ -4153,7 +4153,10 @@ var Inspections = function()
 												        writer.onwriteend = function(evt)
 												        {
 												        	// Get the path to the file
-												        	var uri = fileEntry.toURI();
+												        	if (is_on_simulator)
+                                                                var uri = fileEntry.fullPath;
+                                                            else
+                            								    var uri = fileEntry.toURI();
 
 												        	// Update the database with the path
 
@@ -4171,7 +4174,11 @@ var Inspections = function()
 														}
 
 														// Write the photo data to the file.
-														writer.write(data.photo);
+                                                        if (is_on_simulator) {
+                                                            writer.write(new Blob([data.photo]));
+                                                        } else {
+                                                            writer.write(data.photo);
+                                                        }
 
 													}, fail);
 
