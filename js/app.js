@@ -6,6 +6,11 @@
 * Need to show more than 3 images on a report
 * Check history functionality - nothing showing in the modal window.
 */
+
+if (typeof LocalFileSystem == 'undefined')
+    var LocalFileSystem = {'PERSISTENT': 0};
+window.requestFileSystem  = window.requestFileSystem || window.webkitRequestFileSystem;
+
 function App() 
 {
 	var self = this;	// Create a reference to the object itself

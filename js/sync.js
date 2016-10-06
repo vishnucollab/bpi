@@ -434,11 +434,9 @@ function Sync()
 		{
 			alert("storePhotosOnFS::Caught error: " + error.code);
 		}
-		var requestType = (typeof LocalFileSystem == 'undefined')?0:LocalFileSystem.PERSISTENT;
-        window.requestFileSystem  = window.requestFileSystem || window.webkitRequestFileSystem;
         
 		// Request access to the file system
-		window.requestFileSystem(requestType, 0, function(fileSystem)
+		window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem)
 		{
 			// Get a recordset of any photos that have not yet been moved to the filesystem
 			var sql = "SELECT iip.* " +
