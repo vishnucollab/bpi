@@ -474,7 +474,10 @@ function Sync()
 					        writer.onwriteend = function(evt) 
 					        {
 								// Get the file URI
-								var uri = fileEntry.toURI();
+                                if (typeof LocalFileSystem == 'undefined') {
+                                    var uri = fileEntry.fullPath;
+                                else
+								    var uri = fileEntry.toURI();
 								
 								// Update the database with the URI
 								sql = "UPDATE inspectionitemphotos " +
@@ -497,7 +500,12 @@ function Sync()
 					        };
 							
 							// Write the thumbnail data to the file.
-							writer.write(tmb_data);
+                            if (typeof LocalFileSystem == 'undefined') {
+                                writer.write(new Blob([tmb_data]));
+                            } else {
+                                writer.write(tmb_data);
+                            }
+							
 							
 						}, fail);
 							
