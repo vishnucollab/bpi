@@ -33,7 +33,7 @@ function DBUtils()
     this.tables.push(new Array('address_book', 1.0));
 	this.tables.push(new Array('builders', 1.0));
 	this.tables.push(new Array('resources', 1.0));
-	this.tables.push(new Array('inspections', 1.3));
+	this.tables.push(new Array('inspections', 1.2));
 	this.tables.push(new Array('reinspections', 1.2));
 	this.tables.push(new Array('inspectionitems', 1.0));
 	this.tables.push(new Array('reinspectionitems', 1.0));
@@ -1175,7 +1175,6 @@ function DBUtils()
 				"'finalised' INTEGER NOT NULL DEFAULT 0, " +
 				"'failed' INTEGER NOT NULL DEFAULT 1, " +
 				"'client_info' VARCHAR, " +
-                "'modified' TIMESTAMP, " + 		
 				"'notes' TEXT, " +
 				"'initials' VARCHAR NOT NULL, " +
                 "'min_roof_tiles' SMALLINT(6) DEFAULT 0, " +
@@ -1184,7 +1183,7 @@ function DBUtils()
                 "'min_flooring_tiles' SMALLINT(6) DEFAULT 0, " +
                 "'grout_samples' SMALLINT(6) DEFAULT 0, " +
                 "'barrel_code' TEXT DEFAULT NULL, " +
-                "'created_by' INTEGER NOT NULL, " +                
+                "'created_by' INTEGER NOT NULL, " +
 				"'deleted' INTEGER NOT NULL DEFAULT 0 , " + 
 				"'dirty' INTEGER NOT NULL DEFAULT 1)";
 
