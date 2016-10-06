@@ -84,17 +84,19 @@
 
         objDBUtils.createTablesTable();
         
-        navigator.contacts.find(["emails", "name"], function(contacts){
-            for (var i=0; i<contacts.length; i++) 
-            {
-                objApp.contacts.push({'value':contacts[i].emails[0], 'label':contacts[i].name + '( ' + contacts[i].name +' )'});
-            }  
-        }, function(contactError){
-            if (contactError.code == 20)
-                alert('Cannot get contacts. Please allow Blueprint to access your Contacts in Settings.');
-            else
-                alert('Cannot get contacts');
-        });
+        if (typeof navigator.contacts != 'undefined'){
+            navigator.contacts.find(["emails", "name"], function(contacts){
+                for (var i=0; i<contacts.length; i++) 
+                {
+                    objApp.contacts.push({'value':contacts[i].emails[0], 'label':contacts[i].name + '( ' + contacts[i].name +' )'});
+                }  
+            }, function(contactError){
+                if (contactError.code == 20)
+                    alert('Cannot get contacts. Please allow Blueprint to access your Contacts in Settings.');
+                else
+                    alert('Cannot get contacts');
+            });
+        }
     } 
     
 	</script>
