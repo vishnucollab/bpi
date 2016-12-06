@@ -402,18 +402,45 @@
                         <tr>
                             <td><label for="report_type">Report Type</label></td>
                             <td>
-                             <select name="report_type" id="report_type">
-                                <option value="House & Land PCI">House & Land PCI</option>
-                                <option value="Tower & Unit PCI">Tower & Unit PCI</option>
-                                <option value="Quality Inspection">Quality Inspection</option>
-                                <option value="Handovers">Handovers</option>
-                                <option value="Fix / Plaster Inspection">Fix / Plaster Inspection</option>
-                                <option value="Frame Inspection">Frame Inspection</option>
-                                <option value="Maintenance Report">Maintenance Report</option>
-                                <option value="Slab Report">Slab Report</option>
+                             <select name="report_type" id="report_type">                                
+                                <optgroup label="Builder inspection">
+                                        <option value="Builder: Slab inspections">Builder: Slab inspections</option>
+                                        <option value="Builder: Frame inspections">Builder: Frame inspections</option>
+                                        <option value="Builder: Pre-plaster and lock up inspections">Builder: Pre-plaster and lock up inspections</option>
+                                        <option value="Builder: Waterproofing inspections">Builder: Waterproofing inspections</option>
+                                        <option value="Builder: Pre-paint/fixing inspections">Builder: Pre-paint/fixing inspections</option>
+                                        <option value="Builder: PCI/Final inspections">Builder: PCI/Final inspections</option>
+                                        <option value="Builder: Maintenance inspections">Builder: Maintenance inspections</option>
+                                </optgroup>
+                                <optgroup label="Client inspection">
+                                        <option value="Client: Slab inspections">Client: Slab inspections</option>
+                                        <option value="Client: Frame inspections">Client: Frame inspections</option>
+                                        <option value="Client: Pre-plaster and lock up inspections">Client: Pre-plaster and lock up inspections</option>
+                                        <option value="Client: Waterproofing inspections">Client: Waterproofing inspections</option>
+                                        <option value="Client: Pre-paint/fixing inspections">Client: Pre-paint/fixing inspections</option>
+                                        <option value="Client: PCI/Final inspections">Client: PCI/Final inspections</option>
+                                </optgroup>
+                                <optgroup label="Handovers.com">
+                                        <option value="House & Land PCI">House & Land PCI</option>
+                                        <option value="Tower & Unit PCI">Tower & Unit PCI</option>
+                                        <option value="Quality Inspection">Quality Inspection</option>
+                                        <option value="Handovers">Handovers</option>
+                                        <option value="Fix / Plaster Inspection">Fix / Plaster Inspection</option>
+                                        <option value="Frame Inspection">Frame Inspection</option>
+                                        <option value="Maintenance Report">Maintenance Report</option>
+                                        <option value="Slab Report">Slab Report</option>
+                                </optgroup>                                
                             </select>
                             </td>
                         </tr>
+                        
+                        <tr>
+                            <td></td>
+                            <td>
+                                
+                            </td>
+                        </tr>
+                        
                         <tr>
                             <td><label for="builder_id">Select a Builder</label></td>
                             <td>
