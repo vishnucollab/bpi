@@ -42,7 +42,7 @@
     <gap:plugin name="cordova-plugin-vibration" source="npm"/>
     <gap:plugin name="cordova-plugin-dialogs" source="npm"/>
     <gap:plugin name="cordova-plugin-statusbar" source="npm"/>
-    <gap:plugin name="io.github.pwlin.cordova.plugins.fileopener2" version="1.0.8" />     
+    <gap:plugin name="cordova-plugin-file-opener2" version="1.0.8" source="npm"/>
     
     <gap:config-file platform="ios" parent="UIStatusBarHidden">
         <true/>
