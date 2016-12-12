@@ -21,8 +21,8 @@
     <preference name="fullscreen" value="false" />
     <preference name="webviewbounce" value="false" />
     <preference name="StatusBarOverlaysWebView" value="false" />
-    
-    <gap:plugin name="org.apache.cordova.battery-status" />
+
+    <gap:plugin name="cordova-plugin-battery-status" source="npm"/>
     <gap:plugin name="org.apache.cordova.camera" />
     <gap:plugin name="org.apache.cordova.media-capture" />
     <gap:plugin name="org.apache.cordova.console" />
