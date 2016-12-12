@@ -41,7 +41,7 @@
     <gap:plugin name="org.apache.cordova.splashscreen" />
     <gap:plugin name="org.apache.cordova.vibration" />
     <gap:plugin name="org.apache.cordova.dialogs" />
-    <gap:plugin name="com.phonegap.plugin.statusbar" />
+    <gap:plugin name="org.apache.cordova.statusbar" />
     <gap:plugin name="io.github.pwlin.cordova.plugins.fileopener2" version="1.0.8" />     
     
     <gap:config-file platform="ios" parent="UIStatusBarHidden">
