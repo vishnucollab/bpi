@@ -400,26 +400,12 @@
                     <fieldset class="thefs">
                         <table>
                         <tr>
-                            <td><label for="report_type">Report Type</label></td>
+                            <td style="vertical-align:top"><label for="report_type">Report Type</label></td>
                             <td>
-                             <select name="report_type" id="report_type">                                
-                                <optgroup label="Builder inspection">
-                                        <option value="Builder: Slab inspections">Builder: Slab inspections</option>
-                                        <option value="Builder: Frame inspections">Builder: Frame inspections</option>
-                                        <option value="Builder: Pre-plaster and lock up inspections">Builder: Pre-plaster and lock up inspections</option>
-                                        <option value="Builder: Waterproofing inspections">Builder: Waterproofing inspections</option>
-                                        <option value="Builder: Pre-paint/fixing inspections">Builder: Pre-paint/fixing inspections</option>
-                                        <option value="Builder: PCI/Final inspections">Builder: PCI/Final inspections</option>
-                                        <option value="Builder: Maintenance inspections">Builder: Maintenance inspections</option>
-                                </optgroup>
-                                <optgroup label="Client inspection">
-                                        <option value="Client: Slab inspections">Client: Slab inspections</option>
-                                        <option value="Client: Frame inspections">Client: Frame inspections</option>
-                                        <option value="Client: Pre-plaster and lock up inspections">Client: Pre-plaster and lock up inspections</option>
-                                        <option value="Client: Waterproofing inspections">Client: Waterproofing inspections</option>
-                                        <option value="Client: Pre-paint/fixing inspections">Client: Pre-paint/fixing inspections</option>
-                                        <option value="Client: PCI/Final inspections">Client: PCI/Final inspections</option>
-                                </optgroup>
+                             <select name="report_type" id="report_type">                      
+                                <option value="Builder inspection">Builder inspection</option>
+                                <option value="Client inspection">Client inspection</option>
+                             
                                 <optgroup label="Handovers.com">
                                         <option value="House & Land PCI">House & Land PCI</option>
                                         <option value="Tower & Unit PCI">Tower & Unit PCI</option>
@@ -431,6 +417,27 @@
                                         <option value="Slab Report">Slab Report</option>
                                 </optgroup>                                
                             </select>
+                            <div>
+                            <select class="sub_options ignore" id="builder_report_type" name="builder_report_type" style="display: none;">
+                                        <option value="Builder: Slab inspections">Slab inspections</option>
+                                        <option value="Builder: Frame inspections">Frame inspections</option>
+                                        <option value="Builder: Pre-plaster and lock up inspections">Pre-plaster and lock up inspections</option>
+                                        <option value="Builder: Waterproofing inspections">Waterproofing inspections</option>
+                                        <option value="Builder: Pre-paint/fixing inspections">Pre-paint/fixing inspections</option>
+                                        <option value="Builder: PCI/Final inspections">PCI/Final inspections</option>
+                                        <option value="Builder: Maintenance inspections">Maintenance inspections</option>                           
+                            </select>
+                            </div>
+                            <div>
+                            <select class="sub_options ignore" id="client_report_type" name="client_report_type" style="display: none;">
+                                        <option value="Client: Slab inspections">Slab inspections</option>
+                                        <option value="Client: Frame inspections">Frame inspections</option>
+                                        <option value="Client: Pre-plaster and lock up inspections">Pre-plaster and lock up inspections</option>
+                                        <option value="Client: Waterproofing inspections">Waterproofing inspections</option>
+                                        <option value="Client: Pre-paint/fixing inspections">Pre-paint/fixing inspections</option>
+                                        <option value="Client: PCI/Final inspections">PCI/Final inspections</option>
+                            </select>                            
+                            </div>
                             </td>
                         </tr>
                         

@@ -1268,7 +1268,7 @@ var Inspections = function()
 		// Set the new inspection button to be active
 		objApp.setNavActive("#navNewInspection");
 
-
+        $("#report_type").trigger('change');
         if(!$("#inspection #btnDeleteInspection").hasClass("hidden"))
 		{
 			$("#inspection #btnDeleteInspection").addClass("hidden");
@@ -1408,6 +1408,18 @@ var Inspections = function()
 		$("#inspection #initials").val(inspection.initials);
 
         $("#inspection #report_type").val(inspection.report_type);
+        $(".sub_options").hide();
+        if (inspection.report_type.indexOf('Builder:') > -1) 
+        {
+            $("#inspection #report_type").val("Builder inspection");
+            $("#builder_report_type").show();
+        }
+        if (inspection.report_type.indexOf('Client:') > -1) 
+        {
+            $("#inspection #report_type").val("Client inspection");
+            $("#client_report_type").show();
+        }        
+        
         $("#inspection #weather").val(inspection.weather);
         $("#inspection #lot_no").val(inspection.lot_no);
         $("#inspection #address").val(inspection.address);
@@ -1996,7 +2008,22 @@ var Inspections = function()
         $("#inspection #report_type").bind('change', function(e)
         {
             e.preventDefault();
-
+            
+            if($(this).val() == "Builder inspection")
+            {
+                $(".sub_options").hide();
+                $("#builder_report_type").show();
+            }
+            else if($(this).val() == "Client inspection")
+            {
+                $(".sub_options").hide();
+                $("#client_report_type").show();
+            }
+            else{
+                $(".sub_options").hide();
+            }
+                        
+            
             if($(this).val() == "Quality Inspection")
             {
                 objApp.setSubExtraHeading("Step 1 of 5", true);
@@ -2013,6 +2040,21 @@ var Inspections = function()
         });
 
         $("#report_type").change(function() {
+            
+            if($(this).val() == "Builder inspection")
+            {
+                $(".sub_options").hide();
+                $("#builder_report_type").show();
+            }
+            else if($(this).val() == "Client inspection")
+            {
+                $(".sub_options").hide();
+                $("#client_report_type").show();
+            }
+            else{
+                $(".sub_options").hide();
+            }
+                        
             self.setDefaultNotes();
         });
 
@@ -7067,3 +7109,4 @@ var Inspections = function()
         return result;
     }						
 };
+

@@ -513,15 +513,29 @@ function DBUtils()
 			+ "#main #" + formSelector + " input[type='hidden']";
 
 		$(selectStr).each(function()
-		{
+		{            
 			// Make sure this field shouldn't be ignored
 			if(!$(this).hasClass("ignore"))
 			{
-				var field_name = $(this).attr("id");	
+			    var field_name = $(this).attr("id");	
 				var field_val = $(this).val();
-			
-				fields.push(field_name); 
-				values.push(field_val);
+                
+			    if( formSelector == 'frmInspectionDetails' && field_name == 'report_type')
+                {
+                    if(field_val == "Builder inspection")
+                    {
+                        field_val = $("#frmInspectionDetails #builder_report_type").val();
+                    }
+                    
+                    if(field_val == "Client inspection")
+                    {
+                        field_val = $("#frmInspectionDetails #client_report_type").val();
+                    }
+                                        
+                }
+
+                fields.push(field_name); 
+                values.push(field_val); 
 			} 
 		}); 
 		
