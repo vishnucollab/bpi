@@ -1412,11 +1412,13 @@ var Inspections = function()
         if (inspection.report_type.indexOf('Builder:') > -1) 
         {
             $("#inspection #report_type").val("Builder inspection");
+            $("#builder_report_type").val(inspection.report_type);
             $("#builder_report_type").show();
         }
         if (inspection.report_type.indexOf('Client:') > -1) 
         {
             $("#inspection #report_type").val("Client inspection");
+            $("#client_report_type").val(inspection.report_type);
             $("#client_report_type").show();
         }        
         
