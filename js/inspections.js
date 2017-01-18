@@ -1268,7 +1268,7 @@ var Inspections = function()
 		// Set the new inspection button to be active
 		objApp.setNavActive("#navNewInspection");
 
-        $("#report_type").trigger('change');
+        $("#report_type2").trigger('change');
         if(!$("#inspection #btnDeleteInspection").hasClass("hidden"))
 		{
 			$("#inspection #btnDeleteInspection").addClass("hidden");
@@ -1408,19 +1408,22 @@ var Inspections = function()
 		$("#inspection #initials").val(inspection.initials);
 
         $("#inspection #report_type").val(inspection.report_type);
-        $(".sub_options").hide();
+        $("#inspection #report_type option").hide();
         if (inspection.report_type.indexOf('Builder:') > -1) 
         {
-            $("#inspection #report_type").val("Builder inspection");
-            $("#builder_report_type").val(inspection.report_type);
-            $("#builder_report_type").show();
+            $("#inspection #report_type2").val("Builder inspection");
+            $("#inspection .builder-child").show();
         }
-        if (inspection.report_type.indexOf('Client:') > -1) 
+        else if (inspection.report_type.indexOf('Client:') > -1) 
         {
             $("#inspection #report_type").val("Client inspection");
-            $("#client_report_type").val(inspection.report_type);
-            $("#client_report_type").show();
-        }        
+            $("#inspection .client-child").show();
+        } 
+        else
+        {
+            $("#inspection #report_type").val("Handovers.com");
+            $("#inspection .handovers-child").show();
+        }       
         
         $("#inspection #weather").val(inspection.weather);
         $("#inspection #lot_no").val(inspection.lot_no);
@@ -2006,26 +2009,39 @@ var Inspections = function()
 
             }, "");
         });
+        
+        $("#inspection #report_type2").change(function() 
+        {
+            $("#inspection #report_type option").hide();
+            
+            if($(this).val() == "Builder inspection")
+            {
+                $("#inspection #report_type2").val("Builder inspection");
+                $("#inspection #report_type .builder-child").show();
+                $("#inspection #report_type").val('Builder: Slab inspections');     
+                
+            }
+            else if($(this).val() == "Client inspection")
+            {
+                $("#inspection #report_type2").val("Client inspection");
+                $("#inspection #report_type .client-child").show();
+                $("#inspection #report_type").val('Client: Slab inspections');      
+                
+            } 
+            else
+            {
+                $("#inspection #report_type2").val("Handovers.com");
+                $("#inspection #report_type .handovers-child").show();
+                $("#inspection #report_type").val('House & Land PCI');                
+                
+            }    
+            $("#inspection #report_type").trigger('change');           
+        });
 
         $("#inspection #report_type").bind('change', function(e)
         {
             e.preventDefault();
-            
-            if($(this).val() == "Builder inspection")
-            {
-                $(".sub_options").hide();
-                $("#builder_report_type").show();
-            }
-            else if($(this).val() == "Client inspection")
-            {
-                $(".sub_options").hide();
-                $("#client_report_type").show();
-            }
-            else{
-                $(".sub_options").hide();
-            }
                         
-            
             if($(this).val() == "Quality Inspection")
             {
                 objApp.setSubExtraHeading("Step 1 of 5", true);
@@ -2042,20 +2058,6 @@ var Inspections = function()
         });
 
         $("#report_type").change(function() {
-            
-            if($(this).val() == "Builder inspection")
-            {
-                $(".sub_options").hide();
-                $("#builder_report_type").show();
-            }
-            else if($(this).val() == "Client inspection")
-            {
-                $(".sub_options").hide();
-                $("#client_report_type").show();
-            }
-            else{
-                $(".sub_options").hide();
-            }
                         
             self.setDefaultNotes();
         });
