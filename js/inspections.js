@@ -6,6 +6,8 @@ OBJECT: INSPECTIONS
 * @project: Blueprint Inspections iPad App
 * @author: Andrew Chapman
 */
+var selected_report_type = '';
+
 var Inspections = function()                              
 {
 	// Inspection level pop selectors
@@ -675,7 +677,9 @@ var Inspections = function()
             
             $("div.btnEditNotes").show();
             
-            if(($("#inspection #report_type").val() == "Quality Inspection") || (objApp.keys.report_type == "Quality Inspection")) {
+            //if(($("#inspection #report_type").val() == "Quality Inspection") || (objApp.keys.report_type == "Quality Inspection")) {
+            if(( $("#inspection #report_type").val() == "Quality Inspection") || (objApp.keys.report_type == "Quality Inspection")) {
+                
                 objApp.setSubExtraHeading("Step 1 of 5", true);
             } /*else if (($("#inspection #report_type").val() == "Fix / Plaster Inspection") || (objApp.keys.report_type == "Fix / Plaster Inspection")) {
                 objApp.setSubExtraHeading("Step 1 of 4", true);
@@ -694,7 +698,7 @@ var Inspections = function()
         objApp.setSubHeading("Add Issues");
         $("div.btnEditNotes").show();
         
-        if(($("#inspection #report_type").val() == "Quality Inspection") || (objApp.keys.report_type == "Quality Inspection")) {
+        if(( $("#inspection #report_type").val() == "Quality Inspection") || (objApp.keys.report_type == "Quality Inspection")) {
             objApp.setSubExtraHeading("Step 2 of 5", true);
         } /*else if(($("#inspection #report_type").val() == "Fix / Plaster Inspection") || (objApp.keys.report_type == "Fix / Plaster Inspection")) {    
             objApp.setSubExtraHeading("Step 2 of 4", true);
@@ -1027,7 +1031,7 @@ var Inspections = function()
         // If the current note value is empty and if this is not a Quality inspection,
         // set the default notes.
         if($("#inspection #notes").val() == "") {
-            report_type = $("#report_type").val();
+            report_type = $("#inspection #report_type").val();
 
             if((report_type == "Quality Inspection") || (report_type == "Fix / Plaster Inspection")) {
                 $("#inspection #notes").val(self.default_notes);
@@ -1406,23 +1410,26 @@ var Inspections = function()
 		$("#inspection #finalised").val(inspection.finalised);
 		$("#inspection #failed").val(inspection.failed);
 		$("#inspection #initials").val(inspection.initials);
-
+        
         $("#inspection #report_type").val(inspection.report_type);
-        $("#inspection #report_type option").hide();
+        $("#inspection .report_type_options").hide();
         if (inspection.report_type.indexOf('Builder:') > -1) 
         {
             $("#inspection #report_type2").val("Builder inspection");
-            $("#inspection .builder-child").show();
+            $("#inspection #builder_report_type").show();
+            $("#inspection #builder_report_type").val(inspection.report_type);
         }
         else if (inspection.report_type.indexOf('Client:') > -1) 
         {
-            $("#inspection #report_type").val("Client inspection");
-            $("#inspection .client-child").show();
+            $("#inspection #report_type2").val("Client inspection");
+            $("#inspection #client_report_type").show();
+            $("#inspection #client_report_type").val(inspection.report_type);
         } 
         else
         {
-            $("#inspection #report_type").val("Handovers.com");
-            $("#inspection .handovers-child").show();
+            $("#inspection #report_type2").val("Handovers.com");
+            $("#inspection #handover_report_type").show();
+            $("#inspection #handover_report_type").val(inspection.report_type);
         }       
         
         $("#inspection #weather").val(inspection.weather);
@@ -1753,6 +1760,7 @@ var Inspections = function()
         $("a.sendEmailButton").unbind();
         $("a.btnViewChart").unbind();
         $("#report_type").unbind();
+        $(".report_type_options").unbind();
         $('#frmDefectDetails #observation').unbind();
         $("#inspectionList #btnAddInspection").unbind();
         $("form.search input").unbind();
@@ -2012,33 +2020,29 @@ var Inspections = function()
         
         $("#inspection #report_type2").change(function() 
         {
-            $("#inspection #report_type option").hide();
+            $("#inspection .report_type_options").hide();
             
             if($(this).val() == "Builder inspection")
             {
                 $("#inspection #report_type2").val("Builder inspection");
-                $("#inspection #report_type .builder-child").show();
-                $("#inspection #report_type").val('Builder: Slab inspections');     
+                $("#inspection #builder_report_type").show();    
                 
             }
             else if($(this).val() == "Client inspection")
             {
                 $("#inspection #report_type2").val("Client inspection");
-                $("#inspection #report_type .client-child").show();
-                $("#inspection #report_type").val('Client: Slab inspections');      
+                $("#inspection #client_report_type").show();      
                 
             } 
             else
             {
                 $("#inspection #report_type2").val("Handovers.com");
-                $("#inspection #report_type .handovers-child").show();
-                $("#inspection #report_type").val('House & Land PCI');                
+                $("#inspection #handover_report_type").show();               
                 
-            }    
-            $("#inspection #report_type").trigger('change');           
+            }          
         });
 
-        $("#inspection #report_type").bind('change', function(e)
+        $("#inspection #handover_report_type").bind('change', function(e)
         {
             e.preventDefault();
                         
@@ -2052,16 +2056,22 @@ var Inspections = function()
                 objApp.setSubExtraHeading("Step 1 of 3", true);
                 objApp.keys.report_type = $(this).val();
             }
-
+            
             $('#inspection .btnEditNotes').show();
 
         });
 
-        $("#report_type").change(function() {
+        $("#handover_report_type").change(function() {
                         
             self.setDefaultNotes();
         });
 
+        $(".report_type_options").change(function() {
+                        
+            selected_report_type = $(this).val();
+            $("#inspection #report_type").val(selected_report_type);  
+        });
+        
         $(".inspectionDetails #btnCapturePhoto").bind(objApp.touchEvent, function(e)
 		{
             e.preventDefault();

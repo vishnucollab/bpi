@@ -518,13 +518,15 @@ function DBUtils()
 			if(!$(this).hasClass("ignore"))
 			{
 			    var field_name = $(this).attr("id");	
-				var field_val = $(this).val();
-                
-
+				var field_val = $(this).val();               
+        
                 fields.push(field_name); 
                 values.push(field_val); 
 			} 
 		}); 
+        
+
+
 		
 		// Checkboxes
 		$("#main #" + formSelector + " input[type='checkbox']").each(function()
