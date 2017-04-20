@@ -15,6 +15,7 @@ function Sync()
 	this.tableIndex = 0;
 	this.recordIndex = 0;
 	this.refreshSync = false;
+    this.startTime = '';
 	this.noRefreshWarning = false;
 	this.silentMode = false;
 	this.callbackMethod = null;
@@ -185,6 +186,105 @@ function Sync()
 			}
 		}, "json"); 			
 	}
+
+	this.smartSync = function()
+	{
+        objApp.objSync.startTime = '- 1 month';
+		if(!self.silentMode)
+		{
+			// Make sure the username and pass have been entered.
+			if(!$("#frmSync").validate().form())
+			{
+				alert("Please enter a valid email address and your password.  Your password should be at least 5 characters long.");
+				return;
+			}
+
+			if(($("#frmSync #refresh_sync").is(":checked")) && (!objApp.objSync.noRefreshWarning))
+			{
+				if(!confirm("Warning, you have selected the 'reset my data' option.  This will delete all your local data and then download everything since 1 month ago from the Blueprint server.  Any data that you've entered since your last sync will be lost.  Are you sure?'"))
+					return;
+
+				objApp.objSync.refreshSync = true;
+			}
+
+			this.tableIndex = 0;
+			this.recordIndex = 0;
+
+			$("#accountMessage").text("Checking login...");
+		}
+
+		var parameters = {};
+		parameters['email'] = localStorage.getItem("email");
+		parameters['password'] = localStorage.getItem("password");
+
+		if((parameters['email'] == null) || (parameters['password'] == null) || (parameters['email'] == "") || (parameters['password'] == ""))
+		{
+			objApp.objLogin.logout();
+			return;
+		}
+
+		if(!self.silentMode) blockElement("#frmSync");
+
+		$.post(objApp.apiURL + 'account/do_login', parameters , function(data)
+		{
+			if(data.status == "OK")
+			{
+				// The login is OK.
+				if(objApp.objSync.refreshSync)
+				{
+					// The user is doing a refresh sync
+					// Clear any data in the database object
+					objDBUtils.data = "";
+
+					// Delete all local data (except the first two tables app_tables and preferences - that's why we start at index 2 instead if 0)
+					if(!self.silentMode) $("#accountMessage").text("Login OK.  Deleting local data...");
+
+					// Tell the database to delete all data.
+					setTimeout('objDBUtils.emptyAllTables(1, objApp.objSync.sendData);', 200);
+				}
+				else
+				{
+					var isPhonegap = objApp.phonegapBuild;
+
+
+					if(!self.silentMode) $("#accountMessage").text("Login OK.  Preparing data...");
+
+					// Now proceed with sync.
+					// Ask the database object to get all dirty data and to call the sendData method
+					// in this object when done.
+
+					objDBUtils.callbackMethod = objApp.objSync.sendData;
+
+					// Do not send photos when not running under phonegap.
+					setTimeout('objDBUtils.getDirtyData(1, 0);', 200);
+				}
+			}
+			else if(data.message == "INVALID")
+			{
+				if(!self.silentMode)
+				{
+					unblockElement("#frmSync");
+					$("#accountMessage").text("Sorry, either your email or password is incorrect.");
+				}
+				else if(self.callbackMethod != null)
+				{
+					self.callbackMethod(false);
+				}
+			}
+			else
+			{
+				if(!self.silentMode)
+				{
+					unblockElement("#frmSync");
+					$("#accountMessage").text("Sorry, something went wrong.  Please report this error to the Blueprint support team.");
+				}
+				else if(self.callbackMethod != null)
+				{
+					self.callbackMethod(false);
+				}
+			}
+		}, "json");
+	}
 	
 
 	/***
@@ -200,8 +300,9 @@ function Sync()
 		parameters['password'] = localStorage.getItem("password");		
 		parameters['version'] = objApp.version;
 		parameters['data'] = objDBUtils.data;
-        parameters['anticache'] = Math.floor(Math.random() * 999999);  
-		
+        parameters['anticache'] = Math.floor(Math.random() * 999999);
+        parameters['start_time'] = objApp.objSync.startTime;
+        objApp.objSync.startTime = '';
 		var refreshSync = "false";
 		
 		if(objApp.objSync.refreshSync)
