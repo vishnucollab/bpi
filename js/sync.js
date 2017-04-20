@@ -13,6 +13,8 @@ function Sync()
 	var self = this;
 	this.data = "";
 	this.tableIndex = 0;
+    this.syncIndex = 0;
+    this.syncingRows = 0;
 	this.recordIndex = 0;
 	this.refreshSync = false;
     this.startTime = '';
@@ -147,7 +149,7 @@ function Sync()
  					if(!self.silentMode) $("#accountMessage").text("Login OK.  Deleting local data...");
  					
  					// Tell the database to delete all data.
- 					setTimeout('objDBUtils.emptyAllTables(1, objApp.objSync.sendData);', 200);
+ 					setTimeout('objDBUtils.emptyAllTables(1, objApp.objSync.getSmartData);', 200);
  				}
  				else
  				{
@@ -160,7 +162,7 @@ function Sync()
  					// Ask the database object to get all dirty data and to call the sendData method
  					// in this object when done.
 
- 					objDBUtils.callbackMethod = objApp.objSync.sendData; 						
+ 					objDBUtils.callbackMethod = objApp.objSync.getSmartData;
  						
  					// Do not send photos when not running under phonegap.
  					setTimeout('objDBUtils.getDirtyData(1, 0);', 200);
@@ -246,7 +248,7 @@ function Sync()
 					if(!self.silentMode) $("#accountMessage").text("Login OK.  Deleting local data...");
 
 					// Tell the database to delete all data.
-					setTimeout('objDBUtils.emptyAllTables(1, objApp.objSync.sendData);', 200);
+					setTimeout('objDBUtils.emptyAllTables(1, objApp.objSync.getSmartData);', 200);
 				}
 				else
 				{
@@ -256,10 +258,10 @@ function Sync()
 					if(!self.silentMode) $("#accountMessage").text("Login OK.  Preparing data...");
 
 					// Now proceed with sync.
-					// Ask the database object to get all dirty data and to call the sendData method
+					// Ask the database object to get all dirty data and to call the getSmartData method
 					// in this object when done.
 
-					objDBUtils.callbackMethod = objApp.objSync.sendData;
+					objDBUtils.callbackMethod = objApp.objSync.getSmartData;
 
 					// Do not send photos when not running under phonegap.
 					setTimeout('objDBUtils.getDirtyData(1, 0);', 200);
@@ -291,6 +293,154 @@ function Sync()
 			}
 		}, "json");
 	}
+
+    /***
+     * getSmartData Get data from the Blueprint server,
+     * awaits processing, and then receives any new
+     * data and stores it locally.
+     */
+    this.getSmartData = function()
+    {
+        if(objApp.objSync.refreshSync)
+        {
+            if(!self.silentMode) $("#accountMessage").text("Asking server for your data...");
+        }
+        else
+        {
+            if(!self.silentMode) $("#accountMessage").text("Sending data to server...");
+        }
+        self.syncIndex = 1;
+        self.getDataTable();
+    }
+
+    this.getDataTable = function()
+    {
+        // Setup the request data.
+        var parameters = {};
+        parameters['email'] = localStorage.getItem("email");
+        parameters['password'] = localStorage.getItem("password");
+        parameters['version'] = objApp.version;
+        parameters['data'] = objDBUtils.data;
+        parameters['anticache'] = Math.floor(Math.random() * 999999);
+        parameters['start_time'] = objApp.objSync.startTime;
+        objApp.objSync.startTime = '';
+        var refreshSync = "false";
+        if(objApp.objSync.refreshSync)
+            refreshSync = "true";
+
+        if (self.syncIndex < 1)
+            self.syncIndex = 1;
+        else if (self.syncIndex >= objDBUtils.tables.length)
+            self.syncIndex = objDBUtils.tables.length - 1;
+        self.recordIndex = 0;
+        var tableName = objDBUtils.tables[self.syncIndex][0];
+        if(!self.silentMode) $("#accountMessage").text("Loading table " + tableName + "...");
+        $.post(objApp.apiURL + 'account/get_data_table/' + tableName +'/' + refreshSync, parameters , function(data)
+        {
+            // Remove / clear the data store temporarily in the DB object
+            objDBUtils.data = "";
+            try {
+                data = jQuery.parseJSON(data);
+
+                // Make sure the server processed the data OK.
+                if(data.status == "OK")
+                {
+                    var tableName = data.table_name;
+
+                    if(!self.silentMode) $("#accountMessage").text("Data sent OK, checking for data to process...");
+
+                    // Store the data locally.
+                    self.syncingRows = data[tableName];
+
+                    // Data was processed OK.
+                    // Did the server send us any data to store locally?
+                    if(self.syncingRows.length > 0)
+                    {
+                        // How many records for this table do we need to prcess.
+                        var num_recs = self.syncingRows.length;
+
+                        // Get the current row
+                        var row = self.syncingRows[self.recordIndex];
+
+                        // Start a transaction
+                        objDBUtils.db.transaction(function(transaction)
+                        {
+                            // handleRecord processes a record and handles deciding whether to
+                            // process more records in the current table or whether to move on to the next table.
+                            var handleRecord = function(transaction, tableName, row)
+                            {
+                                if(!self.silentMode) $("#accountMessage").text("Processing table: " + tableName + ", record " + (self.recordIndex + 1));
+
+                                // Build the sql insert/update statement
+                                var sql = self.buildSaveData(tableName, row);
+                                transaction.executeSql(sql, self.saveData, function (transaction, result)
+                                {
+                                    // Increment the recordIndex
+                                    self.recordIndex++;
+                                    if(self.recordIndex >= num_recs)
+                                    {
+                                        // This table has finished
+                                        self.recordIndex = 0;
+                                        self.syncIndex++;
+
+                                        // If there's more processing to be done
+                                        // invoke the process table method again.
+                                        // Otherwise invoke sync finished
+                                        if(self.syncIndex < objDBUtils.tables.length)
+                                        {
+                                            self.getDataTable();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        // There is more data to handle for this table
+                                        // Get the next row.
+                                        row = self.syncingRows[self.recordIndex];
+                                        handleRecord(transaction, tableName, row);
+                                    }
+
+                                }, self.DB_error_handler);
+                            }
+
+                            // Handle the first record for this table.
+                            handleRecord(transaction, tableName, row);
+                        });
+                    }
+                    else
+                    {
+                        self.tableIdx = 0;
+                        self.uploadPhotos("inspection");
+                    }
+                }
+                else
+                {
+                    if(!self.silentMode)
+                    {
+                        unblockElement("#frmSync");
+                        alert("Warning: An error occured during the data sync operation.  Please report this error to the Blueprint team.");
+                        $("#accountMessage").text("Sorry, something went wrong during the processing phase.  Please report this error to the Blueprint team.");
+                    }
+                    else if(self.callbackMethod != null)
+                    {
+                        self.callbackMethod(false);
+                    }
+                }
+            } catch (e) {
+                // error
+                console.log(e);
+                if(!self.silentMode)
+                {
+                    unblockElement("#frmSync");
+                    alert("Warning: An error occured during the data sync operation.  Please report this error to the Blueprint team.");
+                    $("#accountMessage").text("Sorry, something went wrong during the processing phase.  Please report this error to the Blueprint team.");
+                }
+                else if(self.callbackMethod != null)
+                {
+                    self.callbackMethod(false);
+                }
+            }
+        }, "");
+    }
 	
 
 	/***
@@ -849,5 +999,12 @@ function Sync()
 			}			
 			
 		}, "");
-	}			
+	}
+
+    this.DB_error_handler = function(transaction, error)
+    {
+        alert("Sorry, the following database error occured\n\n" +
+            "Code: " + error.code + "\n" +
+            "Message: " + error.message);
+    }
 }

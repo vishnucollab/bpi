@@ -1415,6 +1415,7 @@ function DBUtils()
 		
 		var sql = "CREATE TABLE IF NOT EXISTS inspectionitemphotos  (" +
 				"'id' VARCHAR PRIMARY KEY NOT NULL, " +
+                "'company_id' VARCHAR KEY NOT NULL, " +
 				"'inspection_id' VARCHAR NOT NULL, " +
 				"'seq_no' INTEGER NOT NULL, " +
 				"'photodata_tmb' VARCHAR, " +
@@ -1473,6 +1474,7 @@ function DBUtils()
 		
 		var sql = "CREATE TABLE IF NOT EXISTS reinspectionitemphotos  (" +
 				"'id' VARCHAR PRIMARY KEY NOT NULL, " +
+			    "'company_id' VARCHAR KEY NOT NULL, " +
 				"'reinspection_id' VARCHAR NOT NULL, " +
 				"'seq_no' INTEGER NOT NULL, " +
 				"'photodata_tmb' VARCHAR, " +
