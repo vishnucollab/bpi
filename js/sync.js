@@ -70,8 +70,14 @@ function Sync()
 			e.preventDefault();
 			
 			objApp.objSync.startSync();
-		});	
-	}
+		});
+
+        $("#frmSync input#smartSync").bind(objApp.touchEvent, function(e)
+        {
+            e.preventDefault();
+            objApp.objSync.smartSync();
+        });
+    }
 	
 	this.forceRefresh = function()
 	{
