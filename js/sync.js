@@ -16,6 +16,9 @@ function Sync()
     this.syncIndex = 0;
     this.syncingRows = 0;
 	this.recordIndex = 0;
+    this.syncingTables = {};
+    this.syncingIndexs = {};
+    this.syncingCounter = 0;
 	this.refreshSync = false;
     this.startTime = '';
 	this.noRefreshWarning = false;
@@ -218,7 +221,7 @@ function Sync()
 			this.tableIndex = 0;
 			this.recordIndex = 0;
 
-			$("#accountMessage").text("Checking login...");
+			$("#accountMessage #general").text("Checking login...");
 		}
 
 		var parameters = {};
@@ -245,7 +248,7 @@ function Sync()
 					objDBUtils.data = "";
 
 					// Delete all local data (except the first two tables app_tables and preferences - that's why we start at index 2 instead if 0)
-					if(!self.silentMode) $("#accountMessage").text("Login OK.  Deleting local data...");
+					if(!self.silentMode) $("#accountMessage #general").text("Login OK.  Deleting local data...");
 
 					// Tell the database to delete all data.
 					setTimeout('objDBUtils.emptyAllTables(1, objApp.objSync.getSmartData);', 200);
@@ -255,7 +258,7 @@ function Sync()
 					var isPhonegap = objApp.phonegapBuild;
 
 
-					if(!self.silentMode) $("#accountMessage").text("Login OK.  Preparing data...");
+					if(!self.silentMode) $("#accountMessage #general").text("Login OK.  Preparing data...");
 
 					// Now proceed with sync.
 					// Ask the database object to get all dirty data and to call the getSmartData method
@@ -303,17 +306,211 @@ function Sync()
     {
         if(objApp.objSync.refreshSync)
         {
-            if(!self.silentMode) $("#accountMessage").text("Asking server for your data...");
+            if(!self.silentMode) $("#accountMessage #general").text("Asking server for your data...");
         }
         else
         {
-            if(!self.silentMode) $("#accountMessage").text("Sending data to server...");
+            if(!self.silentMode) $("#accountMessage #general").text("Sending data to server...");
         }
-        self.syncIndex = 1;
-        self.getDataTable();
+        // Setup the request data.
+        var parameters = {};
+        parameters['email'] = localStorage.getItem("email");
+        parameters['password'] = localStorage.getItem("password");
+        parameters['version'] = objApp.version;
+        parameters['data'] = objDBUtils.data;
+        parameters['anticache'] = Math.floor(Math.random() * 999999);
+        parameters['start_time'] = objApp.objSync.startTime;
+        objApp.objSync.startTime = '';
+        for(var i = 1; i < objDBUtils.tables.length; i++){
+            $("#accountMessage").append('<div id="msg'+objDBUtils.tables[i][0] +'"></div>');
+            self.getDataTable(objDBUtils.tables[i][0], parameters);
+        }
     }
 
-    this.getDataTable = function()
+    this.getDataTable = function(tableName, parameters)
+    {
+        var refreshSync = "false";
+        if(objApp.objSync.refreshSync)
+            refreshSync = "true";
+
+        self.syncingTables[tableName] = [];
+        self.syncingIndexs[tableName] = 0;
+
+        if(!self.silentMode) $("#accountMessage #msg" + tableName).text("Loading table " + tableName + "...");
+
+        self.syncingCounter++;
+
+        $.post(objApp.apiURL + 'account/get_data_table/' + tableName +'/' + refreshSync, parameters , function(data)
+        {
+            // Remove / clear the data store temporarily in the DB object
+            objDBUtils.data = "";
+            try {
+                data = jQuery.parseJSON(data);
+
+                // Make sure the server processed the data OK.
+                if(data.status == "OK")
+                {
+                    var tableName = data.table_name;
+                    if (typeof data.numberOfPages != 'undefined'){
+                        self.syncingCounter--;
+                        /* Table is large, let send multiple requests */
+                        var itemPerPage = 5000;
+                        for(var p = 1; p <= data.numberOfPages; p++){
+                            self.syncingTables[tableName] = {};
+                            self.syncingIndexs[tableName] = {};
+                            self.syncingCounter++;
+                            $.post(objApp.apiURL + 'account/get_data_table/' + tableName +'/' + refreshSync + '/' + p, parameters , function(r_data)
+                            {
+                                r_data = jQuery.parseJSON(r_data);
+                                if(r_data.status == "OK") {
+                                    var tblName = r_data.table_name;
+                                    var page = r_data.page;
+
+                                    // Store the data locally.
+                                    self.syncingTables[tblName][page] = r_data[tblName];
+                                    self.syncingIndexs[tblName][page] = 0;
+
+                                    // Data was processed OK.
+                                    // Did the server send us any data to store locally?
+                                    if (self.syncingTables[tblName][page].length > 0) {
+                                        // Get the current row
+                                        var row = self.syncingTables[tblName][page][self.syncingIndexs[tblName][page]];
+
+                                        // Start a transaction
+                                        objDBUtils.db.transaction(function (transaction) {
+                                            // handleRecord processes a record and handles deciding whether to
+                                            // process more records in the current table or whether to move on to the next table.
+                                            var handleRecord = function (transaction, tblName, row) {
+                                                // Build the sql insert/update statement
+                                                var sql = self.buildSaveData(tblName, row);
+                                                transaction.executeSql(sql, self.saveData, function (transaction, result) {
+                                                    // Increment the recordIndex
+                                                    self.syncingIndexs[tblName][page]++;
+                                                    if (self.syncingIndexs[tblName][page] >= self.syncingTables[tblName][page].length) {
+                                                        self.syncingCounter--;
+                                                        console.log(tblName + ' ' + page + ' ' + self.syncingCounter);
+                                                        if (self.syncingCounter == 0 && !self.silentMode) {
+                                                            unblockElement("#frmSync");
+                                                            $("#accountMessage").html('<div id="general">Done!</div>');
+                                                        }
+                                                    }
+                                                    else {
+                                                        // There is more data to handle for this table
+                                                        // Get the next row.
+                                                        row = self.syncingTables[tblName][page][self.syncingIndexs[tblName][page]];
+                                                        handleRecord(transaction, tblName, row);
+                                                    }
+
+                                                }, self.DB_error_handler);
+                                            }
+
+                                            // Handle the first record for this table.
+                                            handleRecord(transaction, tblName, row);
+                                        });
+                                    }
+                                }
+                                else
+                                {
+                                    if(!self.silentMode)
+                                    {
+                                        unblockElement("#frmSync");
+                                        alert("Warning: An error occured during the data sync operation.  Please report this error to the Blueprint team.");
+                                        $("#accountMessage").text("Sorry, something went wrong during the processing phase.  Please report this error to the Blueprint team.");
+                                    }
+                                    else if(self.callbackMethod != null)
+                                    {
+                                        self.callbackMethod(false);
+                                    }
+                                }
+                            }, "");
+                        }
+
+                    }else{
+                        if(!self.silentMode) $("#accountMessage #msg" + tableName).text("Data sent OK, checking for data to process...");
+
+                        // Store the data locally.
+                        self.syncingTables[tableName] = data[tableName];
+
+                        // Data was processed OK.
+                        // Did the server send us any data to store locally?
+                        if(self.syncingTables[tableName].length > 0)
+                        {
+                            // Get the current row
+                            var row = self.syncingTables[tableName][self.syncingIndexs[tableName]];
+
+                            // Start a transaction
+                            objDBUtils.db.transaction(function(transaction)
+                            {
+                                // handleRecord processes a record and handles deciding whether to
+                                // process more records in the current table or whether to move on to the next table.
+                                var handleRecord = function(transaction, tableName, row)
+                                {
+                                    if(!self.silentMode) $("#accountMessage #msg" + tableName).text("Processing table " + tableName + ": record " + (self.syncingIndexs[tableName] + 1));
+
+                                    // Build the sql insert/update statement
+                                    var sql = self.buildSaveData(tableName, row);
+                                    transaction.executeSql(sql, self.saveData, function (transaction, result)
+                                    {
+                                        // Increment the recordIndex
+                                        self.syncingIndexs[tableName]++;
+                                        if(self.syncingIndexs[tableName] >= self.syncingTables[tableName].length)
+                                        {
+                                            if(!self.silentMode) $("#accountMessage #msg" + tableName).text("Table " + tableName + ": " + self.syncingIndexs[tableName] + " records has been loaded.");
+                                            self.syncingCounter--;
+                                            console.log(tableName + ' ' + self.syncingCounter);
+                                            if (self.syncingCounter == 0 && !self.silentMode){
+                                                unblockElement("#frmSync");
+                                                $("#accountMessage").html('<div id="general">Done!</div>');
+                                            }
+                                        }
+                                        else
+                                        {
+                                            // There is more data to handle for this table
+                                            // Get the next row.
+                                            row = self.syncingTables[tableName][self.syncingIndexs[tableName]];
+                                            handleRecord(transaction, tableName, row);
+                                        }
+
+                                    }, self.DB_error_handler);
+                                }
+
+                                // Handle the first record for this table.
+                                handleRecord(transaction, tableName, row);
+                            });
+                        }
+                    }
+                }
+                else
+                {
+                    if(!self.silentMode)
+                    {
+                        unblockElement("#frmSync");
+                        alert("Warning: An error occured during the data sync operation.  Please report this error to the Blueprint team.");
+                        $("#accountMessage").text("Sorry, something went wrong during the processing phase.  Please report this error to the Blueprint team.");
+                    }
+                    else if(self.callbackMethod != null)
+                    {
+                        self.callbackMethod(false);
+                    }
+                }
+            } catch (e) {
+                // error
+                console.log(e);
+                if(!self.silentMode)
+                {
+                    unblockElement("#frmSync");
+                    alert("Warning: An error occured during the data sync operation.  Please report this error to the Blueprint team.");
+                    $("#accountMessage").text("Sorry, something went wrong during the processing phase.  Please report this error to the Blueprint team.");
+                }
+                else if(self.callbackMethod != null)
+                {
+                    self.callbackMethod(false);
+                }
+            }
+        }, "");
+    }
+
+    this.getDataTable2 = function()
     {
         // Setup the request data.
         var parameters = {};
