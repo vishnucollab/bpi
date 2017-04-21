@@ -29,6 +29,34 @@ hr { display: block; height: 1px; border: 0; border-top: 1px solid #ccc; margin:
 
 input, select, ul { vertical-align: middle; }
 
+input[type="submit"], input[type="button"] {
+    -webkit-appearance: none;
+}
+
+@font-face {
+    font-family: 'SourceSansPro';
+    src: url('fonts/SourceSansPro-Regular.eot');
+    src: url('fonts/SourceSansPro-Regular.eot?#iefix') format('embedded-opentype'),
+    url('fonts/SourceSansPro-Regular.woff') format('woff'),
+    url('fonts/SourceSansPro-Regular.ttf') format('truetype'),
+    url('fonts/SourceSansPro-Regular.svg#SourceSansPro-Regular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+@font-face {
+    font-family: 'SourceSansPro-Bold';
+    src: url('fonts/SourceSansPro-Bold.eot');
+    src: url('fonts/SourceSansPro-Bold.eot?#iefix') format('embedded-opentype'),
+    url('fonts/SourceSansPro-Bold.woff') format('woff'),
+    url('fonts/SourceSansPro-Bold.ttf') format('truetype'),
+    url('fonts/SourceSansPro-Bold.svg#SourceSansPro-Bold') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
 /*@font-face {
     font-family: 'PTSansCaptionBold';
     src: url('fonts/PTC75F-webfont.eot');
@@ -104,7 +132,7 @@ input, select, ul { vertical-align: middle; }
 
 
 /* main layout ------------------------------ */
-
+                                        
 html 
 {
     background: #fff; 
@@ -131,23 +159,36 @@ body > div:focus {outline: none;}
 	font-family: 'PTSansItalic', sans-serif;
 }
 
-#extra_heading
+#header
 {
-    position: absolute;
-        right: 100px; top: 0px;
-    color: white;
-    font-size: 18px;
-    font-family: 'PTSansBold', sans-serif;
-    margin: 0 0 20px -20px;
-    padding: 15px 20px 0;
-    z-index: 6;    
+    color: #ffffff;
+    font-family: 'PTSansBoldItalic', sans-serif;
+    font-size: 24px;
+    font-weight: normal;    
+    letter-spacing: 0.03em;
+    line-height: 1.2em;    
+    padding: 8px 20px 7px;
+    overflow: auto;
+    background-image: -webkit-gradient(
+        linear,
+        left top,
+        left bottom,
+        color-stop(0, #2D3C84),
+        color-stop(1, #2547C4)
+    );
+    background-image: -o-linear-gradient(bottom, #2D3C84 0%, #2547C4 100%);
+    background-image: -moz-linear-gradient(bottom, #2D3C84 0%, #2547C4 100%);
+    background-image: -webkit-linear-gradient(bottom, #2D3C84 0%, #2547C4 100%);
+    background-image: -ms-linear-gradient(bottom, #2D3C84 0%, #2547C4 100%);
+    background-image: linear-gradient(to bottom, #2D3C84 0%, #2547C4 100%);
+    
 }
 
 .wrapper
 {
     margin-bottom: 20px;
     height: 768px;
-    padding: 0 20px; 
+    padding: 0 0px; 
     max-width: 984px;   
 }
 
@@ -190,7 +231,7 @@ footer
     background: linear-gradient(top, #fff 0%, #ccc 100%); /* W3C */    
     height: 50px;
     position: absolute;
-    bottom: -1px; left: 0;
+    bottom: 0px; left: 0;
     width: 100%;
 	border-top: 2px solid #222;
 	border-bottom: 2px solid #222
@@ -283,46 +324,16 @@ footer li a.active
 
 /* type ------------------------------ */
 
-h1.leader {
-background: #2a3e83;
-border-top: 2px solid #222;
-border-bottom: 2px solid #222;
-font-family: Arial;
-font-size: 30px;
-height: auto;
-line-height: 1em;
-padding: 20px 10px 10px;
-text-align: left;
-text-shadow: 1px 1px 2px #002c30;
-width: 100%;
-color: #FFFFFF;
-margin-bottom: 0
+div#subheader {
+    background: #F4F4F4;
+    border-bottom: solid 1px black;
+    overflow: auto;
 }
 
-h1.subleader {
-color: #222;
-background: #FFFFFF;
-text-shadow: none;
-border-top: 0;
-font-size: 26px
-}
-
-h1
+div#subheader h1
 {   
-    /*color: #fff;
-    font-size: 24px;
-    font-weight: bold;
-    height: 40px;*/
-    /*padding: 20px 20px 0;
-    background-color: #00A4B5;*/
-    background: #2a3e83;
-    color: #ffffff;
-    font-family: 'PTSansBoldItalic', sans-serif;
-    font-size: 24px;
-    font-weight: normal;    
-    letter-spacing: 0.03em;
-    line-height: 1.2em;
-    margin: 0 0 20px -20px;    
+    font-size: 22px;
+    color: black;
     padding: 10px 20px 5px;
 }
 
@@ -367,7 +378,7 @@ a.button, input[type="submit"], input[type="button"]
     background: -webkit-linear-gradient(top, #1ac6d7 0%, #2192aa 100%);
     background: linear-gradient(top, #1ac6d7 0%, #2192aa 100%);*/
 	background: #5391cd;
-	border: 1px solid #222;
+	border: 1px solid #444444;
     -webkit-border-radius: 10px; border-radius: 10px;
     color: #fff;
     cursor: pointer;
@@ -395,6 +406,7 @@ a.button, input[type="submit"], input[type="button"]
         -webkit-box-shadow: inset 0px 0px 15px 0px rgba(227, 245, 139, .8); box-shadow: inset 0px 0px 15px 0px rgba(227, 245, 139, .8);    
         color: #262627;   
         text-shadow: #f0f7cb 0px 1px 0;
+        margin-left: 50px !important;
     }
 
         a#btnAddDefect:hover, a#btnStep3AddAnotherIssue:hover
@@ -437,7 +449,7 @@ a.button.warning:hover, a.button.alert:hover
 
 
 
-a#btnCreateUser
+a#btnCreateUser, a#backtoLog
 {
 /*    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#e3f58b), color-stop(100%,#c7dc59));
     background: -webkit-linear-gradient(top, #e3f58b 0%, #c7dc59 100%);
@@ -451,10 +463,17 @@ a#btnCreateUser
 	text-shadow: none;
 	text-transform: none;
 	font-size: 18px;
-	position: relative;
-	left: 41px
 }
 
+/*a#btnCreateUser:hover
+{
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#e3f58b), color-stop(100%,#7bcd24)); /* Chrome,Safari4+
+    background: -webkit-linear-gradient(top, #e3f58b 0%, #7bcd24 100%); /* Chrome10+,Safari5.1+
+    background: linear-gradient(top, #e3f58b 0%, #7bcd24 100%); /* W3C
+    -webkit-box-shadow: inset 0px 0px 15px 0px rgba(227, 245, 139, .9); box-shadow: inset 0px 0px 15px 0px rgba(227, 245, 139, .9); 
+    text-shadow: #f0f7cb 0px -1px 0;        
+}
+*/
 .button.right+.button.right
 {
     margin-right: 5px;
@@ -519,6 +538,22 @@ input[type="text"], input[type="password"], input[type="email"], input[type="num
     width: 390px;
 }
 
+select
+{
+    background: #f7f7f7;
+    border: 1px solid #bbbbbb;   
+    border-radius: 0px;
+    font-size: 16px; 
+    margin: 5px 0 20px;
+    padding: 9px;
+    width: 390px;
+}
+
+#rateScrollWrapper select
+{
+    width: 100px;
+}
+
 input#inspection_no
 {
     color: gray;
@@ -533,10 +568,6 @@ textarea
     padding: 9px;
 }
 
-#frmInspectionDetails #notes
-{
-	width: 640px;
-}
 
 #inspection #btnDeleteInspection
 {
@@ -735,69 +766,21 @@ aside textarea
     padding: 0;
 }
 
-
-#frmInspectionDetails
-{
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#e0e0e0), color-stop(100%,#d9d9d9)); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(top, #e0e0e0 0%, #d9d9d9 100%); /* Chrome10+,Safari5.1+ */
-    background: linear-gradient(top, #e0e0e0 0%, #d9d9d9 100%); /* W3C */    
-    -webkit-border-radius: 10px; border-radius: 10px; 
-    margin: 0 0 30px;
-    padding: 30px 50px 15px 30px;
-}
-
-#frmInspectionDetails label, .twocolumn label
+.twocolumn label
 {
     margin: 0;
-    padding: 5px 10px 0 50px;
     white-space: nowrap;
-    float: right;
 }
 
-#frmInspectionDetails td:first-child label, .twocolumn td:first-child label
+.twocolumn td:first-child label
 {
     padding-left: 0;
-}
-
-#frmInspectionDetails input[type="text"]
-{
-    margin: 0 0 5px;
-    width: 90%;
 }
 
 .gldp-flatwhite {
     margin-top: -10px;    
 }
 
-#frmInspectionDetails #inspection_date
-{
-    width: 75%;
-}
-
-#frmInspectionDetails input[type="text"].long, .twocolumn input[type="text"]
-{
-    width: 250px;
-}
-
-#frmInspectionDetails #inspection_date{
-    height: 0px;
-    margin-top: 10px;
-    background: none;
-    border: none;
-}
-    #frmInspectionDetails #inspection_date:focus{
-        background: none;
-        border: none;
-        -webkit-box-shadow: none;
-        box-shadow: none;
-        outline: none;
-    }
-
-
-#frmDefectDetails textarea{
-    width: 90%;
-    height: 100px;
-}
 
 #creatingInspectionStep1{
     text-align: right;
@@ -828,44 +811,171 @@ aside textarea
     padding: 2px 5px;
 }
     
-#btnAddDefect, a.btnEditNotes, #btnStep3AddAnotherIssue{
+#btnAddDefect, a.btnEditNotes, #btnStep3Email, #btnReportPhotos, #btnStep4Email {
     margin-left: 10px;
+    top: 20px;
 }
 
+#btnStep4Back {
+    top: 10px;    
+}
+
+#btnStep3AddAnotherIssue{
+    margin-left: 50px;
+}
 .inspectionDetails tr td{
-    padding-bottom: 10px;
+    vertical-align: middle;
 }
-    .inspectionDetails tr td:first-child{
-        vertical-align: top;
-    }
-
 
 .inspectionDetails.panel{
     background: none;
-}
-
-.inspectionDetails ul.selector{
-    width: 90%;
-    margin-right: 10px;
 }
 
 .inspectionDetails #breadcrumbs{
     height: 40px;
     font-size: 21px;
 }
+#inspectionStep2 textarea {
+    width: 252px;
+    height: 150px;
+}
 #inspectionStep3 #breadcrumbs{
     width: 70%;
     float: left;
 }
-    .inspectionDetails #breadcrumbs a{
-        text-decoration: none;
-        font-family: 'PTSansBold', sans-serif;
-        color: #222;
-    }
-    
+#inspectionStep3 #tblDefectListing span.arrow{
+    float: right;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    padding-right: 10px;
+    z-index: 9999;
+}
+#inspectionStep3 #tblDefectListing span.seq_no{
+    float: left;
+}
+#inspectionStep3 #tblDefectListing a.edit_issue_btn{
+    float: left;
+    margin-left:10px;
+    text-decoration:none;
+    color:#FFF;
+    background:#5391CD;
+    padding:0 10px;
+    font-size:.9em;
+    border-radius:10px;
+    -webkit-border-radius:10px;
+}
+#inspectionStep3 #tblDefectListing .arrow.up{
+    background: url('../images/arrow-up.png') top left no-repeat;
+}
+#inspectionStep3 #tblDefectListing .arrow.down{
+    background: url('../images/arrow-down.png') top left no-repeat;
+}
+
+/* Inspection list*/
+#inspectionList #builder_id {
+    margin-left: 10px;
+	margin-bottom: 15px;
+    width: 250px;
+}
+#inspectionList .bottomBtns {
+    padding-left: 40px;
+    padding-bottom: 20px;
+}
+#inspectionList #tblInspectionListing div.i-passed {
+    width: 120px;
+    margin-top: 10px;
+    height: 48px;
+    position: relative;
+    display: inline-block;
+}
+#inspectionList #tblInspectionListing div.i-passed a {
+    text-decoration: none;
+    width: 48px;
+    height: 50px;
+    left: 25px;
+    float: right;
+    margin-top: -5px;
+}
+#inspectionList a.status-passed{
+    background: url('../images/passed.png') bottom left no-repeat;
+    width: 48px;
+    height: 50px;
+}
+
+#inspectionList a.status-failed{
+    background: url('../images/failed.png') bottom left no-repeat;
+    width: 48px;
+    height: 50px;
+}
+#inspectionList .selector {
+    margin-left: 300px;
+}
+#inspectionList div.action {
+    position: relative;
+    width: 200px;
+    height: 48px;
+    line-height: 48px;
+}
+#inspectionList div.action > a.action, #inspectionList #historyReinspection a.action {
+    width: 80px;
+    height: 48px;
+    color: white;
+    display: block;
+    float: left;
+    text-decoration: none;
+    border-radius: 10px;
+    vertical-align: middle;
+    text-align: center;
+    margin-right: 10px;
+}
+
+#historyReinspection h2 {
+    color: #333333;
+    font-size: 14pt;
+    padding: 10px;
+}
+
+#historyReinspection td, #historyReinspection th {
+    vertical-align: middle;
+    text-align: center;
+}
+
+#inspectionList .action.reinspect {
+    background: green;
+}
+
+#inspectionList .action.view{
+    background: blue;
+}
+#inspectionList .bottomBtns a{
+    text-decoration: none;
+    position: absolute;
+}
+#inspectionList .bottomBtns .btnContainer{
+    width: 80px;
+    margin: 0 10px 10px 10px;
+    height: 80px;
+    position: relative;
+}
+#inspectionList .bottomBtns .btnContainer span{
+    font-size: 14px;
+    font-family: 'PTSansBold', sans-serif; 
+    position: absolute;
+        bottom: 0px;
+    text-align: center;
+    text-transform: uppercase;
+}
+/*End Inspection list*/
+.inspectionDetails #breadcrumbs a{
+    text-decoration: none;
+    font-family: 'PTSansBold', sans-serif;
+    color: #222;
+}
+
 .inspectionDetails #searchItemsContainer{
     float: right;
-    width: 250px;
+    width: 223px;
 }
     .inspectionDetails #searchItemsContainer #keywords{
         font-size: 14px;
@@ -874,15 +984,20 @@ aside textarea
     }
 
 .inspectionDetails .bottomBtns {
-    position: relative;  
-    margin-top: 10px;  
+    width: 100%;
+    position: absolute;
+    bottom: 40px;
 }
     
     .inspectionDetails .bottomBtns a{
         text-decoration: none;
         position: absolute;
     }
-
+    
+    .inspectionDetails .bottomBtns a.button{
+        position: relative;
+    }
+    
     .inspectionDetails .bottomBtns .btnContainer{
         width: 80px;
         margin: 10px;
@@ -913,6 +1028,12 @@ aside textarea
 
 .inspectionDetails .bottomBtns .preview{
     background: url('../images/preview.png') top center no-repeat;
+    width: 44px;
+    height: 49px;
+    left: 5px;
+}
+.inspectionDetails .bottomBtns .weather{
+    background: url('../images/weather.png') top center no-repeat;
     width: 44px;
     height: 49px;
     left: 5px;
@@ -949,10 +1070,9 @@ aside textarea
     -webkit-border-radius: 10px; border-radius: 10px;
     -webkit-box-shadow: 0px 5px 5px 0px rgba(210, 210, 210, 0.3); box-shadow: 0px 5px 5px 0px rgba(210, 210, 210, 0.3);     
     width: 360px;
-    margin-left: -180px; 
     padding: 10px;
-    position: absolute;
-        bottom: 80px; left: 50%;
+    position: relative;
+    float: left;
 }
 
 .inspectionDetails .historySection{
@@ -970,53 +1090,106 @@ aside textarea
 }
 
     
-.inspectionDetails a.addSite, .inspectionDetails a.addClient, .inspectionDetails a.addPhoto{
+.inspectionDetails a.addSite, .inspectionDetails a.addClient{
     background: url("../images/icon_plus2.png") left 6px no-repeat;
     display: block;
     height: 35px;
     width: 28px;
     position: absolute;
 }
-
-.inspectionDetails a.addPhoto {
-    background: url("../images/camera.png") left top no-repeat;    
-    right: 10px;    
-    height: 50px;
-    width: 50px;
+#photoWrapper #addPhoto-wrapper{
+    height: 30px;
+    margin-top: 20px;
+}
+#photoWrapper #addPhoto-wrapper>a#addPhoto-btn{
+    background: url("../images/camera-75.png") top left no-repeat;
+    right: 0px;
+    width: 140px;
+    padding-left: 80px;
+    position: absolute;
+    height: 75px;
+    text-decoration: none;
+    color: black;
+    font-weight: bold;
+    font-size: 14pt;
+}
+#addPhotoFromGallery{
+    font-size: 14pt;
+    background: url("../images/ipad_tablet.png") top left no-repeat;
+    right: 20px;
+    background-size: 88px;
+    width: 115px;
+    padding-left: 88px;
+    position: absolute;
+    height: 100px;
+    text-decoration: none;
+    color: black;
+    font-weight: bold;
+    top: 135px;
+}
+.inspectionDetails a#btnCapturePhoto {
+    background: url("../images/camera-75.png") left top no-repeat;
+    right: 150px;
+    bottom: -10px;
+    height: 75px;
+    width: 75px;
+    position: absolute;
 }
 
 .inspectionDetails .plain{
     width: 100%;
 }
 
-.inspectionDetails #photoList{
+#photoWrapper #photoList{
     padding-top: 10px;
-    margin-left: -35px;
+    margin-left: 30px;
 }
-    .inspectionDetails #photoList p{
-        padding-left: 35px;
-    }
+#photoWrapper.reveal-modal{
+    width: 98%;
+    height: 86%;
+    padding: 0;
+    margin: 10px 20px;
+    left: 0;
+    top: 75px;
+}
+#photoWrapper #controlBtns
+{
+    bottom: 10px;
+}
+#photoWrapper #controlBtns #btnDone.close-reveal-modal
+{
+    position: relative;
+    width: 100px;
+    height: 20px;
+    color: white;
+    line-height: 20px;
+}
+#photoWrapper #photoList p{
+    padding-left: 35px;
+}
     
 .inspectionDetails #tblDefectListingHeader, .inspectionDetails #tblDefectListing{
     width: 950px;
 }
 
 .inspectionDetails #defectScrollWrapper{
-    margin-bottom: 15px;
     height: 247px;
+    overflow-x: hidden;
 }
 
 .inspectionDetails ul.gallery{
     height: 300px;
     overflow: auto;
+    width: 80%;
 }
     .inspectionDetails ul.gallery li{
         display: block;
-        float: none;
+        float: left;
         margin: 0;
         background: none;
-        width: 100%;
+        width: 135px;
         vertical-align: top;
+	cursor: pointer;
     }
     .inspectionDetails ul.gallery li .deletePhoto{
         height: 39px;
@@ -1029,7 +1202,19 @@ aside textarea
         float: left;
         padding-right: 10px;
     }
-    
+    .inspectionDetails .numImgCurr {
+        float:  right;
+        margin: -20px -15px 0 0;
+        background: rgb(8, 135, 252);
+        width: 35px;
+        height: 35px;
+        border-radius: 35px;
+        border: 1px solid black;
+        text-align: center;
+        color: white;
+        font: 20px bold;
+        line-height: 35px;
+    }
 #historyList{
     height: 500px;
     overflow: auto;
@@ -1128,7 +1313,7 @@ ul.historygallery{
 #controlBtns{
     position: absolute;
     left: 10px;
-    bottom: 10px;
+    bottom: 50px;
     width: 100%;
 }
 
@@ -1136,14 +1321,60 @@ ul.historygallery{
     width: 560px;
 }
 
-#inspectionStep4 aside{
-    width: 380px;
+#observationFS {
+    margin-top: 10px;
 }
+
+    #observationFS legend {
+        font-weight: bold;
+        margin: 0;
+        padding: 0;
+    }
+
+/* Reinspection */
+#reinspection {
+    padding: 20px;
+}
+#reinspection .infomation {
+    margin: 20px 0;
+    padding: 10px 0;
+    height: 60px;
+    background: #A9E2F3;
+}
+#reinspection .infomation p{
+    float: left;
+    padding: 10px;
+}
+/* #reinspection th, #reinspection td {
+    overflow: hidden;
+    padding: 10px 0 10px 10px!important;
+    white-space: nowrap;
+} */
+
+#reinspection #reinspectionScrollWrapper {
+    margin-bottom: 15px;
+    height: 200px;
+}
+#reinspection select#rectified {
+    vertical-align: middle;
+    text-align: center;
+    width: 20%;
+    float : right;
+    margin: 10px;
+}
+
+/* end reinspections */
 
 .twocolumn input[type="text"], .twocolumn input[type="password"]
 {
-    margin: 0 0 10px;
+    margin: 5px 0;
     width: 200px;
+}
+
+.twocolumn select
+{
+    margin: 0 0 10px;
+    width: 218px;
 }
 
 #create_user_screen fieldset
@@ -1257,14 +1488,14 @@ table.listing
 
 .listing th, .listing th a
 {   
-    background: #222222;
-    color: #fff;
+    background: #fff;
+    color: #000;
     font-family: Arial, Helvetica, sans-serif;
 	font-weight: bold;
     font-size: 15px;
     line-height: 1em;
-    text-shadow: 1px 1px 2px #002c30; 
-    font-weight: normal;
+    text-shadow: none; 
+    font-weight: bold;
     text-decoration: none;     
 }
 
@@ -1491,7 +1722,7 @@ a#forgotpass {color: #80b1df; font-weight: bold; text-transform: none}
 
 #btnCreateUser, #backtoLog {margin-top: 20px}
 
-fieldset.thefs {padding: 20px; border: 1px solid #222; min-width: 515px; float: left}
+fieldset.thefs {padding: 0px 20px; min-width: 425px; float: left}
 legend.theleg {font-weight: bold}
 
 #previousLogins {padding-top: 20px; padding-right: 10px; width: 180px}
@@ -1500,7 +1731,6 @@ legend.theleg {font-weight: bold}
 #frm {float: left; width: 515px}
 #frm fieldset.thefs {min-width: 475px !important}
 #logo {float: left; margin-left: 60px !important; margin-top: 10px !important; width: 440px}
-#btnStep1Next {position: relative; top: -40px}
 
 #popSelector h1 {background: #222 !important}
 #popSelector #btnPopSelectorSearch, #popSelector #btnPopSelectorAdd {height: 35px !important}
@@ -1512,13 +1742,33 @@ legend.theleg {font-weight: bold}
 #create_user_screen #btnBack {float: left; margin-top: 120px; 	background: #cbcccc;border: 1px solid #222; color: #262627;min-width: 120px;padding: 15px 20px;text-shadow: none;text-transform: none;font-size: 18px; margin-left: 30px}
 
 
-td.view {border: 1px solid #000; border-bottom: 0; border-top: 0}
-.listing tr:last-child td {border-bottom: 1px solid #000}
-#tblBuilderListingHeader th {border: 1px solid #000; background: #eee}
-#btnAddBuilder {float: left; margin-left: 45px; padding: 10px 15px}
+
+tr:last-child td {border-bottom: 1px solid #000}
+table th, td {
+    border: 1px solid #000; 
+    background: #eee; 
+    overflow: hidden;
+    padding: 10px!important;
+    /*white-space: nowrap;*/
+    text-overflow: ellipsis;
+}
+
+#inspection table td, #inspection td ,#inspectionStep2 table th, #inspectionStep2 td
+{
+    border: none; 
+    background: transparent;   
+}
+
+#inspectionStep2 table#observation_suggestion td
+{ 
+	border: 1px solid #000 !important;
+}
+
+table td {border-bottom: 0; border-top: 0}
+#btnAddBuilder {float: left; margin-left: 50px; padding: 10px 15px}
 
 #builderDetails label {float: none; display: block; padding: 0}
-#builderDetails fieldset {min-width: 300px !important; height: 300px; margin-right: 30px}
+#builderDetails fieldset {min-width: 300px !important; height: 350px; margin-right: 30px; border: 1px solid #222;}
 
 #forgotpass_screen {max-width: 100%; height: 100%; }
 #frmForgetPass {padding-top: 30px; padding-left: 10px}
@@ -1529,3 +1779,101 @@ td.view {border: 1px solid #000; border-bottom: 0; border-top: 0}
 #frmForgetPass #logo {margin-left: 75px !important}
 
 footer span {float: right; margin: 15px; font-weight: bold}
+
+form.search input[type="text"] {
+    width: 250px;
+}
+
+a.yesno_enabled
+{
+    background: #5391cd;
+    border: 1px solid #444444;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    color: #fff;
+    cursor: pointer;
+    display: block;
+    font-family: 'PTSansBold', sans-serif;
+    font-size: 18px;
+    font-weight: normal;
+    line-height: 1em;
+    margin: 0 0 0px;
+    padding: 10px 60px;
+    text-align: center;
+    text-decoration: none;
+    text-shadow: #007b87 0px 1px 0;
+    text-transform: none;
+}
+
+a.yesno_enabled:hover {
+    background: #4072A3;
+}
+
+a.yesno_disabled
+{
+    background: #B6B6B6;
+    border: 1px solid #444444;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    color: #000;
+    cursor: pointer;
+    display: block;
+    font-family: 'PTSansBold', sans-serif;
+    font-size: 18px;
+    font-weight: normal;
+    line-height: 1em;
+    margin: 0 0 0px;
+    padding: 10px 60px;
+    text-align: center;
+    text-decoration: none;
+    text-shadow: #FFFFFF 0px 1px 0;
+    text-transform: none;
+}
+
+a.yesno_disabled:hover {
+    background: #9B9B9B;
+}
+
+.inspectionDetails .bottomBtns .email {
+    background: url('../images/mail.png') top center no-repeat;
+    width: 75px;
+    height: 49px;
+    left: 5px;
+}
+
+#btnStep3Email, #btnEditNotes { top: 0; }
+#btnStep3Email span { left: 20px; }
+#btnEditNotes span { left: 10px; }
+
+.inspectionDetails .bottomBtns .btnEditNotes a.btnNotes {
+    background: url('../images/notes.png') top center no-repeat;
+    width: 50px;
+    height: 45px;
+    left: 5px;
+    top: 0;
+    background-size: auto 100%;
+}
+
+.inspectionDetails .bottomBtns a.btnReinspect {
+    background: url('../images/icon-reinspect-sm.png') top center no-repeat;
+    width: 50px;
+    height: 45px;
+    left: 5px;
+    top: 0;
+    background-size: auto 100%;
+}
+
+.inspectionDetails .bottomBtns a.btnViewChart {
+    background: url('../images/chart-icon.png') top center no-repeat;
+    width: 48px;
+    height: 48px;
+    left: 5px;
+    top: 0;
+    background-size: auto 100%;
+}
+
+.inspectionDetails .btnViewChart span{margin-left: 5px;}
+#frmEmailTo ul.select2-selection__rendered{margin-top: 5px;}
+#frmEmailTo ul.select2-selection__rendered li{margin: 5px 5px 5px 0;padding: 0 5px 0 5px;float: left;clear: none;}
+#frmEmailTo .select2-selection--multiple{border-color:#bbbbbb;}
+#frmEmailTo .select2-container{min-width: 800px;}

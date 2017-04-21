@@ -33,10 +33,7 @@ var Builders = function()
 		objApp.setNavActive("#navBuilders");
 
 		// Show the inspectionListing screen
-		$("#buildersList").removeClass("hidden");  	
-        
-        $("form.search input").val("");
-        $("form.search").show();
+		$("#buildersList").removeClass("hidden");
 
 		// Initialise filters
 		objFilters.filterScreen = "builders";
@@ -72,10 +69,9 @@ var Builders = function()
 			self.setupAddNewBuilder();
 			return false;
 		});
+
         
-        $("form.search").unbind();
-        
-        $("form.search input").keyup(function() {
+        $("#doSearch").click(function() {
             self.doBuilderSearch();    
         });
 	}
@@ -114,7 +110,7 @@ var Builders = function()
 		// If the user has entered a value into the Name filter,
 		// use that to match against the builder name or contact names.
 	    //var searchText = objFilters.name;  
-        var searchText = $("form.search input").val();
+        var searchText = $("#builderSearch").val();
 		
 		var sql = "SELECT * FROM builders WHERE deleted = 0 ";
 			
@@ -396,6 +392,8 @@ var Builders = function()
 		
 		// Set the main heading
 		objApp.setHeading("Builder Details");
+
+        objApp.setSubHeading('', false);
 		
 		// Set the builders nav option to be active.
 		objApp.setNavActive("#navBuilders");
@@ -439,7 +437,10 @@ var Builders = function()
 	{
 		if(self.objPopState == null)
 		{
-			self.objPopState = new popselector("#builderDetails #state", "Choose a state");
+			//self.objPopState = new popselector("#builderDetails #state", "Choose a state");
+			$("#builderDetails #state").select2({
+                minimumResultsForSearch: -1
+            });
 		}
 		
 		if(self.objPopCountry == null)
@@ -455,7 +456,9 @@ var Builders = function()
 		}
 		else
 		{
-			self.objPopState.preselect(builder.state); 
+            $("#builderDetails #state").val(builder.state);
+            $("#builderDetails #state").trigger('change');
+			//self.objPopState.preselect(builder.state);
 			self.objPopCountry.preselect(builder.country);										
 		}
 	}

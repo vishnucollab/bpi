@@ -52,6 +52,7 @@ function Sync()
         // Set the main heading
         objApp.setHeading("Data Sync");
         objApp.setSubHeading("Send & Receive Inspection Data");
+        objApp.setSubExtraHeading('', false);
         objApp.setNavActive("#navSync");
         
         // Show the sync screen.
@@ -67,17 +68,17 @@ function Sync()
 	this.bindEvents = function()
 	{
 		// Unbind submit button
-		$("#frmSync input[type='submit']").unbind();
+		$("#frmSync button[type='submit']").unbind();
 		
 		// User starts sync
-		$("#frmSync input[type='submit']").bind(objApp.touchEvent, function(e)
+		$("#frmSync button[type='submit']").bind(objApp.touchEvent, function(e)
 		{
 			e.preventDefault();
 			
 			objApp.objSync.startSync();
 		});
 
-        $("#frmSync input#smartSync").bind(objApp.touchEvent, function(e)
+        $("#frmSync button#smartSync").bind(objApp.touchEvent, function(e)
         {
             e.preventDefault();
             objApp.objSync.smartSync();

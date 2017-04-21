@@ -23,7 +23,7 @@ function App()
 	//this.apiURL = "http://projects.loc/blueprintapi/";
     //this.apiURL = "http://192.168.0.52/blueprint/api/";
 	this.phonegapBuild = true; 	// Set this to true when phonegap is the target
-	this.version = 1.29;				// Identifies the app version to the server
+	this.version = '2.0';				// Identifies the app version to the server
 	this.versionStatus = "Production";
 	this.localMode = false;
 	this.context = "";
@@ -331,9 +331,9 @@ function App()
         var orientation = this.getOrientation();
 
         if(orientation == "landscape") {
-            screenWidth = screen.height;
-        }  
-        
+            screenWidth = screen.width > screen.height?screen.width:screen.height;
+        }
+
         $("form.search").hide();      
         
         // Set main area height and scrollWrapper height
@@ -354,6 +354,7 @@ function App()
 		
         // Set widths of both, content area, heading and footer areas
         $("body").css("width", screenWidth + "px");
+
         $(".header").css("width", screenWidth + "px");
         $("footer").css("width", screenWidth + "px");
         $("#content").css("width", screenWidth + "px");
@@ -869,7 +870,7 @@ function App()
         if(objUtils.isMobileDevice()) {
             orientation = Math.abs(window.orientation) == 90 ? 'landscape' : 'portrait';        
         }
-        
+
         return orientation; 
     }
     
