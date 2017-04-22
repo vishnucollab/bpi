@@ -99,13 +99,11 @@ var Inspections = function()
 		// Set the main heading
         objApp.setHeading("Blueprint Inspections");
 		objApp.setSubHeading("Inspection Listing");
+        objApp.setSubExtraHeading('', false);
 		objApp.setNavActive("#navInspections");
 		
 		// Show the inspectionListing screen
-		$("#inspectionList").removeClass("hidden");  
-        
-        $("form.search input").val("");
-        $("form.search").show();      
+		$("#inspectionList").removeClass("hidden");
 
 	    // Initialise filters
 		objFilters.filterScreen = "inspections";
@@ -132,6 +130,9 @@ var Inspections = function()
 		objFilters.searchMethod = objApp.objInspection.doInspectionSearch;
 		
 	    //objFilters.show();
+
+        if (!$("#inspectionList #il_builder_id").hasClass('select2-hidden-accessible'))
+            $("#inspectionList #il_builder_id").select2();
 
 		// Do the client search
 		self.doInspectionSearch();
@@ -177,7 +178,7 @@ var Inspections = function()
 
 		var values = new Array();
         
-        var searchText = $("form.search input").val();
+        var searchText = $("#inspectionSearch").val();
         objFilters.builder_id = $("#inspectionList #il_builder_id").val(); 
           
         if(searchText != "")
@@ -189,6 +190,7 @@ var Inspections = function()
                             "OR (i.lot_no LIKE '%" + searchText + "%') " +
                             "OR (i.postcode LIKE '%" + searchText + "%') " +
                             "OR (i.inspection_date LIKE '%" + searchText + "%') " +
+                            "OR (b.name LIKE '%" + searchText + "%') " +
                             ") ";                
         }        
 		
@@ -249,9 +251,8 @@ var Inspections = function()
 				var num_defects = 0;
 			    var row = items.rows.item(r);
 			    var inspDate = objApp.isoDateStrToDate(row.inspection_date);
-			    html += '<tr rel="' + row.id + '">';	
-                html += '<td class="delete"></td>';
-			    html += '<td>'
+			    html += '<tr rel="' + row.id + '">';
+			    html += '<td class="view">'
                 
                 html += '<span class="icon';
 			    
@@ -262,10 +263,10 @@ var Inspections = function()
 			    html += '"></span>';
 			
 			    html += objApp.formatUserDate(inspDate) + '</td>';  
-			    html += '<td>' + row.lot_no + ' ' + row.address + ' ' + row.suburb + '</td>';
-			    html += '<td>' + row.name + '</td>';
-			    html += '<td>' + row.report_type + '</td>';
-                html += '<td>' + row.num_reinspections + '</td>';
+			    html += '<td class="view">' + row.lot_no + ' ' + row.address + ' ' + row.suburb + '</td>';
+			    html += '<td class="view">' + row.name + '</td>';
+			    html += '<td class="view">' + row.report_type + '</td>';
+                html += '<td class="view">' + row.num_reinspections + '</td>';
                 
                 
                 /*
@@ -279,11 +280,11 @@ var Inspections = function()
                 html += '<td><div class="action">';
                 
                 // Always have the view action
-                if(row.num_reinspections == 0) {
-                    html += '<a href="#" class="action view" data-id="' + row.id + '">View</a>';
-                } else {
-                    html += '<a href="#" data-reveal-id="historyReinspection" class="action view showhistory" data-id="' + row.id + '">View</a>';
+                if(row.num_reinspections > 0) {
+                    html += '<a href="#" data-reveal-id="historyReinspection" class="action view showhistory" data-id="' + row.id + '">History</a>';
                 }
+
+                html += '<a href="#" class="action delete" data-id="' + row.id + '">Delete</a>';
                 
                 // If the inspection is finalised but failed, the user may reinspect it.
                 /*
@@ -346,9 +347,40 @@ var Inspections = function()
 
                     self.doInspectionSearch();
                 }
-                    
             });
-            
+
+            // Bind click/touch event to buttons in the listing.
+            $("#tblInspectionListing tr td.view").bind("click", function(e)
+            {
+                e.preventDefault();
+
+                var inspection_id = $(this).parent().attr('rel');
+                var num_reinspections = $(this).attr("data-reinspections");
+
+                // The view button may require the user to select from the inspection history window.
+                if($(this).hasClass("showhistory")) {
+                    self.loadHistoryReinspectionItems(inspection_id);
+                    return;
+                }
+
+                // Show the loading indicator
+                blockElement("#tblInspectionListing");
+
+                // Load the inspection in question
+                objDBUtils.loadRecord("inspections", inspection_id, function(inspection_id, row)
+                {
+                    unblockElement("#tblInspectionListing");
+
+                    if(!row) {
+                        alert("Sorry, the inspection could not be loaded.  Please report this error.");
+                        return;
+                    }
+
+                    objApp.objInspection.editInspection(row);
+
+                }, inspection_id);
+            });
+
             // Handle the event when the user clicks on the VIEW button.
             $("#tblInspectionListing a.view").click(function(e)  {
                 e.preventDefault();
@@ -544,7 +576,7 @@ var Inspections = function()
         var screenWidth = screen.width;
         
         if(orientation == "landscape") {
-            screenWidth = screen.height;
+            screenWidth = screen.width > screen.height?screen.width:screen.height;
         }
         
         var tableWidth = screenWidth - 50;
@@ -563,24 +595,22 @@ var Inspections = function()
         var average_width = Math.floor(tableWidth / 6);
         average_width = average_width - 22;  // Take into account 10px padding left and right, 10 + 10 = 20, plus 1px border left and right
         
-        var width_col1 = average_width - 60; 
+        var width_col1 = average_width - 50;
         var width_col2 = average_width + 60;
         
-        $(tableHeader).find("th:eq(0)").css("width", "30px");    // Delete icon column
-        $(tableHeader).find("th:eq(1)").css("width", width_col1 + "px");  
-        $(tableHeader).find("th:eq(2)").css("width", width_col2 + "px");
+        $(tableHeader).find("th:eq(0)").css("width", width_col1);    // Delete icon column
+        $(tableHeader).find("th:eq(1)").css("width", width_col2 + "px");
+        $(tableHeader).find("th:eq(2)").css("width", average_width + "px");
         $(tableHeader).find("th:eq(3)").css("width", average_width + "px"); 
-        $(tableHeader).find("th:eq(4)").css("width", (average_width - 20) + "px");
-        $(tableHeader).find("th:eq(5)").css("width", (average_width - 20) + "px");
-        $(tableHeader).find("th:eq(6)").css("width", (average_width + 40) + "px");
+        $(tableHeader).find("th:eq(4)").css("width", (average_width - 60) + "px");
+        $(tableHeader).find("th:eq(5)").css("width", (average_width + 40) + "px");
         
-        $(tableBody).find("tr td:eq(0)").css("width", "30px");  
-        $(tableBody).find("tr td:eq(1)").css("width", width_col1 + "px");  
-        $(tableBody).find("tr td:eq(2)").css("width", width_col2 + "px");
+        $(tableBody).find("tr td:eq(0)").css("width", width_col1);
+        $(tableBody).find("tr td:eq(1)").css("width", width_col2 + "px");
+        $(tableBody).find("tr td:eq(2)").css("width", average_width + "px");
         $(tableBody).find("tr td:eq(3)").css("width", average_width + "px");                  
-        $(tableBody).find("tr td:eq(4)").css("width", (average_width - 20) + "px");
-        $(tableBody).find("tr td:eq(5)").css("width", (average_width - 20) + "px");
-        $(tableBody).find("tr td:eq(6)").css("width", (average_width + 40) + "px");
+        $(tableBody).find("tr td:eq(4)").css("width", (average_width - 60) + "px");
+        $(tableBody).find("tr td:eq(5)").css("width", (average_width + 40) + "px");
     }    
     
     /* new version section */
@@ -1763,7 +1793,7 @@ var Inspections = function()
         $(".report_type_options").unbind();
         $('#frmDefectDetails #observation').unbind();
         $("#inspectionList #btnAddInspection").unbind();
-        $("form.search input").unbind();
+
         $("select[name='builder_id']").unbind();
         
         setTimeout(function() {
@@ -1796,8 +1826,7 @@ var Inspections = function()
             self.resolveEmailReportRecipients();
         });
         
-        $("form.search").unbind();
-        
+
         $('#inspectionList .btnContainer a#passed').click(function() {
             if (!$(this).hasClass("active"))
             {
@@ -1816,21 +1845,10 @@ var Inspections = function()
             } 
         });
         
-        $("form.search input").keyup(function() {
-            
-            self.lastKeyPress = new Date();
-            
-            setTimeout(function() {
-                
-                var now = new Date();
-                var diff = now - self.lastKeyPress;
-                 
-                if((diff > 1500) && (!self.doingSearch)) {   
-                    self.lastKeyPress = new Date();
-                    self.doInspectionSearch();
-                };                      
-            }, 2000);            
+        $("#doInspectionSearch").click(function() {
+            self.doInspectionSearch();
         });
+
         
         $("#inspectionList #il_builder_id").change(function(){
             self.doInspectionSearch();
@@ -3197,7 +3215,7 @@ var Inspections = function()
                 var screenWidth = screen.width;
 
                 if(orientation == "landscape") {
-                    screenWidth = screen.height;
+                    screenWidth = screen.width > screen.height?screen.width:screen.height;
                 }
 
                 var tableWidth = screenWidth - 50;
@@ -5352,7 +5370,7 @@ var Inspections = function()
         }
 
         if(orientation == "landscape") {
-            screenWidth = screen.height;
+            screenWidth = screen.width > screen.height?screen.width:screen.height;
         }
 
         var tableWidth = screenWidth - 50;
@@ -5380,7 +5398,7 @@ var Inspections = function()
                 {
                     if(i == 0)
                     {
-                        $(tableHeader).find("th:eq("+i+")").css("width", 30 + "px");
+                        //$(tableHeader).find("th:eq("+i+")").css("width", 30 + "px");
                         $(tableBody).find("tr td:eq("+i+")").css("width", 30 + "px");
                     }
                 }

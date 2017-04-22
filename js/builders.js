@@ -30,6 +30,7 @@ var Builders = function()
 		// Set the main heading
 		objApp.setHeading("Blueprint Inspections");
 		objApp.setSubHeading("Builder Listing");
+		objApp.setSubExtraHeading('', false);
 		objApp.setNavActive("#navBuilders");
 
 		// Show the inspectionListing screen
@@ -93,7 +94,7 @@ var Builders = function()
 		$("#tblBuilderListingHeader tr").unbind();
 		
 		// Inject the triangle
-		//$("#tblBuilderListingHeader th[class='" + self.sortBy + "']").append('<span class="triangle ' + self.sortDir + '"></span>');		
+		$("#tblBuilderListingHeader th[class='" + self.sortBy + "']").append('<span class="triangle ' + self.sortDir + '"></span>');
         
         // Remove previously bound events
         $("#builderScrollWrapper").unbind();
@@ -162,9 +163,8 @@ var Builders = function()
 				
 			    // Derive the location of the builder.
 			    var location = row.address +", "+ row.city +", "+ row.state; 
-			    html += '<tr rel="' + row.id + '">';			
-			    html += '<td class="delete" rel="' + row.id + '"></td>';
-			    html += '<td class="view" rel="' + row.id + '">' + row.name + '</td>';
+			    html += '<tr rel="' + row.id + '">';
+			    html += '<td class="view" rel="' + row.id + '"><div rel="' + row.id + '" class="delete"></div>' + row.name + '</td>';
 			    html += '<td class="view" rel="' + row.id + '">' + location + '</td>';
 			    html += '<td class="view" rel="' + row.id + '">' + row.phone + '</td>';
 			    html += '</tr>';
@@ -281,7 +281,7 @@ var Builders = function()
         var screenWidth = screen.width;
         
         if(orientation == "landscape") {
-            screenWidth = screen.height;
+            screenWidth = screen.width > screen.height?screen.width:screen.height;
         }
         
         var tableWidth = screenWidth - 50;
@@ -324,8 +324,6 @@ var Builders = function()
 			objApp.objLogin.logout();
 			return;
 		}
-        
-        //$("form.search input").hide();
 		
 		// Hide the filters panel
 		objFilters.hide();		

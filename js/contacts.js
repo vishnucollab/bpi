@@ -247,7 +247,7 @@ var Contacts = function()
         var screenWidth = screen.width;
         
         if(orientation == "landscape") {
-            screenWidth = screen.height;
+            screenWidth = screen.width > screen.height?screen.width:screen.height;
         }
         
         var tableWidth = screenWidth - 50;

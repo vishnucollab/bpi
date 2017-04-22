@@ -101,7 +101,7 @@ body > div:focus {outline: none;}
     height: 70px;
     text-align: center;
     background: #009fe3;
-    margin-bottom: 60px;
+    margin-bottom: 40px;
 }
 #header .left{float: none;}
 #header h1{
@@ -178,8 +178,21 @@ aside
     padding: 0;
 }
 .btn-bg-w100{
-    background: url('../images/btn-bg-h51.png') bottom right;
-    width: 100px;
+     background: url('../images/btn-bg-h51.png') bottom right;
+     width: 100px;
+     height: 51px;
+     font-size: 21px;
+     font-family: 'SourceSansPro-SemiBold', sans-serif;
+     font-weight: normal;
+     color: #fff;
+     text-transform: uppercase;
+     border: none;
+     border-radius: 0;
+     padding: 0;
+ }
+.btn-green-bg-51x81{
+    background: url('../images/btn-green-bg-51x81.png') bottom right;
+    width: 81px;
     height: 51px;
     font-size: 21px;
     font-family: 'SourceSansPro-SemiBold', sans-serif;
@@ -279,7 +292,6 @@ aside
 
 /* Start builders */
 #buildersList{
-    max-width: 750px;
     position: relative;
     margin: 0 auto;
 }
@@ -314,10 +326,19 @@ aside
     font-family: 'SourceSansPro-SemiBold', sans-serif;
     font-size: 22px;
 }
-#tblBuilderListingHeader th:nth-child(2){
+
+#tblBuilderListingHeader th .triangle, #tblBuilderListingHeader th .triangle.DESC{
+    background-image: url('../images/triangle3.png');
+}
+
+#tblBuilderListingHeader th:nth-child(1){
     background: #5c5756;
     color: #fff;
     border-bottom-color: #fff;
+}
+
+#tblBuilderListingHeader th:nth-child(1) .triangle, #tblBuilderListingHeader th:nth-child(1) .triangle.DESC{
+    background-image: url('../images/triangle2.png');
 }
 
 #builderScrollWrapper td{
@@ -326,13 +347,83 @@ aside
     background: none;
     font-size: 21px;
 }
-#builderScrollWrapper td:nth-child(4n + 2){
+#builderScrollWrapper td:nth-child(4n + 1){
     background: #5c5756;
     color: #fff;
     border-top-color: #fff;
     border-bottom-color: #fff;
 }
+
+#builderScrollWrapper td div.delete
+{
+    width: 30px;
+    height: 30px;
+    border: none !important;
+    background: transparent url('../images/icon_delete.png') no-repeat !important;
+    display: inline-block;
+    cursor: pointer !important;
+    float: left;
+    margin-right: 10px;
+}
+
+#builderScrollWrapper tr td.view{
+    cursor: pointer;
+}
+
 /* End builders */
+
+/* Start inspections */
+#inspectionSearchContainer{
+    float: right;
+    position: relative;
+}
+#inspectionSearchContainer .search-icon{
+    position: absolute;
+    left: 8px;
+    top: 8px;
+}
+#inspectionSearch{
+    display: inline;
+    height: 51px;
+    margin: 0;
+    box-sizing: border-box;
+    border: 1px solid #babbbd;
+    padding-left: 50px;
+
+}
+#inspectionSearch:focus{
+    box-shadow: none;
+}
+#doInspectionSearch{
+    float: right;
+}
+
+#tblInspectionListingHeader th{
+    background: #5c5756;
+    color: #fff;
+    border-right-color: #fff;
+    font-family: 'SourceSansPro-SemiBold', sans-serif;
+    font-size: 20px;
+}
+
+#tblInspectionListing td{
+    color: #5c5756;
+    border: 1px solid #5c5756;
+    background: none;
+    font-size: 18px;
+}
+
+#tblInspectionListing tr td.view{
+    cursor: pointer;
+}
+
+#inspectionList .searchByBuilder{margin-bottom: 20px;display: inline-block;margin-top: -5px;}
+
+.searchByBuilder .select2-container{margin-top: -5px;}
+.searchByBuilder .select2-container--default .select2-selection--single{height: 51px;}
+.searchByBuilder .select2-container--default .select2-selection--single .select2-selection__rendered{line-height: 51px;}
+
+/* End inspections */
 
 .twocolumn .select2-container{
     width: 380px !important;
@@ -353,7 +444,19 @@ aside
 .select2-container--default .select2-selection--single .select2-selection__arrow b{
     border-width: 10px 8px 0 8px;
     margin-left: -12px;
-    margin-top: -12px;
+    margin-top: -14px;
+    font-size: 21px;
+}
+
+.select2-search--dropdown .select2-search__field{
+    padding: 10px;
+    font-size: 21px;
+    color: #5c5756;
+}
+
+div#subheader .right h1{
+    margin-right: 10px !important;
+    font-size: 21px;
 }
 /* End simb-dev3 */
 
@@ -1134,7 +1237,14 @@ aside textarea
 }
 
 #inspectionList .action.view{
-    background: blue;
+     background: url('../images/btn-bg-w81.png');
+     width: 81px;
+     height: 48px;
+ }
+#inspectionList .action.delete{
+    background: url('../images/btn-red-bg-w81.png');
+    width: 81px;
+    height: 48px;
 }
 #inspectionList .bottomBtns a{
     text-decoration: none;

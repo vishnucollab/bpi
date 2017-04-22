@@ -196,6 +196,7 @@
         });
     </script>
     <link rel="stylesheet" href="../../BitBucket/minim-v2/public/css/style.css">
+    <link rel="stylesheet" href="../../1my_team/batdongsan247/wp-content/themes/fullestate/css/style.css">
     <!--
     <link rel="stylesheet" href="css/main1366x768.css">
     -->
@@ -845,22 +846,25 @@
 
         <!-- inspection listing screen -->
         <div id="inspectionList" class="hidden panel">
-            <div class="bottomBtns bottomPadding">
-                Builder:
+            <button id="addInspection" type="button" class="btn-green-bg-51x81">Add</button>
+            <div class="searchByBuilder">
                 <select name="builder_id" id="il_builder_id">
-                    <option value="">Choose</option>
+                    <option value="">Builder</option>
                 </select>
             </div>
-
+            <button id="doInspectionSearch" type="button" class="btn-bg-w100">Search</button>
+            <div id="inspectionSearchContainer">
+                <img class="search-icon" src="images/search-icon.png" />
+                <input id="inspectionSearch" type="text" name="keywords" value="" placeholder="Search this list" />
+            </div>
             <table id="tblInspectionListingHeader" class="listing">
                 <thead>
                 <tr>
-                    <th class="delete"></th>
                     <th class="i.inspection_start">Date</th>
                     <th class="i.address">Address</th>
                     <th class="b.name">Builder</th>
                     <th class="i.report_type">Report Type</th>
-                    <th>Reinspections</th>
+                    <th>Re Inspec.</th>
                     <th>Action</th>
                 </tr>
                 </thead>
@@ -978,7 +982,6 @@
             <table id="tblBuilderListingHeader" class="listing">
                 <thead>
                 <tr>
-                    <th class="delete"></th>
                     <th id="tbhead-builders" class="name">Builder</th>
                     <th id="tbhead-add" class="address">Address</th>
                     <th id="tbhead-phone" class="phone">Phone</th>
