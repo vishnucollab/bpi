@@ -14,7 +14,7 @@ function DBUtils()
 	this.db_short_name = "BluePrint";   	// The database short name
 	this.db_version = "1.0";             	// The database version
 	this.db_display_name = "BluePrint"; 	// The name of the database that's shown to the user in settings
-	this.db_max_size = 1024 * 1024 * 1024;  		// Maximum database size in Kb
+	this.db_max_size = 5 * 1024 * 1024;  		// Maximum database size in Kb
 	this.db_OK = false;                  	// Set to true if a localstorage DB object is successfully created
 	this.DB_DEBUG = false;                	// Set to true to enable database debug messages	
 	
