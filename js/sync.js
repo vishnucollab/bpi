@@ -123,7 +123,7 @@ function Sync()
 			this.tableIndex = 0;
 			this.recordIndex = 0;		
 			
-			$("#accountMessage").text("Checking login..."); 
+			 $("#accountMessage #general").text("Checking login..."); 
 		}
         
 		var parameters = {};
@@ -150,7 +150,7 @@ function Sync()
  					objDBUtils.data = "";
  					
  					// Delete all local data (except the first two tables app_tables and preferences - that's why we start at index 2 instead if 0)
- 					if(!self.silentMode) $("#accountMessage").text("Login OK.  Deleting local data...");
+ 					if(!self.silentMode) $("#accountMessage #general").text("Login OK.  Deleting local data...");
  					
  					// Tell the database to delete all data.
  					setTimeout('objDBUtils.emptyAllTables(1, objApp.objSync.getSmartData);', 200);
@@ -160,7 +160,7 @@ function Sync()
  					var isPhonegap = objApp.phonegapBuild;
                     
 
- 					if(!self.silentMode) $("#accountMessage").text("Login OK.  Preparing data...");
+ 					if(!self.silentMode) $("#accountMessage #general").text("Login OK.  Preparing data...");
  						
  					// Now proceed with sync.
  					// Ask the database object to get all dirty data and to call the sendData method
@@ -177,7 +177,7 @@ function Sync()
 				if(!self.silentMode)
 				{
 					unblockElement("body");
-					$("#accountMessage").text("Sorry, either your email or password is incorrect.");
+					$("#accountMessage #general").text("Sorry, either your email or password is incorrect.");
 				}
 				else if(self.callbackMethod != null)
 				{
@@ -189,7 +189,7 @@ function Sync()
 				if(!self.silentMode)
 				{				
 					unblockElement("body");
-					$("#accountMessage").text("Sorry, something went wrong.  Please report this error to the Blueprint support team.");				
+					 $("#accountMessage #general").text("Sorry, something went wrong.  Please report this error to the Blueprint support team.");				
 				}
 				else if(self.callbackMethod != null)
 				{
@@ -276,7 +276,7 @@ function Sync()
 				if(!self.silentMode)
 				{
 					unblockElement("body");
-					$("#accountMessage").text("Sorry, either your email or password is incorrect.");
+					 $("#accountMessage #general").text("Sorry, either your email or password is incorrect.");
 				}
 				else if(self.callbackMethod != null)
 				{
@@ -288,7 +288,7 @@ function Sync()
 				if(!self.silentMode)
 				{
 					unblockElement("body");
-					$("#accountMessage").text("Sorry, something went wrong.  Please report this error to the Blueprint support team.");
+					 $("#accountMessage #general").text("Sorry, something went wrong.  Please report this error to the Blueprint support team.");
 				}
 				else if(self.callbackMethod != null)
 				{
@@ -323,7 +323,7 @@ function Sync()
         parameters['start_time'] = objApp.objSync.startTime;
         objApp.objSync.startTime = '';
         for(var i = 1; i < objDBUtils.tables.length; i++){
-            //$("#accountMessage").append('<div id="msg'+objDBUtils.tables[i][0] +'"></div>');
+            // $("#accountMessage #general").append('<div id="msg'+objDBUtils.tables[i][0] +'"></div>');
             self.getDataTable(objDBUtils.tables[i][0], parameters);
         }
     }
@@ -395,7 +395,7 @@ function Sync()
                                                         if(!self.silentMode) $("#accountMessage #general").text("Processing: " + (self.syncingTotalRequest - self.syncingCounter) + '/' + self.syncingTotalRequest);
                                                         if (self.syncingCounter == 0 && !self.silentMode) {
                                                             unblockElement("body");
-                                                            $("#accountMessage").html('<div id="general">Done!</div>');
+                                                             $("#accountMessage #general").html('<div id="general">Done!</div>');
                                                         }
                                                     }
                                                     else {
@@ -419,7 +419,7 @@ function Sync()
                                     {
                                         unblockElement("body");
                                         alert("Warning: An error occured during the data sync operation.  Please report this error to the Blueprint team.");
-                                        $("#accountMessage").text("Sorry, something went wrong during the processing phase.  Please report this error to the Blueprint team.");
+                                         $("#accountMessage #general").text("Sorry, something went wrong during the processing phase.  Please report this error to the Blueprint team.");
                                     }
                                     else if(self.callbackMethod != null)
                                     {
@@ -462,7 +462,7 @@ function Sync()
                                             if(!self.silentMode) $("#accountMessage #general").text("Processing: " + (self.syncingTotalRequest - self.syncingCounter) + '/' + self.syncingTotalRequest);
                                             if (self.syncingCounter == 0 && !self.silentMode){
                                                 unblockElement("body");
-                                                $("#accountMessage").html('<div id="general">Done!</div>');
+                                                 $("#accountMessage #general").html('<div id="general">Done!</div>');
                                             }
                                         }
                                         else
@@ -488,7 +488,7 @@ function Sync()
                     {
                         unblockElement("body");
                         alert("Warning: An error occured during the data sync operation.  Please report this error to the Blueprint team.");
-                        $("#accountMessage").text("Sorry, something went wrong during the processing phase.  Please report this error to the Blueprint team.");
+                         $("#accountMessage #general").text("Sorry, something went wrong during the processing phase.  Please report this error to the Blueprint team.");
                     }
                     else if(self.callbackMethod != null)
                     {
@@ -502,7 +502,7 @@ function Sync()
                 {
                     unblockElement("body");
                     alert("Warning: An error occured during the data sync operation.  Please report this error to the Blueprint team.");
-                    $("#accountMessage").text("Sorry, something went wrong during the processing phase.  Please report this error to the Blueprint team.");
+                     $("#accountMessage #general").text("Sorry, something went wrong during the processing phase.  Please report this error to the Blueprint team.");
                 }
                 else if(self.callbackMethod != null)
                 {
@@ -533,7 +533,7 @@ function Sync()
             self.syncIndex = objDBUtils.tables.length - 1;
         self.recordIndex = 0;
         var tableName = objDBUtils.tables[self.syncIndex][0];
-        if(!self.silentMode) $("#accountMessage").text("Loading table " + tableName + "...");
+        if(!self.silentMode)  $("#accountMessage #general").text("Loading table " + tableName + "...");
         $.post(objApp.apiURL + 'account/get_data_table/' + tableName +'/' + refreshSync, parameters , function(data)
         {
             // Remove / clear the data store temporarily in the DB object
@@ -546,7 +546,7 @@ function Sync()
                 {
                     var tableName = data.table_name;
 
-                    if(!self.silentMode) $("#accountMessage").text("Data sent OK, checking for data to process...");
+                    if(!self.silentMode)  $("#accountMessage #general").text("Data sent OK, checking for data to process...");
 
                     // Store the data locally.
                     self.syncingRows = data[tableName];
@@ -568,7 +568,7 @@ function Sync()
                             // process more records in the current table or whether to move on to the next table.
                             var handleRecord = function(transaction, tableName, row)
                             {
-                                if(!self.silentMode) $("#accountMessage").text("Processing table: " + tableName + ", record " + (self.recordIndex + 1));
+                                if(!self.silentMode)  $("#accountMessage #general").text("Processing table: " + tableName + ", record " + (self.recordIndex + 1));
 
                                 // Build the sql insert/update statement
                                 var sql = self.buildSaveData(tableName, row);
@@ -617,7 +617,7 @@ function Sync()
                     {
                         unblockElement("#frmSync");
                         alert("Warning: An error occured during the data sync operation.  Please report this error to the Blueprint team.");
-                        $("#accountMessage").text("Sorry, something went wrong during the processing phase.  Please report this error to the Blueprint team.");
+                         $("#accountMessage #general").text("Sorry, something went wrong during the processing phase.  Please report this error to the Blueprint team.");
                     }
                     else if(self.callbackMethod != null)
                     {
@@ -631,7 +631,7 @@ function Sync()
                 {
                     unblockElement("#frmSync");
                     alert("Warning: An error occured during the data sync operation.  Please report this error to the Blueprint team.");
-                    $("#accountMessage").text("Sorry, something went wrong during the processing phase.  Please report this error to the Blueprint team.");
+                     $("#accountMessage #general").text("Sorry, something went wrong during the processing phase.  Please report this error to the Blueprint team.");
                 }
                 else if(self.callbackMethod != null)
                 {
@@ -665,11 +665,11 @@ function Sync()
 			// Set the refresh sync flag
 			refreshSync = "true";
 
-			if(!self.silentMode) $("#accountMessage").text("Asking server for your data...");
+			if(!self.silentMode)  $("#accountMessage #general").text("Asking server for your data...");
 		}
 		else
 		{
-			if(!self.silentMode) $("#accountMessage").text("Sending data to server...");
+			if(!self.silentMode)  $("#accountMessage #general").text("Sending data to server...");
 		}
 
 		$.post(objApp.apiURL + 'account/process_data/' + refreshSync, parameters , function(data)
@@ -683,7 +683,7 @@ function Sync()
                 // Make sure the server processed the data OK.    
                 if(data.status == "OK")
                 {
-                    if(!self.silentMode) $("#accountMessage").text("Data sent OK, checking for data to process...");
+                    if(!self.silentMode)  $("#accountMessage #general").text("Data sent OK, checking for data to process...");
                     
                     // Store the data locally.
                     self.data = data;
@@ -707,7 +707,7 @@ function Sync()
                     {                
                         unblockElement("#frmSync");
                         alert("Warning: An error occured during the data sync operation.  Please report this error to the Blueprint team.");
-                        $("#accountMessage").text("Sorry, something went wrong during the processing phase.  Please report this error to the Blueprint team.");                                    
+                         $("#accountMessage #general").text("Sorry, something went wrong during the processing phase.  Please report this error to the Blueprint team.");                                    
                     }
                     else if(self.callbackMethod != null)
                     {
@@ -722,7 +722,7 @@ function Sync()
                 {                
                     unblockElement("#frmSync");
                     alert("Warning: An error occured during the data sync operation.  Please report this error to the Blueprint team.");
-                    $("#accountMessage").text("Sorry, something went wrong during the processing phase.  Please report this error to the Blueprint team.");                                    
+                     $("#accountMessage #general").text("Sorry, something went wrong during the processing phase.  Please report this error to the Blueprint team.");                                    
                 }
                 else if(self.callbackMethod != null)
                 {
@@ -754,7 +754,7 @@ function Sync()
 			// process more records in the current table or whether to move on to the next table.
 			var handleRecord = function(transaction, tableName, row)
 			{
-				if(!self.silentMode) $("#accountMessage").text("Processing table: " + tableName + ", record " + (self.recordIndex + 1));
+				if(!self.silentMode)  $("#accountMessage #general").text("Processing table: " + tableName + ", record " + (self.recordIndex + 1));
 
 				// Build the sql insert/update statement
 				var sql = self.buildSaveData(tableName, row);   
@@ -847,7 +847,7 @@ function Sync()
 		if(self.tableIdx < objDBUtils.tables.length)
 		{
 			var tableName = objDBUtils.tables[self.tableIdx][0];   
-			if(!self.silentMode) $("#accountMessage").text("Cleaning up table '" + tableName + "', one moment...");
+			if(!self.silentMode)  $("#accountMessage #general").text("Cleaning up table '" + tableName + "', one moment...");
 
 			// Set all dirty records as not dirty
 			var sql = "UPDATE " + tableName + " SET dirty = 0 WHERE dirty = 1";
@@ -970,7 +970,7 @@ function Sync()
 				{
 					if(!self.silentMode)
 					{     
-						$("#accountMessage").text("Moving thumbnails to local file system");	
+						 $("#accountMessage #general").text("Moving thumbnails to local file system");	
 					}
 										
 					doNext();
@@ -986,7 +986,7 @@ function Sync()
 		if(!self.silentMode)
 		{
 			unblockElement("#frmSync");        
-			$("#accountMessage").text("All done - Sync completed successfully!");	
+			 $("#accountMessage #general").text("All done - Sync completed successfully!");	
 		}
 		
 		// Not sure why this is required, but the
@@ -1092,7 +1092,7 @@ function Sync()
                     }
                     
 
-					if(!self.silentMode) $("#accountMessage").text("Uploading photo " + (r + 1));
+					if(!self.silentMode)  $("#accountMessage #general").text("Uploading photo " + (r + 1));
 					
 					// Invoke the upload
 					$.post(objApp.apiURL + "inspections/upload_photo", params, function(data)

@@ -272,10 +272,10 @@ var Inspections = function()
 			    html += '"></span>';
 			
 			    html += objApp.formatUserDate(inspDate) + '</td>';  
-			    html += '<td class="view">' + row.lot_no + ' ' + row.address + ' ' + row.suburb + '</td>';
-			    html += '<td class="view">' + row.name + '</td>';
-			    html += '<td class="view">' + row.report_type + '</td>';
-                html += '<td class="view">' + row.num_reinspections + '</td>';
+			    html += '<td>' + row.lot_no + ' ' + row.address + ' ' + row.suburb + '</td>';
+			    html += '<td>' + row.name + '</td>';
+			    html += '<td>' + row.report_type + '</td>';
+                html += '<td>' + row.num_reinspections + '</td>';
                 
                 
                 /*

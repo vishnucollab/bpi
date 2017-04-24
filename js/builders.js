@@ -165,8 +165,8 @@ var Builders = function()
 			    var location = row.address +", "+ row.city +", "+ row.state; 
 			    html += '<tr rel="' + row.id + '">';
 			    html += '<td class="view" rel="' + row.id + '"><div rel="' + row.id + '" class="delete"></div>' + row.name + '</td>';
-			    html += '<td class="view" rel="' + row.id + '">' + location + '</td>';
-			    html += '<td class="view" rel="' + row.id + '">' + row.phone + '</td>';
+			    html += '<td rel="' + row.id + '">' + location + '</td>';
+			    html += '<td rel="' + row.id + '">' + row.phone + '</td>';
 			    html += '</tr>';
 			}
 			
