@@ -1897,6 +1897,14 @@ table ul.selector
     font-size: 32px;
 }
 
+@media only screen and (min-device-width: 481px) and (max-device-width: 1024px) and (orientation:landscape) {
+    /* For landscape layouts only */
+    #frmSync .custom-checkbox-with-tick [type="checkbox"]:not(:checked) + label:after,
+    #frmSync .custom-checkbox-with-tick [type="checkbox"]:checked + label:after{
+        left: 7px;
+    }
+}
+
 
 /* buttons ------------------------------ */ 
 a.moreBtn
