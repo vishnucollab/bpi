@@ -294,6 +294,7 @@ aside
 #buildersList{
     position: relative;
     margin: 0 auto;
+    min-height: 400px;
 }
 #builderSearchContainer{
     float: right;
@@ -340,7 +341,11 @@ aside
 #tblBuilderListingHeader th:nth-child(1) .triangle, #tblBuilderListingHeader th:nth-child(1) .triangle.DESC{
     background-image: url('../images/triangle2.png');
 }
-
+#builderScrollWrapper{
+    max-height: 337px;
+    min-height: 337px;
+    overflow-x: hidden;
+}
 #builderScrollWrapper td{
     color: #5c5756;
     border: 1px solid #5c5756;
@@ -418,7 +423,11 @@ aside
 }
 
 #inspectionList .searchByBuilder{margin-bottom: 20px;display: inline-block;margin-top: -5px;}
-
+#inspectionScrollWrapper{
+    max-height: 325px;
+    min-height: 325px;
+    overflow-x: hidden;
+}
 .searchByBuilder .select2-container{margin-top: -5px;}
 .searchByBuilder .select2-container--default .select2-selection--single{height: 51px;}
 .searchByBuilder .select2-container--default .select2-selection--single .select2-selection__rendered{line-height: 51px;}
@@ -513,12 +522,12 @@ footer li a#navNewInspection:hover, footer li a#navNewInspection.active
 
 footer li a#navInspections
 {
-    background: url('../images/footer-icon-inspections.png') top center no-repeat;     
+    background: url('../images/footer-icon-new-inspection.png') top center no-repeat;
 }
 
 footer li a#navInspections:hover, footer li a#navNewInspection.active
 {
-    background: url('../images/footer-icon-new-inspections-hover.png') top center no-repeat;
+    background: url('../images/footer-icon-new-inspection-hover.png') top center no-repeat;
     background-position: top center !important;
     color: #009fe3;
 }
@@ -1170,6 +1179,7 @@ aside textarea
 }
 
 /* Inspection list*/
+#inspectionList{min-height: 400px;}
 #inspectionList #builder_id {
     margin-left: 10px;
 	margin-bottom: 15px;
@@ -1901,7 +1911,8 @@ table ul.selector
     /* For landscape layouts only */
     #frmSync .custom-checkbox-with-tick [type="checkbox"]:not(:checked) + label:after,
     #frmSync .custom-checkbox-with-tick [type="checkbox"]:checked + label:after{
-        left: 7px;
+        top: 3px;
+        left: 9px;
     }
 }
 

@@ -69,13 +69,12 @@ function Sync()
 	this.bindEvents = function()
 	{
 		// Unbind submit button
-		$("#frmSync button[type='submit']").unbind();
+		$("#frmSync .submit").unbind();
 		
 		// User starts sync
-		$("#frmSync button[type='submit']").bind(objApp.touchEvent, function(e)
+		$("#frmSync .submit").bind(objApp.touchEvent, function(e)
 		{
 			e.preventDefault();
-			
 			objApp.objSync.startSync();
 		});
 

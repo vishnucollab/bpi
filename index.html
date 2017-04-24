@@ -64,7 +64,6 @@
         // PhoneGap is ready
         function onDeviceReady()
         {
-            alert('This must be shown when device is ready');
             if (typeof navigator.notification != 'undefined'){
                 if (typeof navigator.notification.alert != 'undefined')
                     window.alert = navigator.notification.alert;
@@ -170,7 +169,6 @@
             objFilters = new Filters();
 
             objFilters.init();
-            alert('This must be shown when app is ready');
             // objDBUtils.dropAllTables(0);
             //localStorage.setItem("sync_email", "");
             //localStorage.setItem("sync_password", "");
@@ -359,7 +357,7 @@
                     <label for="refresh_sync" class="sanpro-semibold f26">Reset My Data</label>
                 </div>
                 <br/>
-                <button type="submit" class="btn-bg-w200 submit">Start Sync</button>
+                <button type="button" class="btn-bg-w200 submit">Start Sync</button>
                 <br/><br/>
                 <p class="f26">Use "SMART SYNC" to get data in recent 2 weeks.</p><p><br /></p>
                 <button type="button" id="smartSync" class="btn-bg-w200">Smart Sync</button>
