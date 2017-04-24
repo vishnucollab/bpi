@@ -21,6 +21,7 @@
     <preference name="fullscreen" value="false" />
     <preference name="webviewbounce" value="false" />
     <preference name="StatusBarOverlaysWebView" value="false" />
+    <preference name="AutoHideSplashScreen" value="true"/>
 
     <gap:plugin name="cordova-plugin-battery-status" source="npm"/>
     <gap:plugin name="cordova-plugin-camera" source="npm"/>

@@ -64,6 +64,7 @@
         // PhoneGap is ready
         function onDeviceReady()
         {
+            alert('This must be shown when device is ready');
             if (typeof navigator.notification != 'undefined'){
                 if (typeof navigator.notification.alert != 'undefined')
                     window.alert = navigator.notification.alert;
@@ -72,6 +73,8 @@
                  window.confirm = navigator.notification.confirm;
                  */
             }
+            if (typeof navigator.splashscreen != 'undefined')
+                navigator.splashscreen.hide();
             // Override the hardware back button
             document.addEventListener("backbutton", function()
             {
