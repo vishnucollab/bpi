@@ -202,7 +202,7 @@ function Sync()
 
 	this.smartSync = function()
 	{
-        objApp.objSync.startTime = '- 1 month';
+        objApp.objSync.startTime = '- 2 weeks';
 		if(!self.silentMode)
 		{
 			// Make sure the username and pass have been entered.
@@ -214,7 +214,7 @@ function Sync()
 
 			if(($("#frmSync #refresh_sync").is(":checked")) && (!objApp.objSync.noRefreshWarning))
 			{
-				if(!confirm("Warning, you have selected the 'reset my data' option.  This will delete all your local data and then download everything since 1 month ago from the Blueprint server.  Any data that you've entered since your last sync will be lost.  Are you sure?'"))
+				if(!confirm("Warning, you have selected the 'reset my data' option.  This will delete all your local data and then download everything since 2 weeks ago from the Blueprint server.  Any data that you've entered since your last sync will be lost.  Are you sure?'"))
 					return;
 
 				objApp.objSync.refreshSync = true;
