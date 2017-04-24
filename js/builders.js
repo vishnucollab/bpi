@@ -72,7 +72,7 @@ var Builders = function()
 		});
 
         
-        $("#doSearch").bind(self.touchEvent, function() {
+        $("#doSearch").bind(objApp.touchEvent, function() {
             self.doBuilderSearch();    
         });
 	}
