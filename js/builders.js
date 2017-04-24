@@ -72,7 +72,7 @@ var Builders = function()
 		});
 
         
-        $("#doSearch").click(function() {
+        $("#doSearch").bind(self.touchEvent, function() {
             self.doBuilderSearch();    
         });
 	}
@@ -216,7 +216,7 @@ var Builders = function()
 			
 		    
 			// Bind click/touch event to buttons in the listing.
-			$("#tblBuilderListing tr td.view").bind("click", function(e) 
+			$("#tblBuilderListing tr td.view").bind(objApp.touchEvent, function(e)
 			{
 				e.preventDefault();
 				
@@ -436,9 +436,11 @@ var Builders = function()
 		if(self.objPopState == null)
 		{
 			//self.objPopState = new popselector("#builderDetails #state", "Choose a state");
+			/*
 			$("#builderDetails #state").select2({
                 minimumResultsForSearch: -1
             });
+            */
 		}
 		
 		if(self.objPopCountry == null)
@@ -449,7 +451,9 @@ var Builders = function()
 		// Preselect state and country
 		if(builder == null)
 		{
-			self.objPopState.preselect("VIC"); 
+			//self.objPopState.preselect("VIC");
+            $("#builderDetails #state").val("VIC");
+            $("#builderDetails #state").trigger('change');
 			self.objPopCountry.preselect("Australia");							
 		}
 		else

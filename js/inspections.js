@@ -131,14 +131,23 @@ var Inspections = function()
 		
 	    //objFilters.show();
 
-        if (!$("#inspectionList #il_builder_id").hasClass('select2-hidden-accessible'))
-            $("#inspectionList #il_builder_id").select2();
-
 		// Do the client search
 		self.doInspectionSearch();
 
-        this.unbindEvents();        
-	}
+        this.unbindEvents();
+
+        $("#addInspection").bind(objApp.touchEvent, function(e)
+        {
+            e.preventDefault();
+            objApp.cleanup();
+            objApp.objInspection.setReturnInspectionID("");
+            objApp.objInspection.addNewInspection();
+            objApp.context = "inspection";
+        });
+
+        if (!$("#inspectionList #il_builder_id").hasClass('select2-hidden-accessible'))
+            $("#inspectionList #il_builder_id").select2();
+    }
     
 	/***
 	* doInspectionSearch searches the inspections database
@@ -325,7 +334,7 @@ var Inspections = function()
 			
 
 			// Bind click event to list items
-            $("#tblInspectionListing td.delete").bind("click", function(e) {
+            $("#tblInspectionListing td.delete").bind(objApp.touchEvent, function(e) {
 
                 self.is_change_order = true;
 				e.preventDefault();
@@ -350,7 +359,7 @@ var Inspections = function()
             });
 
             // Bind click/touch event to buttons in the listing.
-            $("#tblInspectionListing tr td.view").bind("click", function(e)
+            $("#tblInspectionListing tr td.view").bind(objApp.touchEvent, function(e)
             {
                 e.preventDefault();
 
@@ -382,7 +391,7 @@ var Inspections = function()
             });
 
             // Handle the event when the user clicks on the VIEW button.
-            $("#tblInspectionListing a.view").click(function(e)  {
+            $("#tblInspectionListing a.view").bind(objApp.touchEvent, function(e)  {
                 e.preventDefault();
                 var inspection_id = $(this).attr('data-id');
                 var num_reinspections = $(this).attr("data-reinspections");
@@ -1592,38 +1601,27 @@ var Inspections = function()
 	*/
 	this.setupPopselectors = function()
 	{
-		if(self.objPopBuilders == null)
-		{
-			self.objPopBuilders = new popselector("#frmInspectionDetails #builder_id", "Choose a builder");
-            self.objPopBuilders.callbackMethod = objApp.objInspection.handleBuilderChanged;
-        }
-
-        if(self.objPopState == null)
-		{
-			self.objPopState = new popselector("#frmInspectionDetails #state", "Choose a state");
-            self.objPopState.callbackMethod = objApp.objInspection.handleStateChanged;
-        }
-
-
-        self.objPopBuilders.removePopOptions(0, "", "Choose");
-
         // Load builders
 		objDBUtils.primaryKey = "id";
 		objDBUtils.showColumn = "name";
 		objDBUtils.orderBy = "ABS(name) ASC";
         $("#inspection #builder_id").empty();
-        $("#inspection #builder_id").append('<li title="">Choose</li>');
+        $("#inspection #builder_id").append('<option title="">Builder</option>');
 
         objDBUtils.loadSelect("builders", [], "#inspection #builder_id", function()
 		{
+            if ($("#inspection #builder_id").hasClass('select2-hidden-accessible'))
+                $("#inspection #builder_id").select2('destroy');
+            $("#inspection #builder_id").select2();
 			// Builders have finished loading.  Preselect the client if we have a client_id.
 			if(objApp.keys.builder_id != "")
 			{
-				self.objPopBuilders.preselect(objApp.keys.builder_id);
+                $('#inspection #builder_id').val(objApp.keys.builder_id);
+                $('#inspection #builder_id').trigger('change');
 			}
-		});
+		}, 'option');
 
-        self.objPopState.preselect(objApp.keys.state);
+        $('#frmInspectionDetails #state').val(objApp.keys.state);
 	}
 
     this.loadAddressBookList = function(callback)
@@ -1827,7 +1825,7 @@ var Inspections = function()
         });
         
 
-        $('#inspectionList .btnContainer a#passed').click(function() {
+        $('#inspectionList .btnContainer a#passed').bind(objApp.touchEvent, function() {
             if (!$(this).hasClass("active"))
             {
                 $(this).parent().parent().find("a#failed.active").removeClass("active");
@@ -1836,7 +1834,7 @@ var Inspections = function()
             }
         });
         
-        $('#inspectionList .btnContainer a#failed').click(function() {
+        $('#inspectionList .btnContainer a#failed').bind(objApp.touchEvent, function() {
             if (!$(this).hasClass("active"))
             {
                 $(this).parent().parent().find("a#passed.active").removeClass("active");
@@ -1845,7 +1843,7 @@ var Inspections = function()
             } 
         });
         
-        $("#doInspectionSearch").click(function() {
+        $("#doInspectionSearch").bind(objApp.touchEvent, function() {
             self.doInspectionSearch();
         });
 
@@ -3737,7 +3735,7 @@ var Inspections = function()
         objDBUtils.loadSelect("resources", self.filters, "#frmDefectDetails #observation_suggestion", function()
         {
             // Bind the click event after search
-            $("#frmDefectDetails #observation_suggestion tr td").click(function() {
+            $("#frmDefectDetails #observation_suggestion tr td").bind(objApp.touchEvent, function() {
                 var selectedTxt = $(this).text();
                 $('#frmDefectDetails #observation').val(selectedTxt);
                 console.log("Different Binding");
@@ -5629,7 +5627,7 @@ var Inspections = function()
                 }
 
 				// Bind the move up / move down arrow button events
-                $("#tblDefectListing span.arrow").bind("click", function(e) {
+                $("#tblDefectListing span.arrow").bind(objApp.touchEvent, function(e) {
                     e.preventDefault();
 
                     var current_row = $(this).parent().parent();
@@ -5643,7 +5641,7 @@ var Inspections = function()
                     self.handleMoveInspectionItem(inspection_item_id, direction);
                 });
 
-                $('#tblDefectListing a.edit_issue_btn').bind('click', function(e){
+                $('#tblDefectListing a.edit_issue_btn').bind(objApp.touchEvent, function(e){
 
                     
                     // if(objUtils.isMobileDevice())
@@ -5686,7 +5684,7 @@ var Inspections = function()
 					}
                 });
 
-				$("#tblDefectListing td").bind("click", function(e)
+				$("#tblDefectListing td").bind(objApp.touchEvent, function(e)
 				{
                     if(self.is_change_order)
                     {
@@ -5965,7 +5963,7 @@ var Inspections = function()
                     }
 
                     // Handle the event when the user clicks on a row in the item table
-                    $('#tblReinspectionListing tr').bind("click", function() {
+                    $('#tblReinspectionListing tr').bind(objApp.touchEvent, function() {
 
                         var reinspectionItemID = $(this).attr("data-id");
                         self.reinspectionItemRow = $(this);

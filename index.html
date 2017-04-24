@@ -221,7 +221,7 @@
             <label class="aleft" for="pword">Password</label>
             <input type="password" name="pword" id="pword" value="" class="required" />
             <br/><br/>
-            <button type="submit" class="btn-bg-w200">Login</button>
+            <button type="submit" class="btn-bg-w200 submit">Login</button>
         </fieldset>
     </form>
 </div> <!--! end of login screen wrapper -->
@@ -355,7 +355,7 @@
                     <label for="refresh_sync" class="sanpro-semibold f26">Reset My Data</label>
                 </div>
                 <br/>
-                <button type="submit" class="btn-bg-w200">Start Sync</button>
+                <button type="submit" class="btn-bg-w200 submit">Start Sync</button>
                 <br/><br/>
                 <p class="f26">Use "SMART SYNC" to get data in recent month.</p><p><br /></p>
                 <button type="button" id="smartSync" class="btn-bg-w200">Smart Sync</button>
@@ -411,9 +411,9 @@
                         <tr>
                             <td><label for="builder_id">Select a Builder</label></td>
                             <td>
-                                <ul class="selector" id="builder_id" title="Select a Builder">
-                                    <li title="">Choose</li>
-                                </ul>
+                                <select class="selector" id="builder_id" title="Select a Builder">
+                                    <option title="">Builder</option>
+                                </select>
                             </td>
                         </tr>
                         <tr>

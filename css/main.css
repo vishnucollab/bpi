@@ -442,10 +442,16 @@ aside
     top: 30px;
 }
 .select2-container--default .select2-selection--single .select2-selection__arrow b{
-    border-width: 10px 8px 0 8px;
-    margin-left: -12px;
+    border-width: 7px 4px 0 4px;
+    margin-left: -6px;
     margin-top: -14px;
+    border-color: #5c5756 transparent transparent transparent;
     font-size: 21px;
+}
+
+.select2-container--default.select2-container--open .select2-selection--single .select2-selection__arrow b{
+    border-width: 0 4px 7px 4px;
+    border-color: transparent transparent #5c5756 transparent;
 }
 
 .select2-search--dropdown .select2-search__field{
@@ -465,7 +471,7 @@ footer
 {
     background: #76787b;
     height: 100px;
-    position: absolute;
+    position: fixed;
     bottom: 0px; left: 0;
     width: 100%;
 	border: none;
@@ -512,7 +518,7 @@ footer li a#navInspections
 
 footer li a#navInspections:hover, footer li a#navNewInspection.active
 {
-    background: url('../images/footer-icon-inspections-hover.png') top center no-repeat;
+    background: url('../images/footer-icon-new-inspections-hover.png') top center no-repeat;
     background-position: top center !important;
     color: #009fe3;
 }
@@ -1671,7 +1677,11 @@ ul.historygallery{
 
 .twocolumn select
 {
-    margin: 0 0 10px;
+    margin: 5px 0;
+    width: 380px;
+    height: 56px;
+    font-size: 21px;
+    color: #5c5756;
 }
 
 #create_user_screen fieldset

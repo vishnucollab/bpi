@@ -897,9 +897,9 @@ function blockElement(elementSelector)
 {
 	$(elementSelector).block(
 	{
-		message: '<div style="padding: 20px;"><img src="images/loading.gif" /><p>Please Wait...</p></div>',  
+		message: '<div style="padding: 20px;"><img width="64" height="64" src="images/spinner.gif" /><p></p></div>',
 		css: {border:'0px', 'background-color':'transparent', position:'absolute'},
-		overlayCSS: {opacity:0.04, cursor:'pointer', position:'absolute'}
+		overlayCSS: {opacity:0.4, cursor:'pointer', position:'absolute'}
 	});
 }
 

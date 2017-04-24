@@ -19,6 +19,7 @@ function Sync()
     this.syncingTables = {};
     this.syncingIndexs = {};
     this.syncingCounter = 0;
+    this.syncingTotalRequest = 0;
 	this.refreshSync = false;
     this.startTime = '';
 	this.noRefreshWarning = false;
@@ -136,7 +137,7 @@ function Sync()
 			return;
 		}
 
-		if(!self.silentMode) blockElement("#frmSync");
+		if(!self.silentMode) blockElement("#main");
 
 		$.post(objApp.apiURL + 'account/do_login', parameters , function(data)
 		{  	
@@ -176,7 +177,7 @@ function Sync()
 			{
 				if(!self.silentMode)
 				{
-					unblockElement("#frmSync");
+					unblockElement("#main");
 					$("#accountMessage").text("Sorry, either your email or password is incorrect.");
 				}
 				else if(self.callbackMethod != null)
@@ -188,7 +189,7 @@ function Sync()
 			{
 				if(!self.silentMode)
 				{				
-					unblockElement("#frmSync");
+					unblockElement("#main");
 					$("#accountMessage").text("Sorry, something went wrong.  Please report this error to the Blueprint support team.");				
 				}
 				else if(self.callbackMethod != null)
@@ -235,7 +236,7 @@ function Sync()
 			return;
 		}
 
-		if(!self.silentMode) blockElement("#frmSync");
+		if(!self.silentMode) blockElement("#main");
 
 		$.post(objApp.apiURL + 'account/do_login', parameters , function(data)
 		{
@@ -275,7 +276,7 @@ function Sync()
 			{
 				if(!self.silentMode)
 				{
-					unblockElement("#frmSync");
+					unblockElement("#main");
 					$("#accountMessage").text("Sorry, either your email or password is incorrect.");
 				}
 				else if(self.callbackMethod != null)
@@ -287,7 +288,7 @@ function Sync()
 			{
 				if(!self.silentMode)
 				{
-					unblockElement("#frmSync");
+					unblockElement("#main");
 					$("#accountMessage").text("Sorry, something went wrong.  Please report this error to the Blueprint support team.");
 				}
 				else if(self.callbackMethod != null)
@@ -323,7 +324,7 @@ function Sync()
         parameters['start_time'] = objApp.objSync.startTime;
         objApp.objSync.startTime = '';
         for(var i = 1; i < objDBUtils.tables.length; i++){
-            $("#accountMessage").append('<div id="msg'+objDBUtils.tables[i][0] +'"></div>');
+            //$("#accountMessage").append('<div id="msg'+objDBUtils.tables[i][0] +'"></div>');
             self.getDataTable(objDBUtils.tables[i][0], parameters);
         }
     }
@@ -337,9 +338,10 @@ function Sync()
         self.syncingTables[tableName] = [];
         self.syncingIndexs[tableName] = 0;
 
-        if(!self.silentMode) $("#accountMessage #msg" + tableName).text("Loading table " + tableName + "...");
-
         self.syncingCounter++;
+        self.syncingTotalRequest++;
+
+        if(!self.silentMode) $("#accountMessage #general").text("Processing: " + (self.syncingTotalRequest - self.syncingCounter) + '/' + self.syncingTotalRequest);
 
         $.post(objApp.apiURL + 'account/get_data_table/' + tableName +'/' + refreshSync, parameters , function(data)
         {
@@ -360,6 +362,8 @@ function Sync()
                             self.syncingTables[tableName] = {};
                             self.syncingIndexs[tableName] = {};
                             self.syncingCounter++;
+                            self.syncingTotalRequest++;
+                            if(!self.silentMode) $("#accountMessage #general").text("Processing: " + (self.syncingTotalRequest - self.syncingCounter) + '/' + self.syncingTotalRequest);
                             $.post(objApp.apiURL + 'account/get_data_table/' + tableName +'/' + refreshSync + '/' + p, parameters , function(r_data)
                             {
                                 r_data = jQuery.parseJSON(r_data);
@@ -389,9 +393,9 @@ function Sync()
                                                     self.syncingIndexs[tblName][page]++;
                                                     if (self.syncingIndexs[tblName][page] >= self.syncingTables[tblName][page].length) {
                                                         self.syncingCounter--;
-                                                        console.log(tblName + ' ' + page + ' ' + self.syncingCounter);
+                                                        if(!self.silentMode) $("#accountMessage #general").text("Processing: " + (self.syncingTotalRequest - self.syncingCounter) + '/' + self.syncingTotalRequest);
                                                         if (self.syncingCounter == 0 && !self.silentMode) {
-                                                            unblockElement("#frmSync");
+                                                            unblockElement("#main");
                                                             $("#accountMessage").html('<div id="general">Done!</div>');
                                                         }
                                                     }
@@ -414,7 +418,7 @@ function Sync()
                                 {
                                     if(!self.silentMode)
                                     {
-                                        unblockElement("#frmSync");
+                                        unblockElement("#main");
                                         alert("Warning: An error occured during the data sync operation.  Please report this error to the Blueprint team.");
                                         $("#accountMessage").text("Sorry, something went wrong during the processing phase.  Please report this error to the Blueprint team.");
                                     }
@@ -427,7 +431,7 @@ function Sync()
                         }
 
                     }else{
-                        if(!self.silentMode) $("#accountMessage #msg" + tableName).text("Data sent OK, checking for data to process...");
+                        if(!self.silentMode) $("#accountMessage #general").text("Processing: " + (self.syncingTotalRequest - self.syncingCounter) + '/' + self.syncingTotalRequest);
 
                         // Store the data locally.
                         self.syncingTables[tableName] = data[tableName];
@@ -446,8 +450,6 @@ function Sync()
                                 // process more records in the current table or whether to move on to the next table.
                                 var handleRecord = function(transaction, tableName, row)
                                 {
-                                    if(!self.silentMode) $("#accountMessage #msg" + tableName).text("Processing table " + tableName + ": record " + (self.syncingIndexs[tableName] + 1));
-
                                     // Build the sql insert/update statement
                                     var sql = self.buildSaveData(tableName, row);
                                     transaction.executeSql(sql, self.saveData, function (transaction, result)
@@ -458,9 +460,9 @@ function Sync()
                                         {
                                             if(!self.silentMode) $("#accountMessage #msg" + tableName).text("Table " + tableName + ": " + self.syncingIndexs[tableName] + " records has been loaded.");
                                             self.syncingCounter--;
-                                            console.log(tableName + ' ' + self.syncingCounter);
+                                            if(!self.silentMode) $("#accountMessage #general").text("Processing: " + (self.syncingTotalRequest - self.syncingCounter) + '/' + self.syncingTotalRequest);
                                             if (self.syncingCounter == 0 && !self.silentMode){
-                                                unblockElement("#frmSync");
+                                                unblockElement("#main");
                                                 $("#accountMessage").html('<div id="general">Done!</div>');
                                             }
                                         }
@@ -485,7 +487,7 @@ function Sync()
                 {
                     if(!self.silentMode)
                     {
-                        unblockElement("#frmSync");
+                        unblockElement("#main");
                         alert("Warning: An error occured during the data sync operation.  Please report this error to the Blueprint team.");
                         $("#accountMessage").text("Sorry, something went wrong during the processing phase.  Please report this error to the Blueprint team.");
                     }
@@ -499,7 +501,7 @@ function Sync()
                 console.log(e);
                 if(!self.silentMode)
                 {
-                    unblockElement("#frmSync");
+                    unblockElement("#main");
                     alert("Warning: An error occured during the data sync operation.  Please report this error to the Blueprint team.");
                     $("#accountMessage").text("Sorry, something went wrong during the processing phase.  Please report this error to the Blueprint team.");
                 }
