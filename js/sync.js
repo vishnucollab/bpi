@@ -137,7 +137,7 @@ function Sync()
 			return;
 		}
 
-		if(!self.silentMode) blockElement("#main");
+		if(!self.silentMode) blockElement("body");
 
 		$.post(objApp.apiURL + 'account/do_login', parameters , function(data)
 		{  	
@@ -177,7 +177,7 @@ function Sync()
 			{
 				if(!self.silentMode)
 				{
-					unblockElement("#main");
+					unblockElement("body");
 					$("#accountMessage").text("Sorry, either your email or password is incorrect.");
 				}
 				else if(self.callbackMethod != null)
@@ -189,7 +189,7 @@ function Sync()
 			{
 				if(!self.silentMode)
 				{				
-					unblockElement("#main");
+					unblockElement("body");
 					$("#accountMessage").text("Sorry, something went wrong.  Please report this error to the Blueprint support team.");				
 				}
 				else if(self.callbackMethod != null)
@@ -236,7 +236,7 @@ function Sync()
 			return;
 		}
 
-		if(!self.silentMode) blockElement("#main");
+		if(!self.silentMode) blockElement("body");
 
 		$.post(objApp.apiURL + 'account/do_login', parameters , function(data)
 		{
@@ -276,7 +276,7 @@ function Sync()
 			{
 				if(!self.silentMode)
 				{
-					unblockElement("#main");
+					unblockElement("body");
 					$("#accountMessage").text("Sorry, either your email or password is incorrect.");
 				}
 				else if(self.callbackMethod != null)
@@ -288,7 +288,7 @@ function Sync()
 			{
 				if(!self.silentMode)
 				{
-					unblockElement("#main");
+					unblockElement("body");
 					$("#accountMessage").text("Sorry, something went wrong.  Please report this error to the Blueprint support team.");
 				}
 				else if(self.callbackMethod != null)
@@ -395,7 +395,7 @@ function Sync()
                                                         self.syncingCounter--;
                                                         if(!self.silentMode) $("#accountMessage #general").text("Processing: " + (self.syncingTotalRequest - self.syncingCounter) + '/' + self.syncingTotalRequest);
                                                         if (self.syncingCounter == 0 && !self.silentMode) {
-                                                            unblockElement("#main");
+                                                            unblockElement("body");
                                                             $("#accountMessage").html('<div id="general">Done!</div>');
                                                         }
                                                     }
@@ -418,7 +418,7 @@ function Sync()
                                 {
                                     if(!self.silentMode)
                                     {
-                                        unblockElement("#main");
+                                        unblockElement("body");
                                         alert("Warning: An error occured during the data sync operation.  Please report this error to the Blueprint team.");
                                         $("#accountMessage").text("Sorry, something went wrong during the processing phase.  Please report this error to the Blueprint team.");
                                     }
@@ -462,7 +462,7 @@ function Sync()
                                             self.syncingCounter--;
                                             if(!self.silentMode) $("#accountMessage #general").text("Processing: " + (self.syncingTotalRequest - self.syncingCounter) + '/' + self.syncingTotalRequest);
                                             if (self.syncingCounter == 0 && !self.silentMode){
-                                                unblockElement("#main");
+                                                unblockElement("body");
                                                 $("#accountMessage").html('<div id="general">Done!</div>');
                                             }
                                         }
@@ -487,7 +487,7 @@ function Sync()
                 {
                     if(!self.silentMode)
                     {
-                        unblockElement("#main");
+                        unblockElement("body");
                         alert("Warning: An error occured during the data sync operation.  Please report this error to the Blueprint team.");
                         $("#accountMessage").text("Sorry, something went wrong during the processing phase.  Please report this error to the Blueprint team.");
                     }
@@ -501,7 +501,7 @@ function Sync()
                 console.log(e);
                 if(!self.silentMode)
                 {
-                    unblockElement("#main");
+                    unblockElement("body");
                     alert("Warning: An error occured during the data sync operation.  Please report this error to the Blueprint team.");
                     $("#accountMessage").text("Sorry, something went wrong during the processing phase.  Please report this error to the Blueprint team.");
                 }
