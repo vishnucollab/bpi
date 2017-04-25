@@ -75,6 +75,8 @@ var Builders = function()
         $("#doSearch").bind(objApp.touchEvent, function() {
             self.doBuilderSearch();    
         });
+
+		objApp.setBodyClass('builder');
 	}
 
 	/***
@@ -136,12 +138,12 @@ var Builders = function()
 	    	values.push(objFilters.recordLimit);
 	    }		    
 	    
-	    blockElement("#frmFilters"); 
+	    blockElement('body');
 	    
 	    objDBUtils.loadRecordsSQL(sql, values, function(param, items)
 	    {
 		    // Remove any element block
-		    unblockElement("#frmFilters"); 
+		    unblockElement('body');
             
             if(!items)
             {
@@ -230,12 +232,12 @@ var Builders = function()
 			    var builder_id = $(this).attr("rel");
 			    
 			    // Show the loading indicator
-			    blockElement("#tblBuilderListing");
+			    blockElement('body');
 			    
 			    // Load the inspection in question
 			    objDBUtils.loadRecord("builders", builder_id, function(builder_id, row)
 			    {
-			    	unblockElement("#tblBuilderListing");
+			    	unblockElement('body');
 			    	
 					if(row)
 					{
@@ -499,7 +501,7 @@ var Builders = function()
 	    
 	    $("#frmBuilderDetails input").blur();
 	    
-	    blockElement("#builderDetails #frmBuilderDetails");
+	    blockElement('body');
 	    
 	    // Invoke the autoSave method after a short delay.
 	    setTimeout(function()
@@ -519,7 +521,7 @@ var Builders = function()
                     objDBUtils.setKeyFromLastInsertID("builder_id");
 			    }
 			    
-			    unblockElement("#builderDetails #frmBuilderDetails");
+			    unblockElement('body');
 			    
                 if (objApp.objInspection.getStep() == 1)
                 {
@@ -530,7 +532,7 @@ var Builders = function()
                 }				
 			});
 			
-			unblockElement("#builderDetails #frmBuilderDetails");
+			unblockElement('body');
 			
 			if(new_builder==false){
 				if(confirm("Changes Saved! do you want to go back to the Builders List?"))

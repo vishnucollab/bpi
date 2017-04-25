@@ -60,7 +60,9 @@ function Sync()
         $("#sync").removeClass("hidden"); 
           
         // Bind sync events
-        self.bindEvents();                
+        self.bindEvents();
+
+        objApp.setBodyClass('sync');
 	}
 	
 	/***
@@ -153,7 +155,10 @@ function Sync()
  					if(!self.silentMode) $("#accountMessage #general").text("Login OK.  Deleting local data...");
  					
  					// Tell the database to delete all data.
- 					setTimeout('objDBUtils.emptyAllTables(1, objApp.objSync.getSmartData);', 200);
+                    if (objApp.objSync.refreshSync)
+                        setTimeout('objDBUtils.emptyAllTables(1, objApp.objSync.sendData);', 200);
+                    else
+ 					    setTimeout('objDBUtils.emptyAllTables(1, objApp.objSync.getSmartData);', 200);
  				}
  				else
  				{
@@ -165,8 +170,10 @@ function Sync()
  					// Now proceed with sync.
  					// Ask the database object to get all dirty data and to call the sendData method
  					// in this object when done.
-
- 					objDBUtils.callbackMethod = objApp.objSync.getSmartData;
+                    if (objApp.objSync.refreshSync)
+                        objDBUtils.callbackMethod = objApp.objSync.sendData;
+                    else
+ 					    objDBUtils.callbackMethod = objApp.objSync.getSmartData;
  						
  					// Do not send photos when not running under phonegap.
  					setTimeout('objDBUtils.getDirtyData(1, 0);', 200);
@@ -615,7 +622,7 @@ function Sync()
                 {
                     if(!self.silentMode)
                     {
-                        unblockElement("#frmSync");
+                        unblockElement("body");
                         alert("Warning: An error occured during the data sync operation.  Please report this error to the Blueprint team.");
                          $("#accountMessage #general").text("Sorry, something went wrong during the processing phase.  Please report this error to the Blueprint team.");
                     }
@@ -629,7 +636,7 @@ function Sync()
                 console.log(e);
                 if(!self.silentMode)
                 {
-                    unblockElement("#frmSync");
+                    unblockElement("body");
                     alert("Warning: An error occured during the data sync operation.  Please report this error to the Blueprint team.");
                      $("#accountMessage #general").text("Sorry, something went wrong during the processing phase.  Please report this error to the Blueprint team.");
                 }
@@ -720,7 +727,7 @@ function Sync()
                 // error
                 if(!self.silentMode)
                 {                
-                    unblockElement("#frmSync");
+                    unblockElement("body");
                     alert("Warning: An error occured during the data sync operation.  Please report this error to the Blueprint team.");
                      $("#accountMessage #general").text("Sorry, something went wrong during the processing phase.  Please report this error to the Blueprint team.");                                    
                 }
@@ -985,7 +992,7 @@ function Sync()
 	{	              
 		if(!self.silentMode)
 		{
-			unblockElement("#frmSync");        
+			unblockElement("body");
 			 $("#accountMessage #general").text("All done - Sync completed successfully!");	
 		}
 		

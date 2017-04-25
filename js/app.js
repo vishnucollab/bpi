@@ -385,6 +385,7 @@ function App()
 		{
 			$("#defect").addClass("hidden");
 		}
+		objApp.setBodyClass('');
 	}	
 	
 	/***
@@ -886,7 +887,11 @@ function App()
     this.validateEmail = function(email) { 
         var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
         return re.test(email);
-    } 
+    }
+
+    this.setBodyClass = function(body_class){
+    	$('body').attr('class', body_class);
+	}
 };
 
 /**********************************************************
@@ -960,3 +965,17 @@ $.assocArraySize = function(obj) {
     }
     return size;
 };
+
+function preselectByText($selector, text){
+	var found = 0;
+	$selector.find('option').each(function(){
+		if (found)
+			return;
+		var o_text = $(this).text();
+		var o_value = $(this).attr('value');
+		if (o_text == text){
+			found = 1;
+			$selector.val(o_value);
+		}
+	});
+}

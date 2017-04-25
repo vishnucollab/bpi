@@ -732,7 +732,7 @@ fieldset legend {
         #emailReportWrapper ul li label {
             float: left;
             margin-left: 10px;
-            margin-top: -5px;
+            margin-top: 2px;
             display: block;
         }
 		

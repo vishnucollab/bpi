@@ -53,7 +53,7 @@ var popselector = function(selector, heading)
 			thisHeight = height - 60; 	
 		}
 		
-		var optionsHeight = thisHeight - 140;
+		var optionsHeight = thisHeight - 80;
 		
 		// If the width is greater than 500px, make the width only 500 anyway.
 		if(width > 500)
@@ -70,7 +70,7 @@ var popselector = function(selector, heading)
 
 		// Setup the control html
 		var div = $('<div id="popSelector" style="height: ' + thisHeight + 'px; width: ' + width + 'px;" />');
-		div.append('<h1 style="width: ' + width + 'px !important;">' + self.heading + '</h1>');
+		div.append('<h1>' + self.heading + '</h1>');
 		div.append('<form id="frmPopSearch" name="frmPopSearch">');
 		
 		if(self.largeScreenMode)

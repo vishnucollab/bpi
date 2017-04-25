@@ -329,23 +329,16 @@
         <div class="left">
             <h1>Blueprint Inspection</h1>
         </div>
-
-        <div class="right">
-            <h1 class="hidden">Extra Heading Goes Here</h1>
-        </div>
     </div>
 
     <div id="subheader">
-
         <div class="left">
             <h1>Heading Goes Here</h1>
         </div>
-
         <div class="right">
             <h1 class="hidden">Extra Heading Goes Here</h1>
         </div>
     </div>
-
 
     <div id="content">
         <div id="sync" class="sync hidden panel center">
@@ -414,7 +407,7 @@
                             <td><label for="builder_id">Select a Builder</label></td>
                             <td>
                                 <select class="selector" id="builder_id" title="Select a Builder">
-                                    <option title="">Builder</option>
+                                    <option value="">Builder</option>
                                 </select>
                             </td>
                         </tr>
@@ -423,12 +416,8 @@
                             <td><input type="text" name="inspection_date" id="inspection_date" readonly="readonly" value="" class="required" />     </td>
                         </tr>
                         <tr>
-                            <td><label for="client_info">Client name/Investment group</label></td>
+                            <td><label for="client_info">Client name/<br/>Investment group</label></td>
                             <td><input type="text" name="client_info" id="client_info" value="" class="" />     </td>
-                        </tr>
-                        <tr>
-                            <td><label for="weather">Weather</label>  </td>
-                            <td><textarea id="weather" name="weather"></textarea></td>
                         </tr>
                     </table>
                 </fieldset>
@@ -453,18 +442,22 @@
                         <tr>
                             <td><label for="state">State</label></td>
                             <td>
-                                <ul class="selector" id="state" title="Select a State">
-                                    <li title="">Choose</li>
-                                    <li title="VIC">VIC</li>
-                                    <li title="NSW">NSW</li>
-                                    <li title="ACT">ACT</li>
-                                    <li title="QLD">QLD</li>
-                                    <li title="NT">NT</li>
-                                    <li title="WA">WA</li>
-                                    <li title="SA">SA</li>
-                                    <li title="TAS">TAS</li>
-                                </ul>
+                                <select class="selector" id="state" title="Select a State">
+                                    <option value="">Choose</option>
+                                    <option value="VIC">VIC</option>
+                                    <option value="NSW">NSW</option>
+                                    <option value="ACT">ACT</option>
+                                    <option value="QLD">QLD</option>
+                                    <option value="NT">NT</option>
+                                    <option value="WA">WA</option>
+                                    <option value="SA">SA</option>
+                                    <option value="TAS">TAS</option>
+                                </select>
                             </td>
+                        </tr>
+                        <tr>
+                            <td><label for="weather">Weather</label>  </td>
+                            <td><textarea id="weather" name="weather"></textarea></td>
                         </tr>
                     </table>
                 </fieldset>
@@ -484,13 +477,15 @@
                 </div>
 
                 <a id="btnCapturePhoto" data-reveal-id="photoWrapper" class="right" href="#"></a>
-                <a id="btnStep1Next" class="button right rightmargin" href="#">Next &rsaquo;&rsaquo;</a>
+                <div class="btnContainer right">
+                    <a id="btnStep1Next" class="mtop20 right rightmargin btn-bg-w81" href="#">Next &rsaquo;&rsaquo;</a>
+                </div>
             </div>
         </div> <!--! end of inspection details screen wrapper -->
 
         <!-- inspection step 2 screen -->
         <div id="inspectionStep2" class="inspectionDetails hidden panel">
-            <a id="btnAddDefect" class="button right leftmargin" href="#">Add Another Issue</a>
+            <a id="btnAddDefect" class="button leftmargin" href="#">Add Another Issue</a>
             <form action="#" method="post" id="frmDefectDetails" class="clear">
                 <fieldset class="thefs">
                     <table>
@@ -541,8 +536,12 @@
 
             <div id="controlBtns" class="bottomBtns" >
                 <a id="btnCapturePhoto" data-reveal-id="photoWrapper" class="right" href="#"></a>
-                <a id="btnStep2Back" class="button left leftmargin gotoStep1" href="#">&lsaquo;&lsaquo; Back</a>
-                <a id="btnStep2Next" class="button right rightmargin" href="#">Next &rsaquo;&rsaquo;</a>
+                <div class="btnContainer left">
+                    <a id="btnStep2Back" class="mtop20 left gotoStep1 btn-bg-w81" href="#">&lsaquo;&lsaquo; Back</a>
+                </div>
+                <div class="btnContainer right">
+                    <a id="btnStep2Next" class="mtop20 right rightmargin btn-bg-w81" href="#">Next &rsaquo;&rsaquo;</a>
+                </div>
                 <div class="btnContainer left btnEditNotes" id="btnEditNotes">
                     <a href="#" class="btnNotes "></a>
                     <span>Notes</span>
@@ -569,8 +568,6 @@
             </table>
 
             <div id="defectScrollWrapper" class="scrollWrapper"></div>
-
-
 
             <div class="bottomBtns">
 
@@ -617,7 +614,7 @@
                 <a id="btnReportPhotos" class="button left hidden" href="javascript:void(0);">Set Report Photos</a>
 
                 <div class="btnContainer right">
-                    <a id="btnStep3Next" class="button right rightmargin" href="#">Exit</a>
+                    <a id="btnStep3Next" class="right rightmargin mtop20 btn-bg-w81" href="#">Exit</a>
                 </div>
             </div>
             <div style="clear: both;"></div>
@@ -698,7 +695,7 @@
 
             <div class="bottomBtns">
                 <div class="btnContainer left">
-                    <a id="btnStep4Back" class="button left gotoStep3" href="#">&lsaquo;&lsaquo;&nbsp;Back</a>
+                    <a id="btnStep4Back" class="button left gotoStep3 btn-bg-w100" href="#">&lsaquo;&lsaquo;&nbsp;Back</a>
                 </div>
 
                 <div class="btnContainer left">
@@ -717,7 +714,7 @@
 
 
                 <div class="btnContainer right">
-                    <a id="btnStep4Next" class="button right rightmargin" href="#">Next &rsaquo;&rsaquo;</a>
+                    <a id="btnStep4Next" class="button right rightmargin btn-bg-w100" href="#">Next &rsaquo;&rsaquo;</a>
                 </div>
             </div>
 
@@ -1018,15 +1015,15 @@
                     <input type="text" name="postcode" id="postcode" value="" class="number" tabindex="7" minlength="4" maxlength="4" />
                     <label for="state">State</label>
                     <select class="selector" id="state" title="Select a State">
-                        <option title="">Choose</option>
-                        <option title="VIC">VIC</option>
-                        <option title="NSW">NSW</option>
-                        <option title="ACT">ACT</option>
-                        <option title="QLD">QLD</option>
-                        <option title="NT">NT</option>
-                        <option title="WA">WA</option>
-                        <option title="SA">SA</option>
-                        <option title="TAS">TAS</option>
+                        <option value="">Choose</option>
+                        <option value="VIC">VIC</option>
+                        <option value="NSW">NSW</option>
+                        <option value="ACT">ACT</option>
+                        <option value="QLD">QLD</option>
+                        <option value="NT">NT</option>
+                        <option value="WA">WA</option>
+                        <option value="SA">SA</option>
+                        <option value="TAS">TAS</option>
                     </select>
                 </fieldset>
                 <div class="clear"></div><br />
@@ -1047,7 +1044,6 @@
     <footer>
         <ul>
             <li><a id="navNewInspection" href="#">New Inspection</a></li>
-
             <li><a id="navInspections" href="#">Inspections</a></li>
             <li><a id="navBuilders" href="#">Builders</a></li>
             <li><a id="navSync" class="active" href="#">Sync</a></li>

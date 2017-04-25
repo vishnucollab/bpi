@@ -143,10 +143,13 @@ var Inspections = function()
             objApp.objInspection.setReturnInspectionID("");
             objApp.objInspection.addNewInspection();
             objApp.context = "inspection";
+            objApp.setBodyClass('inspection');
         });
 
         if (!$("#inspectionList #il_builder_id").hasClass('select2-hidden-accessible'))
             $("#inspectionList #il_builder_id").select2();
+
+        objApp.setBodyClass('inspections');
     }
     
 	/***
@@ -172,7 +175,7 @@ var Inspections = function()
         $("#tblInspectionListingHeader th").unbind();
         //$("#tblInspectionListing a.reinspect").unbind();            
         $("#tblInspectionListing a.view").unbind();            
-        $("#tblInspectionListing td.delete").unbind(); 
+        $("#tblInspectionListing a.delete").unbind();
 
 		// Inject the triangle
 		$("#tblInspectionListingHeader th[class='" + self.sortBy + "']").append('<span class="triangle ' + self.sortDir + '"></span>');	
@@ -238,8 +241,8 @@ var Inspections = function()
 	    objApp.showHideSpinner(true, "#inspectionList");
         
         objDBUtils.primaryKey = "id";
-		objDBUtils.showColumn = "name";     
-	    
+		objDBUtils.showColumn = "name";
+        
 	    objDBUtils.loadRecordsSQL(sql, values, function(param, items)
 	    {
 			objApp.showHideSpinner(false, "#inspectionList");
@@ -334,13 +337,13 @@ var Inspections = function()
 			
 
 			// Bind click event to list items
-            $("#tblInspectionListing td.delete").bind(objApp.touchEvent, function(e) {
+            $("#tblInspectionListing a.delete").bind(objApp.touchEvent, function(e) {
 
                 self.is_change_order = true;
 				e.preventDefault();
-				var inspection_item_id = $(this).parent().attr("rel");
+				var inspection_item_id = $(this).attr("data-id");
 				
-				var parent = $(this).parent();
+				var parent = $(this).parents('tr');
 
 				
                 var item_name = $(parent).find("td:eq(2)").text();
@@ -350,10 +353,7 @@ var Inspections = function()
                     var sql = "UPDATE inspections " +
                               "SET deleted = 1, dirty = 1 " +
                               "WHERE id = ?";
-                              
                     objDBUtils.execute(sql, [inspection_item_id], null);
-
-
                     self.doInspectionSearch();
                 }
             });
@@ -373,12 +373,12 @@ var Inspections = function()
                 }
 
                 // Show the loading indicator
-                blockElement("#tblInspectionListing");
+                blockElement('body');
 
                 // Load the inspection in question
                 objDBUtils.loadRecord("inspections", inspection_id, function(inspection_id, row)
                 {
-                    unblockElement("#tblInspectionListing");
+                    unblockElement('body');
 
                     if(!row) {
                         alert("Sorry, the inspection could not be loaded.  Please report this error.");
@@ -403,12 +403,12 @@ var Inspections = function()
                 }
 
                 // Show the loading indicator
-                blockElement("#tblInspectionListing");
+                blockElement('body');
                 
                 // Load the inspection in question
                 objDBUtils.loadRecord("inspections", inspection_id, function(inspection_id, row)
                 {
-                    unblockElement("#tblInspectionListing");
+                    unblockElement('body');
                     
                     if(!row) {
                         alert("Sorry, the inspection could not be loaded.  Please report this error.");
@@ -480,14 +480,14 @@ var Inspections = function()
             return;
         } 
         
-        blockElement("#content");       
+        blockElement('body');
         
         // Load the original inspection
         objDBUtils.loadRecord("inspections", inspection_id, function(inspection_id, row)
         {
             if(!row) {
                 alert("Sorry, the inspection could not be loaded.  Please report this error.");
-                unblockElement("#content");
+                unblockElement('body');
                 return;
             }
 
@@ -531,7 +531,7 @@ var Inspections = function()
                         if(!items)
                         {
                             alert("Sorry, an error occurred whilst trying to create the reinspection items.  Please report this error");
-                            unblockElement("#content");
+                            unblockElement('body');
                             return;
                         }
 
@@ -555,7 +555,7 @@ var Inspections = function()
 
                                 // See if the last reinspection item has been copied in.
                                 if(finished) {
-                                    unblockElement("#content");
+                                    unblockElement('body');
                                     // Open the reinspection page for this reinspection
                                     self.loadReinspectionItems(reinspection_id);
                                 }
@@ -1138,12 +1138,12 @@ var Inspections = function()
 	    	values.push(objFilters.recordLimit);
 	    }
 
-	    blockElement("#frmFilters");
+	    blockElement('body');
 
 	    objDBUtils.loadRecordsSQL(sql, values, function(param, items)
 	    {
 		    // Remove any element block
-		    unblockElement("#frmFilters");
+		    unblockElement('body');
 
 			if(!items)
             {
@@ -1205,12 +1205,12 @@ var Inspections = function()
 			    var inspection_id = $(this).attr("rel");
 
 			    // Show the loading indicator
-			    blockElement("#tblInspectionListing");
+			    blockElement('body');
 
 			    // Load the inspection in question
 			    objDBUtils.loadRecord("inspections", inspection_id, function(inspection_id, row)
 			    {
-			    	unblockElement("#tblInspectionListing");
+			    	unblockElement('body');
 
 					if(row)
 					{
@@ -1379,6 +1379,7 @@ var Inspections = function()
 		this.unbindEvents();
 		// Setup client and site popselectors
 		this.setupPopselectors();
+        objApp.setBodyClass('inspection');
 	}
 
     /**
@@ -1413,6 +1414,7 @@ var Inspections = function()
 
 		// Set the app context so we can warn the user about unfinalised inspections.
 		objApp.context = "inspection";
+        objApp.setBodyClass('inspection');
 
 		if(objApp.keys.inspection_id == "")
 			return;
@@ -1605,23 +1607,30 @@ var Inspections = function()
 		objDBUtils.primaryKey = "id";
 		objDBUtils.showColumn = "name";
 		objDBUtils.orderBy = "ABS(name) ASC";
-        $("#inspection #builder_id").empty();
-        $("#inspection #builder_id").append('<option title="">Builder</option>');
+
+        self.objPopBuilders = $("#frmInspectionDetails #builder_id");
+
+        self.objPopBuilders.bind('change', objApp.objInspection.handleBuilderChanged);
+        self.objPopBuilders.empty();
+        self.objPopBuilders.append('<option value="">Builder</option>');
 
         objDBUtils.loadSelect("builders", [], "#inspection #builder_id", function()
 		{
-            if ($("#inspection #builder_id").hasClass('select2-hidden-accessible'))
-                $("#inspection #builder_id").select2('destroy');
-            $("#inspection #builder_id").select2();
 			// Builders have finished loading.  Preselect the client if we have a client_id.
 			if(objApp.keys.builder_id != "")
 			{
-                $('#inspection #builder_id').val(objApp.keys.builder_id);
-                $('#inspection #builder_id').trigger('change');
+                self.objPopBuilders.val(objApp.keys.builder_id);
+                self.objPopBuilders.trigger('change');
 			}
+
+            if (self.objPopBuilders.hasClass('select2-hidden-accessible'))
+                self.objPopBuilders.select2('destroy');
+            self.objPopBuilders.select2({dropdownParent: $("#inspection")});
 		}, 'option');
 
+        $('#frmInspectionDetails #state').bind('change', objApp.objInspection.handleStateChanged);
         $('#frmInspectionDetails #state').val(objApp.keys.state);
+        $('#frmInspectionDetails #state').trigger('change');
 	}
 
     this.loadAddressBookList = function(callback)
@@ -1858,7 +1867,7 @@ var Inspections = function()
              self.setReturnInspectionID("");
              self.addNewInspection(); 
              objApp.context = "inspection";
-             
+            objApp.setBodyClass('inspection');
              return false;
         });                  
 
@@ -1883,7 +1892,7 @@ var Inspections = function()
 
             var reinspection_id = objApp.getKey("reinspection_id");
 
-            blockElement($("#frmEmailTo"));
+            blockElement('body');
 
             // Load the inspection record
             objDBUtils.loadRecord("inspections", inspection_id, function(param, inspection) {
@@ -1927,7 +1936,7 @@ var Inspections = function()
                 objApp.objSync.startSyncSilent(function(success) {
                     
                     if(!success) {
-                        unblockElement($("#frmEmailTo"));
+                        unblockElement('body');
                         alert("Sorry, a problem occurred whilst syncing your data to the server");
                         return;
                     }
@@ -1948,7 +1957,7 @@ var Inspections = function()
                     
                     $.post(objApp.apiURL + "reports/send_inspection_report", params, function(response) {
                         
-                        unblockElement($("#frmEmailTo"));
+                        unblockElement('body');
                         
                         var data = JSON.parse(response);
 
@@ -1992,7 +2001,7 @@ var Inspections = function()
 
             var reinspection_id = objApp.getKey("reinspection_id");
 
-            blockElement($("#frmEmailAdressBooks"));
+            blockElement('body');
 
             // Load the inspection record
             objDBUtils.loadRecord("inspections", inspection_id, function(param, inspection) {
@@ -2021,7 +2030,7 @@ var Inspections = function()
                         var values = [primaryKey, email];
 
                         objDBUtils.execute(sql, values, function(){
-                            unblockElement($("#frmEmailAdressBooks"));
+                            unblockElement('body');
                             self.loadAddressBookList(function(){
                                 $('#' + primaryKey).prop('checked', true);
                                 self.resolveEmailReportRecipients();
@@ -2361,7 +2370,7 @@ var Inspections = function()
         $(".inspectionDetails #btnStep1Next").bind(objApp.touchEvent, function(e) {
 			e.preventDefault();
 
-            if(self.objPopBuilders.getValue() == "") {
+            if(self.objPopBuilders.val() == "") {
                 alert("Please select a builder");
                 return;
             }
@@ -2391,7 +2400,7 @@ var Inspections = function()
                 return;
             }
 
-            if(self.objPopState.getValue() == "") {
+            if($('#frmInspectionDetails #state').val() == "") {
                 alert("Please select a state");
                 return;
             }
@@ -2427,7 +2436,7 @@ var Inspections = function()
                 var objTimePicker = new Timepicker();
                 $("#inspection #finish").val(objTimePicker.getTimeStr(objDate));
 
-                blockElement("#frmDefectDetails");
+                blockElement('body');
 
                 self.checkSaveInspection();
                 // self.loadInspectionItems();
@@ -2451,7 +2460,7 @@ var Inspections = function()
 
                         objDBUtils.execute(sql, [num_defects, objApp.keys.inspection_id], function()
                         {
-                            unblockElement("#frmDefectDetails");
+                            unblockElement('body');
                             self.doingSave = false;
 
                             self.showStep3();
@@ -2481,6 +2490,7 @@ var Inspections = function()
 
                 self.setupInspections();
                 objApp.context = "inspections";
+                objApp.setBodyClass('inspections');
             }
 
 			return false;
@@ -2536,6 +2546,7 @@ var Inspections = function()
 
                 self.setupInspections();
                 objApp.context = "inspections";
+                objApp.setBodyClass('inspections');
             }
 
             return false;
@@ -2550,6 +2561,7 @@ var Inspections = function()
 
             self.setupInspections();
             objApp.context = "inspections";
+            objApp.setBodyClass('inspections');
 			return false;
 		});
 
@@ -2760,7 +2772,7 @@ var Inspections = function()
 			e.preventDefault();
 
 			// Show the loader graphic
-			blockElement(".inspectionDetails");
+			blockElement('body');
 
 			objApp.objSync.startSyncSilent(function(success)
 			{
@@ -2768,18 +2780,18 @@ var Inspections = function()
 				{
 					// The silent sync has completed successfully.
 					// We can now launch the report.
-					unblockElement(".inspectionDetails");
+					unblockElement('body');
 
                     // Create a token
                     var params = {};
                     params["email"] = localStorage.getItem("email");
                     params["password"] = localStorage.getItem("password");
                     var url = objApp.apiURL + "account/create_token/" + Math.floor(Math.random() * 99999);
-                    blockElement(".inspectionDetails");
+                    blockElement('body');
 
                     $.post(url, params, function(data)
                     {
-                        unblockElement(".inspectionDetails");
+                        unblockElement('body');
 
                         try {
                             data = jQuery.parseJSON(data);
@@ -2818,7 +2830,7 @@ var Inspections = function()
 				}
 				else
 				{
-					unblockElement(".inspectionDetails");
+					unblockElement('body');
 					alert("Sorry, something went wrong whilst syncing your data back to the Blueprint server.  Please try again later.");
 				}
 			});
@@ -3001,7 +3013,7 @@ var Inspections = function()
 				return true;
 			}
 
-			blockElement("#frmInspectionDetails");
+			blockElement('body');
 
 			// Delete related inspectionitemphotos
 			var sql = "UPDATE inspectionitemphotos " +
@@ -3029,7 +3041,7 @@ var Inspections = function()
 				// Now move back to the inspection listing screen.
 				self.setupInspections();
 
-				unblockElement("#frmInspectionDetails");
+				unblockElement('body');
 			}, 500);
 		});
 
@@ -3250,7 +3262,7 @@ var Inspections = function()
                     // Get the ID of the selected photo
                     var photo_id = $(this).val();
 
-                    blockElement("#frmReportPhotos");
+                    blockElement('body');
 
                     // Remove any existing is_cover_photo flags for this inspection
                     var sql = "UPDATE inspectionitemphotos " +
@@ -3269,7 +3281,7 @@ var Inspections = function()
                             // All done
 
 
-                            unblockElement("#frmReportPhotos");
+                            unblockElement('body');
                         });
                     });
                 });
@@ -3294,11 +3306,11 @@ var Inspections = function()
                             "SET is_report_photo = 1, dirty = 1 " +
                             "WHERE id = ?";
 
-                        blockElement("#frmReportPhotos");
+                        blockElement('body');
 
                         objDBUtils.execute(sql, [photo_id], function() {
                             // All done
-                            unblockElement("#frmReportPhotos");
+                            unblockElement('body');
                         });
 
 
@@ -3308,11 +3320,11 @@ var Inspections = function()
                             "SET is_report_photo = 0, dirty = 1 " +
                             "WHERE id = ?";
 
-                        blockElement("#frmReportPhotos");
+                        blockElement('body');
 
                         objDBUtils.execute(sql, [photo_id], function() {
                             // All done
-                            unblockElement("#frmReportPhotos");
+                            unblockElement('body');
                         });  
                     }
                 });
@@ -3486,6 +3498,8 @@ var Inspections = function()
 
     this.updateExtraSubHeader = function()
 	{
+	    /* Do not use it anymore */
+	    return;
         var text = '';
         var lot = $('#frmInspectionDetails #lot_no').val();
         var address = $('#frmInspectionDetails #address').val();
@@ -3723,6 +3737,8 @@ var Inspections = function()
     });
     
 	this.searchObservations = function(){
+	    if (typeof self.filters == 'undefined')
+	        return;
         // Remove any previously bound events.
         $("#frmDefectDetails #observation_suggestion tr td").unbind();
         
@@ -3742,7 +3758,7 @@ var Inspections = function()
             });            
             
             if(objUtils.isMobileDevice()) {
-                self.scroller = new iScroll('observationWrapper', { click: true, hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar'});
+                self.scroller = new IScroll('observationWrapper', { click: true, hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar'});
             }
         }, 'td');
     }
@@ -4190,14 +4206,14 @@ var Inspections = function()
 								alert("Sorry, this request could not be completed");
 							}
 
-							blockElement("#inspection #photoWrapper");
+							blockElement('body');
 
 							// Create the request URL
 							var url = objApp.apiURL + "inspections/get_inspection_photo/" + photoID;
 
 							$.post(url, params, function(data)
 							{
-								unblockElement("#inspection #photoWrapper");
+								unblockElement('body');
 
 								if(data.status == "OK")
 								{
@@ -4832,14 +4848,14 @@ var Inspections = function()
 							alert("Sorry, this request could not be completed");
 						}
 
-						blockElement("#inspection #photoWrapper");
+						blockElement('body');
 
 						// Create the request URL
 						var url = objApp.apiURL + "inspections/get_inspection_photo/" + photoID;
 
 						$.post(url, params, function(data)
 						{
-							unblockElement("#inspection #photoWrapper");
+							unblockElement('body');
 
 							if(data.status == "OK")
 							{
@@ -4994,11 +5010,11 @@ var Inspections = function()
    		// Invoke autosave
 		$("#frmDefectDetails input").blur();
 
-		blockElement("#frmDefectDetails");
+		blockElement('body');
 
 		objDBUtils.autoSave("inspectionitems", objApp.getKey("inspection_item_id"), "frmDefectDetails", function(new_id)
 		{
-            unblockElement("#frmDefectDetails");
+            unblockElement('body');
 
 			// If the id was not set and we just did an update, get the id
 			if(objApp.getKey("inspection_item_id") == "")
@@ -5087,7 +5103,7 @@ var Inspections = function()
             return;
         }
 
-        blockElement("#frmReinspection");
+        blockElement('body');
 
         // Step 1 - Load the reinspection item
         var reinspectionItemID = $(this.reinspectionItemRow).attr("data-id").trim();
@@ -5112,7 +5128,7 @@ var Inspections = function()
 
                 objDBUtils.execute(sql, [rectified_status, reinspectionItem.inspectionitem_id], function() {
                     // Step 3 - Update the inspectionitem that the reinspection was based upon
-                    unblockElement("#frmReinspection");
+                    unblockElement('body');
 
                     // Update the table row with the modified text
                     if(objApp.keys.report_type == 'Handovers' || 1) {
@@ -5131,7 +5147,7 @@ var Inspections = function()
     {
         self.doingSave = true;
 
-        blockElement("#frmRateDetails");
+        blockElement('body');
 
         // Invoke the autoSave method after a short delay.
 	    setTimeout(function()
@@ -5139,7 +5155,7 @@ var Inspections = function()
 			objDBUtils.autoSave("inspections", objApp.keys.inspection_id, "frmRateDetails", function()
 			{
 			    self.doingSave = false;
-                unblockElement("#frmRateDetails");
+                unblockElement('body');
 
                 // If the id was not set and we just did an update, get the id
 			    if(objApp.keys.inspection_id == "")
@@ -5216,7 +5232,7 @@ var Inspections = function()
 			    self.setReturnInspectionID(objApp.keys.inspection_id);
                 $('#btnCapturePhoto').attr('data-reveal-id', 'photoWrapper');
 
-			    // unblockElement(".inspectionDetails");
+			    // unblockElement('body');
                 $("#reinspection input#failed").addClass("ignore");
                 $("#reinspection input#finalised").addClass("ignore");
                 $("#reinspection select#rectified").removeClass("ignore");
@@ -5240,7 +5256,7 @@ var Inspections = function()
 	    }
 
 	    // Make sure both the client and site pop selectors are also set
-	    if((self.objPopBuilders.getValue() == ""))
+	    if((self.objPopBuilders.val() == ""))
 	    {
 			return;
 	    }
@@ -5290,7 +5306,7 @@ var Inspections = function()
 	    // Ready to save
 	    $("#frmInspectionDetails input").blur();
 
-	    blockElement(".inspectionDetails");
+	    blockElement("body");
 
 	    // Invoke the autoSave method after a short delay.
 	    setTimeout(function()
@@ -5336,7 +5352,7 @@ var Inspections = function()
 			        self.setReturnInspectionID(objApp.keys.inspection_id);
                     $('#btnCapturePhoto').attr('data-reveal-id', 'photoWrapper');
 
-			        unblockElement(".inspectionDetails");
+			        unblockElement("body");
 
 			        // Show the toggle objects
 			        $("#toggles").removeClass("hidden");
@@ -5467,11 +5483,11 @@ var Inspections = function()
             filters.push(new Array(filter_string));
         }
 
-		blockElement(".inspectionDetails");
+		blockElement('body');
 
 		objDBUtils.loadRecords("inspectionitems", filters, function(param, items)
 		{
-		    unblockElement(".inspectionDetails");
+		    unblockElement('body');
 			$("#defectScrollWrapper").html("");            
 
             
@@ -5660,12 +5676,12 @@ var Inspections = function()
 
 					if(confirm("Would you like to edit this item?"))
 					{
-						blockElement("#tblDefectListing");
+						blockElement('body');
 
     					// Load the inspection item record
     					objDBUtils.loadRecord("inspectionitems", inspection_item_id, function(inspection_item_id, item)
     					{
-    						unblockElement("#tblDefectListing");
+    						unblockElement('body');
 
     						if(!item)
     						{
@@ -5730,12 +5746,12 @@ var Inspections = function()
 						}
 						/*else if(confirm("Would you like to edit this item?"))
     					{
-    						blockElement("#tblDefectListing");
+    						blockElement('body');
 
         					// Load the inspection item record
         					objDBUtils.loadRecord("inspectionitems", inspection_item_id, function(inspection_item_id, item)
         					{
-        						unblockElement("#tblDefectListing");
+        						unblockElement('body');
 
         						if(!item)
         						{
@@ -6081,7 +6097,7 @@ var Inspections = function()
     // Update the reinspection and master inspection record with the new status
 	this.updateReinspectionPassFail = function(failed)
     {
-        blockElement("#frmReinspection");
+        blockElement('body');
 
         // Step 1 - Load the reinspection item
         var reinspectionID = this.reinspectionKey;
@@ -6120,7 +6136,7 @@ var Inspections = function()
                         $("#reinspectionPassed a").addClass('active');
                     }
 
-                    unblockElement("#frmReinspection");
+                    unblockElement('body');
                 });
 
             });
@@ -6388,7 +6404,7 @@ var Inspections = function()
         
         if(self.finalised == 1)
 		{            
-            self.objPopBuilders.readOnly = true;
+            self.objPopBuilders.prop( 'disabled', true );
             
             if(self.objToggleFailed != null) {
 			    self.objToggleFailed.preventToggle = true;
@@ -6408,8 +6424,10 @@ var Inspections = function()
 		}
 		else
 		{
-			self.objPopBuilders.readOnly = false;
-			self.objToggleFailed.preventToggle = false;
+			self.objPopBuilders.prop( 'disabled', false );
+            if(self.objToggleFailed != null) {
+                self.objToggleFailed.preventToggle = false;
+            }
 			
 			if(self.objPopLocation != null ) self.objPopLocation.readOnly = false;
 			if(self.objPopAction != null ) self.objPopAction.readOnly = false;
@@ -6586,7 +6604,7 @@ var Inspections = function()
 			}
             
 			// Show the loader graphic
-			blockElement("#printModal");
+			blockElement('body');
 			
 			objApp.objSync.startSyncSilent(function(success)
 			{
@@ -6610,7 +6628,7 @@ var Inspections = function()
 
 					$.post(url, params, function(data)
 					{
-						unblockElement("#printModal");
+						unblockElement('body');
                         
                         try {
                             data = jQuery.parseJSON(data);
@@ -6634,7 +6652,7 @@ var Inspections = function()
 				}
 				else
 				{
-					unblockElement("#printModal");
+					unblockElement('body');
 					alert("Sorry, something went wrong whilst syncing your data back to the Blueprint server.  Please try again later.");
 				}
 			});					
@@ -6919,7 +6937,7 @@ var Inspections = function()
 				return;
                 */
                 emailMessage = "Hi there, please find attached a Blueprint inspection report for: <br/><br/>" +
-                                "   Client: " + self.objPopBuilders.getText() + "<br/>" +
+                                "   Client: " + self.objPopBuilders.select2('data').text + "<br/>" +
                                 "   Site: " + self.objPopSites.getText() + "<br/>" +
                                 "   Inspection Date: " + $("#inspection #inspection_date").val() + "<br/>" +
                                 "   Passed: ";
@@ -6941,7 +6959,7 @@ var Inspections = function()
 			}
             
 			// Show the loader graphic
-			blockElement("#inspectionStep4");
+			blockElement('body');
 			
 			objApp.objSync.startSyncSilent(function(success)
 			{
@@ -6966,7 +6984,7 @@ var Inspections = function()
 					
 					$.post(url, params, function(data)
 					{
-						unblockElement("#inspectionStep4");
+						unblockElement('body');
                         
                         try {
                             data = jQuery.parseJSON(data);
@@ -6988,7 +7006,7 @@ var Inspections = function()
 				}
 				else
 				{
-					unblockElement("#inspectionStep4");
+					unblockElement('body');
 					alert("Sorry, something went wrong whilst syncing your data back to the Blueprint server.  Please try again later.");
 				}
 			});					
@@ -7007,10 +7025,10 @@ var Inspections = function()
 
         $("#frmEmailTo ul#list_email input[type='checkbox']").unbind();
 
-        blockElement("#frmEmailTo");
+        blockElement('body');
 
         objDBUtils.loadRecord("builders", self.inspection.builder_id, function(param, builder) {
-            unblockElement("#frmEmailTo");
+            unblockElement('body');
 
             if(builder) {
                 builder_email = builder.email;
