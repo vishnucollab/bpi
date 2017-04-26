@@ -121,7 +121,7 @@ body > div:focus {outline: none;}
     margin-bottom: 20px;
     height: 768px;
     padding: 0 0px; 
-    max-width: 984px;   
+    max-width: none;
 }
 
 .panel
@@ -166,6 +166,19 @@ aside
 .spacing25{letter-spacing: 0.025em;}
 .mbottom30{margin-bottom: 30px;}
 .mtop20{margin-top: 20px;}
+.btn-bg-w400{
+    background: url('../images/btn-bg-w400.png') bottom right;
+    width: 400px;
+    height: 58px;
+    font-size: 21px;
+    font-family: 'SourceSansPro-SemiBold', sans-serif;
+    font-weight: normal;
+    color: #fff;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+}
 .btn-bg-w200{
     background: url('../images/btn-bg-w200.png') bottom right;
     width: 200px;
@@ -477,7 +490,7 @@ body.inspection #header{margin-bottom: 10px;}
 }
 
 body.inspection div#subheader .left{float: left;}
-body.inspection div#subheader .left h1{margin: 0  0 10px 10px !important;}
+body.inspection div#subheader .left h1{margin: 0  0 10px 10px !important;font-size: 30px;}
 body.inspection div#subheader .right{float: right;}
 
 /* End inspection */
@@ -1548,6 +1561,7 @@ aside textarea
 .inspectionDetails #defectScrollWrapper{
     height: 247px;
     overflow-x: hidden;
+    max-height: 320px;
 }
 
 .inspectionDetails ul.gallery{

@@ -263,7 +263,8 @@ function App()
 					{
 						// Default to the add new inspection screen.
 						//self.objInspection.addNewInspection();
-						self.objInspection.setupInspections(); 	
+						//self.objInspection.setupInspections();
+                        self.setupStartScreen();
 					}
 				}
 			}
@@ -369,6 +370,35 @@ function App()
 		//$("#main").css("width", screen.width + "px");	
 		//$("#sidebar").css("display", "block");		
 	}
+
+	this.setupStartScreen = function()
+	{
+        $("#btnNewInspection").bind(self.touchEvent, function(e)
+        {
+            e.preventDefault();
+            $("#main").removeClass("hidden");
+            $("#start_screen").addClass("hidden");
+            self.cleanup();
+            self.objInspection.setReturnInspectionID("");
+            self.objInspection.addNewInspection();
+            self.context = "inspection";
+        });
+
+        $("#btnViewInspections").bind(self.touchEvent, function(e)
+        {
+            e.preventDefault();
+            $("#main").removeClass("hidden");
+            $("#start_screen").addClass("hidden");
+            if(self.blockScreenChange()) return;
+            self.cleanup();
+            self.objInspection.setReturnInspectionID("");
+            self.objInspection.setupInspections();
+            self.context = "inspections";
+        });
+		// Show the start screen
+		$("#main").addClass("hidden");
+		$("#start_screen").removeClass("hidden");
+	}
 	
 	this.cleanup = function()
 	{
@@ -412,7 +442,6 @@ function App()
 		$("#navNewInspection").bind(self.touchEvent, function(e)
 		{
 			e.preventDefault();
-			
  			self.cleanup(); 
  			self.objInspection.setReturnInspectionID("");
  			self.objInspection.addNewInspection(); 

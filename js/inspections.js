@@ -81,7 +81,7 @@ var Inspections = function()
         objApp.clearKeys();
         this.inspection = false;
         
-        objDBUtils.orderBy = "";
+        objDBUtils.orderBy = "name";
         $("#inspectionList .bottomBtns").find("a").removeClass("active");
         $("#inspectionList #il_builder_id").empty();
         $("#inspectionList #il_builder_id").append('<option value="">Choose</option>');
@@ -242,7 +242,7 @@ var Inspections = function()
         
         objDBUtils.primaryKey = "id";
 		objDBUtils.showColumn = "name";
-        
+
 	    objDBUtils.loadRecordsSQL(sql, values, function(param, items)
 	    {
 			objApp.showHideSpinner(false, "#inspectionList");
@@ -836,7 +836,8 @@ var Inspections = function()
                 $('#reinspection > .bottomBtns > .btnContainer.right > a#btnStep3Next').html('Next');
                 $('#reinspection > .bottomBtns > .btnContainer.right > a#btnStep4Next').html('Done');                
             } */ else {
-                objApp.setSubExtraHeading("Step 3 of 3", true);
+                //objApp.setSubExtraHeading("Step 3 of 3", true);
+                objApp.setSubExtraHeading("", false);
                 $('#inspectionStep3 > .bottomBtns > a#btnStep3Email').show();
                 $('#inspectionStep3 > .bottomBtns > .btnContainer.right > a#btnStep3Next').html('Exit');
             }
@@ -1606,7 +1607,7 @@ var Inspections = function()
         // Load builders
 		objDBUtils.primaryKey = "id";
 		objDBUtils.showColumn = "name";
-		objDBUtils.orderBy = "ABS(name) ASC";
+		objDBUtils.orderBy = "name ASC";
 
         self.objPopBuilders = $("#frmInspectionDetails #builder_id");
 
