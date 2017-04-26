@@ -156,9 +156,9 @@ function Sync()
  					
  					// Tell the database to delete all data.
                     if (objApp.objSync.refreshSync)
-                        setTimeout('objDBUtils.emptyAllTables(1, objApp.objSync.sendData);', 200);
+                        setTimeout('objDBUtils.emptyAllTables(1, objApp.objSync.getSmartData);', 200);
                     else
- 					    setTimeout('objDBUtils.emptyAllTables(1, objApp.objSync.getSmartData);', 200);
+ 					    setTimeout('objDBUtils.emptyAllTables(1, objApp.objSync.sendData);', 200);
  				}
  				else
  				{
@@ -171,9 +171,9 @@ function Sync()
  					// Ask the database object to get all dirty data and to call the sendData method
  					// in this object when done.
                     if (objApp.objSync.refreshSync)
-                        objDBUtils.callbackMethod = objApp.objSync.sendData;
+                        objDBUtils.callbackMethod = objApp.objSync.getSmartData;
                     else
- 					    objDBUtils.callbackMethod = objApp.objSync.getSmartData;
+ 					    objDBUtils.callbackMethod = objApp.objSync.sendData;
  						
  					// Do not send photos when not running under phonegap.
  					setTimeout('objDBUtils.getDirtyData(1, 0);', 200);
