@@ -865,7 +865,7 @@ var Inspections = function()
             });
             
             $("a.btnReinspect").bind(objApp.touchEvent, function(e) {
-                self.startReinspection(objApp.getKey("inspection_id"));   
+                self.startReinspection(objApp.getKey("inspection_id"));
             });
 
 
@@ -5851,8 +5851,8 @@ var Inspections = function()
         if(this.scroller) {
             this.scroller.destroy();
             this.scroller = null;
-        }        
-
+        }
+        $('body').addClass('reinspect');
         objDBUtils.loadRecord("reinspections", reinspection_id, function(param, reinspection) {
             if(!reinspection) {
                 alert("Couldn't load the reinspection record!");

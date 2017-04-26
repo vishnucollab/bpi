@@ -220,6 +220,21 @@ aside
     padding: 0;
     text-align: center;
 }
+.btn-red-bg-w81{
+    background: url('../images/btn-red-bg-w81.png') bottom right;
+    width: 81px;
+    height: 48px;
+    font-size: 21px;
+    font-family: 'SourceSansPro-SemiBold', sans-serif;
+    font-weight: normal;
+    color: #fff;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    text-align: center;
+    line-height: 48px;
+}
 .btn-green-bg-51x81{
     background: url('../images/btn-green-bg-51x81.png') bottom right;
     width: 81px;
@@ -474,7 +489,7 @@ ul.selector{border-radius: 0;  height: auto;font-size: 21px;}
 /* End inspections */
 
 /* Start inspection */
-body.inspection #header{margin-bottom: 10px;}
+body.inspection #header, body.reinspect #header{margin-bottom: 10px;}
 
 .inspectionDetails{}
 .inspectionDetails fieldset.thefs{width: 45%;}
@@ -489,10 +504,17 @@ body.inspection #header{margin-bottom: 10px;}
     position: relative;
 }
 
-body.inspection div#subheader .left{float: left;}
+body.inspection div#subheader .left, body.reinspect div#subheader .left{float: left;}
 body.inspection div#subheader .left h1{margin: 0  0 10px 10px !important;font-size: 30px;}
 body.inspection div#subheader .right{float: right;}
 
+body.reinspect .inspectionDetails .bottomBtns{bottom: -100px;}
+body.reinspect .inspectionDetails a#btnCapturePhoto{bottom: -85px;}
+body.reinspect footer{display: none;}
+body.reinspect #btnReinspectDelete{top: 0;}
+
+#inspectionList #historyReinspection div.action{width: auto;}
+#historyReinspection table{display: block;overflow: auto;}
 /* End inspection */
 
 .twocolumn .select2-container{
