@@ -191,7 +191,8 @@ var Inspections = function()
 		var values = new Array();
         
         var searchText = $("#inspectionSearch").val();
-        objFilters.builder_id = $("#inspectionList #il_builder_id").val(); 
+        objFilters.builder_id = $("#inspectionList #il_builder_id").val();
+        objFilters.finalised = $("#inspectionList #is_finalised").val();
           
         if(searchText != "")
         {
@@ -1860,7 +1861,11 @@ var Inspections = function()
         
         $("#inspectionList #il_builder_id").change(function(){
             self.doInspectionSearch();
-        }); 
+        });
+
+        $("#inspectionList #is_finalised").change(function(){
+            self.doInspectionSearch();
+        });
         
         $("#inspectionList #btnAddInspection").bind(objApp.touchEvent, function()
         {

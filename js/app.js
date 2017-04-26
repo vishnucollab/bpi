@@ -384,6 +384,19 @@ function App()
             self.context = "inspection";
         });
 
+        $("#btnCompleteReinspection").bind(self.touchEvent, function(e)
+        {
+            e.preventDefault();
+            $("#main").removeClass("hidden");
+            $("#start_screen").addClass("hidden");
+            $("#inspectionList #is_finalised").val(1);
+            if(self.blockScreenChange()) return;
+            self.cleanup();
+            self.objInspection.setReturnInspectionID("");
+            self.objInspection.setupInspections();
+            self.context = "inspections";
+        });
+
         $("#btnViewInspections").bind(self.touchEvent, function(e)
         {
             e.preventDefault();

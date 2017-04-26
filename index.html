@@ -360,8 +360,8 @@
             <form id="frmSync" name="frmSync">
                 <p class="f26">To send your inspection data to the Blueprint server, please<br />
                     click the "START SYNC" button below.</p><p><br /></p>
-                <div class="custom-checkbox-with-tick">
-                    <input type="checkbox" id="refresh_sync" name="refresh_sync" />
+                <div class="custom-checkbox-with-tick large-green">
+                    <input type="checkbox" id="refresh_sync" name="refresh_sync" value="1" />
                     <label for="refresh_sync" class="sanpro-semibold f26">Reset My Data</label>
                 </div>
                 <br/>
@@ -861,15 +861,24 @@
         <!-- inspection listing screen -->
         <div id="inspectionList" class="hidden panel">
             <button id="addInspection" type="button" class="btn-green-bg-51x81">Add</button>
-            <div class="searchByBuilder">
-                <select name="builder_id" id="il_builder_id">
-                    <option value="">Builder</option>
+            <div class="builderFilters">
+                <select name="is_finalised" id="is_finalised">
+                    <option value="">All</option>
+                    <option value="1">Is Finalised</option>
+                    <option value="0">Not Finalise</option>
                 </select>
-            </div>
-            <button id="doInspectionSearch" type="button" class="btn-bg-w100">Search</button>
-            <div id="inspectionSearchContainer">
-                <img class="search-icon" src="images/search-icon.png" />
-                <input id="inspectionSearch" type="text" name="keywords" value="" placeholder="Search this list" />
+                <div class="searchByBuilder">
+                    <select name="builder_id" id="il_builder_id">
+                        <option value="">Builder</option>
+                    </select>
+                </div>
+                <div class="searchBuilderContainer">
+                    <div id="inspectionSearchContainer">
+                        <img class="search-icon" src="images/search-icon.png" />
+                        <input id="inspectionSearch" type="text" name="keywords" value="" placeholder="Search this list" />
+                    </div>
+                    <button id="doInspectionSearch" type="button" class="btn-bg-w100">Search</button>
+                </div>
             </div>
             <table id="tblInspectionListingHeader" class="listing">
                 <thead>

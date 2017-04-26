@@ -432,8 +432,21 @@ ul.selector{border-radius: 0;  height: auto;font-size: 21px;}
 /* End builders */
 
 /* Start inspections */
+.builderFilters{float: right;}
+
+.builderFilters #is_finalised{
+    display: inline-block;
+    height: 51px;
+    width: 170px;
+    float: left;
+    margin-right: 5px;
+}
+
+.searchBuilderContainer{
+    display: inline-block;
+}
 #inspectionSearchContainer{
-    float: right;
+    float: left;
     position: relative;
 }
 #inspectionSearchContainer .search-icon{
@@ -448,13 +461,13 @@ ul.selector{border-radius: 0;  height: auto;font-size: 21px;}
     box-sizing: border-box;
     border: 1px solid #babbbd;
     padding-left: 50px;
-
+    width: 240px;
 }
 #inspectionSearch:focus{
     box-shadow: none;
 }
 #doInspectionSearch{
-    float: right;
+    display: inline-block;
 }
 
 #tblInspectionListingHeader th{
@@ -514,6 +527,7 @@ body.reinspect footer{display: none;}
 body.reinspect #btnReinspectDelete{top: 0;}
 
 #inspectionList #historyReinspection div.action{width: auto;}
+#inspectionList #il_builder_id + span.select2-container{width: 280px !important;}
 #historyReinspection table{display: block;overflow: auto;}
 /* End inspection */
 
@@ -947,7 +961,7 @@ select
     background: #f7f7f7;
     border: 1px solid #bbbbbb;   
     border-radius: 0px;
-    font-size: 16px; 
+    font-size: 21px;
     margin: 5px 0 20px;
     padding: 9px;
     width: 390px;
@@ -1972,31 +1986,31 @@ table ul.selector
     width: 50px; height: 50px;
 }
 
-#frmSync .custom-checkbox-with-tick [type="checkbox"]:not(:checked) + label:before{
+.large-green.custom-checkbox-with-tick [type="checkbox"]:not(:checked) + label:before{
     background-color: #f6f6f6;
 }
 
-#frmSync .custom-checkbox-with-tick [type="checkbox"]:checked + label:before{
+.large-green.custom-checkbox-with-tick [type="checkbox"]:checked + label:before{
     background: url('../images/checkbox-bg.png') center center no-repeat;
 }
 
-#frmSync .custom-checkbox-with-tick [type="checkbox"]:not(:checked) + label:before,
-#frmSync .custom-checkbox-with-tick [type="checkbox"]:checked + label:before{
+.large-green.custom-checkbox-with-tick [type="checkbox"]:not(:checked) + label:before,
+.large-green.custom-checkbox-with-tick [type="checkbox"]:checked + label:before{
     width: 50px; height: 50px;
 }
 
-#frmSync .custom-checkbox-with-tick [type="checkbox"]:not(:checked) + label,
-#frmSync .custom-checkbox-with-tick [type="checkbox"]:checked + label{
+.large-green.custom-checkbox-with-tick [type="checkbox"]:not(:checked) + label,
+.large-green.custom-checkbox-with-tick [type="checkbox"]:checked + label{
     padding-left: 65px;
 }
 
-#frmSync .custom-checkbox-with-tick [type="checkbox"]:not(:checked) + label:before,
-#frmSync .custom-checkbox-with-tick [type="checkbox"]:checked + label:before{
+.large-green.custom-checkbox-with-tick [type="checkbox"]:not(:checked) + label:before,
+.large-green.custom-checkbox-with-tick [type="checkbox"]:checked + label:before{
     top: -7px;
 }
 
-#frmSync .custom-checkbox-with-tick [type="checkbox"]:not(:checked) + label:after,
-#frmSync .custom-checkbox-with-tick [type="checkbox"]:checked + label:after{
+.large-green.custom-checkbox-with-tick [type="checkbox"]:not(:checked) + label:after,
+.large-green.custom-checkbox-with-tick [type="checkbox"]:checked + label:after{
     top: 0;
     left: 17px;
     font-size: 32px;
@@ -2004,8 +2018,8 @@ table ul.selector
 
 @media only screen and (min-device-width: 481px) and (max-device-width: 1024px) and (orientation:landscape) {
     /* For landscape layouts only */
-    #frmSync .custom-checkbox-with-tick [type="checkbox"]:not(:checked) + label:after,
-    #frmSync .custom-checkbox-with-tick [type="checkbox"]:checked + label:after{
+    .large-green.custom-checkbox-with-tick [type="checkbox"]:not(:checked) + label:after,
+    .large-green.custom-checkbox-with-tick [type="checkbox"]:checked + label:after{
         top: 3px;
         left: 9px;
     }
