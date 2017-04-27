@@ -2809,7 +2809,6 @@ var Inspections = function()
                             }
 
                             var token = data.message;
-                            
                             var report_type = objApp.keys.report_type.trim();
 
                             if(report_type == "Fix / Plaster Inspection") {

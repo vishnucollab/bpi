@@ -373,6 +373,7 @@ function App()
 
 	this.setupStartScreen = function()
 	{
+        $("#btnNewInspection").unbind(self.touchEvent);
         $("#btnNewInspection").bind(self.touchEvent, function(e)
         {
             e.preventDefault();
@@ -384,6 +385,7 @@ function App()
             self.context = "inspection";
         });
 
+        $("#btnCompleteReinspection").unbind(self.touchEvent);
         $("#btnCompleteReinspection").bind(self.touchEvent, function(e)
         {
             e.preventDefault();
@@ -397,6 +399,7 @@ function App()
             self.context = "inspections";
         });
 
+        $("#btnViewInspections").unbind(self.touchEvent);
         $("#btnViewInspections").bind(self.touchEvent, function(e)
         {
             e.preventDefault();
@@ -452,6 +455,15 @@ function App()
 			self.objInspection.showReinspection();
 			self.context = "reinspections";
         });
+
+		$("#navHome").bind(self.touchEvent, function(e)
+		{
+			e.preventDefault();
+			self.cleanup();
+            self.setupStartScreen();
+			self.context = "start_screen";
+		});
+
 		$("#navNewInspection").bind(self.touchEvent, function(e)
 		{
 			e.preventDefault();

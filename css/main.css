@@ -618,6 +618,20 @@ footer li a#navNewInspection:hover, footer li a#navNewInspection.active
     color: #009fe3;
 }
 
+footer li a#navHome
+{
+    background: url('../images/footer-icon-home.png') top center no-repeat;
+    width: 54px;
+    text-align: center;
+}
+
+footer li a#navHome:hover, footer li a#navHome.active
+{
+    background: url('../images/footer-icon-home-hover.png') top center no-repeat;
+    background-position: top center !important;
+    color: #009fe3;
+}
+
 footer li a#navInspections
 {
     background: url('../images/footer-icon-new-inspection.png') top center no-repeat;
