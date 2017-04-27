@@ -2308,7 +2308,7 @@ var Inspections = function()
                            for (i = 0, len = imageData.length; i < len; i += 1) {
                             var imageData1 = imageData[i].fullPath;
                                 editPhoto2(imageData1);
-                                photo();
+                                //photo();
                                 use_image = 1;
                             }
                         }
