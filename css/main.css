@@ -1402,8 +1402,8 @@ aside textarea
 
 .inspectionDetails .bottomBtns {
     width: 100%;
-    position: absolute;
-    bottom: 0;
+    position: fixed;
+    bottom: 90px;
 }
     
     .inspectionDetails .bottomBtns a{
@@ -1548,10 +1548,10 @@ aside textarea
     background: url("../images/camera-75.png") left top no-repeat;
     background-size: 100%;
     right: 150px;
-    bottom: 15px;
+    bottom: 105px;
     height: 65px;
     width: 65px;
-    position: absolute;
+    position: fixed;
 }
 
 .inspectionDetails .plain{
