@@ -123,9 +123,7 @@ function Sync()
 			}
 			
 			this.tableIndex = 0;
-			this.recordIndex = 0;		
-			
-			 $("#accountMessage #general").text("Checking login..."); 
+			this.recordIndex = 0;
 		}
         
 		var parameters = {};
@@ -138,72 +136,31 @@ function Sync()
 			return;
 		}
 
-		if(!self.silentMode) blockElement("body");
+        if(objApp.objSync.refreshSync)
+        {
+            // The user is doing a refresh sync
+            // Clear any data in the database object
+            objDBUtils.data = "";
 
-		$.post(objApp.apiURL + 'account/do_login', parameters , function(data)
-		{  	
-			if(data.status == "OK")
-			{                    
- 				// The login is OK.
- 				if(objApp.objSync.refreshSync)
- 				{
- 					// The user is doing a refresh sync
- 					// Clear any data in the database object
- 					objDBUtils.data = "";
- 					
- 					// Delete all local data (except the first two tables app_tables and preferences - that's why we start at index 2 instead if 0)
- 					if(!self.silentMode) $("#accountMessage #general").text("Login OK.  Deleting local data...");
- 					
- 					// Tell the database to delete all data.
-                    if (objApp.objSync.refreshSync)
-                        setTimeout('objDBUtils.emptyAllTables(1, objApp.objSync.getSmartData);', 200);
-                    else
- 					    setTimeout('objDBUtils.emptyAllTables(1, objApp.objSync.sendData);', 200);
- 				}
- 				else
- 				{
- 					var isPhonegap = objApp.phonegapBuild;
-                    
-
- 					if(!self.silentMode) $("#accountMessage #general").text("Login OK.  Preparing data...");
- 						
- 					// Now proceed with sync.
- 					// Ask the database object to get all dirty data and to call the sendData method
- 					// in this object when done.
-                    if (objApp.objSync.refreshSync)
-                        objDBUtils.callbackMethod = objApp.objSync.getSmartData;
-                    else
- 					    objDBUtils.callbackMethod = objApp.objSync.sendData;
- 						
- 					// Do not send photos when not running under phonegap.
- 					setTimeout('objDBUtils.getDirtyData(1, 0);', 200);
-				}
-			}
-			else if(data.message == "INVALID")
-			{
-				if(!self.silentMode)
-				{
-					unblockElement("body");
-					$("#accountMessage #general").text("Sorry, either your email or password is incorrect.");
-				}
-				else if(self.callbackMethod != null)
-				{
-					self.callbackMethod(false);
-				}
-			}
-			else
-			{
-				if(!self.silentMode)
-				{				
-					unblockElement("body");
-					 $("#accountMessage #general").text("Sorry, something went wrong.  Please report this error to the Blueprint support team.");				
-				}
-				else if(self.callbackMethod != null)
-				{
-					self.callbackMethod(false);
-				}				
-			}
-		}, "json"); 			
+            // Tell the database to delete all data.
+            if (objApp.objSync.refreshSync)
+                setTimeout('objDBUtils.emptyAllTables(1, objApp.objSync.getSmartData);', 200);
+            else
+                setTimeout('objDBUtils.emptyAllTables(1, objApp.objSync.sendData);', 200);
+        }
+        else
+        {
+            var isPhonegap = objApp.phonegapBuild;
+            // Now proceed with sync.
+            // Ask the database object to get all dirty data and to call the sendData method
+            // in this object when done.
+            if (objApp.objSync.refreshSync)
+                objDBUtils.callbackMethod = objApp.objSync.getSmartData;
+            else
+                objDBUtils.callbackMethod = objApp.objSync.sendData;
+            // Do not send photos when not running under phonegap.
+            setTimeout('objDBUtils.getDirtyData(1, 0);', 200);
+        }
 	}
 
 	this.smartSync = function()
@@ -228,8 +185,6 @@ function Sync()
 
 			this.tableIndex = 0;
 			this.recordIndex = 0;
-
-			$("#accountMessage #general").text("Checking login...");
 		}
 
 		var parameters = {};
@@ -242,67 +197,22 @@ function Sync()
 			return;
 		}
 
-		if(!self.silentMode) blockElement("body");
-
-		$.post(objApp.apiURL + 'account/do_login', parameters , function(data)
-		{
-			if(data.status == "OK")
-			{
-				// The login is OK.
-				if(objApp.objSync.refreshSync)
-				{
-					// The user is doing a refresh sync
-					// Clear any data in the database object
-					objDBUtils.data = "";
-
-					// Delete all local data (except the first two tables app_tables and preferences - that's why we start at index 2 instead if 0)
-					if(!self.silentMode) $("#accountMessage #general").text("Login OK.  Deleting local data...");
-
-					// Tell the database to delete all data.
-					setTimeout('objDBUtils.emptyAllTables(1, objApp.objSync.getSmartData);', 200);
-				}
-				else
-				{
-					var isPhonegap = objApp.phonegapBuild;
-
-
-					if(!self.silentMode) $("#accountMessage #general").text("Login OK.  Preparing data...");
-
-					// Now proceed with sync.
-					// Ask the database object to get all dirty data and to call the getSmartData method
-					// in this object when done.
-
-					objDBUtils.callbackMethod = objApp.objSync.getSmartData;
-
-					// Do not send photos when not running under phonegap.
-					setTimeout('objDBUtils.getDirtyData(1, 0);', 200);
-				}
-			}
-			else if(data.message == "INVALID")
-			{
-				if(!self.silentMode)
-				{
-					unblockElement("body");
-					 $("#accountMessage #general").text("Sorry, either your email or password is incorrect.");
-				}
-				else if(self.callbackMethod != null)
-				{
-					self.callbackMethod(false);
-				}
-			}
-			else
-			{
-				if(!self.silentMode)
-				{
-					unblockElement("body");
-					 $("#accountMessage #general").text("Sorry, something went wrong.  Please report this error to the Blueprint support team.");
-				}
-				else if(self.callbackMethod != null)
-				{
-					self.callbackMethod(false);
-				}
-			}
-		}, "json");
+        // The login is OK.
+        if(objApp.objSync.refreshSync)
+        {
+            // The user is doing a refresh sync
+            // Clear any data in the database object
+            objDBUtils.data = "";
+            // Tell the database to delete all data.
+            setTimeout('objDBUtils.emptyAllTables(1, objApp.objSync.getSmartData);', 200);
+        }
+        else
+        {
+            var isPhonegap = objApp.phonegapBuild;
+            objDBUtils.callbackMethod = objApp.objSync.getSmartData;
+            // Do not send photos when not running under phonegap.
+            setTimeout('objDBUtils.getDirtyData(1, 0);', 200);
+        }
 	}
 
     /***
@@ -348,7 +258,7 @@ function Sync()
         self.syncingTotalRequest++;
 
         if(!self.silentMode) $("#accountMessage #general").text("Processing: " + (self.syncingTotalRequest - self.syncingCounter) + '/' + self.syncingTotalRequest);
-
+        blockElement("body");
         $.post(objApp.apiURL + 'account/get_data_table/' + tableName +'/' + refreshSync, parameters , function(data)
         {
             // Remove / clear the data store temporarily in the DB object
@@ -401,8 +311,8 @@ function Sync()
                                                         self.syncingCounter--;
                                                         if(!self.silentMode) $("#accountMessage #general").text("Processing: " + (self.syncingTotalRequest - self.syncingCounter) + '/' + self.syncingTotalRequest);
                                                         if (self.syncingCounter == 0 && !self.silentMode) {
-                                                            unblockElement("body");
-                                                             $("#accountMessage #general").html('<div id="general">Done!</div>');
+                                                            self.tableIdx = 0;
+                                                            self.uploadPhotos("inspection");
                                                         }
                                                     }
                                                     else {
@@ -468,8 +378,8 @@ function Sync()
                                             self.syncingCounter--;
                                             if(!self.silentMode) $("#accountMessage #general").text("Processing: " + (self.syncingTotalRequest - self.syncingCounter) + '/' + self.syncingTotalRequest);
                                             if (self.syncingCounter == 0 && !self.silentMode){
-                                                unblockElement("body");
-                                                 $("#accountMessage #general").html('<div id="general">Done!</div>');
+                                                self.tableIdx = 0;
+                                                self.uploadPhotos("inspection");
                                             }
                                         }
                                         else
@@ -487,6 +397,18 @@ function Sync()
                                 handleRecord(transaction, tableName, row);
                             });
                         }
+                    }
+                }
+                else if(data.message == "INVALID")
+                {
+                    if(!self.silentMode)
+                    {
+                        unblockElement("body");
+                        $("#accountMessage #general").text("Sorry, either your email or password is incorrect.");
+                    }
+                    else if(self.callbackMethod != null)
+                    {
+                        self.callbackMethod(false);
                     }
                 }
                 else
@@ -618,6 +540,19 @@ function Sync()
                         self.uploadPhotos("inspection");
                     }
                 }
+
+                else if(data.message == "INVALID")
+                {
+                    if(!self.silentMode)
+                    {
+                        unblockElement("body");
+                        $("#accountMessage #general").text("Sorry, either your email or password is incorrect.");
+                    }
+                    else if(self.callbackMethod != null)
+                    {
+                        self.callbackMethod(false);
+                    }
+                }
                 else
                 {
                     if(!self.silentMode)
@@ -666,7 +601,7 @@ function Sync()
         parameters['start_time'] = objApp.objSync.startTime;
         objApp.objSync.startTime = '';
 		var refreshSync = "false";
-		
+        console.log(objDBUtils.data);
 		if(objApp.objSync.refreshSync)
 		{
 			// Set the refresh sync flag
@@ -678,65 +613,62 @@ function Sync()
 		{
 			if(!self.silentMode)  $("#accountMessage #general").text("Sending data to server...");
 		}
-
-		$.post(objApp.apiURL + 'account/process_data/' + refreshSync, parameters , function(data)
-		{         		         
+        if(!self.silentMode) blockElement("body");
+		$.post(objApp.apiURL + 'account/process_data_tables/' + refreshSync, parameters , function(data)
+		{
 			// Remove / clear the data store temporarily in the DB object
-			objDBUtils.data = "";  
-            
+			objDBUtils.data = "";
+
             try {
                 data = jQuery.parseJSON(data);
-                
-                // Make sure the server processed the data OK.    
+
+                // Make sure the server processed the data OK.
                 if(data.status == "OK")
                 {
-                    if(!self.silentMode)  $("#accountMessage #general").text("Data sent OK, checking for data to process...");
-                    
-                    // Store the data locally.
-                    self.data = data;
-                    
-                    // Data was processed OK.
-                    // Did the server send us any data to store locally?
-                    if(data.tables.length > 0)
+                    unblockElement("body");
+                    if(!self.silentMode)  $("#accountMessage #general").text("Data sent OK.");
+                }
+                else if(data.message == "INVALID")
+                {
+                    if(!self.silentMode)
                     {
-                        // There is data. 
-                         self.processTable();
+                        unblockElement("body");
+                        $("#accountMessage #general").text("Sorry, either your email or password is incorrect.");
                     }
-                    else
+                    else if(self.callbackMethod != null)
                     {
-                        self.tableIdx = 0;
-                        self.uploadPhotos("inspection");
+                        self.callbackMethod(false);
                     }
                 }
                 else
                 {
                     if(!self.silentMode)
-                    {                
-                        unblockElement("#frmSync");
+                    {
+                        unblockElement("body");
                         alert("Warning: An error occured during the data sync operation.  Please report this error to the Blueprint team.");
-                         $("#accountMessage #general").text("Sorry, something went wrong during the processing phase.  Please report this error to the Blueprint team.");                                    
+                         $("#accountMessage #general").text("Sorry, something went wrong during the processing phase.  Please report this error to the Blueprint team.");
                     }
                     else if(self.callbackMethod != null)
                     {
                         self.callbackMethod(false);
-                    }                
+                    }
                 }
 
-                           
+
             } catch (e) {
                 // error
                 if(!self.silentMode)
-                {                
+                {
                     unblockElement("body");
                     alert("Warning: An error occured during the data sync operation.  Please report this error to the Blueprint team.");
-                     $("#accountMessage #general").text("Sorry, something went wrong during the processing phase.  Please report this error to the Blueprint team.");                                    
+                     $("#accountMessage #general").text("Sorry, something went wrong during the processing phase.  Please report this error to the Blueprint team.");
                 }
                 else if(self.callbackMethod != null)
                 {
                     self.callbackMethod(false);
-                }                
-            }             
-		}, ""); 			
+                }
+            }
+		}, "");
 	}
 	
 	/***
@@ -839,8 +771,8 @@ function Sync()
 			
 			fieldIdx++;
 		}
-		
-		sql += header + ") " + footer + ");";
+        self.saveData.push('0'); /* dirty = 0 */
+		sql += header + ", dirty) " + footer + ", ?);";
 
 		
 		return sql;		
