@@ -1594,6 +1594,7 @@ aside textarea
     height: 247px;
     overflow-x: hidden;
     max-height: 320px;
+    min-height: 320px;
 }
 
 .inspectionDetails ul.gallery{
