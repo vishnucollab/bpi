@@ -2794,7 +2794,7 @@ var Inspections = function()
                     params["password"] = localStorage.getItem("password");
                     var url = objApp.apiURL + "account/create_token/" + Math.floor(Math.random() * 99999);
                     blockElement('body');
-
+                    
                     $.post(url, params, function(data)
                     {
                         unblockElement('body');
@@ -2811,15 +2811,15 @@ var Inspections = function()
                             var token = data.message;
                             
                             var report_type = objApp.keys.report_type.trim();
-                            
+
                             if(report_type == "Fix / Plaster Inspection") {
                                 report_type = "Fix";
                             } else {
-                               report_type = report_type.replace(" ", "%20").trim(); 
-                            }                            
-                            
+                               report_type = report_type.replace(" ", "%20").trim();
+                            }
+
                             var downloadURL = objApp.apiURL + "reports/print_report/" + report_type + '/' + encodeURIComponent(objApp.keys.inspection_id) + '/' + encodeURIComponent(objApp.keys.reinspection_id) + "?token=" + token;
-                            
+
                             if(objApp.phonegapBuild) {
                                 downloadURL = "https://docs.google.com/viewer?url=" + encodeURIComponent(downloadURL);
                                 var ref = window.open(downloadURL, '_blank', 'location=yes');

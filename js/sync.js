@@ -601,7 +601,6 @@ function Sync()
         parameters['start_time'] = objApp.objSync.startTime;
         objApp.objSync.startTime = '';
 		var refreshSync = "false";
-        console.log(objDBUtils.data);
 		if(objApp.objSync.refreshSync)
 		{
 			// Set the refresh sync flag
@@ -625,8 +624,16 @@ function Sync()
                 // Make sure the server processed the data OK.
                 if(data.status == "OK")
                 {
-                    unblockElement("body");
-                    if(!self.silentMode)  $("#accountMessage #general").text("Data sent OK.");
+                    if(self.callbackMethod != null)
+                    {
+                        self.callbackMethod(true);
+                    }
+                    else
+                    {
+                        unblockElement("body");
+                        if(!self.silentMode)  $("#accountMessage #general").text("Data sent OK.");
+                    }
+
                 }
                 else if(data.message == "INVALID")
                 {
