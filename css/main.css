@@ -570,6 +570,7 @@ body.reinspect #btnReinspectDelete{top: 0;}
 
 .select2-container--default .select2-results>.select2-results__options{
     overflow-x: visible;
+    -webkit-overflow-scrolling: touch;
 }
 
 div#subheader .right h1{
