@@ -565,6 +565,11 @@ body.reinspect #btnReinspectDelete{top: 0;}
     font-size: 21px;
     color: #5c5756;
     border-radius: 0;
+    -webkit-appearance: none;
+}
+
+.select2-container--default .select2-results>.select2-results__options{
+    overflow-x: visible;
 }
 
 div#subheader .right h1{
