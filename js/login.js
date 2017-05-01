@@ -305,7 +305,8 @@ var Login = function()
 		
 		// The form is valid.  Submit a login request.
 		blockElement("body");
-		
+		if (typeof document.activeElement != 'undefined')
+			document.activeElement.blur();
 		$.post(objApp.apiURL + "account/do_login", params, function(data)
 		{
 	

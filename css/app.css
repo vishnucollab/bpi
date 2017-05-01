@@ -57,6 +57,7 @@ span.required
     height: 768px;
     padding: 0px; 
     position: relative;
+    min-height: 768px;
 }
 
 #main h1, #create_user_screen h1
