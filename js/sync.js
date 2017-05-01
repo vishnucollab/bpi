@@ -98,9 +98,7 @@ function Sync()
 	{
 		self.silentMode = true;
 		self.callbackMethod = callbackMethod;
-
-        objDBUtils.callbackMethod = objApp.objSync.sendData;
-        // Do not send photos when not running under phonegap.
+        objDBUtils.callbackMethod = objApp.objSync.sendAndSyncData;
         setTimeout('objDBUtils.getDirtyData(1, 0);', 200);
 	}
 	

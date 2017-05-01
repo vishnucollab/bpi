@@ -2814,11 +2814,12 @@ var Inspections = function()
                             if(report_type == "Fix / Plaster Inspection") {
                                 report_type = "Fix";
                             } else {
-                               report_type = report_type.replace(" ", "%20").trim();
+                                report_type = report_type.replace(" ", "%20").trim();
+                                report_type = report_type.replace("/", "-dash-")
                             }
 
                             var downloadURL = objApp.apiURL + "reports/print_report/" + report_type + '/' + encodeURIComponent(objApp.keys.inspection_id) + '/' + encodeURIComponent(objApp.keys.reinspection_id) + "?token=" + token;
-
+console.log(downloadURL);
                             if(objApp.phonegapBuild) {
                                 downloadURL = "https://docs.google.com/viewer?url=" + encodeURIComponent(downloadURL);
                                 var ref = window.open(downloadURL, '_blank', 'location=yes');
