@@ -521,8 +521,8 @@ body.inspection div#subheader .left, body.reinspect div#subheader .left{float: l
 body.inspection div#subheader .left h1{margin: 0  0 10px 10px !important;font-size: 30px;}
 body.inspection div#subheader .right{float: right;}
 
-body.reinspect .inspectionDetails .bottomBtns{bottom: -100px;}
-body.reinspect .inspectionDetails a#btnCapturePhoto{bottom: -85px;}
+body.reinspect .inspectionDetails .bottomBtns{bottom: 0px;}
+body.reinspect .inspectionDetails a#btnCapturePhoto{bottom: 15px;}
 body.reinspect footer{display: none;}
 body.reinspect #btnReinspectDelete{top: 0;}
 

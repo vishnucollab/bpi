@@ -330,7 +330,7 @@ var Login = function()
 			localStorage.setItem("company_id", data.company_id); 
 			localStorage.setItem("company_name", data.company_name); 
 			localStorage.setItem("country", data.country); 
-			localStorage.setItem("initials", data.initials);
+			localStorage.setItem("initials", typeof data.initials == 'undefined'?'':data.initials);
 			localStorage.setItem("restricted", data.restricted);
 			localStorage.setItem("password", params["password"]);
             

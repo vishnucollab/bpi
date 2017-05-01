@@ -29,7 +29,7 @@
 	#noteModal #txtNoteModal
 	{
 		font-size: 12pt;
-		margin: 10px 0px;
+		margin: 0px;
 	}
 
 	#noteModal #frmNMControls a,#btnRWSave
@@ -48,14 +48,12 @@
 		border-radius: 0;
 		padding: 0;
 		text-align: center;
+		margin-right: 10px;
 	}
 	
 	#noteModal #frmNMControls #btnNMCancel
 	{
-	    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#e4214b), color-stop(50%,#c3032c), color-stop(51%,#b10328), color-stop(100%,#c3032c)) !important; /* Chrome,Safari4+ */
-	    background: -webkit-linear-gradient(top, #e4214b 0%,#c3032c 50%,#b10328 51%,#c3032c 100%) !important; /* Chrome10+,Safari5.1+ */
-	    background: linear-gradient(top, #e4214b 0%,#c3032c 50%,#b10328 51%,#c3032c 100%) !important; /* W3C */
-	    border: 1px solid #768b8d !important; 		
+		background: url('../images/btn-red-bg-w81.png') bottom right;
 	}
 	
 	#noteModal #frmNMControls a:hover
