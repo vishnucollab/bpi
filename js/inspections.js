@@ -331,9 +331,9 @@ var Inspections = function()
             
             setTimeout(function()
             {
-                if(objUtils.isMobileDevice())        
+                if(objUtils.isMobileDevice())
                 {
-                    self.scroller = new IScroll('#inspectionScrollWrapper', { click: true, hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar'});
+                    self.scroller = new IScroll('#inspectionScrollWrapper', { click: true, hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar', mouseWheelSpeed: 10});
                 }
             }, 500);            
 			
@@ -719,7 +719,7 @@ var Inspections = function()
             $("div.btnEditNotes").show();
             
             //if(($("#inspection #report_type").val() == "Builder: PCI/Final inspections") || (objApp.keys.report_type == "Builder: PCI/Final inspections")) {
-            if(( $("#inspection #report_type").val() == "Builder: PCI/Final inspections") || (objApp.keys.report_type == "Builder: PCI/Final inspections")) {
+            if(( objApp.keys.report_type == "Quality Inspection") || (objApp.keys.report_type == "Builder: PCI/Final inspections")) {
                 
                 objApp.setSubExtraHeading("Step 1 of 5", true);
             } /*else if (($("#inspection #report_type").val() == "Fix / Plaster Inspection") || (objApp.keys.report_type == "Fix / Plaster Inspection")) {
@@ -739,7 +739,7 @@ var Inspections = function()
         objApp.setSubHeading("Add Issues");
         $("div.btnEditNotes").show();
         
-        if(( $("#inspection #report_type").val() == "Builder: PCI/Final inspections") || (objApp.keys.report_type == "Builder: PCI/Final inspections")) {
+        if(( objApp.keys.report_type == "Quality Inspection") || (objApp.keys.report_type == "Builder: PCI/Final inspections")) {
             objApp.setSubExtraHeading("Step 2 of 5", true);
         } /*else if(($("#inspection #report_type").val() == "Fix / Plaster Inspection") || (objApp.keys.report_type == "Fix / Plaster Inspection")) {    
             objApp.setSubExtraHeading("Step 2 of 4", true);
@@ -799,25 +799,25 @@ var Inspections = function()
             }
             
             self.inspection = inspection;
-            
+
             var inspection_property = "Lot " + inspection.lot_no + ", " + inspection.address + ", " + inspection.suburb;
             
             objApp.setSubHeading("Review Inspection @ " + inspection_property);  
             
             // If this a 5 step inspection, hide the finalisation buttons on step 3
             //if((inspection.report_type == "Builder: PCI/Final inspections") || (inspection.report_type == "Fix / Plaster Inspection")) {
-            if(inspection.report_type == "Builder: PCI/Final inspections") {
+            if(inspection.report_type == "Quality Inspection" || inspection.report_type == "Builder: PCI/Final inspections") {
                 $("#btnFinishedWrapper").hide();
             } else {
                 $("#btnFinishedWrapper").show();
             }
             
-            if(inspection.report_type == "Builder: PCI/Final inspections" && objApp.keys.reinspection_id == "") {
+            if((inspection.report_type == "Quality Inspection" || inspection.report_type == "Builder: PCI/Final inspections") && objApp.keys.reinspection_id == "") {
                 objApp.setSubExtraHeading("Step 3 of 5", true);
                 $('#inspectionStep3 > .bottomBtns > a#btnStep3Email').hide();
                 $('#inspectionStep3 > .bottomBtns > .btnContainer.right > a#btnStep3Next').html('Next');
                 $('#inspectionStep4 > .bottomBtns > .btnContainer.right > a#btnStep4Next').html('Next');
-            }  else if(inspection.report_type == "Builder: PCI/Final inspections" && objApp.keys.reinspection_id != "") {
+            }  else if( (inspection.report_type == "Quality Inspection" || inspection.report_type == "Builder: PCI/Final inspections") && objApp.keys.reinspection_id != "") {
                 objApp.setSubExtraHeading("Step 3 of 4", true);
                 $('#inspectionStep3 > .bottomBtns > a#btnStep3Email').hide();
                 $('#inspectionStep3 > .bottomBtns > .btnContainer.right > a#btnStep3Next').html('Next');
@@ -884,7 +884,7 @@ var Inspections = function()
         objApp.setSubHeading("Materials to be left on site");
         
         //if((self.inspection.report_type == "Builder: PCI/Final inspections" && objApp.keys.reinspection_id != "") || self.inspection.report_type == "Fix / Plaster Inspection") {
-        if(self.inspection.report_type == "Builder: PCI/Final inspections" && objApp.keys.reinspection_id != "") {
+        if( (self.inspection.report_type == "Quality Inspection" || self.inspection.report_type == "Builder: PCI/Final inspections") && objApp.keys.reinspection_id != "") {
             objApp.setSubExtraHeading("Step 4 of 4", true);
         } else {
             objApp.setSubExtraHeading("Step 4 of 5", true);
@@ -1075,7 +1075,7 @@ var Inspections = function()
         if($("#inspection #notes").val() == "") {
             report_type = $("#inspection #report_type").val();
 
-            if((report_type == "Builder: PCI/Final inspections") || (report_type == "Fix / Plaster Inspection")) {
+            if( (report_type == "Quality Inspection") || (report_type == "Builder: PCI/Final inspections") || (report_type == "Fix / Plaster Inspection")) {
                 $("#inspection #notes").val(self.default_notes);
             }
         }
@@ -2080,7 +2080,12 @@ var Inspections = function()
         {
             e.preventDefault();
                         
-            if($(this).val() == "Builder: PCI/Final inspections")
+            if($(this).val() == "Quality Inspection")
+            {
+                objApp.setSubExtraHeading("Step 1 of 5", true);
+                objApp.keys.report_type = "Quality Inspection";
+            }
+            else if($(this).val() == "Builder: PCI/Final inspections")
             {
                 objApp.setSubExtraHeading("Step 1 of 5", true);
                 objApp.keys.report_type = "Builder: PCI/Final inspections";
@@ -2489,7 +2494,7 @@ var Inspections = function()
 			e.preventDefault();
 
             //if((objApp.keys.report_type == 'Builder: PCI/Final inspections') || (objApp.keys.report_type == 'Fix / Plaster Inspection')) {
-            if(objApp.keys.report_type == 'Builder: PCI/Final inspections') {
+            if(objApp.keys.report_type == 'Quality Inspection' || objApp.keys.report_type == 'Builder: PCI/Final inspections') {
                 self.showStep4();
             }
             else {
@@ -2545,7 +2550,7 @@ var Inspections = function()
 
             e.preventDefault();
 
-            if(objApp.keys.report_type == 'Builder: PCI/Final inspections' && objApp.keys.reinspection_id == "") {
+            if( (objApp.keys.report_type == 'Quality Inspection' || objApp.keys.report_type == 'Builder: PCI/Final inspections') && objApp.keys.reinspection_id == "") {
                 self.showStep5();
             }
             else {
@@ -5918,7 +5923,7 @@ console.log(downloadURL);
                 }
 
                 //if((inspection.report_type == "Builder: PCI/Final inspections" && objApp.keys.reinspection_id != "") || (inspection.report_type == "Fix / Plaster Inspection")) {
-                if(inspection.report_type == "Builder: PCI/Final inspections" && objApp.keys.reinspection_id != "") {
+                if( (inspection.report_type == "Quality Inspection" || inspection.report_type == "Builder: PCI/Final inspections") && objApp.keys.reinspection_id != "") {
                     objApp.setSubExtraHeading("Step 3 of 4", true);
                     $('#inspectionStep3 > .bottomBtns > a#btnStep3Email').hide();
                     $('#inspectionStep3 > .bottomBtns > .btnContainer.right > a#btnStep3Next').html('Next');
