@@ -328,15 +328,15 @@ var Inspections = function()
 			$("#inspectionScrollWrapper").html(html);
             
             self.setTableWidths();
-            /*
+
             setTimeout(function()
             {
                 if(objUtils.isMobileDevice())
                 {
-                    self.scroller = new IScroll('#inspectionScrollWrapper', { click: true, hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar', mouseWheelSpeed: 10});
+                    self.scroller = new IScroll('#inspectionScrollWrapper', { click: true, hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar'});
                 }
             }, 500);            
-			*/
+
 
 			// Bind click event to list items
             $("#tblInspectionListing a.delete").bind(objApp.touchEvent, function(e) {
@@ -4066,6 +4066,7 @@ console.log(downloadURL);
 			if(objUtils.isMobileDevice())
 			{
 				//var scroller = new TouchScroll(document.querySelector("#photoWrapper #photoList"));
+                var scroller = new IScroll(document.querySelector("#photoWrapper #photoList"), { click: true, hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbarSm'});
 			}
 
 			$("#photoWrapper #photoList a").unbind();
@@ -4792,6 +4793,7 @@ console.log(downloadURL);
 			if(objUtils.isMobileDevice())
 			{
 				//var scroller = new TouchScroll(document.querySelector("#photoWrapper #photoList"));
+                var scroller = new IScroll(document.querySelector("#photoWrapper #photoList"), { click: true, hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbarSm'});
 			}
 
 			$("#historyList a").unbind();
