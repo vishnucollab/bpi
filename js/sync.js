@@ -165,6 +165,7 @@ function Sync()
 
 	this.smartSync = function()
 	{
+        objApp.objSync.startTime = '-2 weeks';
 		if(!self.silentMode)
 		{
 			// Make sure the username and pass have been entered.
