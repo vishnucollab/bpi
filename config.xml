@@ -43,6 +43,7 @@
     <gap:plugin name="cordova-plugin-vibration" source="npm"/>
     <gap:plugin name="cordova-plugin-statusbar" source="npm"/>
     <gap:plugin name="cordova-plugin-file-opener2" source="npm"/>
+    <gap:plugin name="cordova-plugin-sqlite-2" source="npm"/>
     
     <gap:config-file platform="ios" parent="UIStatusBarHidden">
         <true/>

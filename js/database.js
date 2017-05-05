@@ -14,7 +14,7 @@ function DBUtils()
 	this.db_short_name = "BluePrint";   	// The database short name
 	this.db_version = "1.0";             	// The database version
 	this.db_display_name = "BluePrint"; 	// The name of the database that's shown to the user in settings
-	this.db_max_size = 5 * 1024 * 1024;  		// Maximum database size in Kb
+	this.db_max_size = 500 * 1024 * 1024;  		// Maximum database size in Kb
 	this.db_OK = false;                  	// Set to true if a localstorage DB object is successfully created
 	this.DB_DEBUG = false;                	// Set to true to enable database debug messages	
 	
@@ -43,8 +43,14 @@ function DBUtils()
     this.tables.push(new Array('contacts', 1.0));
     this.tables.push(new Array('contactsfavourites', 1.0));
 	
-	// Open the database                                                
-	this.db = window.openDatabase(this.db_short_name, this.db_version, this.db_display_name, this.db_max_size);	
+	// Open the database
+	console.log(window.sqlitePlugin);
+	if (typeof window.sqlitePlugin == 'function'){
+		alert('Using sqlitePlugin');
+		this.db = window.sqlitePlugin.openDatabase(this.db_short_name, this.db_version, this.db_display_name, this.db_max_size);
+	}
+	else
+		this.db = window.openDatabase(this.db_short_name, this.db_version, this.db_display_name, this.db_max_size);
 	
 	// Determine if we have successfully opened the database or not.
 	if(!this.db)
