@@ -166,7 +166,7 @@ var Builders = function()
 			    // Derive the location of the builder.
 			    var location = row.address +", "+ row.city +", "+ row.state; 
 			    html += '<tr rel="' + row.id + '">';
-			    html += '<td class="view" rel="' + row.id + '"><div rel="' + row.id + '" class="delete"></div>' + row.name + '</td>';
+			    html += '<td rel="' + row.id + '"><div rel="' + row.id + '" class="delete"></div><span class="view">' + row.name + '</span></td>';
 			    html += '<td rel="' + row.id + '">' + location + '</td>';
 			    html += '<td rel="' + row.id + '">' + row.phone + '</td>';
 			    html += '</tr>';
@@ -218,18 +218,18 @@ var Builders = function()
 			
 		    
 			// Bind click/touch event to buttons in the listing.
-			$("#tblBuilderListing tr td.view").bind(objApp.touchEvent, function(e)
+			$("#tblBuilderListing tr td span.view").bind(objApp.touchEvent, function(e)
 			{
 				e.preventDefault();
 				
 			    // Remove any active states of the list items
-			    $(this).parent().parent().parent().find("td").removeClass("active");
+			    $(this).parent().parent().find("td").removeClass("active");
 			    
 			    // Set the active state
-			    $(this).parent().parent().addClass("active");
+			    $(this).parent().addClass("active");
 			    
 			    // Get the id of the selected builder
-			    var builder_id = $(this).attr("rel");
+			    var builder_id = $(this).parent().attr("rel");
 			    
 			    // Show the loading indicator
 			    blockElement('body');
@@ -250,7 +250,7 @@ var Builders = function()
 			    return true; 
 			});			
 
-			$("#tblBuilderListing tr td.delete").bind(objApp.touchEvent, function(e)
+			$("#tblBuilderListing tr td div.delete").bind(objApp.touchEvent, function(e)
 			{	
 				e.preventDefault();
 				
