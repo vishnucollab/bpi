@@ -64,6 +64,7 @@
         // PhoneGap is ready
         function onDeviceReady()
         {
+            objDBUtils = new DBUtils();
             if (typeof navigator.notification != 'undefined'){
                 if (typeof navigator.notification.alert != 'undefined')
                     window.alert = navigator.notification.alert;
@@ -161,7 +162,7 @@
         {
 
             // Create a new instance of the billbot object
-            objDBUtils = new DBUtils();
+
             objApp = new App();
             objDatePicker = new Datepicker();
             objTimePicker = new Timepicker();
@@ -180,6 +181,7 @@
             }
             else
             {
+                objDBUtils = new DBUtils();
                 // Not phonegap - proceed as normal
                 // Ensure all required database tables are present.
                 objDBUtils.createTablesTable();
