@@ -80,6 +80,7 @@ function Sync()
 			objApp.objSync.startSync();
 		});
 
+        $("#frmSync button#smartSync").unbind(objApp.touchEvent);
         $("#frmSync button#smartSync").bind(objApp.touchEvent, function(e)
         {
             e.preventDefault();
@@ -164,7 +165,6 @@ function Sync()
 
 	this.smartSync = function()
 	{
-        objApp.objSync.startTime = '- 2 weeks';
 		if(!self.silentMode)
 		{
 			// Make sure the username and pass have been entered.

@@ -577,7 +577,7 @@ div#subheader .right h1{
     margin-right: 10px !important;
     font-size: 21px;
 }
-
+/* Scrollbar in iOS
 ::-webkit-scrollbar {
     width: 15px;
     height: 15px;
@@ -593,6 +593,7 @@ div#subheader .right h1{
 ::-webkit-scrollbar-track {
     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.2);
 }
+*/
 /* End simb-dev3 */
 
 /* footer ------------------------------ */
