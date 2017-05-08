@@ -530,6 +530,17 @@ body.reinspect #btnReinspectDelete{top: 0;}
 #inspectionList #historyReinspection div.action{width: auto;}
 #inspectionList #il_builder_id + span.select2-container{width: 280px !important;}
 #historyReinspection table{display: block;overflow: auto;-webkit-overflow-scrolling: touch;}
+
+::-webkit-scrollbar{
+    -webkit-appearance: none;
+    width: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 3px;
+    background-color: rgba(0,0,0,.5);
+    -webkit-box-shadow: 0 0 1px rgba(255,255,255,.5);
+}
 /* End inspection */
 
 .twocolumn .select2-container{
