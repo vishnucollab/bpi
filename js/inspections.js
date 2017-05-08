@@ -329,15 +329,22 @@ var Inspections = function()
             
             self.setTableWidths();
 
-            /*
             setTimeout(function()
             {
                 if(objUtils.isMobileDevice())
                 {
-                    self.scroller = new IScroll('#inspectionScrollWrapper', { click: true, hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar'});
+                    self.scroller = new IScroll('#inspectionScrollWrapper', {
+                        click: true,
+                        hScrollbar: false,
+                        vScrollbar: true,
+                        scrollbarClass: 'myScrollbar',
+                        indicators: {
+                            speedRatioX: 0,
+                            speedRatioY: 10,
+                        }
+                    });
                 }
             }, 500);
-            */
 
 			// Bind click event to list items
             $("#tblInspectionListing a.delete").bind(objApp.touchEvent, function(e) {

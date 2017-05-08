@@ -530,17 +530,6 @@ body.reinspect #btnReinspectDelete{top: 0;}
 #inspectionList #historyReinspection div.action{width: auto;}
 #inspectionList #il_builder_id + span.select2-container{width: 280px !important;}
 #historyReinspection table{display: block;overflow: auto;}
-
-::-webkit-scrollbar{
-    -webkit-appearance: none;
-    width: 7px;
-}
-
-::-webkit-scrollbar-thumb {
-    border-radius: 3px;
-    background-color: rgba(0,0,0,.5);
-    -webkit-box-shadow: 0 0 1px rgba(255,255,255,.5);
-}
 /* End inspection */
 
 .twocolumn .select2-container{
@@ -589,20 +578,15 @@ div#subheader .right h1{
     font-size: 21px;
 }
 /* Scrollbar in iOS
-::-webkit-scrollbar {
-    width: 15px;
-    height: 15px;
-    border-bottom: 1px solid #eee;
-    border-top: 1px solid #eee;
-}
-::-webkit-scrollbar-thumb {
-    border-radius: 8px;
-    background-color: #C3C3C3;
-    border: 2px solid #eee;
+::-webkit-scrollbar{
+    -webkit-appearance: none;
+    width: 7px;
 }
 
-::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.2);
+::-webkit-scrollbar-thumb {
+    border-radius: 3px;
+    background-color: rgba(0,0,0,.5);
+    -webkit-box-shadow: 0 0 1px rgba(255,255,255,.5);
 }
 */
 /* End simb-dev3 */
