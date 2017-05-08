@@ -495,7 +495,6 @@ ul.selector{border-radius: 0;  height: auto;font-size: 21px;}
     min-height: 325px;
     height: 325px !important;
     overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
 }
 .searchByBuilder .select2-container{margin-top: -5px;}
 .searchByBuilder .select2-container--default .select2-selection--single{height: 51px;}
@@ -530,7 +529,7 @@ body.reinspect #btnReinspectDelete{top: 0;}
 
 #inspectionList #historyReinspection div.action{width: auto;}
 #inspectionList #il_builder_id + span.select2-container{width: 280px !important;}
-#historyReinspection table{display: block;overflow: auto;-webkit-overflow-scrolling: touch;}
+#historyReinspection table{display: block;overflow: auto;}
 
 ::-webkit-scrollbar{
     -webkit-appearance: none;
@@ -583,7 +582,6 @@ body.reinspect #btnReinspectDelete{top: 0;}
 
 .select2-container--default .select2-results>.select2-results__options{
     overflow-x: visible;
-    -webkit-overflow-scrolling: touch;
 }
 
 div#subheader .right h1{
@@ -1824,7 +1822,6 @@ ul.historygallery{
 #reinspection #reinspectionScrollWrapper {
     margin-bottom: 15px;
     height: 200px;
-    -webkit-overflow-scrolling: touch;
 }
 #reinspection select#rectified {
     vertical-align: middle;
