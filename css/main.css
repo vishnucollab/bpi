@@ -493,6 +493,7 @@ ul.selector{border-radius: 0;  height: auto;font-size: 21px;}
 #inspectionScrollWrapper{
     max-height: 325px;
     min-height: 325px;
+    height: 325px !important;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
 }
@@ -533,7 +534,7 @@ body.reinspect #btnReinspectDelete{top: 0;}
 
 ::-webkit-scrollbar{
     -webkit-appearance: none;
-    width: 3px;
+    width: 7px;
 }
 
 ::-webkit-scrollbar-thumb {
