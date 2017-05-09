@@ -185,7 +185,7 @@ var Builders = function()
 			
 			    if(objUtils.isMobileDevice())	    
 		        {
-                    self.scroller = new IScroll('#builderScrollWrapper', { hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar', click: true });
+                    self.scroller = new IScroll('#builderScrollWrapper', { hScrollbar: false, vScrollbar: false, scrollbarClass: 'myScrollbar', click: true });
 			    }
             }, 1000);
 			

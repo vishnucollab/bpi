@@ -383,7 +383,7 @@ var popselector = function(selector, heading)
 		if(objUtils.isMobileDevice())	    
 	    {
 	    	//$("#popSelector #popSelectorOptions").addClass("webkitBox");
-	    	self.scroller = new IScroll('#popSelectorOptionsWrapper', { click: true, hScrollbar: false, vScrollbar: true});
+	    	self.scroller = new IScroll('#popSelectorOptionsWrapper', { click: true, hScrollbar: false, vScrollbar: false});
             //var scroller = new TouchScroll(document.querySelector("#popSelector #popSelectorOptions"));
 		}		
 		

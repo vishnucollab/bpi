@@ -198,7 +198,7 @@ var Clients = function()
 			
 			    if(objUtils.isMobileDevice())	    
 		        {
-                    self.scroller = new IScroll('#clientScrollWrapper', { click: true, hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar'});
+                    self.scroller = new IScroll('#clientScrollWrapper', { click: true, hScrollbar: false, vScrollbar: false, scrollbarClass: 'myScrollbar'});
 			    }
             }, 1000);
 			
