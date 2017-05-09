@@ -337,7 +337,7 @@ var Inspections = function()
                     self.scroller = new IScroll('#inspectionScrollWrapper', { click: true, hScrollbar: false, vScrollbar: true, scrollbarClass: 'myScrollbar'});
                 }
             }, 500);
-            
+
 
 			// Bind click event to list items
             $("#tblInspectionListing a.delete").bind(objApp.touchEvent, function(e) {
