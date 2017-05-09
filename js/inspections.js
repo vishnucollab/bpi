@@ -1015,7 +1015,7 @@ var Inspections = function()
             $('#inspectionStep4 > .bottomBtns > .btnContainer.right > a#btnStep4Next').html('Next &rsaquo;&rsaquo;');
         }
         */
-        $('#inspectionStep4 > .bottomBtns > .btnContainer.right > a#btnStep4Next').html('Next &rsaquo;&rsaquo;');
+        $('#inspectionStep4 > .bottomBtns > .btnContainer.right > a#btnStep4Next').html('Next');
         $("#inspectionStep4").removeClass("hidden");
 
         self.setTableWidths2('tblRateListingHeader', 'tblRateListing', 2, 500);
