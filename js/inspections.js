@@ -1684,7 +1684,7 @@ var Inspections = function()
                 {
                     if(objUtils.isMobileDevice())
                     {
-                        self.scroller = new IScroll(document.querySelector("#emailListWrapper"), { click: true, hScrollbar: false, vScrollbar: false, scrollbarClass: 'myScrollbar', useTransform: true, zoom: false, onBeforeScrollStart: function (e) {
+                        self.scroller = new IScroll('#emailListWrapper', { click: true, hScrollbar: false, vScrollbar: false, scrollbarClass: 'myScrollbar', useTransform: true, zoom: false, onBeforeScrollStart: function (e) {
                             var target = e.target;
                             while (target.nodeType != 1) target = target.parentNode;
                             if (target.tagName != 'SELECT' && target.tagName != 'INPUT' && target.tagName != 'TEXTAREA')
@@ -4067,7 +4067,7 @@ console.log(downloadURL);
 			if(objUtils.isMobileDevice())
 			{
 				//var scroller = new TouchScroll(document.querySelector("#photoWrapper #photoList"));
-                var scroller = new IScroll(document.querySelector("#photoWrapper #photoList"), { click: true, hScrollbar: false, vScrollbar: false, scrollbarClass: 'myScrollbarSm'});
+                var scroller = new IScroll('#photoList', { click: true, hScrollbar: false, vScrollbar: false, scrollbarClass: 'myScrollbarSm'});
 			}
 
 			$("#photoWrapper #photoList a").unbind();
@@ -4509,7 +4509,7 @@ console.log(downloadURL);
 
 				    // Setup touchScroll if applicable
 					if(objUtils.isMobileDevice()) {
-					    self.scroller = new IScroll(document.querySelector("#historyModal #historyList"), { click: true, hScrollbar: false, vScrollbar: false, scrollbarClass: 'myScrollbar'});
+					    self.scroller = new IScroll('#historyList', { click: true, hScrollbar: false, vScrollbar: false, scrollbarClass: 'myScrollbar'});
 					}
 				}
 
@@ -4794,7 +4794,7 @@ console.log(downloadURL);
 			if(objUtils.isMobileDevice())
 			{
 				//var scroller = new TouchScroll(document.querySelector("#photoWrapper #photoList"));
-                var scroller = new IScroll(document.querySelector("#photoWrapper #photoList"), { click: true, hScrollbar: false, vScrollbar: false, scrollbarClass: 'myScrollbarSm'});
+                var scroller = new IScroll('#photoList', { click: true, hScrollbar: false, vScrollbar: false, scrollbarClass: 'myScrollbarSm'});
 			}
 
 			$("#historyList a").unbind();
@@ -5649,7 +5649,7 @@ console.log(downloadURL);
 
 				// if(objUtils.isMobileDevice())
 			    {
-                    self.scroller = new IScroll(document.querySelector("#defectScrollWrapper"), { click: true, hScrollbar: false, vScrollbar: false, scrollbarClass: 'myScrollbarSm'});
+                    self.scroller = new IScroll("#defectScrollWrapper", { click: true, hScrollbar: false, vScrollbar: false, scrollbarClass: 'myScrollbarSm'});
 				    
                     if(self.last_scroller_y != -1)
                     {
@@ -5992,7 +5992,7 @@ console.log(downloadURL);
 
                     if(objUtils.isMobileDevice())
                     {
-                        self.scroller = new IScroll(document.querySelector("#reinspectionScrollWrapper"), { click: true, hScrollbar: false, vScrollbar: false, scrollbarClass: 'myScrollbarSm'});
+                        self.scroller = new IScroll('#reinspectionScrollWrapper', { click: true, hScrollbar: false, vScrollbar: false, scrollbarClass: 'myScrollbarSm'});
                     }
 
                     // Handle the event when the user clicks on a row in the item table

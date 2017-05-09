@@ -231,7 +231,7 @@ var Sites = function()
             
                 if(objUtils.isMobileDevice())        
                 {
-                    self.scroller = new IScroll(document.querySelector("#siteScrollWrapper"), { click: true, hScrollbar: false, vScrollbar: false, scrollbarClass: 'myScrollbar'});
+                    self.scroller = new IScroll('#siteScrollWrapper', { click: true, hScrollbar: false, vScrollbar: false, scrollbarClass: 'myScrollbar'});
                 }
             }, 500);             
 	
