@@ -81,11 +81,12 @@ var m = Math,
 	translateZ = has3d ? ' translateZ(0)' : '',
 
 	// Constructor
-	iScroll = function (el, options) {
+	IScroll = function (el, options) {
 		var that = this,
 			i;
-
+        el = el.replace('#', '');
 		that.wrapper = typeof el == 'object' ? el : doc.getElementById(el);
+        console.log(el);
 		that.wrapper.style.overflow = 'hidden';
 		that.scroller = that.wrapper.children[0];
 
@@ -188,7 +189,7 @@ var m = Math,
 	};
 
 // Prototype
-iScroll.prototype = {
+    IScroll.prototype = {
 	enabled: true,
 	x: 0,
 	y: 0,
@@ -1098,7 +1099,7 @@ function prefixStyle (style) {
 
 dummyStyle = null;	// for the sake of it
 
-if (typeof exports !== 'undefined') exports.iScroll = iScroll;
-else window.iScroll = iScroll;
+if (typeof exports !== 'undefined') exports.IScroll = IScroll;
+else window.IScroll = IScroll;
 
 })(window, document);
