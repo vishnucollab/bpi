@@ -2823,7 +2823,7 @@ var Inspections = function()
                             if(report_type == "Fix / Plaster Inspection") {
                                 report_type = "Fix";
                             } else {
-                                report_type = report_type.replace(" ", "%20").trim();
+                                report_type = report_type.replace(/ /g, "%20").trim();
                                 report_type = report_type.replace("/", "-dash-")
                             }
 
