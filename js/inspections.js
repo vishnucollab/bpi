@@ -279,7 +279,10 @@ var Inspections = function()
 			    html += objApp.formatUserDate(inspDate) + '</td>';  
 			    html += '<td>' + row.lot_no + ' ' + row.address + ' ' + row.suburb + '</td>';
 			    html += '<td>' + row.name + '</td>';
-			    html += '<td>' + row.report_type + '</td>';
+                var report_type = row.report_type.replace('inspections', 'inspection');
+                if (report_type == 'Builder: PCI/Final inspection')
+                    report_type = 'QA Inspection';
+			    html += '<td>' + report_type + '</td>';
                 html += '<td>' + row.num_reinspections + '</td>';
                 
                 
@@ -2780,6 +2783,25 @@ var Inspections = function()
 			}, 500);
             return false;
 
+        });
+
+        $(".inspectionDetails #btnCertificated").bind(objApp.touchEvent, function(e)
+        {
+            e.preventDefault();
+            $(this).addClass('hidden');
+            $('#btnUncertificated').removeClass('hidden');
+            $('#certificated').val(1);
+            objApp.objInspection.checkSaveRateInspection();
+            return false;
+        });
+        $(".inspectionDetails #btnUncertificated").bind(objApp.touchEvent, function(e)
+        {
+            e.preventDefault();
+            $(this).addClass('hidden');
+            $('#btnCertificated').removeClass('hidden');
+            $('#certificated').val(0);
+            objApp.objInspection.checkSaveRateInspection();
+            return false;
         });
 
         $(".inspectionDetails .preview").bind(objApp.touchEvent, function(e)
@@ -5897,6 +5919,14 @@ console.log(downloadURL);
                 $("#reinspection a.failed").unbind();
                 $('#btnReinspectNotes').unbind();
                 $('#btnRWSave').unbind();
+
+                if (inspection.certificated == 1){
+                    $('#btnCertificated').addClass('hidden');
+                    $('#btnUncertificated').removeClass('hidden');
+                }else{
+                    $('#btnCertificated').removeClass('hidden');
+                    $('#btnUncertificated').addClass('hidden');
+                }
 
                 // Clear the stage
                 objApp.clearMain();

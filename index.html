@@ -729,7 +729,6 @@
                     <span>Email</span>
                 </div>
 
-
                 <div class="btnContainer right">
                     <a id="btnStep4Next" class="mtop20 right rightmargin btn-bg-w81" href="#">Next</a>
                 </div>
@@ -740,6 +739,7 @@
         <!-- inspection step 5 screen -->
         <div id="inspectionStep5" class="inspectionDetails hidden panel">
             <form action="#" id="frmRateDetails" method="post">
+                <input type="hidden" name="certificated" id="certificated"  value="0"/>
                 <table id="tblRateListingHeader" class="listing">
                     <thead>
                     <tr>
@@ -827,6 +827,11 @@
                 <div class="btnContainer left " id="btnStep3Email">
                     <a href="#" id="preview" class="email sendEmailButton" data-reveal-id="emailReportWrapper"></a>
                     <span>Email</span>
+                </div>
+
+                <div class="btnContainer left" style="width: auto;">
+                    <a id="btnCertificated" style="margin-top: 25px;" class="button" href="javascript:void(0);">Certificated</a>
+                    <a id="btnUncertificated" style="background: #ff4539;margin-top: 25px;" class="button hidden" href="javascript:void(0);">Uncertificated</a>
                 </div>
 
                 <div class="btnContainer right">
