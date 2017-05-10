@@ -577,18 +577,9 @@ div#subheader .right h1{
     margin-right: 10px !important;
     font-size: 21px;
 }
-/* Scrollbar in iOS
-::-webkit-scrollbar{
-    -webkit-appearance: none;
-    width: 7px;
-}
 
-::-webkit-scrollbar-thumb {
-    border-radius: 3px;
-    background-color: rgba(0,0,0,.5);
-    -webkit-box-shadow: 0 0 1px rgba(255,255,255,.5);
-}
-*/
+#reportPhotos{max-height: 500px;}
+#reportPhotoList{max-height: 388px;}
 /* End simb-dev3 */
 
 /* footer ------------------------------ */

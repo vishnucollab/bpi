@@ -6396,13 +6396,8 @@ console.log(downloadURL);
             $('#btnStep3Back').removeClass('hidden');
             $('#finished').removeClass('active');
             $('#keywords').removeClass('hidden');
-
-            if(objApp.keys.report_type == "House & Land PCI") {
-                $("#btnReportPhotos").removeClass("hidden");
-            }
-            
+            $("#btnReportPhotos").removeClass("hidden");
             $("div.btnReinspect").hide();
-            
             $("#tblRateListing select.ratingSelect").removeAttr("readonly");
             $("#tblRateListing select.ratingSelect").removeAttr("disabled");            
         }   
