@@ -1501,6 +1501,15 @@ var Inspections = function()
             $(".inspectionDetails .passed").addClass('active');
         }
 
+        $("#inspection #weather").val(inspection.certificated);
+        if (inspection.certificated == 1){
+            $('#btnCertificated').addClass('hidden');
+            $('#btnUncertificated').removeClass('hidden');
+        }else{
+            $('#btnCertificated').removeClass('hidden');
+            $('#btnUncertificated').addClass('hidden');
+        }
+
         this.finalised = false;
 
         if(inspection.finalised == 1) {
@@ -2852,7 +2861,7 @@ var Inspections = function()
                             var downloadURL = objApp.apiURL + "reports/print_report/" + report_type + '/' + encodeURIComponent(objApp.keys.inspection_id) + '/' + encodeURIComponent(objApp.keys.reinspection_id) + "?token=" + token;
 console.log(downloadURL);
                             if(objApp.phonegapBuild) {
-                                downloadURL = "https://docs.google.com/viewer?url=" + encodeURIComponent(downloadURL);
+                                downloadURL = "https://docs.google.com/viewer?url=" + encodeURIComponent(downloadURL) + '&embedded=true';
                                 var ref = window.open(downloadURL, '_blank', 'location=yes');
                             } else {
                                 $.download(downloadURL, [], "post");
@@ -5920,6 +5929,7 @@ console.log(downloadURL);
                 $('#btnReinspectNotes').unbind();
                 $('#btnRWSave').unbind();
 
+                $("#inspection #weather").val(inspection.certificated);
                 if (inspection.certificated == 1){
                     $('#btnCertificated').addClass('hidden');
                     $('#btnUncertificated').removeClass('hidden');
