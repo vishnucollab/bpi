@@ -3,6 +3,43 @@
  * Released under MIT license, http://cubiq.org/license
  */
 (function(window, doc){
+    var utils = (function () {
+        var me = {};
+        me.tap = function (e, eventName) {
+            var ev = document.createEvent('Event');
+            ev.initEvent(eventName, true, true);
+            ev.pageX = e.pageX;
+            ev.pageY = e.pageY;
+            e.target.dispatchEvent(ev);
+        };
+
+        me.click = function (e) {
+            var target = e.target,
+                ev;
+
+            if ( !(/(SELECT|INPUT|TEXTAREA)/i).test(target.tagName) ) {
+                // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/initMouseEvent
+                // initMouseEvent is deprecated.
+                ev = document.createEvent(window.MouseEvent ? 'MouseEvents' : 'Event');
+                ev.initEvent('click', true, true);
+                ev.view = e.view || window;
+                ev.detail = 1;
+                ev.screenX = target.screenX || 0;
+                ev.screenY = target.screenY || 0;
+                ev.clientX = target.clientX || 0;
+                ev.clientY = target.clientY || 0;
+                ev.ctrlKey = !!e.ctrlKey;
+                ev.altKey = !!e.altKey;
+                ev.shiftKey = !!e.shiftKey;
+                ev.metaKey = !!e.metaKey;
+                ev.button = 0;
+                ev.relatedTarget = null;
+                ev._constructed = true;
+                target.dispatchEvent(ev);
+            }
+        };
+        return me;
+    })();
 var m = Math,
 	dummyStyle = doc.createElement('div').style,
 	vendor = (function () {
@@ -136,7 +173,9 @@ var m = Math,
 			onDestroy: null,
 			onZoomStart: null,
 			onZoom: null,
-			onZoomEnd: null
+			onZoomEnd: null,
+            tap: false,
+            click: false
 		};
 
 		// User defined options
@@ -533,6 +572,13 @@ var m = Math,
 		}
 
 		if (!that.moved) {
+			if ( this.options.tap ) {
+				utils.tap(e, this.options.tap);
+			}
+
+			if ( this.options.click ) {
+				utils.click(e);
+			}
 			if (hasTouch) {
 				if (that.doubleTapTimer && that.options.zoom) {
 					// Double tapped

@@ -1500,7 +1500,7 @@ var Inspections = function()
             $(".inspectionDetails .failed").removeClass('active');
             $(".inspectionDetails .passed").addClass('active');
         }
-console.log(inspection);
+
         $("#inspection #certificated").val(inspection.certificated);
         if (inspection.certificated == 1){
             $('#btnCertificated').addClass('hidden');
@@ -2859,7 +2859,6 @@ console.log(inspection);
                             }
 
                             var downloadURL = objApp.apiURL + "reports/print_report/" + report_type + '/' + encodeURIComponent(objApp.keys.inspection_id) + '/' + encodeURIComponent(objApp.keys.reinspection_id) + "?token=" + token;
-console.log(downloadURL);
                             if(objApp.phonegapBuild) {
                                 downloadURL = "https://docs.google.com/viewer?url=" + encodeURIComponent(downloadURL) + '&embedded=true';
                                 var ref = window.open(downloadURL, '_blank', 'location=yes');
@@ -3299,7 +3298,7 @@ console.log(downloadURL);
                 $(tableBody).find("tr td:eq(2)").css("width", average_width + "px");
 
                 if(objUtils.isMobileDevice()) {
-                    self.scroller = new IScroll('#reportPhotoList', { hScrollbar: false, vScrollbar: false, scrollbarClass: 'myScrollbar', tap: true});
+                    self.scroller = new IScroll('#reportPhotoList', { hScrollbar: false, vScrollbar: false, scrollbarClass: 'myScrollbar', click: true});
                 }
                 
 
@@ -3523,7 +3522,8 @@ console.log(downloadURL);
 
             if(r < maxLoop)
             {
-                doNext();
+                if (typeof doNext == 'function')
+                    doNext();
             }
             else
             {
