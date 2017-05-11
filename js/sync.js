@@ -467,7 +467,6 @@ function Sync()
     this.sendAndSyncData = function()
     {
         self.sendData();
-        self.getSmartData();
     }
 
 
@@ -512,8 +511,9 @@ function Sync()
                     }
                     else if (self.syncingCounter <= 0)
                     {
-                        unblockElement("body");
+                        //unblockElement("body");
                         if(!self.silentMode)  $("#accountMessage #general").text("Data sent OK.");
+                        self.getSmartData();
                     }
 
                 }
