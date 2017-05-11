@@ -1500,8 +1500,8 @@ var Inspections = function()
             $(".inspectionDetails .failed").removeClass('active');
             $(".inspectionDetails .passed").addClass('active');
         }
-
-        $("#inspection #weather").val(inspection.certificated);
+console.log(inspection);
+        $("#inspection #certificated").val(inspection.certificated);
         if (inspection.certificated == 1){
             $('#btnCertificated').addClass('hidden');
             $('#btnUncertificated').removeClass('hidden');
@@ -5929,7 +5929,7 @@ console.log(downloadURL);
                 $('#btnReinspectNotes').unbind();
                 $('#btnRWSave').unbind();
 
-                $("#inspection #weather").val(inspection.certificated);
+                $("#inspection #certificated").val(inspection.certificated);
                 if (inspection.certificated == 1){
                     $('#btnCertificated').addClass('hidden');
                     $('#btnUncertificated').removeClass('hidden');
