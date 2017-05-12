@@ -2397,6 +2397,11 @@ var Inspections = function()
         $(".inspectionDetails #btnStep1Next").bind(objApp.touchEvent, function(e) {
 			e.preventDefault();
 
+            if ($('#frmInspectionDetails #report_type').val() == "") {
+                alert("Please select a report type");
+                return;
+            }
+
             if(self.objPopBuilders.val() == "") {
                 alert("Please select a builder");
                 return;
@@ -2859,6 +2864,7 @@ var Inspections = function()
                             }
 
                             var downloadURL = objApp.apiURL + "reports/print_report/" + report_type + '/' + encodeURIComponent(objApp.keys.inspection_id) + '/' + encodeURIComponent(objApp.keys.reinspection_id) + "?token=" + token;
+                            console.log(downloadURL);
                             if(objApp.phonegapBuild) {
                                 downloadURL = "https://docs.google.com/viewer?url=" + encodeURIComponent(downloadURL) + '&embedded=true';
                                 var ref = window.open(downloadURL, '_blank', 'location=yes');
@@ -3298,7 +3304,7 @@ var Inspections = function()
                 $(tableBody).find("tr td:eq(2)").css("width", average_width + "px");
 
                 if(objUtils.isMobileDevice()) {
-                    self.scroller = new IScroll('#reportPhotoList', { hScrollbar: false, vScrollbar: false, scrollbarClass: 'myScrollbar', click: true});
+                    self.scroller = new IScroll('#reportPhotoList', { hScrollbar: false, vScrollbar: false, scrollbarClass: 'myScrollbar', tap: true});
                 }
                 
 
