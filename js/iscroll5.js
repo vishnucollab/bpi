@@ -245,7 +245,7 @@ var utils = (function () {
     return me;
 })();
 
-function IScroll (el, options) {
+function IScroll5 (el, options) {
     this.wrapper = typeof el == 'string' ? document.querySelector(el) : el;
     this.scroller = this.wrapper.children[0];
     this.scrollerStyle = this.scroller.style;        // cache style for better performance
@@ -331,7 +331,7 @@ function IScroll (el, options) {
     this.enable();
 }
 
-IScroll.prototype = {
+IScroll5.prototype = {
     version: '5.1.3',
 
     _init: function () {
@@ -2000,12 +2000,12 @@ Indicator.prototype = {
     }
 };
 
-IScroll.utils = utils;
+IScroll5.utils = utils;
 
 if ( typeof module != 'undefined' && module.exports ) {
-    module.exports = IScroll;
+    module.exports = IScroll5;
 } else {
-    window.IScroll = IScroll;
+    window.IScroll5 = IScroll5;
 }
 
 })(window, document, Math);
