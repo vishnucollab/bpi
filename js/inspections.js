@@ -3304,7 +3304,7 @@ var Inspections = function()
                 $(tableBody).find("tr td:eq(2)").css("width", average_width + "px");
 
                 if(objUtils.isMobileDevice()) {
-                    self.scroller = new IScroll('#reportPhotoList', { hScrollbar: false, vScrollbar: false, scrollbarClass: 'myScrollbar', tap: true});
+                    self.scroller = new IScroll5('#reportPhotoList', { hScrollbar: false, vScrollbar: false, scrollbarClass: 'myScrollbar', tap: true});
                 }
                 
 
