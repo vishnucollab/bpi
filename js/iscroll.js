@@ -85,7 +85,10 @@
 		var that = this,
 			i;
         el = el.replace('#', '');
+
 		that.wrapper = typeof el == 'object' ? el : doc.getElementById(el);
+        if (that.wrapper == null)
+            return;
 		that.wrapper.style.overflow = 'hidden';
 		that.scroller = that.wrapper.children[0];
 

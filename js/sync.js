@@ -505,17 +505,8 @@ function Sync()
                 // Make sure the server processed the data OK.
                 if(data.status == "OK")
                 {
-                    if(self.callbackMethod != null)
-                    {
-                        self.callbackMethod(true);
-                    }
-                    else if (self.syncingCounter <= 0)
-                    {
-                        //unblockElement("body");
-                        if(!self.silentMode)  $("#accountMessage #general").text("Data sent OK.");
-                        self.getSmartData();
-                    }
-
+                    if(!self.silentMode) $("#accountMessage #general").text("Data sent OK, checking for data to process...");
+                    self.getSmartData();
                 }
                 else if(data.message == "INVALID")
                 {
