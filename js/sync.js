@@ -26,7 +26,7 @@ function Sync()
 	this.silentMode = false;
 	this.callbackMethod = null;
     this.photosUploaded = false;
-	
+    this.sendDataAndPhotoOnly = false;
 	/***
 	* Setup the sync/account screen
 	*/   
@@ -99,6 +99,7 @@ function Sync()
 	{
 		self.silentMode = true;
 		self.callbackMethod = callbackMethod;
+        self.sendDataAndPhotoOnly = true;
         objDBUtils.callbackMethod = objApp.objSync.sendAndSyncData;
         setTimeout('objDBUtils.getDirtyData(1, 0);', 200);
 	}
@@ -471,7 +472,7 @@ function Sync()
 
 
 	this.sendData = function()
-	{	
+	{
 		// Setup the request data.
 		var parameters = {};
 		parameters['email'] = localStorage.getItem("email");
@@ -506,7 +507,14 @@ function Sync()
                 if(data.status == "OK")
                 {
                     if(!self.silentMode) $("#accountMessage #general").text("Data sent OK, checking for data to process...");
-                    self.getSmartData();
+                    if (self.sendDataAndPhotoOnly){
+                        self.sendDataAndPhotoOnly = false;
+                        self.tableIdx = 0;
+                        self.uploadPhotos("inspection");
+                    }else{
+                        self.getSmartData();
+                    }
+
                 }
                 else if(data.message == "INVALID")
                 {
