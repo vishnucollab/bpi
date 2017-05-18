@@ -879,7 +879,8 @@
 	*/
 	destroy: function () {
 		var that = this;
-
+		if (typeof that.scroller == 'undefined')
+			return;
 		that.scroller.style[transform] = '';
 
 		// Remove the scrollbars

@@ -3878,7 +3878,7 @@ var Inspections = function()
             return;
 
 		// Flag all related photo records as deleted.
-		var sql = "UPDATE " + this.current_table + " " +
+		var sql = "UPDATE " + self.current_table + " " +
 			"SET deleted = 1, dirty = 1 " +
 			"WHERE id = ?";
 
@@ -4104,7 +4104,7 @@ var Inspections = function()
 			if(objUtils.isMobileDevice())
 			{
 				//var scroller = new TouchScroll(document.querySelector("#photoWrapper #photoList"));
-                var scroller = new IScroll('#photoList', { click: true, hScrollbar: false, vScrollbar: false, scrollbarClass: 'myScrollbarSm'});
+                var scroller = new IScroll5('#photoList', { click: true, hScrollbar: false, vScrollbar: false, scrollbarClass: 'myScrollbarSm'});
 			}
 
 			$("#photoWrapper #photoList a").unbind();
