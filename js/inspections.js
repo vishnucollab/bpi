@@ -5686,7 +5686,7 @@ var Inspections = function()
 
 				// if(objUtils.isMobileDevice())
 			    {
-                    self.scroller = new IScroll("#defectScrollWrapper", { click: true, hScrollbar: false, vScrollbar: false, scrollbarClass: 'myScrollbarSm'});
+                    self.scroller = new IScroll5("#defectScrollWrapper", { click: true, hScrollbar: false, vScrollbar: false, scrollbarClass: 'myScrollbarSm'});
 				    
                     if(self.last_scroller_y != -1)
                     {
