@@ -5769,6 +5769,14 @@ var Inspections = function()
                         return;
                     }
 
+					var inspection_item_id = $(this).parent().attr("rel");
+
+					var parent = $(this).parent();
+					var table = $(parent).parent();
+
+				    // Remove any active states of the list items
+				    $(table).find("tr").removeClass("active");
+
 				    if(listDeleteMode)
 				    {
 						// Did the user click on the first column
