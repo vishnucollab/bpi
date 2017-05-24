@@ -5754,7 +5754,7 @@ var Inspections = function()
 					}
                 });
 
-				$("#tblDefectListing td").bind(objApp.touchEvent, function(e)
+				$("#tblDefectListing tr td:first").bind(objApp.touchEvent, function(e)
 				{
                     if(self.is_change_order)
                     {
@@ -5768,17 +5768,6 @@ var Inspections = function()
                     if(self.finalised == 1) {
                         return;
                     }
-
-					var inspection_item_id = $(this).parent().attr("rel");
-
-					var parent = $(this).parent();
-					var table = $(parent).parent();
-
-				    // Remove any active states of the list items
-				    $(table).find("tr").removeClass("active");
-
-				    // Set the active state
-				    $(parent).addClass("active");
 
 				    if(listDeleteMode)
 				    {
@@ -5798,30 +5787,6 @@ var Inspections = function()
 								return;
 							}
 						}
-						/*else if(confirm("Would you like to edit this item?"))
-    					{
-    						blockElement('body');
-
-        					// Load the inspection item record
-        					objDBUtils.loadRecord("inspectionitems", inspection_item_id, function(inspection_item_id, item)
-        					{
-        						unblockElement('body');
-
-        						if(!item)
-        						{
-        							return;
-        						}
-
-        						objApp.keys.inspection_item_id = item.id;
-        						objApp.keys.level = item.level;
-        						objApp.keys.area = item.area;
-        						objApp.keys.issue = item.issue;
-        						objApp.keys.detail = item.detail;
-
-        						self.showStep2(item);
-
-        					}, inspection_item_id);
-    					}*/
 				    }
 					return false;
 				});
