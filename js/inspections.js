@@ -1818,7 +1818,7 @@ var Inspections = function()
         $(".report_type_options").unbind();
         $('#frmDefectDetails #observation').unbind();
         $("#inspectionList #btnAddInspection").unbind();
-
+        $("#btnSendReport").unbind();
         $("select[name='builder_id']").unbind();
         
         setTimeout(function() {
@@ -3212,8 +3212,37 @@ var Inspections = function()
 
         $("#btnReportPhotos").bind(objApp.touchEvent, function(e) {
             e.preventDefault();
-
             self.showReportPhotos();
+        });
+
+        $("#btnSendReport").bind(objApp.touchEvent, function(e) {
+            e.preventDefault();
+            // Also ensure we have a valid inspection ID
+            var inspection_id = objApp.getKey("inspection_id");
+            if(objApp.empty(inspection_id)) {
+                alert("Invalid inspection ID");
+                return;
+            }
+            //var reinspection_id = objApp.getKey("reinspection_id");
+            blockElement('body');
+            objApp.objSync.startSyncSilent(function(success) {
+                if(!success) {
+                    unblockElement('body');
+                    alert("Sorry, a problem occurred whilst syncing your data to the server");
+                    return;
+                }
+                $.post(objApp.apiURL + "inspections/send_inspection_to_dropbox/" + inspection_id, {}, function(response) {
+                    unblockElement('body');
+                    var data = JSON.parse(response);
+                    if(data.status != "OK") {
+                        alert(data.message);
+                        return;
+                    }
+                    alert("The report was sent successfully to dropbox");
+                }, "").fail(function() {
+                    alert( "Unknown error" );
+                })
+            });
         });
 	}
 

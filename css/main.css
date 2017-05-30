@@ -1243,9 +1243,9 @@ aside textarea
     padding: 2px 5px;
 }
     
-#btnAddDefect, a.btnEditNotes, #btnStep3Email, #btnReportPhotos, #btnStep4Email {
+#btnAddDefect, a.btnEditNotes, #btnStep3Email, #btnReportPhotos, #btnStep4Email, #btnSendReport {
     margin-left: 10px;
-    top: 20px;
+    top: 35px;
 }
 
 #btnStep3AddAnotherIssue{
