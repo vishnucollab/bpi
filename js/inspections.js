@@ -812,8 +812,10 @@ var Inspections = function()
             //if((inspection.report_type == "Builder: PCI/Final inspections") || (inspection.report_type == "Fix / Plaster Inspection")) {
             if(inspection.report_type == "Quality Inspection" || inspection.report_type == "Builder: PCI/Final inspections") {
                 $("#btnFinishedWrapper").hide();
+                $("#btnSendReport").addClass('hidden');
             } else {
                 $("#btnFinishedWrapper").show();
+                $("#btnSendReport").removeClass('hidden');
             }
             
             if((inspection.report_type == "Quality Inspection" || inspection.report_type == "Builder: PCI/Final inspections") && objApp.keys.reinspection_id == "") {
@@ -1818,7 +1820,7 @@ var Inspections = function()
         $(".report_type_options").unbind();
         $('#frmDefectDetails #observation').unbind();
         $("#inspectionList #btnAddInspection").unbind();
-        $("#btnSendReport").unbind();
+        $("#btnSendReport,#btnSendReport2,#btnSendReport3").unbind();
         $("select[name='builder_id']").unbind();
         
         setTimeout(function() {
@@ -3215,7 +3217,7 @@ var Inspections = function()
             self.showReportPhotos();
         });
 
-        $("#btnSendReport").bind(objApp.touchEvent, function(e) {
+        $("#btnSendReport, #btnSendReport2, #btnSendReport3").bind(objApp.touchEvent, function(e) {
             e.preventDefault();
             // Also ensure we have a valid inspection ID
             var inspection_id = objApp.getKey("inspection_id");
