@@ -16,7 +16,7 @@
 		background: none;
 		color: #333333;
 		font-family: arial, sans-serif;
-		font-size: 14pt;
+		font-size: 16pt;
 		font-weight: bold;
 		display: block;
 		padding: 0;
@@ -28,7 +28,7 @@
 	
 	#noteModal #txtNoteModal
 	{
-		font-size: 12pt;
+		font-size: 14pt;
 		margin: 0px;
 	}
 
