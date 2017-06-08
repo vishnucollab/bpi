@@ -5785,7 +5785,7 @@ var Inspections = function()
 					}
                 });
 
-				$("#tblDefectListing tr td:first").bind(objApp.touchEvent, function(e)
+				$("#tblDefectListing tr td.delete").bind(objApp.touchEvent, function(e)
 				{
                     if(self.is_change_order)
                     {
