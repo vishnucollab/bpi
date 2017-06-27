@@ -1248,6 +1248,10 @@ aside textarea
     top: 35px;
 }
 
+#btnSendReinspectReport{
+    top: 20px;
+}
+
 #btnStep3AddAnotherIssue{
     margin-left: 50px;
 }

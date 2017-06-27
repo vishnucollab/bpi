@@ -660,10 +660,6 @@ div.pack a.button
     top: 10px;
 }
 
-#btnReinspectDelete,#btnReinspectEmail {
-    margin-left: 10px;
-}
-
 
 /* Report Photo Listing */
 #tblReportPhotoListing td {

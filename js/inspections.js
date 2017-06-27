@@ -3244,6 +3244,36 @@ var Inspections = function()
                 })
             });
         });
+
+        $("#btnSendReinspectReport").bind(objApp.touchEvent, function(e) {
+            e.preventDefault();
+            // Also ensure we have a valid inspection ID
+            var reinspection_id = objApp.getKey("reinspection_id");
+            if(objApp.empty(reinspection_id)) {
+                alert("Invalid reinspection ID");
+                return;
+            }
+            //var reinspection_id = objApp.getKey("reinspection_id");
+            blockElement('body');
+            objApp.objSync.startSyncSilent(function(success) {
+                if(!success) {
+                    unblockElement('body');
+                    alert("Sorry, a problem occurred whilst syncing your data to the server");
+                    return;
+                }
+                $.post(objApp.apiURL + "inspections/send_reinspection_to_dropbox/" + reinspection_id, {}, function(response) {
+                    unblockElement('body');
+                    var data = JSON.parse(response);
+                    if(data.status != "OK") {
+                        alert(data.message);
+                        return;
+                    }
+                    alert("The report was sent successfully to dropbox");
+                }, "").fail(function() {
+                    alert( "Unknown error" );
+                })
+            });
+        });
 	}
 
     this.showReportPhotos = function()
