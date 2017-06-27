@@ -478,7 +478,7 @@ function Sync()
 		parameters['email'] = localStorage.getItem("email");
 		parameters['password'] = localStorage.getItem("password");		
 		parameters['version'] = objApp.version;
-		parameters['data'] = Base64.encode(objDBUtils.data);
+		parameters['data'] = $.base64('encode', objDBUtils.data);
         parameters['anticache'] = Math.floor(Math.random() * 999999);
         parameters['start_time'] = objApp.objSync.startTime;
         objApp.objSync.startTime = '';

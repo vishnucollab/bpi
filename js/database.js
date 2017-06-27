@@ -453,19 +453,21 @@ function DBUtils()
 		{
 			if(result)
 			{
+				var rs = [];
 				// Loop through the results and populate the select list
 				var maxLoop = result.rows.length; 
 				
 				for(x = 0; x < maxLoop; x++)
 				{
 					var row = result.rows.item(x);
-					
+					if (rs.indexOf(row[self.showColumn]) != -1)
+						continue;
                     if(html_tag == null)
                     {
-					$(param).
-					  append($("<li></li>").
-					  attr("title", row[self.primaryKey]).
-					  text(row[self.showColumn]));
+						$(param).
+						  append($("<li></li>").
+						  attr("title", row[self.primaryKey]).
+						  text(row[self.showColumn]));
                     }
 					else if(html_tag == 'td')
 					{
@@ -476,11 +478,12 @@ function DBUtils()
 					}
                     else
                     {
-                    $(param).
-					  append($("<" + html_tag + "></" + html_tag + ">").
-					  attr("value", row[self.primaryKey]).
-					  text(row[self.showColumn]));
+						$(param).
+						  append($("<" + html_tag + "></" + html_tag + ">").
+						  attr("value", row[self.primaryKey]).
+						  text(row[self.showColumn]));
                     }
+					rs.push(row[self.showColumn]);
 				}
 			}
 			callback_method();

@@ -2074,21 +2074,19 @@ var Inspections = function()
             if($(this).val() == "Builder inspection")
             {
                 $("#inspection #report_type2").val("Builder inspection");
-                $("#inspection #builder_report_type").show();    
-                
+                $("#inspection #builder_report_type").show();
             }
             else if($(this).val() == "Client inspection")
             {
                 $("#inspection #report_type2").val("Client inspection");
-                $("#inspection #client_report_type").show();      
-                
+                $("#inspection #client_report_type").show();
             } 
             else
             {
                 $("#inspection #report_type2").val("Handovers.com");
-                $("#inspection #handover_report_type").show();               
-                
-            }          
+                $("#inspection #handover_report_type").show();
+            }
+            $(".report_type_options").trigger('change');
         });
 
         $("#inspection #handover_report_type").bind('change', function(e)
