@@ -5123,34 +5123,61 @@ var Inspections = function()
    		// Invoke autosave
 		$("#frmDefectDetails input").blur();
 
-		blockElement('body');
 
-		objDBUtils.autoSave("inspectionitems", objApp.getKey("inspection_item_id"), "frmDefectDetails", function(new_id)
-		{
-            unblockElement('body');
+        var sql = "SELECT * " +
+            "FROM inspectionitems " +
+            "WHERE inspection_id = ? AND location = ? AND observation = ? AND action = ? AND deleted = 0";
 
-			// If the id was not set and we just did an update, get the id
-			if(objApp.getKey("inspection_item_id") == "")
-			{
-                objApp.keys.inspection_item_id = new_id;
-			}
+        objDBUtils.loadRecordSQL(sql, [objApp.keys.inspection_id, location, observation, action], function(row)
+        {
+            if(row)
+            {
+                console.log('This inspection item has been added');
+                self.inAudit = true;
 
-			self.inAudit = true;
+                if(self.restricted == 0)
+                {
+                    // Show the delete defect button
+                    $("#btnDeleteDefect").css("visibility", "visible");
+                }
 
-			if(self.restricted == 0)
-			{
-				// Show the delete defect button
-				$("#btnDeleteDefect").css("visibility", "visible");
-			}
+                $("#photoWrapper").removeClass("hidden");
 
-			$("#photoWrapper").removeClass("hidden");
-
-            self.addNewObservationSuggession();
-
-            if((callback != undefined) && (callback != "")) {
-                callback()
+                if((callback != undefined) && (callback != "")) {
+                    callback()
+                }
             }
-		});
+            else
+            {
+                blockElement('body');
+                objDBUtils.autoSave("inspectionitems", objApp.getKey("inspection_item_id"), "frmDefectDetails", function(new_id)
+                {
+                    unblockElement('body');
+
+                    // If the id was not set and we just did an update, get the id
+                    if(objApp.getKey("inspection_item_id") == "")
+                    {
+                        objApp.keys.inspection_item_id = new_id;
+                    }
+
+                    self.inAudit = true;
+
+                    if(self.restricted == 0)
+                    {
+                        // Show the delete defect button
+                        $("#btnDeleteDefect").css("visibility", "visible");
+                    }
+
+                    $("#photoWrapper").removeClass("hidden");
+
+                    self.addNewObservationSuggession();
+
+                    if((callback != undefined) && (callback != "")) {
+                        callback()
+                    }
+                });
+            }
+        });
 	}
 
 	/***
@@ -5621,10 +5648,15 @@ var Inspections = function()
 
 				var r = 0;
 
+                var added_items = [];
+
 			    for(r = 0; r < maxLoop; r++)
 			    {
 			        var row = items.rows.item(r);
                     var seq_no = row.seq_no;
+                    if (added_items.indexOf(row.id) != -1)
+                        continue;
+                    added_items.push(row.id);
                     
                     // Store the current sequence order of the row so we can quickly sort the
                     // items on move up / move down event.
