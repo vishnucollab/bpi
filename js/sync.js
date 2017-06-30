@@ -27,6 +27,7 @@ function Sync()
 	this.callbackMethod = null;
     this.photosUploaded = false;
     this.sendDataAndPhotoOnly = false;
+    this.lastSyncDatetime = '';
 	/***
 	* Setup the sync/account screen
 	*/   
@@ -240,10 +241,21 @@ function Sync()
         parameters['anticache'] = Math.floor(Math.random() * 999999);
         parameters['start_time'] = objApp.objSync.startTime;
         objApp.objSync.startTime = '';
+        objApp.objSync.lastSyncDatetime = new Date();
         for(var i = 1; i < objDBUtils.tables.length; i++){
             // $("#accountMessage #general").append('<div id="msg'+objDBUtils.tables[i][0] +'"></div>');
             self.getDataTable(objDBUtils.tables[i][0], parameters);
         }
+    }
+
+    this.updateLastSyncDate = function(){
+        var parameters = {};
+        parameters['email'] = localStorage.getItem("email");
+        parameters['password'] = localStorage.getItem("password");
+        parameters['version'] = objApp.version;
+        parameters['datetime'] = parseInt(objApp.objSync.lastSyncDatetime.getTime()/1000);
+        objApp.objSync.lastSyncDatetime = '';
+        $.post(objApp.apiURL + 'account/update_last_sync_date/', parameters , function(data){});
     }
 
     this.getDataTable = function(tableName, parameters)
@@ -311,9 +323,12 @@ function Sync()
                                                     if (self.syncingIndexs[tblName][page] >= self.syncingTables[tblName][page].length) {
                                                         self.syncingCounter--;
                                                         if(!self.silentMode) $("#accountMessage #general").text("Processing: " + (self.syncingTotalRequest - self.syncingCounter) + '/' + self.syncingTotalRequest);
-                                                        if (self.syncingCounter == 0 && !self.silentMode) {
-                                                            self.tableIdx = 0;
-                                                            self.uploadPhotos("inspection");
+                                                        if (self.syncingCounter == 0) {
+                                                            self.updateLastSyncDate();
+                                                            if (!self.silentMode){
+                                                                self.tableIdx = 0;
+                                                                self.uploadPhotos("inspection");
+                                                            }
                                                         }
                                                     }
                                                     else {
@@ -334,9 +349,12 @@ function Sync()
                                     {
                                         self.syncingCounter--;
                                         if(!self.silentMode) $("#accountMessage #general").text("Processing: " + (self.syncingTotalRequest - self.syncingCounter) + '/' + self.syncingTotalRequest);
-                                        if (self.syncingCounter == 0 && !self.silentMode) {
-                                            self.tableIdx = 0;
-                                            self.uploadPhotos("inspection");
+                                        if (self.syncingCounter == 0) {
+                                            self.updateLastSyncDate();
+                                            if (!self.silentMode){
+                                                self.tableIdx = 0;
+                                                self.uploadPhotos("inspection");
+                                            }
                                         }
                                     }
                                 }
@@ -387,9 +405,12 @@ function Sync()
                                             if(!self.silentMode) $("#accountMessage #msg" + tableName).text("Table " + tableName + ": " + self.syncingIndexs[tableName] + " records has been loaded.");
                                             self.syncingCounter--;
                                             if(!self.silentMode) $("#accountMessage #general").text("Processing: " + (self.syncingTotalRequest - self.syncingCounter) + '/' + self.syncingTotalRequest);
-                                            if (self.syncingCounter == 0 && !self.silentMode){
-                                                self.tableIdx = 0;
-                                                self.uploadPhotos("inspection");
+                                            if (self.syncingCounter == 0) {
+                                                self.updateLastSyncDate();
+                                                if (!self.silentMode){
+                                                    self.tableIdx = 0;
+                                                    self.uploadPhotos("inspection");
+                                                }
                                             }
                                         }
                                         else
@@ -411,9 +432,12 @@ function Sync()
                         {
                             self.syncingCounter--;
                             if(!self.silentMode) $("#accountMessage #general").text("Processing: " + (self.syncingTotalRequest - self.syncingCounter) + '/' + self.syncingTotalRequest);
-                            if (self.syncingCounter == 0 && !self.silentMode) {
-                                self.tableIdx = 0;
-                                self.uploadPhotos("inspection");
+                            if (self.syncingCounter == 0) {
+                                self.updateLastSyncDate();
+                                if (!self.silentMode){
+                                    self.tableIdx = 0;
+                                    self.uploadPhotos("inspection");
+                                }
                             }
                         }
                     }
