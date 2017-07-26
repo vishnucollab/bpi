@@ -1977,7 +1977,7 @@ var Inspections = function()
                     params["from"] = user_email;
                     params["inspectionid"] = inspection_id;
                     params["reinspectionid"] = reinspection_id;
-                    params["attach_inspection_images"] = $('#frmEmailTo #attach_inspection_images').is(":checked")
+                    params["attach_inspection_images"] = $('#frmEmailTo #attach_inspection_images').is(":checked")?1:0;
                     params["message"] = "Please find attached the " + inspection.report_type + " inspection report for " + address;
                     
                     $.post(objApp.apiURL + "reports/send_inspection_report", params, function(response) {
