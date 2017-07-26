@@ -1325,6 +1325,7 @@ var Inspections = function()
 		{
 			$("#inspection #btnDeleteInspection").addClass("hidden");
 		}
+        $("#inspection .report_type_options").val('');
 
         $("#inspection #inspection_no").val('');
 		// Set the inspection date and start time to the current date and time
@@ -2075,22 +2076,26 @@ var Inspections = function()
             {
                 $("#inspection #report_type2").val("Builder inspection");
                 $("#inspection #builder_report_type").show();
+                $("#inspection #builder_report_type").val('');
                 $("#inspection #builder_report_type").trigger('change');
             }
             else if($(this).val() == "Client inspection")
             {
                 $("#inspection #report_type2").val("Client inspection");
                 $("#inspection #client_report_type").show();
+                $("#inspection #client_report_type").val('');
                 $("#inspection #client_report_type").trigger('change');
             } 
             else
             {
                 $("#inspection #report_type2").val("Handovers.com");
                 $("#inspection #handover_report_type").show();
+                $("#inspection #handover_report_type").val('');
                 $("#inspection #handover_report_type").trigger('change');
             }
         });
 
+        /*
         $("#inspection #handover_report_type").bind('change', function(e)
         {
             e.preventDefault();
@@ -2114,6 +2119,7 @@ var Inspections = function()
             $('#inspection .btnEditNotes').show();
 
         });
+        */
 
         $("#handover_report_type").change(function() {
                         
