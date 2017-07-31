@@ -273,15 +273,13 @@ var Inspections = function()
 			    var inspDate = objApp.isoDateStrToDate(row.inspection_date);
 			    html += '<tr rel="' + row.id + '">';
 			    html += '<td class="view">'
-                
-                html += '<span class="icon';
-			    
+
 			    if(row.finalised) {
+                    html += '<span class="icon';
 					html += ' finalised';
+                    html += '"></span>';
 			    }
-			    
-			    html += '"></span>';
-			
+
 			    html += objApp.formatUserDate(inspDate) + '</td>';  
 			    html += '<td>' + row.lot_no + ' ' + row.address + ' ' + row.suburb + '</td>';
 			    html += '<td>' + row.name + '</td>';
@@ -3255,6 +3253,7 @@ var Inspections = function()
                     }
                     alert("The report was sent successfully to dropbox");
                 }, "").fail(function() {
+                    unblockElement('body');
                     alert( "Unknown error" );
                 })
             });
@@ -3285,6 +3284,7 @@ var Inspections = function()
                     }
                     alert("The report was sent successfully to dropbox");
                 }, "").fail(function() {
+                    unblockElement('body');
                     alert( "Unknown error" );
                 })
             });
