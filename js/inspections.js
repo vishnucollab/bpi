@@ -198,9 +198,9 @@ var Inspections = function()
         {
             sql += "AND (" +
                             "(i.report_type LIKE '%" + searchText + "%') " +
-                            "OR (i.address LIKE '%" + searchText + "%') " +
+                            "OR (i.address LIKE '" + searchText + "%') " +
                             "OR (i.suburb LIKE '%" + searchText + "%') " +
-                            "OR (i.lot_no LIKE '%" + searchText + "%') " +
+                            "OR (i.lot_no = '" + searchText + "') " +
                             "OR (i.postcode LIKE '%" + searchText + "%') " +
                             "OR (i.inspection_date LIKE '%" + searchText + "%') " +
                             "OR (b.name LIKE '%" + searchText + "%') " +
@@ -2867,6 +2867,7 @@ var Inspections = function()
                             if(report_type == "Fix / Plaster Inspection") {
                                 report_type = "Fix";
                             } else {
+                                report_type = report_type.replace(/ /g, "_").trim();
                                 report_type = report_type.replace(/ /g, "%20").trim();
                                 report_type = report_type.replace("/", "-dash-")
                             }

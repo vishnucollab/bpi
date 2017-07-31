@@ -806,17 +806,12 @@ function App()
         if((dateStr == null) || (dateStr == ""))
 			return null;
 
-		var objDate = new Date();
-		
-		// AU Format
-		var elements = dateStr.split("/");
-		if(elements.length != 3)
-			return null;
-			
-		objDate.setFullYear(elements[2]);
-		objDate.setMonth(elements[1] - 1);	
-		objDate.setDate(elements[0]);			
-		
+        // AU Format
+        var elements = dateStr.split("/");
+        if(elements.length != 3)
+            return null;
+
+		var objDate = new Date(elements[2], parseInt(elements[1]) - 1, elements[0], 0, 0, 0, 0);
 		return objDate;
 	};
 	
@@ -828,18 +823,12 @@ function App()
 	{
 		if((dateStr == null) || (dateStr == ""))
 			return null;
-		
-		var objDate = new Date();
+        // ISO Format
+        var elements = dateStr.split("-");
+        if(elements.length != 3)
+            return null;
 
-		// ISO Format
-		var elements = dateStr.split("-");
-		if(elements.length != 3)
-			return null;
-		
-		objDate.setFullYear(elements[0]);		
-		objDate.setMonth(elements[1] - 1);	
-		objDate.setDate(elements[2]);
-			
+		var objDate = new Date(elements[0], parseInt(elements[1]) - 1, elements[2], 0, 0, 0, 0);
 		return objDate;
 	};
 	
