@@ -458,7 +458,10 @@ var Builders = function()
 		if(builder == null)
 		{
 			//self.objPopState.preselect("VIC");
-            $("#builderDetails #state").val("VIC");
+            if (objApp.is_QLD)
+                $("#builderDetails #state").val(objApp.QLD_STATE_CODE);
+            else
+                $("#builderDetails #state").val("VIC");
             $("#builderDetails #state").trigger('change');
 			self.objPopCountry.preselect("Australia");							
 		}
