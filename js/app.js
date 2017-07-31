@@ -134,7 +134,6 @@ function App()
 			// Hide the login screen.
 			$("#main").removeClass("hidden");
 			self.IS_QLD = localStorage.getItem("is_QLD");
-            alert('App :' + self.IS_QLD);
 			// Figure out what to do next.
 			this.determineInitialAction();
 		}

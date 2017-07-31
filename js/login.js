@@ -335,7 +335,6 @@ var Login = function()
 			localStorage.setItem("password", params["password"]);
             localStorage.setItem("is_QLD", typeof data.state_id == 'undefined'?0:(data.state_id == objApp.QLD_STATE_ID?1:0));
             objApp.IS_QLD = localStorage.getItem("is_QLD");
-            alert('Login :' + objApp.IS_QLD);
             if (remember_me == 1)
             {
                 localStorage.setItem("remember_me", 1);
