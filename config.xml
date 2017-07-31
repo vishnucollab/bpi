@@ -2,8 +2,8 @@
 <widget xmlns = "http://www.w3.org/ns/widgets"
         xmlns:gap = "http://phonegap.com/ns/1.0"
         id = "com.simb.Blueprint"
-        version = "2.0">
-    <name>Blueprint</name>
+        version = "2.1">
+    <name>Blueprint 2.1 - QLD users</name>
 
     <description>
         Conduct onsite buidling inspections with Blueprint and produce beautiful reports that your clients will love.

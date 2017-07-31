@@ -128,7 +128,11 @@ var Builders = function()
 			
 		// Apply any additional search filters 
 		var values = new Array();    	                      
-	    
+	    if (objApp.IS_QLD){
+	        sql += "  AND state = '" + objApp.QLD_STATE_CODE + "' ";
+        }else{
+            sql += "  AND state != '" + objApp.QLD_STATE_CODE + "' ";
+        }
 	    sql += "ORDER BY " + self.sortBy + " " + self.sortDir + " ";
 		
 	    

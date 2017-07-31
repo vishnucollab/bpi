@@ -230,7 +230,13 @@ var Inspections = function()
         {
             sql += "AND i.created_by = ? ";
             values.push(objFilters.user);
-        }        	    	    	     	    	                      
+        }
+
+        if (objApp.IS_QLD){
+            sql += "  AND i.state = '" + objApp.QLD_STATE_CODE + "' ";
+        }else{
+            sql += "  AND i.state != '" + objApp.QLD_STATE_CODE + "' ";
+        }
 		
 	    sql += "ORDER BY " + self.sortBy + " " + self.sortDir + " ";	// Show the most recent inspections first.
         

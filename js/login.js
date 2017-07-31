@@ -333,7 +333,7 @@ var Login = function()
 			localStorage.setItem("initials", typeof data.initials == 'undefined'?'':data.initials);
 			localStorage.setItem("restricted", data.restricted);
 			localStorage.setItem("password", params["password"]);
-            
+            localStorage.setItem("is_QLD", typeof data.state_id == 'undefined'?0:(data.state_id == objApp.QLD_STATE_ID?1:0));
             if (remember_me == 1)
             {
                 localStorage.setItem("remember_me", 1);
@@ -403,5 +403,6 @@ var Login = function()
 		localStorage.setItem("country", "");	
         localStorage.setItem("email", ""); 
         localStorage.setItem("password", "");
+        localStorage.setItem("is_QLD", 0);
 	}
 };

@@ -23,10 +23,14 @@ function App()
 	//this.apiURL = "http://projects.loc/blueprintapi/";
     //this.apiURL = "http://192.168.0.52/blueprint/api/";
 	this.phonegapBuild = true; 	// Set this to true when phonegap is the target
-	this.version = '2.0';				// Identifies the app version to the server
+	this.version = '2.1';				// Identifies the app version to the server
 	this.versionStatus = "Production";
 	this.localMode = false;
 	this.context = "";
+
+    this.IS_QLD = 0;
+    this.QLD_STATE_ID = 3;
+    this.QLD_STATE_CODE = 'QLD';
 	
 	// Declare object references
 	this.objLogin = null;		// Holds an instance of the login object
@@ -129,7 +133,7 @@ function App()
 		{
 			// Hide the login screen.
 			$("#main").removeClass("hidden");
-			
+			self.IS_QLD = localStorage.getItem("is_QLD");
 			// Figure out what to do next.
 			this.determineInitialAction();
 		}
@@ -139,7 +143,9 @@ function App()
 		
 		self.scrollTop(); 
 		
-		$("#version").html("Version " + this.version);       
+		$("#version").html("Version " + this.version);
+
+        this.determineStates();
 		
 		// Hide all back / next / save buttons
 		// this.hideAllButtons();
@@ -169,6 +175,22 @@ function App()
         //var sql = "DELETE FROM address_book;";
         //objDBUtils.execute(sql, null, null);
 	}
+
+	this.determineStates = function(){
+        $('#frmInspectionDetails #state option').show();
+        $('#frmBuilderDetails #state option').show();
+        if (self.IS_QLD){
+            $('#frmInspectionDetails #state option[value!="QLD"]').hide();
+            $('#frmInspectionDetails #state').val('QLD');
+            $('#frmBuilderDetails #state option[value!="QLD"]').hide();
+            $('#frmBuilderDetails #state').val('QLD');
+        }else{
+            $('#frmInspectionDetails #state option[value="QLD"]').hide();
+            $('#frmInspectionDetails #state').val('');
+            $('#frmBuilderDetails #state option[value="QLD"]').hide();
+            $('#frmBuilderDetails #state').val('');
+        }
+    }
 	
 	this.scrollTop = function()
 	{
