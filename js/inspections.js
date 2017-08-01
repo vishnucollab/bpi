@@ -196,6 +196,7 @@ var Inspections = function()
           
         if(searchText != "")
         {
+            /*
             sql += "AND (" +
                             "(i.report_type LIKE '%" + searchText + "%') " +
                             "OR (i.address LIKE '" + searchText + "%') " +
@@ -204,7 +205,9 @@ var Inspections = function()
                             "OR (i.postcode LIKE '%" + searchText + "%') " +
                             "OR (i.inspection_date LIKE '%" + searchText + "%') " +
                             "OR (b.name LIKE '%" + searchText + "%') " +
-                            ") ";                
+                            ") ";
+            */
+            sql += " AND i.lot_no = '" + searchText + "' ";
         }        
 		
 	    // Apply advanced search filters  
