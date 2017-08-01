@@ -177,17 +177,17 @@ function App()
 	}
 
 	this.determineStates = function(){
-        $('#frmInspectionDetails #state option').show();
+        $('#frmInspectionDetails #state option').prop('disabled', false);;
         $('#frmBuilderDetails #state option').show();
         if (self.IS_QLD){
-            $('#frmInspectionDetails #state option[value!="QLD"]').hide();
+            $('#frmInspectionDetails #state option[value!="QLD"]').prop('disabled', true);;
             $('#frmInspectionDetails #state').val('QLD');
-            $('#frmBuilderDetails #state option[value!="QLD"]').hide();
+            $('#frmBuilderDetails #state option[value!="QLD"]').prop('disabled', true);;
             $('#frmBuilderDetails #state').val('QLD');
         }else{
-            $('#frmInspectionDetails #state option[value="QLD"]').hide();
+            $('#frmInspectionDetails #state option[value="QLD"]').prop('disabled', true);;
             $('#frmInspectionDetails #state').val('');
-            $('#frmBuilderDetails #state option[value="QLD"]').hide();
+            $('#frmBuilderDetails #state option[value="QLD"]').prop('disabled', true);;
             $('#frmBuilderDetails #state').val('');
         }
     }

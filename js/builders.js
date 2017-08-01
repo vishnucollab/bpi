@@ -458,7 +458,7 @@ var Builders = function()
 		if(builder == null)
 		{
 			//self.objPopState.preselect("VIC");
-            if (objApp.is_QLD)
+            if (objApp.IS_QLD)
                 $("#builderDetails #state").val(objApp.QLD_STATE_CODE);
             else
                 $("#builderDetails #state").val("VIC");
