@@ -177,18 +177,25 @@ function App()
 	}
 
 	this.determineStates = function(){
-        $('#frmInspectionDetails #state option').prop('disabled', false);;
-        $('#frmBuilderDetails #state option').show();
+        $('#frmInspectionDetails #state').empty();
+        $('#frmBuilderDetails #state').empty();
+        $("#frmInspectionDetails #state").append('<option value="">Choose</option>');
+        $("#frmBuilderDetails #state").append('<option value="">Choose</option>');
         if (self.IS_QLD){
-            $('#frmInspectionDetails #state option[value!="QLD"]').prop('disabled', true);;
-            $('#frmInspectionDetails #state').val('QLD');
-            $('#frmBuilderDetails #state option[value!="QLD"]').prop('disabled', true);;
-            $('#frmBuilderDetails #state').val('QLD');
+            var states = ['QLD']
         }else{
-            $('#frmInspectionDetails #state option[value="QLD"]').prop('disabled', true);;
-            $('#frmInspectionDetails #state').val('');
-            $('#frmBuilderDetails #state option[value="QLD"]').prop('disabled', true);;
-            $('#frmBuilderDetails #state').val('');
+            var states = ['VIC', 'NSW', 'ACT', 'NT', 'WA', 'SA', 'TAS']
+        }
+        for(var i in states){
+            $("#frmInspectionDetails #state").append('<option value="'+states[i]+'">'+states[i]+'</option>');
+            $("#frmBuilderDetails #state").append('<option value="'+states[i]+'">'+states[i]+'</option>');
+        }
+
+        $("#inspection #report_type2").empty();
+        $("#inspection #report_type2").append('<option value="Builder inspection">Builder Inspection</option>');
+        $("#inspection #report_type2").append('<option value="Client inspection">Client Inspection</option>');
+        if (objApp.IS_QLD == 0){
+            $("#inspection #report_type2").append('<option value="Handovers.com">Handovers.com</option>');
         }
     }
 	
