@@ -128,7 +128,7 @@ var Builders = function()
 			
 		// Apply any additional search filters 
 		var values = new Array();    	                      
-	    if (objApp.IS_QLD){
+	    if (objApp.IS_QLD == 1){
 	        sql += "  AND state = '" + objApp.QLD_STATE_CODE + "' ";
         }else{
             sql += "  AND state != '" + objApp.QLD_STATE_CODE + "' ";
@@ -458,7 +458,7 @@ var Builders = function()
 		if(builder == null)
 		{
 			//self.objPopState.preselect("VIC");
-            if (objApp.IS_QLD)
+            if (objApp.IS_QLD == 1)
                 $("#builderDetails #state").val(objApp.QLD_STATE_CODE);
             else
                 $("#builderDetails #state").val("VIC");

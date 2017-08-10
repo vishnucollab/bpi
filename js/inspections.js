@@ -85,6 +85,13 @@ var Inspections = function()
         $("#inspectionList .bottomBtns").find("a").removeClass("active");
         $("#inspectionList #il_builder_id").empty();
         $("#inspectionList #il_builder_id").append('<option value="">Choose</option>');
+
+        $("#inspection #report_type2").empty();
+        $("#inspection #report_type2").append('<option value="Builder inspection">Builder Inspection</option>');
+        $("#inspection #report_type2").append('<option value="Client inspection">Client Inspection</option>');
+        if (objApp.IS_QLD == 0){
+            $("#inspection #report_type2").append('<option value="Handovers.com">Handovers.com</option>');
+        }
         
         if(!self.doingSave)
         {
@@ -235,7 +242,7 @@ var Inspections = function()
             values.push(objFilters.user);
         }
 
-        if (objApp.IS_QLD){
+        if (objApp.IS_QLD == 1){
             sql += "  AND i.state = '" + objApp.QLD_STATE_CODE + "' ";
         }else{
             sql += "  AND i.state != '" + objApp.QLD_STATE_CODE + "' ";
@@ -247,7 +254,7 @@ var Inspections = function()
 	    {            
 	    	sql += "LIMIT ?";
 	    	values.push(objFilters.recordLimit);
-	    }		    
+	    }
 	    
 	    objApp.showHideSpinner(true, "#inspectionList");
         
@@ -1327,6 +1334,12 @@ var Inspections = function()
 		// Set the new inspection button to be active
 		objApp.setNavActive("#navNewInspection");
 
+        $("#inspection #report_type2").empty();
+        $("#inspection #report_type2").append('<option value="Builder inspection">Builder Inspection</option>');
+        $("#inspection #report_type2").append('<option value="Client inspection">Client Inspection</option>');
+        if (objApp.IS_QLD == 0){
+            $("#inspection #report_type2").append('<option value="Handovers.com">Handovers.com</option>');
+        }
         $("#report_type2").trigger('change');
         if(!$("#inspection #btnDeleteInspection").hasClass("hidden"))
 		{
@@ -1394,7 +1407,7 @@ var Inspections = function()
 		$("#inspection").removeClass("hidden");
 		// Bind events to UI objects
         
-        console.log("BIND 3")
+
 		this.unbindEvents();
 		// Setup client and site popselectors
 		this.setupPopselectors();
