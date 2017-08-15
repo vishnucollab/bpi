@@ -704,8 +704,11 @@ var Inspections = function()
 
     this.checkIfNeedPhotos = function()
     {
-        if ($("#inspection #report_type2").val() == 'Client Inspection'){
+        if ($("#inspection #report_type2").val() == 'Client inspection'){
             $('a[id="btnCapturePhoto"]').show();
+            if (!$('#btnStep1Next').is(':visible')){
+                $('a[id="btnCapturePhoto"].step1-capture-btn').hide();
+            }
         }else{
             $('a[id="btnCapturePhoto"]').hide();
         }
@@ -5512,11 +5515,11 @@ var Inspections = function()
                         $("a.btnEditPrivateNotes").hide();
                     }
 
-                    // Show the camera button
-                    self.checkIfNeedPhotos();
-
                     // Show the next button
                     $(".inspectionDetails #btnStep1Next").show();
+
+                    // Show the camera button
+                    self.checkIfNeedPhotos();
 
 			        self.setReturnInspectionID(objApp.keys.inspection_id);
                     $('#btnCapturePhoto').attr('data-reveal-id', 'photoWrapper');
