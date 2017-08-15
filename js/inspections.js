@@ -701,6 +701,16 @@ var Inspections = function()
             },false);
         }
     }
+
+    this.checkIfNeedPhotos = function()
+    {
+        if ($("#inspection #report_type2").val() == 'Builder inspection'){
+            $('a[id="btnCapturePhoto"]').hide();
+        }else{
+            $('a[id="btnCapturePhoto"]').show();
+        }
+
+    }
     
     this.showStep1 = function()
     {
@@ -1490,7 +1500,8 @@ var Inspections = function()
             $("#inspection #report_type2").val("Handovers.com");
             $("#inspection #handover_report_type").show();
             $("#inspection #handover_report_type").val(inspection.report_type);
-        }       
+        }
+        self.checkIfNeedPhotos();
         
         $("#inspection #weather").val(inspection.weather);
         $("#inspection #lot_no").val(inspection.lot_no);
@@ -2100,6 +2111,7 @@ var Inspections = function()
                 $("#inspection #handover_report_type").val('');
                 $("#inspection #handover_report_type").trigger('change');
             }
+            self.checkIfNeedPhotos();
         });
 
         /*
@@ -5502,7 +5514,7 @@ var Inspections = function()
                     }
 
                     // Show the camera button
-                    $(".inspectionDetails #btnCapturePhoto").show();
+                    self.checkIfNeedPhotos();
 
                     // Show the next button
                     $(".inspectionDetails #btnStep1Next").show();
