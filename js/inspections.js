@@ -88,7 +88,12 @@ var Inspections = function()
         
         if(!self.doingSave)
         {
-            objDBUtils.loadSelect("builders", ["id","name"], "#inspectionList #il_builder_id", function(){
+            var filters = [];
+            if (objApp.IS_QLD)
+                filters.push(new Array("state = '"+objApp.QLD_STATE_CODE+"'"));
+            else
+                filters.push(new Array("state != '"+objApp.QLD_STATE_CODE+"'"));
+            objDBUtils.loadSelect("builders", filters, "#inspectionList #il_builder_id", function(){
                 self.doingSave = false;
             }, "option"); 
         }
@@ -1655,7 +1660,13 @@ var Inspections = function()
         self.objPopBuilders.empty();
         self.objPopBuilders.append('<option value="">Builder</option>');
 
-        objDBUtils.loadSelect("builders", [], "#inspection #builder_id", function()
+        var filters = [];
+        if (objApp.IS_QLD)
+            filters.push(new Array("state = '"+objApp.QLD_STATE_CODE+"'"));
+        else
+            filters.push(new Array("state != '"+objApp.QLD_STATE_CODE+"'"));
+
+        objDBUtils.loadSelect("builders", filters, "#inspection #builder_id", function()
 		{
 			// Builders have finished loading.  Preselect the client if we have a client_id.
 			if(objApp.keys.builder_id != "")
