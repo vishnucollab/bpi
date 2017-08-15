@@ -89,7 +89,7 @@ var Inspections = function()
         if(!self.doingSave)
         {
             var filters = [];
-            if (objApp.IS_QLD)
+            if (objApp.IS_QLD == 1)
                 filters.push(new Array("state = '"+objApp.QLD_STATE_CODE+"'"));
             else
                 filters.push(new Array("state != '"+objApp.QLD_STATE_CODE+"'"));
@@ -1663,7 +1663,7 @@ var Inspections = function()
         self.objPopBuilders.append('<option value="">Builder</option>');
 
         var filters = [];
-        if (objApp.IS_QLD)
+        if (objApp.IS_QLD == 1)
             filters.push(new Array("state = '"+objApp.QLD_STATE_CODE+"'"));
         else
             filters.push(new Array("state != '"+objApp.QLD_STATE_CODE+"'"));
@@ -7197,7 +7197,6 @@ var Inspections = function()
 
         objDBUtils.loadRecord("builders", self.inspection.builder_id, function(param, builder) {
             unblockElement('body');
-
             if(builder) {
                 builder_email = builder.email;
             }
@@ -7220,12 +7219,13 @@ var Inspections = function()
                     }
                    
                 }
-                
+
+                var need_builder_email = 0;
                 if(($("#emailToBuilder").is(":checked")) && (!objApp.empty(builder_email))) {
                     if(!objApp.empty(recipients)) {
                         recipients += ",";
                     }
-
+                    need_builder_email = 1;
                     recipients += builder_email;
                                              
                 }
@@ -7254,9 +7254,9 @@ var Inspections = function()
                     var recipients_array = $.merge(old_recipients, recipients.split(','));
                 else
                     var recipients_array = recipients.split(',');
-                    
-                var options = ""; 
-                
+
+                var builder_email_not_in_address_book = 1;
+                var options = "";
                 $.each( email_options, function( key, value ) {   
                     if(jQuery.inArray(value, recipients_array) != -1) {   
                         options += "<option value='"+value+"' selected>"+value+"</option>";
@@ -7265,8 +7265,17 @@ var Inspections = function()
                     {
                         options += "<option value='"+value+"' >"+value+"</option>";
                     }
-                })
-                
+                    if (value == builder_email){
+                        builder_email_not_in_address_book = 0;
+                    }
+                });
+                if (builder_email_not_in_address_book){
+                    if (need_builder_email)
+                        options += "<option value='"+builder_email+"' selected>"+builder_email+"</option>";
+                    else
+                        options += "<option value='"+builder_email+"'>"+builder_email+"</option>";
+                }
+
                 $("#recipients").html(options);
                 
                 $("#recipients").select2({
