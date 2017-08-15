@@ -704,12 +704,11 @@ var Inspections = function()
 
     this.checkIfNeedPhotos = function()
     {
-        if ($("#inspection #report_type2").val() == 'Builder inspection'){
-            $('a[id="btnCapturePhoto"]').hide();
-        }else{
+        if ($("#inspection #report_type2").val() == 'Client Inspection'){
             $('a[id="btnCapturePhoto"]').show();
+        }else{
+            $('a[id="btnCapturePhoto"]').hide();
         }
-
     }
     
     this.showStep1 = function()
