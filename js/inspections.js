@@ -714,8 +714,10 @@ var Inspections = function()
             if (!$('#btnStep1Next').is(':visible')){
                 $('a[id="btnCapturePhoto"].step1-capture-btn').hide();
             }
+            $('a[id="btnReportPhotos"]').show();
         }else{
             $('a[id="btnCapturePhoto"]').hide();
+            $('a[id="btnReportPhotos"]').hide();
         }
     }
     
