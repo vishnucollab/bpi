@@ -6551,7 +6551,8 @@ var Inspections = function()
             $('#btnStep3Back').removeClass('hidden');
             $('#finished').removeClass('active');
             $('#keywords').removeClass('hidden');
-            $("#btnReportPhotos").removeClass("hidden");
+            if ($("#inspection #report_type2").val() != 'Client inspection')
+                $("#btnReportPhotos").removeClass("hidden");
             $("div.btnReinspect").hide();
             $("#tblRateListing select.ratingSelect").removeAttr("readonly");
             $("#tblRateListing select.ratingSelect").removeAttr("disabled");            
