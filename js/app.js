@@ -194,7 +194,7 @@ function App()
         $("#inspection #report_type2").empty();
         $("#inspection #report_type2").append('<option value="Builder inspection">Builder Inspection</option>');
         $("#inspection #report_type2").append('<option value="Client inspection">Client Inspection</option>');
-        if (objApp.IS_QLD == 0){
+        if (self.IS_QLD == 0){
             $("#inspection #report_type2").append('<option value="Handovers.com">Handovers.com</option>');
         }
     }

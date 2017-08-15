@@ -368,7 +368,8 @@ var Login = function()
                 
 			// Hide the login screen.
 			$(".home").addClass("hidden");
-			
+
+            objApp.determineStates();
 			// Figure out what to do next.
 			objApp.determineInitialAction();                          
 
