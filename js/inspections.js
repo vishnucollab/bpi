@@ -710,13 +710,15 @@ var Inspections = function()
     this.checkIfNeedPhotos = function()
     {
         if ($("#inspection #report_type2").val() == 'Client inspection'){
+            /*
             $('a[id="btnCapturePhoto"]').show();
             if (!$('#btnStep1Next').is(':visible')){
                 $('a[id="btnCapturePhoto"].step1-capture-btn').hide();
             }
+            */
             $('a[id="btnReportPhotos"]').show();
         }else{
-            $('a[id="btnCapturePhoto"]').hide();
+            //$('a[id="btnCapturePhoto"]').hide();
             $('a[id="btnReportPhotos"]').hide();
         }
     }
