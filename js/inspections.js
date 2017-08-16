@@ -5534,6 +5534,7 @@ var Inspections = function()
                     $(".inspectionDetails #btnStep1Next").show();
 
                     // Show the camera button
+                    $('a[id="btnCapturePhoto"]').show();
                     self.checkIfNeedPhotos();
 
 			        self.setReturnInspectionID(objApp.keys.inspection_id);
