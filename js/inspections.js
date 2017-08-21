@@ -2843,12 +2843,15 @@ var Inspections = function()
 
         });
 
+        $(".inspectionDetails #btnCertificated").unbind(objApp.touchEvent);
         $(".inspectionDetails #btnCertificated").bind(objApp.touchEvent, function(e)
         {
             e.preventDefault();
             self.handleCertificated();
             return false;
         });
+
+        $(".inspectionDetails #btnUncertificated").unbind(objApp.touchEvent);
         $(".inspectionDetails #btnUncertificated").bind(objApp.touchEvent, function(e)
         {
             e.preventDefault();
