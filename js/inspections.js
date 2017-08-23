@@ -2014,7 +2014,7 @@ var Inspections = function()
                     params["reinspectionid"] = reinspection_id;
                     params["attach_inspection_images"] = $('#frmEmailTo #attach_inspection_images').is(":checked")?1:0;
                     params["message"] = "Please find attached the " + inspection.report_type + " inspection report for " + address;
-                    
+                    params['version'] = objApp.version;
                     $.post(objApp.apiURL + "reports/send_inspection_report", params, function(response) {
                         
                         unblockElement('body');
@@ -2878,6 +2878,7 @@ var Inspections = function()
                     var params = {};
                     params["email"] = localStorage.getItem("email");
                     params["password"] = localStorage.getItem("password");
+                    params['version'] = objApp.version;
                     var url = objApp.apiURL + "account/create_token/" + Math.floor(Math.random() * 99999);
                     blockElement('body');
                     
@@ -3273,7 +3274,7 @@ var Inspections = function()
                     alert("Sorry, a problem occurred whilst syncing your data to the server");
                     return;
                 }
-                $.post(objApp.apiURL + "inspections/send_inspection_to_dropbox/" + inspection_id, {}, function(response) {
+                $.post(objApp.apiURL + "inspections/send_inspection_to_dropbox/" + inspection_id, {'version': objApp.version}, function(response) {
                     unblockElement('body');
                     var data = JSON.parse(response);
                     if(data.status != "OK") {
@@ -3304,7 +3305,7 @@ var Inspections = function()
                     alert("Sorry, a problem occurred whilst syncing your data to the server");
                     return;
                 }
-                $.post(objApp.apiURL + "inspections/send_reinspection_to_dropbox/" + reinspection_id, {}, function(response) {
+                $.post(objApp.apiURL + "inspections/send_reinspection_to_dropbox/" + reinspection_id, {'version': objApp.version}, function(response) {
                     unblockElement('body');
                     var data = JSON.parse(response);
                     if(data.status != "OK") {
@@ -4366,8 +4367,8 @@ var Inspections = function()
 
 							// Create the request URL
 							var url = objApp.apiURL + "inspections/get_inspection_photo/" + photoID;
-
-							$.post(url, params, function(data)
+                            params['version'] = objApp.version;
+                            $.post(url, params, function(data)
 							{
 								unblockElement('body');
 
@@ -5009,8 +5010,8 @@ var Inspections = function()
 
 						// Create the request URL
 						var url = objApp.apiURL + "inspections/get_inspection_photo/" + photoID;
-
-						$.post(url, params, function(data)
+                        params['version'] = objApp.version;
+                        $.post(url, params, function(data)
 						{
 							unblockElement('body');
 
@@ -6792,9 +6793,9 @@ var Inspections = function()
                     // For authentication params
                     params["email"] = localStorage.getItem("email");
 					params["password"] = localStorage.getItem("password");
-                    params["anticache"] = Math.floor(Math.random() * 99999);  
-
-					$.post(url, params, function(data)
+                    params["anticache"] = Math.floor(Math.random() * 99999);
+                    params['version'] = objApp.version;
+                    $.post(url, params, function(data)
 					{
 						unblockElement('body');
                         
@@ -7149,8 +7150,8 @@ var Inspections = function()
                     params["email"] = localStorage.getItem("email");
 					params["password"] = localStorage.getItem("password");
                     params["anticache"] = Math.floor(Math.random() * 99999);
-					
-					$.post(url, params, function(data)
+                    params['version'] = objApp.version;
+                    $.post(url, params, function(data)
 					{
 						unblockElement('body');
                         
