@@ -2007,6 +2007,7 @@ var Inspections = function()
                     var params = {};
                     params["email"] = user_email;
                     params['password'] = localStorage.getItem("password");
+                    params['version'] = objApp.version;
                     params["subject"] = inspection.report_type + " at " + address;
                     params["recipients"] = recipients;
                     params["from"] = user_email;
@@ -2014,7 +2015,7 @@ var Inspections = function()
                     params["reinspectionid"] = reinspection_id;
                     params["attach_inspection_images"] = $('#frmEmailTo #attach_inspection_images').is(":checked")?1:0;
                     params["message"] = "Please find attached the " + inspection.report_type + " inspection report for " + address;
-                    params['version'] = objApp.version;
+
                     $.post(objApp.apiURL + "reports/send_inspection_report", params, function(response) {
                         
                         unblockElement('body');
@@ -6790,12 +6791,12 @@ var Inspections = function()
 					params["from"] = "noreply@Blueprintapp.com";
 					params["message"] = emailMessage;
 					params["inspectionid"] = objApp.keys.inspection_id;
-                    
+                    params['version'] = objApp.version;
                     // For authentication params
                     params["email"] = localStorage.getItem("email");
 					params["password"] = localStorage.getItem("password");
                     params["anticache"] = Math.floor(Math.random() * 99999);
-                    params['version'] = objApp.version;
+
                     $.post(url, params, function(data)
 					{
 						unblockElement('body');
@@ -7146,12 +7147,12 @@ var Inspections = function()
 					params["message"] = emailMessage;
 					params["inspectionid"] = objApp.keys.inspection_id;
                     params["reinspectionid"] = objApp.keys.reinspection_id;
-                    
+                    params['version'] = objApp.version;
                     // For authentication params
                     params["email"] = localStorage.getItem("email");
 					params["password"] = localStorage.getItem("password");
                     params["anticache"] = Math.floor(Math.random() * 99999);
-                    params['version'] = objApp.version;
+
                     $.post(url, params, function(data)
 					{
 						unblockElement('body');
