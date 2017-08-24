@@ -181,10 +181,10 @@ function App()
         $('#frmBuilderDetails #state').empty();
         $("#frmInspectionDetails #state").append('<option value="">Choose</option>');
         $("#frmBuilderDetails #state").append('<option value="">Choose</option>');
-        if (self.IS_QLD){
-            var states = ['QLD']
+        if (self.IS_QLD == 0){
+            var states = ['VIC', 'NSW', 'ACT', 'NT', 'WA', 'SA', 'TAS'];
         }else{
-            var states = ['VIC', 'NSW', 'ACT', 'NT', 'WA', 'SA', 'TAS']
+            var states = ['QLD'];
         }
         for(var i in states){
             $("#frmInspectionDetails #state").append('<option value="'+states[i]+'">'+states[i]+'</option>');

@@ -3258,6 +3258,7 @@ var Inspections = function()
             self.showReportPhotos();
         });
 
+        $("#btnSendReport, #btnSendReport2, #btnSendReport3").unbind(objApp.touchEvent);
         $("#btnSendReport, #btnSendReport2, #btnSendReport3").bind(objApp.touchEvent, function(e) {
             e.preventDefault();
             // Also ensure we have a valid inspection ID
