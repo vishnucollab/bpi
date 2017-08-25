@@ -6049,11 +6049,11 @@ var Inspections = function()
 
                 $("#inspection #certificated").val(inspection.certificated);
                 if (inspection.certificated == 1){
-                    $('#btnCertificated').addClass('hidden');
-                    $('#btnUncertificated').removeClass('hidden');
-                }else{
                     $('#btnCertificated').removeClass('hidden');
                     $('#btnUncertificated').addClass('hidden');
+                }else{
+                    $('#btnCertificated').addClass('hidden');
+                    $('#btnUncertificated').removeClass('hidden');
                 }
 
                 // Clear the stage
