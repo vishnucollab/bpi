@@ -1509,11 +1509,11 @@ var Inspections = function()
 
         $("#inspection #certificated").val(inspection.certificated);
         if (inspection.certificated == 1){
-            $('#btnCertificated').addClass('hidden');
-            $('#btnUncertificated').removeClass('hidden');
-        }else{
             $('#btnCertificated').removeClass('hidden');
             $('#btnUncertificated').addClass('hidden');
+        }else{
+            $('#btnCertificated').addClass('hidden');
+            $('#btnUncertificated').removeClass('hidden');
         }
 
         this.finalised = false;
@@ -2810,22 +2810,19 @@ var Inspections = function()
 
         });
 
+        $(".inspectionDetails #btnCertificated").unbind(objApp.touchEvent);
         $(".inspectionDetails #btnCertificated").bind(objApp.touchEvent, function(e)
         {
             e.preventDefault();
-            $(this).addClass('hidden');
-            $('#btnUncertificated').removeClass('hidden');
-            $('#certificated').val(1);
-            objApp.objInspection.checkSaveRateInspection();
+            self.handleCertificated();
             return false;
         });
+
+        $(".inspectionDetails #btnUncertificated").unbind(objApp.touchEvent);
         $(".inspectionDetails #btnUncertificated").bind(objApp.touchEvent, function(e)
         {
             e.preventDefault();
-            $(this).addClass('hidden');
-            $('#btnCertificated').removeClass('hidden');
-            $('#certificated').val(0);
-            objApp.objInspection.checkSaveRateInspection();
+            self.handleCertificated();
             return false;
         });
 
@@ -6013,11 +6010,11 @@ var Inspections = function()
 
                 $("#inspection #certificated").val(inspection.certificated);
                 if (inspection.certificated == 1){
-                    $('#btnCertificated').addClass('hidden');
-                    $('#btnUncertificated').removeClass('hidden');
-                }else{
                     $('#btnCertificated').removeClass('hidden');
                     $('#btnUncertificated').addClass('hidden');
+                }else{
+                    $('#btnCertificated').addClass('hidden');
+                    $('#btnUncertificated').removeClass('hidden');
                 }
 
                 // Clear the stage
@@ -7289,6 +7286,20 @@ var Inspections = function()
         
         var result = "Lot " + inspection.lot_no.trim() + ", " + inspection.address.trim() + ", " + inspection.suburb.trim();
         return result;
-    }						
+    }
+
+    this.handleCertificated = function(inspection) {
+        if(confirm("Are you sure to make it certificated?")){
+            $('#btnUncertificated').addClass('hidden');
+            $('#btnCertificated').removeClass('hidden');
+            $('#certificated').val(1);
+            objApp.objInspection.checkSaveRateInspection();
+        }else{
+            $('#btnCertificated').addClass('hidden');
+            $('#btnUncertificated').removeClass('hidden');
+            $('#certificated').val(0);
+            objApp.objInspection.checkSaveRateInspection();
+        }
+    }
 };
 
