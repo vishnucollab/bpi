@@ -1057,8 +1057,10 @@ function Sync()
     this.DB_error_handler = function(transaction, error)
     {
         console.log(transaction);
+        /*
         alert("Sorry, the following database error occured\n\n" +
             "Code: " + error.code + "\n" +
             "Message: " + error.message);
+        */
     }
 }
