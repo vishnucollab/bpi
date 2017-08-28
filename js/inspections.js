@@ -5789,17 +5789,46 @@ var Inspections = function()
                     var data = new google.visualization.DataTable();                    
                       data.addColumn('string', 'Actions');
                       data.addColumn('number', 'Quantity');
-                      
-                    $.each( actions, function( key, value ) {                     
+
+                    var keys = [];
+                    $.each( actions, function( key, value ) {
+                        if (keys.indexOf(key) == -1)
+                            keys.push(key);
                         data.addRow([key, value]);
                     });
 
+                    var fontSize = 14;
+                    if (keys.length > 19){
+                        fontSize = 13;
+                    }
+                    if (keys.length > 22){
+                        fontSize = 12;
+                    }
+                    if (keys.length > 24){
+                        fontSize = 11;
+                    }
+                    if (keys.length > 26){
+                        fontSize = 10;
+                    }
                     var options = {
                         title: '',
                         width: '100%',
                         height: '100%',     
                         pieSliceText: 'value',
                         is3D: true,
+                        chartArea:{
+                            left:100,
+                            height: '99%',
+                            top: '1%',
+                            width: '100%'
+                        },
+                        legend: {
+                            alignment: 'center',
+                            width: '100%',
+                            textStyle: {
+                                fontSize: fontSize
+                            }
+                        }
                     };    
                     
                     chart.draw(data, options);                   
@@ -5820,7 +5849,7 @@ var Inspections = function()
                         height: '100%',     
                         pieSliceText: 'percentage',
                         is3D: true,
-                    };    
+                    };
                     
                     chart.draw(data, options);                   
                 }
