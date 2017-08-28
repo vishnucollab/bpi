@@ -741,8 +741,8 @@ fieldset legend {
             padding: 20px;
         }
 		
-#inspectionChartWrapper{width: 900px;height: 500px;margin: 0 auto;left: 5%;top: 5%;}     
-#inspectionChartWrapper #piechart{width:850px;height: 472px;}
+#inspectionChartWrapper{width: 850px;height: 500px;margin: 0 auto;left: 8%;top: 5%;}
+#inspectionChartWrapper #piechart{width: 800px;height: 472px;}
 
 select option[disabled] {
     display: none;

@@ -1150,6 +1150,7 @@
                 </ul>
 
                 <div class="clear"></div>
+                <input type="hidden"id="chart_image" name="chart_image" />
                 <input type="submit" value="Send &gt;&gt;" />
             </fieldset>
         </form>
@@ -1187,10 +1188,14 @@
             width: '100%',
             height: '100%',
             pieSliceText: 'percentage',
+            is3D: true,
         };
 
         chart = new google.visualization.PieChart(document.getElementById('piechart'));
-
+        // Wait for the chart to finish drawing before calling the getImageURI() method.
+        google.visualization.events.addListener(chart, 'ready', function () {
+            $("#chart_image").attr('value', chart.getImageURI());
+        });
         chart.draw(data, options);
     }
 </script>
