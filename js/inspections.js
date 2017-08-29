@@ -5767,6 +5767,7 @@ var Inspections = function()
 					    html += '<td>' + row.action + '</td>';
                         if (row.action)
                         {
+                            row.action = $.trim(row.action.replace(/"/g, ''));
                             if (actions.hasOwnProperty(row.action))
                                 actions[row.action] += 1;
                             else
@@ -5791,9 +5792,14 @@ var Inspections = function()
                       data.addColumn('number', 'Quantity');
 
                     var keys = [];
+                    var total_defects = 0;
+                    $.each( actions, function( key, value ) {
+                        total_defects += parseInt(value);
+                    });
                     $.each( actions, function( key, value ) {
                         if (keys.indexOf(key) == -1)
                             keys.push(key);
+                        key += ': ' + value + ' (' + Math.round(value/total_defects*1000)/10.0 + '%)';
                         data.addRow([key, value]);
                     });
 
@@ -5817,7 +5823,7 @@ var Inspections = function()
                         pieSliceText: 'value',
                         is3D: true,
                         chartArea:{
-                            left:100,
+                            left:50,
                             height: '99%',
                             top: '1%',
                             width: '100%'
