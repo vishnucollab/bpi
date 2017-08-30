@@ -3285,8 +3285,6 @@ var Inspections = function()
                     return;
                 }
                 var params = {'version': objApp.version};
-                params["chart_image"] = $('#chart_image').val();
-                params["dummy"] = 'Here is dummy text. Post data will be cut off a part. This will fix that issue.';
                 $.post(objApp.apiURL + "inspections/send_inspection_to_dropbox/" + inspection_id, params, function(response) {
                     unblockElement('body');
                     var data = JSON.parse(response);
