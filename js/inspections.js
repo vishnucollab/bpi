@@ -3302,6 +3302,7 @@ var Inspections = function()
             });
         });
 
+        $("#btnSendReinspectReport").unbind(objApp.touchEvent);
         $("#btnSendReinspectReport").bind(objApp.touchEvent, function(e) {
             e.preventDefault();
             // Also ensure we have a valid inspection ID
