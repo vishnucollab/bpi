@@ -83,15 +83,23 @@ var Inspections = function()
         
         objDBUtils.orderBy = "name";
         $("#inspectionList .bottomBtns").find("a").removeClass("active");
-        $("#inspectionList #il_builder_id").empty();
-        $("#inspectionList #il_builder_id").append('<option value="">Choose</option>');
-        
+        var selected_il_builder_id = $("#inspectionList #il_builder_id").val();
         if(!self.doingSave)
         {
-            objDBUtils.loadSelect("builders", ["id","name"], "#inspectionList #il_builder_id", function(){
+            $("#inspectionList #il_builder_id").empty();
+            $("#inspectionList #il_builder_id").append('<option value="">Choose</option>');
+            var filters = [];
+            if (objApp.IS_QLD == 1)
+                filters.push(new Array("state = '"+objApp.QLD_STATE_CODE+"'"));
+            else
+                filters.push(new Array("state != '"+objApp.QLD_STATE_CODE+"'"));
+            objDBUtils.loadSelect("builders", filters, "#inspectionList #il_builder_id", function(){
                 self.doingSave = false;
-            }, "option"); 
+                $("#inspectionList #il_builder_id").val(selected_il_builder_id);
+                $("#inspectionList #il_builder_id").trigger('change');
+            }, "option");
         }
+
         self.doingSave = true;
 		objDBUtils.orderBy = "ABS(name) ASC";
 		objApp.callbackMethod = null;	// Reset app callback.
@@ -132,7 +140,7 @@ var Inspections = function()
 	    //objFilters.show();
 
 		// Do the client search
-		self.doInspectionSearch();
+		self.doInspectionSearch(selected_il_builder_id);
 
         this.unbindEvents();
 
@@ -146,8 +154,9 @@ var Inspections = function()
             objApp.setBodyClass('inspection');
         });
 
-        if (!$("#inspectionList #il_builder_id").hasClass('select2-hidden-accessible'))
-            $("#inspectionList #il_builder_id").select2();
+        if ($("#inspectionList #il_builder_id").hasClass('select2-hidden-accessible'))
+            $("#inspectionList #il_builder_id").select2('destroy');
+        $("#inspectionList #il_builder_id").select2();
 
         objApp.setBodyClass('inspections');
     }
@@ -156,7 +165,7 @@ var Inspections = function()
 	* doInspectionSearch searches the inspections database
 	* taking into consideration any user entered search terms.  
 	*/
-	this.doInspectionSearch = function()
+	this.doInspectionSearch = function(selected_il_builder_id)
 	{  
         objApp.showHideSpinner(true, "#inspectionList");
         this.doingSearch = true;
@@ -191,7 +200,10 @@ var Inspections = function()
 		var values = new Array();
         
         var searchText = $("#inspectionSearch").val();
-        objFilters.builder_id = $("#inspectionList #il_builder_id").val();
+        if (typeof selected_il_builder_id == 'undefined')
+            selected_il_builder_id = $("#inspectionList #il_builder_id").val();
+
+        objFilters.builder_id = selected_il_builder_id;
         objFilters.finalised = $("#inspectionList #is_finalised").val();
           
         if(searchText != "")
@@ -1883,6 +1895,7 @@ var Inspections = function()
         
         $("#inspectionList #il_builder_id").change(function(){
             self.doInspectionSearch();
+            return true;
         });
 
         $("#inspectionList #is_finalised").change(function(){
@@ -1982,7 +1995,8 @@ var Inspections = function()
                     params["reinspectionid"] = reinspection_id;
                     params["attach_inspection_images"] = $('#frmEmailTo #attach_inspection_images').is(":checked")?1:0;
                     params["message"] = "Please find attached the " + inspection.report_type + " inspection report for " + address;
-                    
+                    params["chart_image"] = $('#chart_image').val();
+                    params["dummy"] = 'Here is dummy text. Post data will be cut off a part. This will fix that issue.';
                     $.post(objApp.apiURL + "reports/send_inspection_report", params, function(response) {
                         
                         unblockElement('body');
@@ -3240,7 +3254,10 @@ var Inspections = function()
                     alert("Sorry, a problem occurred whilst syncing your data to the server");
                     return;
                 }
-                $.post(objApp.apiURL + "inspections/send_inspection_to_dropbox/" + inspection_id, {}, function(response) {
+                var params = {'version': objApp.version};
+                params["chart_image"] = $('#chart_image').val();
+                params["dummy"] = 'Here is dummy text. Post data will be cut off a part. This will fix that issue.';
+                $.post(objApp.apiURL + "inspections/send_inspection_to_dropbox/" + inspection_id, params, function(response) {
                     unblockElement('body');
                     var data = JSON.parse(response);
                     if(data.status != "OK") {
@@ -3270,7 +3287,10 @@ var Inspections = function()
                     alert("Sorry, a problem occurred whilst syncing your data to the server");
                     return;
                 }
-                $.post(objApp.apiURL + "inspections/send_reinspection_to_dropbox/" + reinspection_id, {}, function(response) {
+                var params = {'version': objApp.version};
+                params["chart_image"] = $('#chart_image').val();
+                params["dummy"] = 'Here is dummy text. Post data will be cut off a part. This will fix that issue.';
+                $.post(objApp.apiURL + "inspections/send_reinspection_to_dropbox/" + reinspection_id, params, function(response) {
                     unblockElement('body');
                     var data = JSON.parse(response);
                     if(data.status != "OK") {
@@ -5736,18 +5756,53 @@ var Inspections = function()
                     var data = new google.visualization.DataTable();                    
                       data.addColumn('string', 'Actions');
                       data.addColumn('number', 'Quantity');
-                      
-                    $.each( actions, function( key, value ) {                     
+
+                    var keys = [];
+                    var total_defects = 0;
+                    $.each( actions, function( key, value ) {
+                        total_defects += parseInt(value);
+                    });
+                    $.each( actions, function( key, value ) {
+                        if (keys.indexOf(key) == -1)
+                            keys.push(key);
+                        key += ': ' + value + ' (' + Math.round(value/total_defects*1000)/10.0 + '%)';
                         data.addRow([key, value]);
                     });
 
+                    var fontSize = 14;
+                    if (keys.length > 19){
+                        fontSize = 13;
+                    }
+                    if (keys.length > 22){
+                        fontSize = 12;
+                    }
+                    if (keys.length > 24){
+                        fontSize = 11;
+                    }
+                    if (keys.length > 26){
+                        fontSize = 10;
+                    }
                     var options = {
                         title: '',
                         width: '100%',
-                        height: '100%',     
-                        pieSliceText: 'value',               
-                    };    
-                    
+                        height: '100%',
+                        pieSliceText: 'value',
+                        is3D: true,
+                        chartArea:{
+                            left:50,
+                            height: '99%',
+                            top: '1%',
+                            width: '100%'
+                        },
+                        legend: {
+                            alignment: 'center',
+                            width: '100%',
+                            textStyle: {
+                                fontSize: fontSize
+                            }
+                        }
+                    };
+
                     chart.draw(data, options);                   
                 }
                 else if(!jQuery.isEmptyObject(locations))
@@ -6751,11 +6806,12 @@ var Inspections = function()
 					params["from"] = "noreply@Blueprintapp.com";
 					params["message"] = emailMessage;
 					params["inspectionid"] = objApp.keys.inspection_id;
-                    
                     // For authentication params
                     params["email"] = localStorage.getItem("email");
 					params["password"] = localStorage.getItem("password");
-                    params["anticache"] = Math.floor(Math.random() * 99999);  
+                    params["anticache"] = Math.floor(Math.random() * 99999);
+                    params["chart_image"] = $('#chart_image').val();
+                    params["dummy"] = 'Here is dummy text. Post data will be cut off a part. This will fix that issue.';
 
 					$.post(url, params, function(data)
 					{
@@ -7112,6 +7168,8 @@ var Inspections = function()
                     params["email"] = localStorage.getItem("email");
 					params["password"] = localStorage.getItem("password");
                     params["anticache"] = Math.floor(Math.random() * 99999);
+                    params["chart_image"] = $('#chart_image').val();
+                    params["dummy"] = 'Here is dummy text. Post data will be cut off a part. This will fix that issue.';
 					
 					$.post(url, params, function(data)
 					{
