@@ -88,12 +88,7 @@ var Inspections = function()
         {
             $("#inspectionList #il_builder_id").empty();
             $("#inspectionList #il_builder_id").append('<option value="">Choose</option>');
-            var filters = [];
-            if (objApp.IS_QLD == 1)
-                filters.push(new Array("state = '"+objApp.QLD_STATE_CODE+"'"));
-            else
-                filters.push(new Array("state != '"+objApp.QLD_STATE_CODE+"'"));
-            objDBUtils.loadSelect("builders", filters, "#inspectionList #il_builder_id", function(){
+            objDBUtils.loadSelect("builders", [], "#inspectionList #il_builder_id", function(){
                 self.doingSave = false;
                 $("#inspectionList #il_builder_id").val(selected_il_builder_id);
                 $("#inspectionList #il_builder_id").trigger('change');
@@ -245,7 +240,7 @@ var Inspections = function()
         {
             sql += "AND i.created_by = ? ";
             values.push(objFilters.user);
-        }        	    	    	     	    	                      
+        }
 		
 	    sql += "ORDER BY " + self.sortBy + " " + self.sortDir + " ";	// Show the most recent inspections first.
         
@@ -253,7 +248,7 @@ var Inspections = function()
 	    {            
 	    	sql += "LIMIT ?";
 	    	values.push(objFilters.recordLimit);
-	    }		    
+	    }
 	    
 	    objApp.showHideSpinner(true, "#inspectionList");
         
@@ -282,15 +277,13 @@ var Inspections = function()
 			    var inspDate = objApp.isoDateStrToDate(row.inspection_date);
 			    html += '<tr rel="' + row.id + '">';
 			    html += '<td class="view">'
-                
-                html += '<span class="icon';
-			    
+
 			    if(row.finalised) {
+                    html += '<span class="icon';
 					html += ' finalised';
+                    html += '"></span>';
 			    }
-			    
-			    html += '"></span>';
-			
+
 			    html += objApp.formatUserDate(inspDate) + '</td>';  
 			    html += '<td>' + row.lot_no + ' ' + row.address + ' ' + row.suburb + '</td>';
 			    html += '<td>' + row.name + '</td>';
@@ -707,6 +700,16 @@ var Inspections = function()
             el.addEventListener("touchmove", function(event) {
                 this.scrollTop=scrollStartPos-event.touches[0].pageY;
             },false);
+        }
+    }
+
+    this.checkIfNeedPhotos = function()
+    {
+        console.log($("#inspection #report_type2").val());
+        if ($("#inspection #report_type2").val() == 'Client inspection'){
+            $('a[id="btnReportPhotos"]').removeClass("hidden");
+        }else{
+            $('a[id="btnReportPhotos"]').addClass("hidden");
         }
     }
     
@@ -1402,7 +1405,7 @@ var Inspections = function()
 		$("#inspection").removeClass("hidden");
 		// Bind events to UI objects
         
-        console.log("BIND 3")
+
 		this.unbindEvents();
 		// Setup client and site popselectors
 		this.setupPopselectors();
@@ -1498,7 +1501,8 @@ var Inspections = function()
             $("#inspection #report_type2").val("Handovers.com");
             $("#inspection #handover_report_type").show();
             $("#inspection #handover_report_type").val(inspection.report_type);
-        }       
+        }
+        self.checkIfNeedPhotos();
         
         $("#inspection #weather").val(inspection.weather);
         $("#inspection #lot_no").val(inspection.lot_no);
@@ -1892,7 +1896,6 @@ var Inspections = function()
             self.doInspectionSearch();
         });
 
-        
         $("#inspectionList #il_builder_id").change(function(){
             self.doInspectionSearch();
             return true;
@@ -1988,6 +1991,7 @@ var Inspections = function()
                     var params = {};
                     params["email"] = user_email;
                     params['password'] = localStorage.getItem("password");
+                    params['version'] = objApp.version;
                     params["subject"] = inspection.report_type + " at " + address;
                     params["recipients"] = recipients;
                     params["from"] = user_email;
@@ -2110,6 +2114,7 @@ var Inspections = function()
                 $("#inspection #handover_report_type").val('');
                 $("#inspection #handover_report_type").trigger('change');
             }
+            self.checkIfNeedPhotos();
         });
 
         /*
@@ -2859,6 +2864,7 @@ var Inspections = function()
                     var params = {};
                     params["email"] = localStorage.getItem("email");
                     params["password"] = localStorage.getItem("password");
+                    params['version'] = objApp.version;
                     var url = objApp.apiURL + "account/create_token/" + Math.floor(Math.random() * 99999);
                     blockElement('body');
                     
@@ -3238,6 +3244,7 @@ var Inspections = function()
             self.showReportPhotos();
         });
 
+        $("#btnSendReport, #btnSendReport2, #btnSendReport3").unbind(objApp.touchEvent);
         $("#btnSendReport, #btnSendReport2, #btnSendReport3").bind(objApp.touchEvent, function(e) {
             e.preventDefault();
             // Also ensure we have a valid inspection ID
@@ -3266,11 +3273,13 @@ var Inspections = function()
                     }
                     alert("The report was sent successfully to dropbox");
                 }, "").fail(function() {
+                    unblockElement('body');
                     alert( "Unknown error" );
                 })
             });
         });
 
+        $("#btnSendReinspectReport").unbind(objApp.touchEvent);
         $("#btnSendReinspectReport").bind(objApp.touchEvent, function(e) {
             e.preventDefault();
             // Also ensure we have a valid inspection ID
@@ -3297,6 +3306,7 @@ var Inspections = function()
                     }
                     alert("The report was sent successfully to dropbox");
                 }, "").fail(function() {
+                    unblockElement('body');
                     alert( "Unknown error" );
                 })
             });
@@ -4349,8 +4359,8 @@ var Inspections = function()
 
 							// Create the request URL
 							var url = objApp.apiURL + "inspections/get_inspection_photo/" + photoID;
-
-							$.post(url, params, function(data)
+                            params['version'] = objApp.version;
+                            $.post(url, params, function(data)
 							{
 								unblockElement('body');
 
@@ -4992,8 +5002,8 @@ var Inspections = function()
 
 						// Create the request URL
 						var url = objApp.apiURL + "inspections/get_inspection_photo/" + photoID;
-
-						$.post(url, params, function(data)
+                        params['version'] = objApp.version;
+                        $.post(url, params, function(data)
 						{
 							unblockElement('body');
 
@@ -5510,11 +5520,12 @@ var Inspections = function()
                         $("a.btnEditPrivateNotes").hide();
                     }
 
-                    // Show the camera button
-                    $(".inspectionDetails #btnCapturePhoto").show();
-
                     // Show the next button
                     $(".inspectionDetails #btnStep1Next").show();
+
+                    // Show the camera button
+                    $('a[id="btnCapturePhoto"]').show();
+                    self.checkIfNeedPhotos();
 
 			        self.setReturnInspectionID(objApp.keys.inspection_id);
                     $('#btnCapturePhoto').attr('data-reveal-id', 'photoWrapper');
@@ -5732,6 +5743,7 @@ var Inspections = function()
 					    html += '<td>' + row.action + '</td>';
                         if (row.action)
                         {
+                            row.action = $.trim(row.action.replace(/"/g, ''));
                             if (actions.hasOwnProperty(row.action))
                                 actions[row.action] += 1;
                             else
@@ -5783,7 +5795,7 @@ var Inspections = function()
                     var options = {
                         title: '',
                         width: '100%',
-                        height: '100%',
+                        height: '100%',     
                         pieSliceText: 'value',
                         is3D: true,
                         chartArea:{
@@ -5799,8 +5811,8 @@ var Inspections = function()
                                 fontSize: fontSize
                             }
                         }
-                    };
-
+                    };    
+                    
                     chart.draw(data, options);                   
                 }
                 else if(!jQuery.isEmptyObject(locations))
@@ -5817,8 +5829,9 @@ var Inspections = function()
                         title: '',
                         width: '100%',
                         height: '100%',     
-                        pieSliceText: 'percentage',               
-                    };    
+                        pieSliceText: 'percentage',
+                        is3D: true,
+                    };
                     
                     chart.draw(data, options);                   
                 }
@@ -6568,7 +6581,8 @@ var Inspections = function()
             $('#btnStep3Back').removeClass('hidden');
             $('#finished').removeClass('active');
             $('#keywords').removeClass('hidden');
-            $("#btnReportPhotos").removeClass("hidden");
+            if ($("#inspection #report_type2").val() != 'Client inspection')
+                $("#btnReportPhotos").removeClass("hidden");
             $("div.btnReinspect").hide();
             $("#tblRateListing select.ratingSelect").removeAttr("readonly");
             $("#tblRateListing select.ratingSelect").removeAttr("disabled");            
@@ -6804,14 +6818,14 @@ var Inspections = function()
 					params["from"] = "noreply@Blueprintapp.com";
 					params["message"] = emailMessage;
 					params["inspectionid"] = objApp.keys.inspection_id;
+                    params['version'] = objApp.version;
                     // For authentication params
                     params["email"] = localStorage.getItem("email");
 					params["password"] = localStorage.getItem("password");
                     params["anticache"] = Math.floor(Math.random() * 99999);
                     params["chart_image"] = $('#chart_image').val();
                     params["dummy"] = 'Here is dummy text. Post data will be cut off a part. This will fix that issue.';
-
-					$.post(url, params, function(data)
+                    $.post(url, params, function(data)
 					{
 						unblockElement('body');
                         
@@ -7161,15 +7175,14 @@ var Inspections = function()
 					params["message"] = emailMessage;
 					params["inspectionid"] = objApp.keys.inspection_id;
                     params["reinspectionid"] = objApp.keys.reinspection_id;
-                    
+                    params['version'] = objApp.version;
                     // For authentication params
                     params["email"] = localStorage.getItem("email");
 					params["password"] = localStorage.getItem("password");
                     params["anticache"] = Math.floor(Math.random() * 99999);
                     params["chart_image"] = $('#chart_image').val();
                     params["dummy"] = 'Here is dummy text. Post data will be cut off a part. This will fix that issue.';
-					
-					$.post(url, params, function(data)
+                    $.post(url, params, function(data)
 					{
 						unblockElement('body');
                         
@@ -7216,7 +7229,6 @@ var Inspections = function()
 
         objDBUtils.loadRecord("builders", self.inspection.builder_id, function(param, builder) {
             unblockElement('body');
-
             if(builder) {
                 builder_email = builder.email;
             }
@@ -7239,12 +7251,13 @@ var Inspections = function()
                     }
                    
                 }
-                
+
+                var need_builder_email = 0;
                 if(($("#emailToBuilder").is(":checked")) && (!objApp.empty(builder_email))) {
                     if(!objApp.empty(recipients)) {
                         recipients += ",";
                     }
-
+                    need_builder_email = 1;
                     recipients += builder_email;
                                              
                 }
@@ -7273,9 +7286,9 @@ var Inspections = function()
                     var recipients_array = $.merge(old_recipients, recipients.split(','));
                 else
                     var recipients_array = recipients.split(',');
-                    
-                var options = ""; 
-                
+
+                var builder_email_not_in_address_book = 1;
+                var options = "";
                 $.each( email_options, function( key, value ) {   
                     if(jQuery.inArray(value, recipients_array) != -1) {   
                         options += "<option value='"+value+"' selected>"+value+"</option>";
@@ -7284,8 +7297,17 @@ var Inspections = function()
                     {
                         options += "<option value='"+value+"' >"+value+"</option>";
                     }
-                })
-                
+                    if (value == builder_email){
+                        builder_email_not_in_address_book = 0;
+                    }
+                });
+                if (builder_email_not_in_address_book){
+                    if (need_builder_email)
+                        options += "<option value='"+builder_email+"' selected>"+builder_email+"</option>";
+                    else
+                        options += "<option value='"+builder_email+"'>"+builder_email+"</option>";
+                }
+
                 $("#recipients").html(options);
                 
                 $("#recipients").select2({
