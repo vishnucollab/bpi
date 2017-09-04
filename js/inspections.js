@@ -723,10 +723,10 @@ var Inspections = function()
                 $('a[id="btnCapturePhoto"].step1-capture-btn').hide();
             }
             */
-            $('a[id="btnReportPhotos"]').show();
+            $('a[id="btnReportPhotos"]').removeClass('hidden');
         }else{
             //$('a[id="btnCapturePhoto"]').hide();
-            $('a[id="btnReportPhotos"]').hide();
+            $('a[id="btnReportPhotos"]').addClass('hidden');
         }
     }
     
