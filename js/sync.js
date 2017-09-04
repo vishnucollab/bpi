@@ -493,6 +493,7 @@ function Sync()
     this.sendAndSyncData = function()
     {
         self.sendData();
+        self.saveGraphs();
     }
 
 
@@ -585,6 +586,36 @@ function Sync()
             }
 		}, "");
 	}
+
+	this.saveGraphs = function()
+    {
+        if (typeof inspections_ids != 'undefined' && inspections_ids.length > 0){
+            var parameters = {};
+            parameters['email'] = localStorage.getItem("email");
+            parameters['password'] = localStorage.getItem("password");
+            parameters['version'] = objApp.version;
+            parameters['number_of_items'] = inspections_ids.length;
+            for(var i = 0; i < inspections_ids.length; i++){
+                parameters['id' + i] = inspections_ids[i];
+                parameters['image' + i] = inspection_charts[i];
+            }
+            parameters["z"] = 'Here is dummy text. Post data will be cut off a part. This will fix that issue.';
+            $.post(objApp.apiURL + 'inspections/save_graphs', parameters , function(data)
+            {
+                try {
+                    data = jQuery.parseJSON(data);
+                    if(data.status == "OK"){
+                        if (data.ids.length){
+                            for(var i in data.ids)
+                                removeChartFromQueue(data.ids[i]);
+                        }
+                    }
+                } catch (e) {
+                    console.log(e);
+                }
+            }, "");
+        }
+    }
 	
 	/***
 	* processTable handles inserting/updating the records for the current table

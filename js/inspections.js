@@ -2034,7 +2034,7 @@ var Inspections = function()
                             alert(data.message);
                             return;
                         }
-
+                        removeChartFromQueue(inspection_id);
                         alert("The inspection was sent successfully");
 
                         // Hide the reveal window.
@@ -5858,6 +5858,8 @@ var Inspections = function()
                     
                     chart.draw(data, options);                   
                 }
+
+                current_inspection_id = objApp.keys.inspection_id;
                 
 
 
@@ -6858,7 +6860,8 @@ var Inspections = function()
                             if(data.status == "OK")
                             {
                                 $("#printModal").hide();
-                                alert("Thank you.  The inspection report has been created and sent successfully.");
+                                alert("Thank you. The inspection report has been created and sent successfully.");
+                                removeChartFromQueue(objApp.keys.inspection_id);
                             }
                             else
                             {
@@ -7214,7 +7217,8 @@ var Inspections = function()
                             
                             if(data.status == "OK")
                             {
-                                alert("Thank you.  The inspection report has been created and sent successfully.");
+                                alert("Thank you. The inspection report has been created and sent successfully.");
+                                removeChartFromQueue(objApp.keys.inspection_id);
                             }
                             else
                             {
