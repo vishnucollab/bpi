@@ -2011,6 +2011,7 @@ var Inspections = function()
                             alert(data.message);
                             return;
                         }
+						removeChartFromQueue(inspection_id);
 
                         alert("The inspection was sent successfully");
 

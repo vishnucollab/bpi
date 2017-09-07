@@ -1176,6 +1176,9 @@
 <script type="text/javascript">
     google.charts.load('current', {'packages':['corechart']});
     google.charts.setOnLoadCallback(drawChart);
+    var current_inspection_id = 0;
+    var inspection_charts = [];
+    var inspections_ids = [];
     function drawChart() {
 
         var data = google.visualization.arrayToDataTable([
@@ -1194,9 +1197,23 @@
         chart = new google.visualization.PieChart(document.getElementById('piechart'));
         // Wait for the chart to finish drawing before calling the getImageURI() method.
         google.visualization.events.addListener(chart, 'ready', function () {
-            $("#chart_image").attr('value', chart.getImageURI());
+            var image_data = chart.getImageURI();
+            $("#chart_image").attr('value', image_data);
+            if (current_inspection_id && inspections_ids.indexOf(current_inspection_id) == -1){
+                inspections_ids.push(current_inspection_id);
+                inspection_charts.push(image_data);
+            }
         });
         chart.draw(data, options);
+    }
+    function removeChartFromQueue(inspection_id){
+        var i = inspections_ids.indexOf(inspection_id);
+        if (i != -1){
+            inspections_ids.splice(i, 1);
+            if (typeof inspection_charts[i] != 'undefined'){
+                inspection_charts.splice(i, 1);
+            }
+        }
     }
 </script>
 
