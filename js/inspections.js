@@ -5836,8 +5836,8 @@ var Inspections = function()
                     
                     chart.draw(data, options);                   
                 }
-                
 
+                current_inspection_id = objApp.keys.inspection_id;
 
 				html += '</table>';
 
