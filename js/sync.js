@@ -237,7 +237,10 @@ function Sync()
         parameters['email'] = localStorage.getItem("email");
         parameters['password'] = localStorage.getItem("password");
         parameters['version'] = objApp.version;
-        parameters['is_QLD'] = objApp.IS_QLD;
+        if (objApp.IS_STATE_FILTERED == 1){
+            parameters['filtered_state_code'] = objApp.FILTERED_STATE_CODE;
+            parameters['filtered_state_id'] = objApp.FILTERED_STATE_ID;
+        }
         parameters['data'] = objDBUtils.data;
         parameters['anticache'] = Math.floor(Math.random() * 999999);
         parameters['start_time'] = objApp.objSync.startTime;

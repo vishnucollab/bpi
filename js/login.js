@@ -333,8 +333,18 @@ var Login = function()
 			localStorage.setItem("initials", typeof data.initials == 'undefined'?'':data.initials);
 			localStorage.setItem("restricted", data.restricted);
 			localStorage.setItem("password", params["password"]);
-            localStorage.setItem("is_QLD", typeof data.state_id == 'undefined'?0:(data.state_id == objApp.QLD_STATE_ID?1:0));
-            objApp.IS_QLD = parseInt(localStorage.getItem("is_QLD"));
+            if (typeof data.state_id != 'undefined' && data.state_id != null && data.state_id != 'null'){
+                objApp.IS_STATE_FILTERED = 1;
+                objApp.FILTERED_STATE_ID = data.state_id;
+                objApp.FILTERED_STATE_CODE = objApp.STATE_CODES[data.state_id];
+            }else{
+                objApp.IS_STATE_FILTERED = 0;
+                objApp.FILTERED_STATE_ID = 1;
+                objApp.FILTERED_STATE_CODE = 'VIC';
+            }
+            localStorage.setItem("filtered_state_id", objApp.FILTERED_STATE_ID);
+            localStorage.setItem("filtered_state_code", objApp.FILTERED_STATE_CODE);
+            localStorage.setItem("is_state_filtered", objApp.IS_STATE_FILTERED);
             if (remember_me == 1)
             {
                 localStorage.setItem("remember_me", 1);
@@ -405,6 +415,8 @@ var Login = function()
 		localStorage.setItem("country", "");	
         localStorage.setItem("email", ""); 
         localStorage.setItem("password", "");
-        localStorage.setItem("is_QLD", 0);
+        localStorage.setItem("is_state_filtered", 0);
+        localStorage.setItem("filtered_state_id", 1);
+        localStorage.setItem("filtered_state_code", 'VIC');
 	}
 };

@@ -28,9 +28,10 @@ function App()
 	this.localMode = false;
 	this.context = "";
 
-    this.IS_QLD = 0;
-    this.QLD_STATE_ID = 3;
-    this.QLD_STATE_CODE = 'QLD';
+    this.STATE_CODES = {1: 'VIC', 2: 'TAS', 3: 'QLD', 4: 'NSW', 5: 'SA', 6: 'WA', 7: 'NT'};
+    this.IS_STATE_FILTERED = 0;
+    this.FILTERED_STATE_ID = 1;
+    this.FILTERED_STATE_CODE = 'VIC';
 	
 	// Declare object references
 	this.objLogin = null;		// Holds an instance of the login object
@@ -133,7 +134,10 @@ function App()
 		{
 			// Hide the login screen.
 			$("#main").removeClass("hidden");
-			self.IS_QLD = localStorage.getItem("is_QLD");
+			self.IS_STATE_FILTERED = parseInt(localStorage.getItem("is_state_filtered"));
+            self.FILTERED_STATE_ID = parseInt(localStorage.getItem("filtered_state_id"));
+            self.FILTERED_STATE_CODE = localStorage.getItem("filtered_state_code");
+            console.log(self);
 			// Figure out what to do next.
 			this.determineInitialAction();
 		}
@@ -181,10 +185,10 @@ function App()
         $('#frmBuilderDetails #state').empty();
         $("#frmInspectionDetails #state").append('<option value="">Choose</option>');
         $("#frmBuilderDetails #state").append('<option value="">Choose</option>');
-        if (self.IS_QLD == 0){
-            var states = ['VIC', 'NSW', 'ACT', 'NT', 'WA', 'SA', 'TAS'];
+        if (self.IS_STATE_FILTERED == 0){
+            var states = ['VIC', 'NSW', 'ACT', 'QLD', 'NT', 'WA', 'SA', 'TAS'];
         }else{
-            var states = ['QLD'];
+            var states = [objApp.FILTERED_STATE_CODE];
         }
         for(var i in states){
             $("#frmInspectionDetails #state").append('<option value="'+states[i]+'">'+states[i]+'</option>');
@@ -194,7 +198,7 @@ function App()
         $("#inspection #report_type2").empty();
         $("#inspection #report_type2").append('<option value="Builder inspection">Builder Inspection</option>');
         $("#inspection #report_type2").append('<option value="Client inspection">Client Inspection</option>');
-        if (self.IS_QLD == 0){
+        if (self.IS_STATE_FILTERED == 0){
             $("#inspection #report_type2").append('<option value="Handovers.com">Handovers.com</option>');
         }
     }

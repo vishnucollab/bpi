@@ -89,10 +89,10 @@ var Inspections = function()
             $("#inspectionList #il_builder_id").empty();
             $("#inspectionList #il_builder_id").append('<option value="">Choose</option>');
             var filters = [];
-            if (objApp.IS_QLD == 1)
-                filters.push(new Array("state = '"+objApp.QLD_STATE_CODE+"'"));
+            if (objApp.IS_STATE_FILTERED == 1)
+                filters.push(new Array("state = '"+objApp.FILTERED_STATE_CODE+"'"));
             else
-                filters.push(new Array("state != '"+objApp.QLD_STATE_CODE+"'"));
+                filters.push(new Array("state != '"+objApp.FILTERED_STATE_CODE+"'"));
             objDBUtils.loadSelect("builders", filters, "#inspectionList #il_builder_id", function(){
                 self.doingSave = false;
                 $("#inspectionList #il_builder_id").val(selected_il_builder_id);
@@ -247,10 +247,10 @@ var Inspections = function()
             values.push(objFilters.user);
         }
 
-        if (objApp.IS_QLD == 1){
-            sql += "  AND i.state = '" + objApp.QLD_STATE_CODE + "' ";
+        if (objApp.IS_STATE_FILTERED == 1){
+            sql += "  AND i.state = '" + objApp.FILTERED_STATE_CODE + "' ";
         }else{
-            sql += "  AND i.state != '" + objApp.QLD_STATE_CODE + "' ";
+            sql += "  AND i.state != '" + objApp.FILTERED_STATE_CODE + "' ";
         }
 		
 	    sql += "ORDER BY " + self.sortBy + " " + self.sortDir + " ";	// Show the most recent inspections first.
@@ -1672,10 +1672,10 @@ var Inspections = function()
         self.objPopBuilders.append('<option value="">Builder</option>');
 
         var filters = [];
-        if (objApp.IS_QLD == 1)
-            filters.push(new Array("state = '"+objApp.QLD_STATE_CODE+"'"));
+        if (objApp.IS_STATE_FILTERED == 1)
+            filters.push(new Array("state = '"+objApp.FILTERED_STATE_CODE+"'"));
         else
-            filters.push(new Array("state != '"+objApp.QLD_STATE_CODE+"'"));
+            filters.push(new Array("state != '"+objApp.FILTERED_STATE_CODE+"'"));
 
         objDBUtils.loadSelect("builders", filters, "#inspection #builder_id", function()
 		{
