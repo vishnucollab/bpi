@@ -128,10 +128,8 @@ var Builders = function()
 			
 		// Apply any additional search filters 
 		var values = new Array();    	                      
-	    if (objApp.IS_QLD == 1){
-	        sql += "  AND state = '" + objApp.QLD_STATE_CODE + "' ";
-        }else{
-            sql += "  AND state != '" + objApp.QLD_STATE_CODE + "' ";
+	    if (objApp.IS_STATE_FILTERED == 1){
+	        sql += "  AND state = '" + objApp.FILTERED_STATE_CODE + "' ";
         }
 	    sql += "ORDER BY " + self.sortBy + " " + self.sortDir + " ";
 		
@@ -143,7 +141,6 @@ var Builders = function()
 	    }		    
 	    
 	    blockElement('body');
-	    
 	    objDBUtils.loadRecordsSQL(sql, values, function(param, items)
 	    {
 		    // Remove any element block
@@ -458,8 +455,8 @@ var Builders = function()
 		if(builder == null)
 		{
 			//self.objPopState.preselect("VIC");
-            if (objApp.IS_QLD == 1)
-                $("#builderDetails #state").val(objApp.QLD_STATE_CODE);
+            if (objApp.IS_STATE_FILTERED == 1)
+                $("#builderDetails #state").val(objApp.FILTERED_STATE_CODE);
             else
                 $("#builderDetails #state").val("VIC");
             $("#builderDetails #state").trigger('change');
