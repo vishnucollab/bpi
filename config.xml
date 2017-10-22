@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <widget xmlns = "http://www.w3.org/ns/widgets"
         xmlns:gap = "http://phonegap.com/ns/1.0"
-    id = "com.simb.BlueprintQLD"
+    id = "com.simb.BlueprintNSW"
         version = "2.1">
-    <name>Blueprint QLD</name>
+    <name>Blueprint NSW</name>
 
     <description>
         Conduct onsite buidling inspections with Blueprint and produce beautiful reports that your clients will love.
