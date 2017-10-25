@@ -338,7 +338,7 @@ var Login = function()
                 objApp.FILTERED_STATE_ID = data.state_id;
                 objApp.FILTERED_STATE_CODE = objApp.STATE_CODES[data.state_id];
             }else{
-                objApp.IS_STATE_FILTERED = 0;
+                objApp.IS_STATE_FILTERED = 1;
                 objApp.FILTERED_STATE_ID = 1;
                 objApp.FILTERED_STATE_CODE = 'VIC';
             }
