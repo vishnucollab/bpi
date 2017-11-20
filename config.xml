@@ -30,8 +30,8 @@
     <gap:plugin name="cordova-plugin-contacts" source="npm"/>
     <gap:plugin name="cordova-plugin-device" source="npm"/>
     <gap:plugin name="cordova-plugin-dialogs" source="npm"/>
-    <gap:plugin name="cordova-plugin-file" source="npm" spec="4.3.3"/>
-    <gap:plugin name="cordova-plugin-file-transfer" source="npm" spec="1.6.3"/>
+    <gap:plugin name="cordova-plugin-file" source="npm"/>
+    <gap:plugin name="cordova-plugin-file-transfer" source="npm"/>
     <gap:plugin name="cordova-plugin-geolocation" source="npm"/>
     <gap:plugin name="cordova-plugin-globalization" source="npm"/>
     <gap:plugin name="cordova-plugin-inappbrowser" source="npm"/>
