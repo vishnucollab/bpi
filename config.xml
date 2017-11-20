@@ -15,7 +15,8 @@
 
     <feature name="http://api.phonegap.com/1.0/device" />
 
-    <preference name="phonegap-version" value="cli-7.0.1" />
+    <preference name="phonegap-version" value="cli-6.5.0" />
+    <preference name='pgb-builder-version' value='1' />
     <preference name="orientation" value="landscape" />
     <preference name="target-device" value="tablet" />
     <preference name="fullscreen" value="false" />
@@ -29,6 +30,8 @@
     <gap:plugin name="cordova-plugin-console" source="npm"/>
     <gap:plugin name="cordova-plugin-contacts" source="npm"/>
     <gap:plugin name="cordova-plugin-device" source="npm"/>
+    <gap:plugin name="cordova-plugin-device-motion" source="npm"/>
+    <gap:plugin name="cordova-plugin-device-orientation" source="npm"/>
     <gap:plugin name="cordova-plugin-dialogs" source="npm"/>
     <gap:plugin name="cordova-plugin-file" source="npm"/>
     <gap:plugin name="cordova-plugin-file-transfer" source="npm"/>
