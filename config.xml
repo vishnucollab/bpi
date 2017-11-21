@@ -23,6 +23,9 @@
     <preference name="StatusBarOverlaysWebView" value="false" />
     <preference name="AutoHideSplashScreen" value="true"/>
 
+    <engine name="android" spec="~6.2.3" />
+    <engine name="ios" spec="^4.5.2" />
+
     <gap:plugin name="cordova-plugin-battery-status" source="npm"/>
     <gap:plugin name="cordova-plugin-camera" source="npm"/>
     <gap:plugin name="cordova-plugin-media-capture" source="npm"/>
@@ -30,8 +33,8 @@
     <gap:plugin name="cordova-plugin-contacts" source="npm"/>
     <gap:plugin name="cordova-plugin-device" source="npm"/>
     <gap:plugin name="cordova-plugin-dialogs" source="npm"/>
-    <gap:plugin name="cordova-plugin-file" spec="^5.0.0" />
-    <gap:plugin name="cordova-plugin-file-transfer" spec="^1.6.3" />
+    <gap:plugin name="cordova-plugin-file" source="npm"/>
+    <gap:plugin name="cordova-plugin-file-transfer" source="npm"/>
     <gap:plugin name="cordova-plugin-geolocation" source="npm"/>
     <gap:plugin name="cordova-plugin-globalization" source="npm"/>
     <gap:plugin name="cordova-plugin-inappbrowser" source="npm"/>
