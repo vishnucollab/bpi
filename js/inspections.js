@@ -2730,6 +2730,8 @@ var Inspections = function()
 
         $("#btnMinRoofTilesYes").bind(objApp.touchEvent, function(e)
         {
+            if (self.finalised == 1)
+                return false;
             $("#btnMinRoofTilesYes").removeClass("yesno_disabled").addClass("yesno_enabled");
             $("#btnMinRoofTilesNo").removeClass("yesno_enabled").addClass("yesno_disabled");
             $("#min_roof_tiles").val("1");
@@ -2737,6 +2739,8 @@ var Inspections = function()
         });
         $("#btnMinRoofTilesNo").bind(objApp.touchEvent, function(e)
         {
+            if (self.finalised == 1)
+                return false;
             $("#btnMinRoofTilesYes").removeClass("yesno_enabled").addClass("yesno_disabled");
             $("#btnMinRoofTilesNo").removeClass("yesno_disabled").addClass("yesno_enabled");
             $("#min_roof_tiles").val("0");
@@ -2745,6 +2749,8 @@ var Inspections = function()
 
         $("#btnMinRidgeTilesYes").bind(objApp.touchEvent, function(e)
         {
+            if (self.finalised == 1)
+                return false;
             $("#btnMinRidgeTilesYes").removeClass("yesno_disabled").addClass("yesno_enabled");
             $("#btnMinRidgeTilesNo").removeClass("yesno_enabled").addClass("yesno_disabled");
             $("#min_ridge_tiles").val("1");
@@ -2752,6 +2758,8 @@ var Inspections = function()
         });
         $("#btnMinRidgeTilesNo").bind(objApp.touchEvent, function(e)
         {
+            if (self.finalised == 1)
+                return false;
             $("#btnMinRidgeTilesYes").removeClass("yesno_enabled").addClass("yesno_disabled");
             $("#btnMinRidgeTilesNo").removeClass("yesno_disabled").addClass("yesno_enabled");
             $("#min_ridge_tiles").val("0");
@@ -2760,6 +2768,8 @@ var Inspections = function()
 
         $("#btnTouchUpPaintYes").bind(objApp.touchEvent, function(e)
         {
+            if (self.finalised == 1)
+                return false;
             $("#btnTouchUpPaintYes").removeClass("yesno_disabled").addClass("yesno_enabled");
             $("#btnTouchUpPaintNo").removeClass("yesno_enabled").addClass("yesno_disabled");
             $("#touch_up_paint").val("1");
@@ -2767,6 +2777,8 @@ var Inspections = function()
         });
         $("#btnTouchUpPaintNo").bind(objApp.touchEvent, function(e)
         {
+            if (self.finalised == 1)
+                return false;
             $("#btnTouchUpPaintYes").removeClass("yesno_enabled").addClass("yesno_disabled");
             $("#btnTouchUpPaintNo").removeClass("yesno_disabled").addClass("yesno_enabled");
             $("#touch_up_paint").val("0");
@@ -2775,6 +2787,8 @@ var Inspections = function()
 
         $("#btnMinFlooringTilesYes").bind(objApp.touchEvent, function(e)
         {
+            if (self.finalised == 1)
+                return false;
             $("#btnMinFlooringTilesYes").removeClass("yesno_disabled").addClass("yesno_enabled");
             $("#btnMinFlooringTilesNo").removeClass("yesno_enabled").addClass("yesno_disabled");
             $("#min_flooring_tiles").val("1");
@@ -2782,6 +2796,8 @@ var Inspections = function()
         });
         $("#btnMinFlooringTilesNo").bind(objApp.touchEvent, function(e)
         {
+            if (self.finalised == 1)
+                return false;
             $("#btnMinFlooringTilesYes").removeClass("yesno_enabled").addClass("yesno_disabled");
             $("#btnMinFlooringTilesNo").removeClass("yesno_disabled").addClass("yesno_enabled");
             $("#min_flooring_tiles").val("0");
@@ -2790,6 +2806,8 @@ var Inspections = function()
 
         $("#btnGroutSamplesYes").bind(objApp.touchEvent, function(e)
         {
+            if (self.finalised == 1)
+                return false;
             $("#btnGroutSamplesYes").removeClass("yesno_disabled").addClass("yesno_enabled");
             $("#btnGroutSamplesNo").removeClass("yesno_enabled").addClass("yesno_disabled");
             $("#grout_samples").val("1");
@@ -2797,6 +2815,8 @@ var Inspections = function()
         });
         $("#btnGroutSamplesNo").bind(objApp.touchEvent, function(e)
         {
+            if (self.finalised == 1)
+                return false;
             $("#btnGroutSamplesYes").removeClass("yesno_enabled").addClass("yesno_disabled");
             $("#btnGroutSamplesNo").removeClass("yesno_disabled").addClass("yesno_enabled");
             $("#grout_samples").val("0");
@@ -6644,6 +6664,8 @@ var Inspections = function()
             // Set the rating select boxes to read-only
             $("#tblRateListing select.ratingSelect").attr("readonly", "readonly");
             $("#tblRateListing select.ratingSelect").attr("disabled", "disabled");
+
+            $('#barrel_code').prop('disabled', true);
         }
         else
         {
@@ -6661,6 +6683,8 @@ var Inspections = function()
             $("div.btnReinspect").hide();
             $("#tblRateListing select.ratingSelect").removeAttr("readonly");
             $("#tblRateListing select.ratingSelect").removeAttr("disabled");            
+
+            $('#barrel_code').prop('disabled', false);
         }   
         
         this.setReadOnly();     
