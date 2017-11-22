@@ -348,7 +348,7 @@ function Sync()
 
                                                 function DBErrorHandler(transaction, error)
                                                 {
-                                                    var text_context = context != undefined && context != "" ? "(" + context + ") " : "";
+                                                    var text_context = (typeof context != 'undefined' && context != "")  ? "(" + context + ") " : "";
                                                     self.doServerLog("Error "+text_context+": " + error.message + " in " + sql + " (params : "+self.saveData.join(", ")+")");
                                                     self.syncingCounter--;
                                                     if(!self.silentMode) $("#accountMessage #general").text("Processing: " + (self.syncingTotalRequest - self.syncingCounter) + '/' + self.syncingTotalRequest);
@@ -447,7 +447,7 @@ function Sync()
 
                                     function DBErrorHandler(transaction, error)
                                     {
-                                        var text_context = context != undefined && context != "" ? "(" + context + ") " : "";
+                                        var text_context = (typeof context != 'undefined' && context != "")  ? "(" + context + ") " : "";
                                         self.doServerLog("Error "+text_context+": " + error.message + " in " + sql + " (params : "+self.saveData.join(", ")+")");
                                         self.syncingCounter--;
                                         if(!self.silentMode) $("#accountMessage #general").text("Processing: " + (self.syncingTotalRequest - self.syncingCounter) + '/' + self.syncingTotalRequest);
