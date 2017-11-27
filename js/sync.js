@@ -534,6 +534,11 @@ function Sync()
 		self.saveGraphs();
     }
 
+    this.validData = function(data)
+    {
+        return data.replace(/â€™/g,"'").replace(/â€˜/g,"'");
+    }
+
 
 	this.sendData = function()
 	{
@@ -542,12 +547,12 @@ function Sync()
 		parameters['email'] = localStorage.getItem("email");
 		parameters['password'] = localStorage.getItem("password");		
 		parameters['version'] = objApp.version;
-		parameters['data'] = $.base64('encode', objDBUtils.data);
+		parameters['data'] = $.base64('encode', self.validData(objDBUtils.data));
         parameters['anticache'] = Math.floor(Math.random() * 999999);
         parameters['start_time'] = objApp.objSync.startTime;
         objApp.objSync.startTime = '';
 		var refreshSync = "false";
-        self.doServerLog(objDBUtils.data);
+        self.doServerLog(self.validData(objDBUtils.data));
 		if(objApp.objSync.refreshSync)
 		{
 			// Set the refresh sync flag
