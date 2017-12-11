@@ -23,7 +23,7 @@ function App()
 	//this.apiURL = "http://projects.loc/blueprintapi/";
     //this.apiURL = "http://192.168.0.52/blueprint/api/";
 	this.phonegapBuild = true; 	// Set this to true when phonegap is the target
-	this.version = '2.0.10';				// Identifies the app version to the server
+	this.version = '2.0.11';				// Identifies the app version to the server
 	this.versionStatus = "Production";
 	this.localMode = false;
 	this.context = "";
