@@ -317,7 +317,7 @@
 				var monthNames = options.monthNames || [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ];
 
 				// Create cell width based on el size
-				var containerWidth = el.outerWidth();
+				var containerWidth = el.outerWidth(false);
 				var containerHeight = containerWidth;
 
 				// Create cell size based on container size
@@ -343,8 +343,8 @@
 				}
 				else {
 					if(!eval(calendar.data('is'))) {
-						containerWidth = calendar.outerWidth();
-						containerHeight = calendar.outerHeight();
+						containerWidth = calendar.outerWidth(false);
+						containerHeight = calendar.outerHeight(false);
 
 						cellWidth = getCellSize(containerWidth, maxCol);
 						cellHeight = getCellSize(containerHeight, maxRow + 2);
@@ -365,7 +365,7 @@
 					var elPos = el.offset();
 					calendar.css(
 					{
-						top: (elPos.top + el.outerHeight() + options.calendarOffset.y) + 'px',
+						top: (elPos.top + el.outerHeight(false) + options.calendarOffset.y) + 'px',
 						left: (elPos.left + options.calendarOffset.x) + 'px'
 					});
 				};
