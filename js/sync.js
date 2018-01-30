@@ -237,6 +237,7 @@ function Sync()
         parameters['email'] = localStorage.getItem("email");
         parameters['password'] = localStorage.getItem("password");
         parameters['version'] = objApp.version;
+		parameters['patch'] = objApp.patch;
         parameters['is_QLD'] = objApp.IS_QLD;
         parameters['data'] = objDBUtils.data;
         parameters['anticache'] = Math.floor(Math.random() * 999999);

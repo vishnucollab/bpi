@@ -672,13 +672,15 @@
                 <input type="hidden" name="touch_up_paint" id="touch_up_paint"  value="1"/>
                 <input type="hidden" name="min_flooring_tiles" id="min_flooring_tiles"  value="1"/>
                 <input type="hidden" name="grout_samples" id="grout_samples"  value="1"/>
+				<input type="hidden" name="practical_completed" id="practical_completed"  value="1"/>
 
                 <table class="listing">
                     <thead>
                     <tr>
-                        <th class="tagID" style="width: 50%">Materials to be left on site</th>
-                        <th class="location" style="width: 25%">Yes</th>
-                        <th class="observation" style="width: 25%">No</th>
+                        <th class="tagID" style="width: 40%">Materials to be left on site</th>
+                        <th class="location" style="width: 20%">Yes</th>
+                        <th class="observation" style="width: 20%">No</th>
+                        <th style="width: 20%">N/A</th>
                     </tr>
                     </thead>
 
@@ -687,30 +689,40 @@
                         <td>Minimum of 12 roof tiles</td>
                         <td><a id="btnMinRoofTilesYes" class="left yesno_enabled" href="javascript:void(0);">Yes</a></td>
                         <td><a id="btnMinRoofTilesNo" class="left yesno_disabled" href="javascript:void(0);">No</a></td>
+                        <td><a id="btnMinRoofTilesNA" class="left yesno_disabled" href="javascript:void(0);">N/A</a></td>
                     </tr>
                     <tr>
                         <td>Minimum of 4 ridge tiles</td>
                         <td><a id="btnMinRidgeTilesYes" class="left yesno_enabled" href="javascript:void(0);">Yes</a></td>
                         <td><a id="btnMinRidgeTilesNo" class="left yesno_disabled" href="javascript:void(0);">No</a></td>
+                        <td><a id="btnMinRidgeTilesNA" class="left yesno_disabled" href="javascript:void(0);">N/A</a></td>
                     </tr>
                     <tr>
                         <td>Touch up paint one of each colour including external (labelled)</td>
                         <td><a id="btnTouchUpPaintYes" class="left yesno_enabled" href="javascript:void(0);">Yes</a></td>
                         <td><a id="btnTouchUpPaintNo" class="left yesno_disabled" href="javascript:void(0);">No</a></td>
+                        <td><a id="btnTouchUpPaintNA" class="left yesno_disabled" href="javascript:void(0);">N/A</a></td>
                     </tr>
                     <tr>
                         <td>Minimum of 6 flooring tiles</td>
                         <td><a id="btnMinFlooringTilesYes" class="left yesno_enabled" href="javascript:void(0);">Yes</a></td>
                         <td><a id="btnMinFlooringTilesNo" class="left yesno_disabled" href="javascript:void(0);">No</a></td>
+                        <td><a id="btnMinFlooringTilesNA" class="left yesno_disabled" href="javascript:void(0);">N/A</a></td>
                     </tr>
                     <tr>
                         <td>Grout samples in plastic container</td>
                         <td><a id="btnGroutSamplesYes" class="left yesno_enabled" href="javascript:void(0);">Yes</a></td>
                         <td><a id="btnGroutSamplesNo" class="left yesno_disabled" href="javascript:void(0);">No</a></td>
+                        <td><a id="btnGroutSamplesNA" class="left yesno_disabled" href="javascript:void(0);">N/A</a></td>
+                    </tr>
+                    <tr>
+                        <td>Has this House/Unit achieved Practical Completion</td>
+                        <td><a id="btnPracticalCompletedYes" class="left yesno_enabled" href="javascript:void(0);">Yes</a></td>
+                        <td colspan="2"><a id="btnPracticalCompletedNo" class="left yesno_disabled" href="javascript:void(0);">No</a></td>
                     </tr>
                     <tr>
                         <td>Barrel Code to key locks on entry door & garage door</td>
-                        <td colspan="2" style="border-top:1px solid;"><input type="text" name="barrel_code" id="barrel_code" style="width: 97%; margin: 5px 0;"/></td>
+                        <td colspan="3" style="border-top:1px solid;"><input type="text" name="barrel_code" id="barrel_code" style="width: 97%; margin: 5px 0;"/></td>
                     </tr>
                     </tbody>
                 </table>
@@ -761,7 +773,7 @@
 
                     <table id="tblRateListing" class="listing">
                         <tr>
-                            <td>Brickwork</td>
+                            <td>External Cladding</td>
                             <td><select name="" id="brickwork" class="ratingSelect">
                                 <option value="1" selected>1</option>
                                 <option value="2">2</option>
