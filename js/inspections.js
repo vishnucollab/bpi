@@ -3076,6 +3076,23 @@ var Inspections = function()
 
         $("#btnSendReport, #btnSendReport2, #btnSendReport3").unbind(objApp.touchEvent);
         $("#btnSendReport, #btnSendReport2, #btnSendReport3").bind(objApp.touchEvent, function(e) {
+            if(objApp.keys.reinspection_id != "") {
+                var sql = 'UPDATE reinspections SET min_roof_tiles = ?,min_ridge_tiles =?,touch_up_paint =?,' +
+                    'min_flooring_tiles=?, grout_samples=?, practical_completed=?, barrel_code=?,  dirty = 1 WHERE id = ?';
+                var min_roof_tiles = $("#min_roof_tiles").val();
+                var min_ridge_tiles = $("#min_ridge_tiles").val();
+                var touch_up_paint = $("#touch_up_paint").val();
+                var min_flooring_tiles = $("#min_flooring_tiles").val();
+                var grout_samples = $("#grout_samples").val();
+                var practical_completed = $("#practical_completed").val();
+                var barrel_code = $("#barrel_code").val();
+                objDBUtils.execute(sql, [min_roof_tiles,min_ridge_tiles,touch_up_paint,min_flooring_tiles,
+                    grout_samples,practical_completed,barrel_code,objApp.keys.reinspection_id], null);
+            }
+            else {
+                self.checkSaveInspection();
+            }
+
             e.preventDefault();
             // Also ensure we have a valid inspection ID
             var inspection_id = objApp.getKey("inspection_id");
