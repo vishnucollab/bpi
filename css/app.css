@@ -743,3 +743,8 @@ fieldset legend {
 
 #inspectionChartWrapper{width: 850px;height: 500px;margin: 0 auto;left: 8%;top: 5%;}
 #inspectionChartWrapper #piechart{width: 800px;height: 472px;}
+#frmInspectionDetails .listing th, #frmInspectionDetails .listing td {
+    line-height: 20px;
+    min-height: 20px;
+    padding: 5px !important;
+}

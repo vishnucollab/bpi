@@ -1193,6 +1193,7 @@ function DBUtils()
                 "'min_ridge_tiles' SMALLINT(6) DEFAULT 0, " +
                 "'touch_up_paint' SMALLINT(6) DEFAULT 0, " +
                 "'min_flooring_tiles' SMALLINT(6) DEFAULT 0, " +
+                "'practical_completed' SMALLINT(6) DEFAULT 0, " +
                 "'grout_samples' SMALLINT(6) DEFAULT 0, " +
                 "'barrel_code' TEXT DEFAULT NULL, " +
 				"'certificated' SMALLINT(6) DEFAULT 0, " +
@@ -1263,6 +1264,7 @@ function DBUtils()
                 "'min_ridge_tiles' SMALLINT(6) DEFAULT 0, " +
                 "'touch_up_paint' SMALLINT(6) DEFAULT 0, " +
                 "'min_flooring_tiles' SMALLINT(6) DEFAULT 0, " +
+                "'practical_completed' SMALLINT(6) DEFAULT 0, " +
                 "'grout_samples' SMALLINT(6) DEFAULT 0, " +
                 "'barrel_code' TEXT DEFAULT NULL, " +
                 "'created_by' INTEGER NOT NULL DEFAULT 48, " + 
