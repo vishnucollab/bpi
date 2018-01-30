@@ -237,6 +237,7 @@ function Sync()
         parameters['email'] = localStorage.getItem("email");
         parameters['password'] = localStorage.getItem("password");
         parameters['version'] = objApp.version;
+		parameters['patch'] = objApp.patch;
         if (objApp.IS_STATE_FILTERED == 1){
             parameters['filtered_state_code'] = objApp.FILTERED_STATE_CODE;
             parameters['filtered_state_id'] = objApp.FILTERED_STATE_ID;
