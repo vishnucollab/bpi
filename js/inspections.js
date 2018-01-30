@@ -3100,30 +3100,33 @@ var Inspections = function()
                 alert("Invalid inspection ID");
                 return;
             }
-            //var reinspection_id = objApp.getKey("reinspection_id");
-            blockElement('body');
-            objApp.objSync.startSyncSilent(function(success) {
-                if(!success) {
-                    unblockElement('body');
-                    alert("Sorry, a problem occurred whilst syncing your data to the server");
-                    return;
-                }
-                var params = {'version': objApp.version};
-                params["chart_image"] = $('#chart_image').val();
-                params["dummy"] = 'Here is dummy text. Post data will be cut off a part. This will fix that issue.';
-                $.post(objApp.apiURL + "inspections/send_inspection_to_dropbox/" + inspection_id, params, function(response) {
-                    unblockElement('body');
-                    var data = JSON.parse(response);
-                    if(data.status != "OK") {
-                        alert(data.message);
+            setTimeout(function()
+            {
+                //var reinspection_id = objApp.getKey("reinspection_id");
+                blockElement('body');
+                objApp.objSync.startSyncSilent(function(success) {
+                    if(!success) {
+                        unblockElement('body');
+                        alert("Sorry, a problem occurred whilst syncing your data to the server");
                         return;
                     }
-                    alert("The report was sent successfully to dropbox");
-                }, "").fail(function() {
-                    unblockElement('body');
-                    alert( "Unknown error" );
-                })
-            });
+                    var params = {'version': objApp.version};
+                    params["chart_image"] = $('#chart_image').val();
+                    params["dummy"] = 'Here is dummy text. Post data will be cut off a part. This will fix that issue.';
+                    $.post(objApp.apiURL + "inspections/send_inspection_to_dropbox/" + inspection_id, params, function(response) {
+                        unblockElement('body');
+                        var data = JSON.parse(response);
+                        if(data.status != "OK") {
+                            alert(data.message);
+                            return;
+                        }
+                        alert("The report was sent successfully to dropbox");
+                    }, "").fail(function() {
+                        unblockElement('body');
+                        alert( "Unknown error" );
+                    })
+                });
+            },500);
         });
 
         $("#btnSendReinspectReport").unbind(objApp.touchEvent);
