@@ -542,8 +542,7 @@ var Inspections = function()
                 row.practical_completed,row.barrel_code];
                 
                 sql = "INSERT INTO reinspections(id, inspection_id, reinspection_date, failed, most_recent,notes, " +
-                    "min_roof_tiles, min_ridge_tiles, touch_up_paint, min_flooring_tiles, grout_samples, practical_completed, barrel_code) " +
-                    "VALUES(?,?,?,?,?,?,?,?,?,?,?,?)";
+                    "min_roof_tiles, min_ridge_tiles, touch_up_paint, min_flooring_tiles, grout_samples, practical_completed, barrel_code) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
                 objDBUtils.execute(sql, values, function(){
                     
