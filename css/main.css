@@ -1620,10 +1620,10 @@ aside textarea
 }
 
 .inspectionDetails #defectScrollWrapper{
-    height: 280px;
+    height: 275px;
     overflow-x: hidden;
-    max-height: 280px;
-    min-height: 280px;
+    max-height: 275px;
+    min-height: 275px;
 }
 
 .inspectionDetails ul.gallery{
