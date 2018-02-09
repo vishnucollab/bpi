@@ -747,6 +747,8 @@ var Inspections = function()
                 //$("div.btnEditNotes").hide();
             }
         }
+
+        $('.report_type_options:visible').trigger('change');
     }
     
     this.showStep2 = function(inspectionItem)
@@ -1213,6 +1215,8 @@ var Inspections = function()
         $('#frmInspectionDetails #postcode').val('');
         $('#frmInspectionDetails #weather').val('');
         $('#frmInspectionDetails #client_info').val('');
+        $('#frmInspectionDetails #practical_completed_selector').val(0);
+        $('#frmInspectionDetails #practical_completed_selector').trigger('change');
 
         // Hide the camera button until the inspection is created.
         $(".inspectionDetails #btnCapturePhoto").hide();
@@ -2053,9 +2057,13 @@ var Inspections = function()
         });
 
         $(".report_type_options").change(function() {
-                        
             selected_report_type = $(this).val();
-            $("#inspection #report_type").val(selected_report_type);  
+            $("#inspection #report_type").val(selected_report_type);
+            if (selected_report_type == 'Client: PCI/Final inspections'){
+                $('.client-pci').show();
+            }else{
+                $('.client-pci').hide();
+            }
         });
         
         $(".inspectionDetails #btnCapturePhoto").bind(objApp.touchEvent, function(e)
@@ -3160,6 +3168,10 @@ var Inspections = function()
                     alert( "Unknown error" );
                 })
             });
+        });
+
+        $('#practical_completed_selector').change(function(){
+            $('#practical_completed').val($(this).val());
         });
 	}
 
@@ -7308,10 +7320,12 @@ var Inspections = function()
             $("#btnPracticalCompletedYes").removeClass("yesno_disabled").addClass("yesno_enabled");
             $("#btnPracticalCompletedNo").removeClass("yesno_enabled").addClass("yesno_disabled");
             $("#practical_completed").val("1");
+            $('#frmInspectionDetails #practical_completed_selector').val(1);
         } else if(obj.practical_completed == 0) {
             $("#btnPracticalCompletedYes").removeClass("yesno_enabled").addClass("yesno_disabled");
             $("#btnPracticalCompletedNo").removeClass("yesno_disabled").addClass("yesno_enabled");
             $("#practical_completed").val("0");
+            $('#frmInspectionDetails #practical_completed_selector').val(0);
         }
     }
 

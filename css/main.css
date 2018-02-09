@@ -2251,6 +2251,10 @@ table th, td {
     background: transparent;   
 }
 
+#inspection #frmInspectionDetails table td{
+    padding: 5px! important;
+}
+
 #inspectionStep2 table#observation_suggestion td
 { 
 	border: 1px solid #000 !important;
