@@ -767,6 +767,8 @@ var Inspections = function()
                 //$("div.btnEditNotes").hide();
             }
         }
+
+        $('.report_type_options:visible').trigger('change');
     }
     
     this.showStep2 = function(inspectionItem)
