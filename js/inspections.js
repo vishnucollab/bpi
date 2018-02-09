@@ -3210,6 +3210,7 @@ var Inspections = function()
 
         $('#practical_completed_selector').change(function(){
             $('#practical_completed').val($(this).val());
+            self.checkSaveInspection(0);
         });
 	}
 
