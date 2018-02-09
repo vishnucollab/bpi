@@ -1672,7 +1672,7 @@ var Inspections = function()
 	this.handleStateChanged = function()
 	{
 		// Save the inspection if possible
-		self.checkSaveInspection();
+		self.checkSaveInspection(0);
 	}
 
     this.createDatepicker = function(){
