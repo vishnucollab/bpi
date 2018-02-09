@@ -483,17 +483,6 @@
                         </tr>
                     </table>
                 </fieldset>
-                <fieldset style="padding-left: 20px;">
-                    <table>
-                        <tr class="client-pci" style="display: none;">
-                            <td><label for="practical_completed_selector">Has this House/Unit achieved Practical Completion?</label></td>
-                            <td><select class="selector ignore" id="practical_completed_selector">
-                                <option value="0">No</option>
-                                <option value="1">Yes</option>
-                            </select></td>
-                        </tr>
-                    </table>
-                </fieldset>
                 <input type="hidden" id="inspection_start" name="inspection_start" value="" />
                 <input type="hidden" id="created_by" name="created_by" value="" />
                 <input type="hidden" id="finalised" name="finalised" value="0" />
@@ -601,6 +590,17 @@
 
             <div id="defectScrollWrapper" class="scrollWrapper"></div>
 
+            <fieldset style="padding-left: 48px;margin-top: 10px;display: none;" class="client-pci">
+                <table style="width: 925px; table-layout: fixed;">
+                    <tr>
+                        <td style="width: 500px; background: none; border: none;padding: 0 !important;"><label for="practical_completed_selector">Has this House/Unit achieved Practical Completion?</label></td>
+                        <td style="background: none; border: none;padding: 0 !important;text-align: right"><select class="selector ignore" id="practical_completed_selector">
+                            <option value="0">No</option>
+                            <option value="1">Yes</option>
+                        </select></td>
+                    </tr>
+                </table>
+            </fieldset>
             <div class="bottomBtns">
 
                 <div class="btnContainer left hidden reinspectOnly">

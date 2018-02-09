@@ -912,7 +912,17 @@ var Inspections = function()
                 self.startReinspection(objApp.getKey("inspection_id"));
             });
 
+            if (inspection.report_type == 'Client: PCI/Final inspections'){
+                $('.client-pci').show();
+            }else{
+                $('.client-pci').hide();
+            }
 
+            if (inspection.finalised == 1){
+                $('#practical_completed_selector').prop('disabled', true);
+            }else{
+                $('#practical_completed_selector').prop('disabled', false);
+            }
         }, inspection_id);
     }
 
@@ -1234,8 +1244,9 @@ var Inspections = function()
         $('#frmInspectionDetails #postcode').val('');
         $('#frmInspectionDetails #weather').val('');
         $('#frmInspectionDetails #client_info').val('');
-        $('#frmInspectionDetails #practical_completed_selector').val(0);
-        $('#frmInspectionDetails #practical_completed_selector').trigger('change');
+        $('#practical_completed_selector').val(0);
+        $('#practical_completed_selector').trigger('change');
+        $('#practical_completed_selector').prop('disabled', false);
         // Hide the camera button until the inspection is created.
         $(".inspectionDetails #btnCapturePhoto").hide();
 
@@ -1684,7 +1695,7 @@ var Inspections = function()
 	this.handleStateChanged = function()
 	{
 		// Save the inspection if possible
-		self.checkSaveInspection();
+		self.checkSaveInspection(0);
 	}
 
     this.createDatepicker = function(){
@@ -2402,6 +2413,7 @@ var Inspections = function()
                 return;
             }
 
+            self.checkSaveInspection(0);
             self.showStep2();
 			return false;
 		});
@@ -2682,6 +2694,12 @@ var Inspections = function()
 
 			objApp.objInspection.checkSaveInspection();
 
+            if (self.finalised == 1){
+                $('#practical_completed_selector').prop('disabled', true);
+            }else{
+                $('#practical_completed_selector').prop('disabled', false);
+            }
+			
 			setTimeout(function()
 			{
 				objApp.objInspection.loadInspectionItems();
@@ -2852,23 +2870,23 @@ var Inspections = function()
 
         $('#frmInspectionDetails #lot_no').change(function(){
             self.updateExtraSubHeader();
-            self.checkSaveInspection();
+            self.checkSaveInspection(0);
            });
 
         $('#frmInspectionDetails #address').change(function(){
             self.updateExtraSubHeader();
-            self.checkSaveInspection();
+            self.checkSaveInspection(0);
            });
         $('#frmInspectionDetails #suburb').change(function(){
             self.updateExtraSubHeader();
-            self.checkSaveInspection();
+            self.checkSaveInspection(0);
            });
         // $('#frmInspectionDetails #postcode').change(function(){
             // self.updateExtraSubHeader();
             // self.checkSaveInspection();
            // });
         $('#frmInspectionDetails #weather').change(function(){
-            self.checkSaveInspection();
+            self.checkSaveInspection(0);
         });
 
         $('.btnEditPrivateNotes').bind(objApp.touchEvent, function(e){
@@ -5308,8 +5326,10 @@ var Inspections = function()
 	* details form.  It checks if enough information has been provided and if so, adds/updates the
 	* inspection.
 	*/
-	this.checkSaveInspection = function()
+	this.checkSaveInspection = function(blockBody)
 	{
+	    if (typeof blockBody == 'undefined')
+            blockBody = 1;
 	    // Validate the form
 	    if(!$("#frmInspectionDetails").validate().form())
 	    {
@@ -5367,7 +5387,8 @@ var Inspections = function()
 	    // Ready to save
 	    $("#frmInspectionDetails input").blur();
 
-	    blockElement("body");
+        if (blockBody)
+	        blockElement("body");
 
 	    // Invoke the autoSave method after a short delay.
 	    setTimeout(function()
@@ -7348,12 +7369,12 @@ var Inspections = function()
             $("#btnPracticalCompletedYes").removeClass("yesno_disabled").addClass("yesno_enabled");
             $("#btnPracticalCompletedNo").removeClass("yesno_enabled").addClass("yesno_disabled");
             $("#practical_completed").val("1");
-			$('#frmInspectionDetails #practical_completed_selector').val(1);
+			$('#practical_completed_selector').val(1);
         } else if(obj.practical_completed == 0) {
             $("#btnPracticalCompletedYes").removeClass("yesno_enabled").addClass("yesno_disabled");
             $("#btnPracticalCompletedNo").removeClass("yesno_disabled").addClass("yesno_enabled");
             $("#practical_completed").val("0");
-			$('#frmInspectionDetails #practical_completed_selector').val(0);
+			$('#practical_completed_selector').val(0);
         }
     }
 
