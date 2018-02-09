@@ -483,6 +483,17 @@
                         </tr>
                     </table>
                 </fieldset>
+				<fieldset style="padding-left: 20px;">
+                    <table>
+                        <tr class="client-pci" style="display: none;">
+                            <td><label for="practical_completed_selector">Has this House/Unit achieved Practical Completion?</label></td>
+                            <td><select class="selector ignore" id="practical_completed_selector">
+                                <option value="0">No</option>
+                                <option value="1">Yes</option>
+                            </select></td>
+                        </tr>
+                    </table>
+                </fieldset>
 
                 <input type="hidden" id="inspection_start" name="inspection_start" value="" />
                 <input type="hidden" id="created_by" name="created_by" value="" />
@@ -716,7 +727,7 @@
                         <td><a id="btnGroutSamplesNA" class="left yesno_disabled" href="javascript:void(0);">N/A</a></td>
                     </tr>
                     <tr>
-                        <td>Has this House/Unit achieved Practical Completion</td>
+                        <td>Is this House/Unit ready for A Practical Completion Inspection</td>
                         <td><a id="btnPracticalCompletedYes" class="left yesno_enabled" href="javascript:void(0);">Yes</a></td>
                         <td colspan="2"><a id="btnPracticalCompletedNo" class="left yesno_disabled" href="javascript:void(0);">No</a></td>
                     </tr>
