@@ -1620,10 +1620,10 @@ aside textarea
 }
 
 .inspectionDetails #defectScrollWrapper{
-    height: 247px;
+    height: 280px;
     overflow-x: hidden;
-    max-height: 320px;
-    min-height: 320px;
+    max-height: 280px;
+    min-height: 280px;
 }
 
 .inspectionDetails ul.gallery{
@@ -2249,10 +2249,6 @@ table th, td {
 {
     border: none; 
     background: transparent;   
-}
-
-#inspection #frmInspectionDetails table td{
-    padding: 5px! important;
 }
 
 #inspectionStep2 table#observation_suggestion td

@@ -747,8 +747,6 @@ var Inspections = function()
                 //$("div.btnEditNotes").hide();
             }
         }
-
-        $('.report_type_options:visible').trigger('change');
     }
     
     this.showStep2 = function(inspectionItem)
@@ -892,8 +890,15 @@ var Inspections = function()
                 self.startReinspection(objApp.getKey("inspection_id"));
             });
 
+            if (inspection.report_type == 'Client: PCI/Final inspections'){
+                $('.client-pci').show();
+            }else{
+                $('.client-pci').hide();
+            }
 
         }, inspection_id);
+
+
     }
 
     this.showStep4 = function()
@@ -1215,8 +1220,9 @@ var Inspections = function()
         $('#frmInspectionDetails #postcode').val('');
         $('#frmInspectionDetails #weather').val('');
         $('#frmInspectionDetails #client_info').val('');
-        $('#frmInspectionDetails #practical_completed_selector').val(0);
-        $('#frmInspectionDetails #practical_completed_selector').trigger('change');
+        $('#practical_completed_selector').val(0);
+        $('#practical_completed_selector').trigger('change');
+        $('#practical_completed_selector').prop('disabled', false);
 
         // Hide the camera button until the inspection is created.
         $(".inspectionDetails #btnCapturePhoto").hide();
@@ -7320,12 +7326,18 @@ var Inspections = function()
             $("#btnPracticalCompletedYes").removeClass("yesno_disabled").addClass("yesno_enabled");
             $("#btnPracticalCompletedNo").removeClass("yesno_enabled").addClass("yesno_disabled");
             $("#practical_completed").val("1");
-            $('#frmInspectionDetails #practical_completed_selector').val(1);
+            $('#practical_completed_selector').val(1);
         } else if(obj.practical_completed == 0) {
             $("#btnPracticalCompletedYes").removeClass("yesno_enabled").addClass("yesno_disabled");
             $("#btnPracticalCompletedNo").removeClass("yesno_disabled").addClass("yesno_enabled");
             $("#practical_completed").val("0");
-            $('#frmInspectionDetails #practical_completed_selector').val(0);
+            $('#practical_completed_selector').val(0);
+        }
+
+        if (obj.finalised == 1){
+            $('#practical_completed_selector').prop('disabled', true);
+        }else{
+            $('#practical_completed_selector').prop('disabled', false);
         }
     }
 
