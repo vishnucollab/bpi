@@ -2200,17 +2200,21 @@ var Inspections = function()
                                 }
                                 else
                                 {
+                                    alert('requestFileSystem');
                                     // Phonegap build - save the images to the file system
                                     // Request access to the file system
                                     window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem)
                                     {
                                         var file_name = new_id + "_thumb.jpg";
                                         // Get permission to write the file
+                                        alert('getFile ' + file_name);
                                         fileSystem.root.getFile(file_name, {create: true, exclusive: false}, function(fileEntry)
                                         {
+                                            alert('createWriter');
                                             // Create the file write object
                                             fileEntry.createWriter(function(writer)
                                             {
+                                                alert('onwriteend');
                                                 writer.onwriteend = function(evt)
                                                 {
                                                     // Get the file URI for the thumbnail image
@@ -2218,12 +2222,14 @@ var Inspections = function()
 
                                                     // Now write the full image to the file system
                                                     var file_name = new_id + ".jpg";
-
+                                                    alert('getFile ' + file_name);
                                                     fileSystem.root.getFile(file_name, {create: true, exclusive: false}, function(fileEntry)
                                                     {
+                                                        alert('createWriter');
                                                         // Create the file write object
                                                         fileEntry.createWriter(function(writer)
                                                         {
+                                                            alert('onwriteend');
                                                             writer.onwriteend = function(evt)
                                                             {
                                                                 // Get the file URI for the thumbnail image
@@ -2232,7 +2238,7 @@ var Inspections = function()
                                                                 // Save the image data and notes back to the database
                                                                 var sql = "INSERT INTO " + self.current_table + "(id, " + self.current_key + ", seq_no, photodata_tmb, photodata, notes, created_by, dirty) " +
                                                                     "VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
-
+                                                                alert(sql);
                                                                 var values = [new_id, objApp.getKey(self.current_key), seq_no, uri_thumb, uri, notes, user_id, "1"];
 
                                                                 objDBUtils.execute(sql, values, function()
