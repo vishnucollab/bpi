@@ -2130,23 +2130,15 @@ var Inspections = function()
 					// Setup a new image object, using the photo data as the image source
 					objImage = new Image();
 
-                    if(!objApp.phonegapBuild)
-                    {
-					    objImage.src = 'data:image/jpeg;base64,' + photoData;
-                    }
-                    else
-                    {
-					    objImage.src = photoData;
-                    }
-                    alert(photoData);
-                    alert('onload');
+                    objImage.src = 'data:image/jpeg;base64,' + photoData;
+
 					//notes = "";
 
 					// When the image has loaded, setup the image marker object
 					objImage.onload = function()
 					{
-                        alert('imageResizer 600');
  						// Resize the image so it's 600px wide
+                        alert('imageResizer 600');
 						objResizer = new imageResizer(objImage);
 						var imageData = objResizer.resize(600);
 
@@ -2154,10 +2146,9 @@ var Inspections = function()
  						// Create a thumbnail version of the image
 						objImage = new Image();
 						objImage.src = 'data:image/jpeg;base64,' + imageData;
-                        alert('onload');
+
 						objImage.onload = function()
 						{
-                            alert('imageResizer 90');
 							objResizer = new imageResizer(objImage);
 							var thumbData = objResizer.resize(90);
 
@@ -2203,21 +2194,17 @@ var Inspections = function()
                                 }
                                 else
                                 {
-                                    alert('requestFileSystem');
                                     // Phonegap build - save the images to the file system
                                     // Request access to the file system
                                     window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem)
                                     {
                                         var file_name = new_id + "_thumb.jpg";
                                         // Get permission to write the file
-                                        alert('getFile ' + file_name);
                                         fileSystem.root.getFile(file_name, {create: true, exclusive: false}, function(fileEntry)
                                         {
-                                            alert('createWriter');
                                             // Create the file write object
                                             fileEntry.createWriter(function(writer)
                                             {
-                                                alert('onwriteend');
                                                 writer.onwriteend = function(evt)
                                                 {
                                                     // Get the file URI for the thumbnail image
@@ -2225,14 +2212,12 @@ var Inspections = function()
 
                                                     // Now write the full image to the file system
                                                     var file_name = new_id + ".jpg";
-                                                    alert('getFile ' + file_name);
+
                                                     fileSystem.root.getFile(file_name, {create: true, exclusive: false}, function(fileEntry)
                                                     {
-                                                        alert('createWriter');
                                                         // Create the file write object
                                                         fileEntry.createWriter(function(writer)
                                                         {
-                                                            alert('onwriteend');
                                                             writer.onwriteend = function(evt)
                                                             {
                                                                 // Get the file URI for the thumbnail image
@@ -2241,7 +2226,7 @@ var Inspections = function()
                                                                 // Save the image data and notes back to the database
                                                                 var sql = "INSERT INTO " + self.current_table + "(id, " + self.current_key + ", seq_no, photodata_tmb, photodata, notes, created_by, dirty) " +
                                                                     "VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
-                                                                alert(sql);
+
                                                                 var values = [new_id, objApp.getKey(self.current_key), seq_no, uri_thumb, uri, notes, user_id, "1"];
 
                                                                 objDBUtils.execute(sql, values, function()
@@ -2281,7 +2266,7 @@ var Inspections = function()
                         var use_image = 0;
                         // Invoke the camera API to allow the user to take a photo
                         var photo =function(){
-                            var options = { limit: 1 };
+                            var options = { limit: 1, destinationType: Camera.DestinationType.DATA_URL };
                             navigator.device.capture.captureImage(onSuccess, onFail, options)
                             };
 
@@ -2325,7 +2310,7 @@ var Inspections = function()
                             },
                             {
                                 quality: 50,
-                                destinationType: Camera.DestinationType.FILE_URI,
+                                destinationType: Camera.DestinationType.DATA_URL,
                                 sourceType : Camera.PictureSourceType.PHOTOLIBRARY,
                                 correctOrientation: true
                             });
