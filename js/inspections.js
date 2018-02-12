@@ -2263,10 +2263,24 @@ var Inspections = function()
                 if(e.target.id=='addPhoto-btn'){
                     if(objApp.phonegapBuild)
                     {
+                        navigator.camera.getPicture(function(imageData)
+                            {
+                                editPhoto2(imageData);
+
+                            }, function(message)
+                            {
+                                alert("Image load failed because: " + message);
+                            },
+                            {
+                                quality: 50,
+                                destinationType: Camera.DestinationType.DATA_URL
+                            });
+
+                        /*
                         var use_image = 0;
                         // Invoke the camera API to allow the user to take a photo
                         var photo =function(){
-                            var options = { limit: 1, destinationType: Camera.DestinationType.DATA_URL };
+                            var options = { limit: 1 };
                             navigator.device.capture.captureImage(onSuccess, onFail, options)
                             };
 
@@ -2285,7 +2299,7 @@ var Inspections = function()
                             if (!use_image)
                                 alert('No captured image');
                         }
-
+                        */
                     }
                     else
                     {
