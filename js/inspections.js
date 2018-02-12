@@ -2138,7 +2138,6 @@ var Inspections = function()
 					objImage.onload = function()
 					{
  						// Resize the image so it's 600px wide
-                        alert('imageResizer 600');
 						objResizer = new imageResizer(objImage);
 						var imageData = objResizer.resize(600);
 
