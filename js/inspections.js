@@ -2138,12 +2138,14 @@ var Inspections = function()
                     {
 					    objImage.src = photoData;
                     }
-
+                    alert(photoData);
+                    alert('onload');
 					//notes = "";
 
 					// When the image has loaded, setup the image marker object
 					objImage.onload = function()
 					{
+                        alert('imageResizer 600');
  						// Resize the image so it's 600px wide
 						objResizer = new imageResizer(objImage);
 						var imageData = objResizer.resize(600);
@@ -2152,9 +2154,10 @@ var Inspections = function()
  						// Create a thumbnail version of the image
 						objImage = new Image();
 						objImage.src = 'data:image/jpeg;base64,' + imageData;
-
+                        alert('onload');
 						objImage.onload = function()
 						{
+                            alert('imageResizer 90');
 							objResizer = new imageResizer(objImage);
 							var thumbData = objResizer.resize(90);
 
