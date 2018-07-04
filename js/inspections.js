@@ -80,6 +80,7 @@ var Inspections = function()
         // Ensure all keys are cleared
         objApp.clearKeys();
         self.inspection = false;
+        self.user_type = localStorage.getItem("user_type");
         
         objDBUtils.orderBy = "name";
         $("#inspectionList .bottomBtns").find("a").removeClass("active");
@@ -309,7 +310,10 @@ var Inspections = function()
                     html += '<a href="#" data-reveal-id="historyReinspection" class="action view showhistory" data-id="' + row.id + '">History</a>';
                 }
 
-                html += '<a href="#" class="action delete" data-id="' + row.id + '">Delete</a>';
+                if (self.user_type == 'admin'){
+                    html += '<a href="#" class="action delete" data-id="' + row.id + '">Delete</a>';
+                }
+
                 
                 // If the inspection is finalised but failed, the user may reinspect it.
                 /*
@@ -1354,6 +1358,7 @@ var Inspections = function()
 
 		// Check to see if the user is restricted
 		self.restricted = localStorage.getItem("restricted");
+        self.user_type = localStorage.getItem("user_type");
 
 		self.checkCanDelete();
 
@@ -1491,8 +1496,8 @@ var Inspections = function()
 
 		// Load the defect items for this inspection
 		self.loadInspectionItems();
-
         self.updateInspectionPhotoCount(inspection.id);
+        self.applyPermission();
 
 		// Show the Add Defect button.
 		$("#btnAddDefect").removeClass("hidden");
@@ -7518,6 +7523,14 @@ var Inspections = function()
             $("#practical_completed").val("0");
             return false;
         });
+    }
+
+    this.applyPermission = function(){
+        if (self.user_type == 'admin'){
+            $('#btnStep3DeleteInspection').show();
+        }else{
+            $('#btnStep3DeleteInspection').hide();
+        }
     }
 };
 

@@ -327,13 +327,13 @@ var Login = function()
 			localStorage.setItem("first_name", data.first_name); 
 			localStorage.setItem("last_name", data.last_name); 
 			localStorage.setItem("email", data.email); 
-			localStorage.setItem("company_id", data.company_id); 
-			localStorage.setItem("company_name", data.company_name); 
-			localStorage.setItem("country", data.country); 
+			localStorage.setItem("company_id", data.company_id);
+			localStorage.setItem("company_name", data.company_name);
+			localStorage.setItem("country", data.country);
 			localStorage.setItem("initials", typeof data.initials == 'undefined'?'':data.initials);
 			localStorage.setItem("restricted", data.restricted);
 			localStorage.setItem("password", params["password"]);
-            
+            localStorage.setItem("user_type", data.user_type);
             if (remember_me == 1)
             {
                 localStorage.setItem("remember_me", 1);
@@ -403,5 +403,6 @@ var Login = function()
 		localStorage.setItem("country", "");	
         localStorage.setItem("email", ""); 
         localStorage.setItem("password", "");
+        localStorage.setItem("user_type", "");
 	}
 };
