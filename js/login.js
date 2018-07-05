@@ -304,13 +304,13 @@ var Login = function()
         var remember_me = $("#remember_me").val();
 		
 		// The form is valid.  Submit a login request.
-		//blockElement("body");
+		blockElement("body");
 		if (typeof document.activeElement != 'undefined')
 			document.activeElement.blur();
 		$.post(objApp.apiURL + "account/do_login", params, function(data)
 		{
 	
-			//unblockElement("body");
+			unblockElement("body");
 			if(data.status != "OK")
 			{                    
 				// Login was not successful.
