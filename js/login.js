@@ -333,7 +333,7 @@ var Login = function()
 			localStorage.setItem("initials", typeof data.initials == 'undefined'?'':data.initials);
 			localStorage.setItem("restricted", data.restricted);
 			localStorage.setItem("password", params["password"]);
-            localStorage.setItem("user_type", data.user_type);
+            localStorage.setItem("user_type", typeof data.initials == 'undefined'?'general':data.user_type);
             if (remember_me == 1)
             {
                 localStorage.setItem("remember_me", 1);
