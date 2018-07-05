@@ -307,12 +307,10 @@ var Login = function()
 		//blockElement("body");
 		if (typeof document.activeElement != 'undefined')
 			document.activeElement.blur();
-        alert(objApp.apiURL + "account/do_login");
 		$.post(objApp.apiURL + "account/do_login", params, function(data)
 		{
 	
 			//unblockElement("body");
-            alert(data.status);
 			if(data.status != "OK")
 			{                    
 				// Login was not successful.

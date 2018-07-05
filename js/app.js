@@ -17,8 +17,8 @@ function App()
 {
 	var self = this;	// Create a reference to the object itself
 	//this.apiURL = "http://localhost/nycran/blueprintapi/";
-	this.apiURL = "http://qa.simb.com.au/blueprint/api/";
-    //this.apiURL = "http://blueprint.simb.com.au/api/";
+	//this.apiURL = "http://qa.simb.com.au/blueprint/api/";
+    this.apiURL = "http://blueprint.simb.com.au/api/";
 	//this.apiURL = "http://blue.print/BlueprintAPI/";
 	//this.apiURL = "http://projects.loc/blueprintapi/";
     //this.apiURL = "http://192.168.0.52/blueprint/api/";
