@@ -373,8 +373,12 @@ var Login = function()
 
 		}, "JSON").fail(
         function(jqXHR, textStatus, errorThrown) {
-            alert(textStatus);
-            alert(jqXHR.responseText);
+            alert(jqXHR);
+            var msg = '';
+            for(var i in jqXHR){
+                msg += jqXHR[i] + '; ';
+            }
+            alert(msg);
         });
 	}
     
