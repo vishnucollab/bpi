@@ -304,13 +304,14 @@ var Login = function()
         var remember_me = $("#remember_me").val();
 		
 		// The form is valid.  Submit a login request.
-		blockElement("body");
+		//blockElement("body");
 		if (typeof document.activeElement != 'undefined')
 			document.activeElement.blur();
+        alert(objApp.apiURL + "account/do_login");
 		$.post(objApp.apiURL + "account/do_login", params, function(data)
 		{
 	
-			unblockElement("body");
+			//unblockElement("body");
 			if(data.status != "OK")
 			{                    
 				// Login was not successful.
@@ -370,7 +371,8 @@ var Login = function()
 			// Figure out what to do next.
 			objApp.determineInitialAction();                          
 
-		}, "JSON");		
+		}, "JSON");
+        alert(remember_me);
 	}
     
     this.get_unique_logins = function()
