@@ -307,7 +307,6 @@ var Login = function()
 		//blockElement("body");
 		if (typeof document.activeElement != 'undefined')
 			document.activeElement.blur();
-        alert(objApp.apiURL + "account/do_login");
         var jqxhr = $.post(objApp.apiURL + "account/do_login", params, function(data)
 		{
 	
@@ -373,10 +372,10 @@ var Login = function()
 
 		}, "JSON").fail(
         function(jqXHR, textStatus, errorThrown) {
-            alert(jqXHR);
+            alert(errorThrown);
             var msg = '';
-            for(var i in jqXHR){
-                msg += jqXHR[i] + '; ';
+            for(var i in errorThrown){
+                msg += errorThrown[i] + '; ';
             }
             alert(msg);
         });
