@@ -371,14 +371,11 @@ var Login = function()
 			// Figure out what to do next.
 			objApp.determineInitialAction();                          
 
-		}, "JSON").done(function() {
-            alert( "second success" );
-        }).fail(function() {
-            alert( "error" );
-        }).always(function() {
-            alert( "finished" );
+		}, "JSON").fail(
+        function(jqXHR, textStatus, errorThrown) {
+            alert(textStatus);
+            alert(jqXHR.responseText);
         });
-        alert(jqxhr);
 	}
     
     this.get_unique_logins = function()
