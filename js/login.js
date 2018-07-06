@@ -308,7 +308,7 @@ var Login = function()
 		if (typeof document.activeElement != 'undefined')
 			document.activeElement.blur();
         alert(objApp.apiURL + "account/do_login");
-		$.post(objApp.apiURL + "account/do_login", params, function(data)
+        var jqxhr = $.post(objApp.apiURL + "account/do_login", params, function(data)
 		{
 	
 			//unblockElement("body");
@@ -371,8 +371,14 @@ var Login = function()
 			// Figure out what to do next.
 			objApp.determineInitialAction();                          
 
-		}, "JSON");
-        alert(remember_me);
+		}, "JSON").done(function() {
+            alert( "second success" );
+        }).fail(function() {
+            alert( "error" );
+        }).always(function() {
+            alert( "finished" );
+        });
+        alert(jqxhr);
 	}
     
     this.get_unique_logins = function()
