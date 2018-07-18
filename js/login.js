@@ -304,7 +304,7 @@ var Login = function()
         var remember_me = $("#remember_me").val();
 		
 		// The form is valid.  Submit a login request.
-		//blockElement("body");
+		blockElement("body");
 		if (typeof document.activeElement != 'undefined')
 			document.activeElement.blur();
         var jqxhr = $.post(objApp.apiURL + "account/do_login", params, function(data)
