@@ -372,10 +372,11 @@ var Login = function()
 
 		}, "JSON").fail(
             function(jqXHR, textStatus, errorThrown) {
-                alert(errorThrown);
+                alert(textStatus);
+                alert(jqXHR);
                 var msg = '';
-                for(var i in errorThrown){
-                    msg += errorThrown[i] + '; ';
+                for(var i in jqXHR){
+                    msg += jqXHR[i] + '; ';
                 }
                 alert(msg);
             });
