@@ -304,7 +304,7 @@ var Login = function()
         var remember_me = $("#remember_me").val();
 		
 		// The form is valid.  Submit a login request.
-		blockElement("body");
+		//blockElement("body");
 		if (typeof document.activeElement != 'undefined')
 			document.activeElement.blur();
         var jqxhr = $.post(objApp.apiURL + "account/do_login", params, function(data)
@@ -370,7 +370,15 @@ var Login = function()
 			// Figure out what to do next.
 			objApp.determineInitialAction();                          
 
-		}, "JSON")
+		}, "JSON").fail(
+            function(jqXHR, textStatus, errorThrown) {
+                alert(errorThrown);
+                var msg = '';
+                for(var i in errorThrown){
+                    msg += errorThrown[i] + '; ';
+                }
+                alert(msg);
+            });
 	}
     
     this.get_unique_logins = function()
