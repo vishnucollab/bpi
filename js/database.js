@@ -32,6 +32,7 @@ function DBUtils()
 	this.tables.push(new Array('app_tables', 1.0));
     this.tables.push(new Array('address_book', 1.0));
 	this.tables.push(new Array('builders', 1.0));
+    this.tables.push(new Array('builders_supervisors', 1.0));
 	this.tables.push(new Array('resources', 1.0));
 	this.tables.push(new Array('inspections', 1.2));
 	this.tables.push(new Array('reinspections', 1.2));
@@ -694,7 +695,21 @@ function DBUtils()
 			if(callback_method != null)
 				callback_method();
 		}
-	}			   
+	}
+
+	this.emptyTable  = function(table_name, callback_method)
+    {
+        sql = "DELETE FROM " + table_name;
+        this.db.transaction(function(transaction)
+        {
+            transaction.executeSql(sql, null, function(transaction, result)
+            {
+                if(callback_method != null)
+                    callback_method();
+
+            }, self.DB_error_handler);
+        });
+    }
 	
 	/*********************** DROP METHODS ************************/
 	/************************************** **********************/
@@ -1018,6 +1033,56 @@ function DBUtils()
 			}, self.DB_error_handler);
 		});    
 	}
+
+    /**********************************************
+     * Builders Supervisors
+     */
+    this.createBuilders_supervisors = function(table_number)
+    {
+        if(this.DB_DEBUG)
+            alert("CREATE BUILDERS SUPERVISORS");
+
+        var table_name = this.tables[table_number][0];
+        var table_version = this.tables[table_number][1];
+
+        var sql = "CREATE TABLE IF NOT EXISTS builders_supervisors  (" +
+            "'id' VARCHAR PRIMARY KEY NOT NULL, " +
+            "'builder_id' VARCHAR NOT NULL, " +
+            "'supervisor_id' VARCHAR NOT NULL, " +
+            "'is_primary' INTEGER NOT NULL DEFAULT 0 , " +
+            "'dirty' INTEGER NOT NULL DEFAULT 1)";
+
+        this.db.transaction(function(transaction)
+        {
+            transaction.executeSql(sql, null, function (transaction, result)
+            {
+                // Create indexes
+
+                // builder_id index
+                sql = "CREATE INDEX IF NOT EXISTS " + table_name + "_builder_id ON " + table_name + " (builder_id);";
+                self.execute(sql, null, null);
+
+                // Dirty index
+                sql = "CREATE INDEX IF NOT EXISTS " + table_name + "_dirty ON " + table_name + " (dirty);";
+                self.execute(sql, null, null);
+
+                // supervisor_id index
+                sql = "CREATE INDEX IF NOT EXISTS " + table_name + "_supervisor_id ON " + table_name + " (supervisor_id);";
+                self.execute(sql, null, null);
+
+                // INSERT THE REGISTRY ENTRY
+                sql = "INSERT INTO app_tables (table_name, version) VALUES(?, ?);";
+                transaction.executeSql(sql, [table_name, table_version], function (transaction, result)
+                {
+                    if(this.DB_DEBUG)
+                        alert("INSERTED REGISTRY");
+
+                    self.checkNextTable(table_number);
+
+                }, self.DB_error_handler);
+            }, self.DB_error_handler);
+        });
+    }
 	
 	/**********************************************
 	* SITES
@@ -1169,6 +1234,7 @@ function DBUtils()
 				"'id' VARCHAR PRIMARY KEY NOT NULL, " +
 				"'report_type' VARCHAR NOT NULL, " +
 				"'builder_id' VARCHAR NOT NULL, " +
+                "'supervisor_id' VARCHAR NULL, " +
 				"'weather' VARCHAR, " +	
 				"'lot_no' VARCHAR, " +	
 				"'address' VARCHAR, " +	
@@ -1193,7 +1259,7 @@ function DBUtils()
                 "'min_ridge_tiles' SMALLINT(6) DEFAULT 0, " +
                 "'touch_up_paint' SMALLINT(6) DEFAULT 0, " +
                 "'min_flooring_tiles' SMALLINT(6) DEFAULT 0, " +
-				"'practical_completed' SMALLINT(6) DEFAULT 0, " +
+                "'practical_completed' SMALLINT(6) DEFAULT 0, " +
                 "'grout_samples' SMALLINT(6) DEFAULT 0, " +
                 "'barrel_code' TEXT DEFAULT NULL, " +
 				"'certificated' SMALLINT(6) DEFAULT 0, " +
@@ -1264,7 +1330,7 @@ function DBUtils()
                 "'min_ridge_tiles' SMALLINT(6) DEFAULT 0, " +
                 "'touch_up_paint' SMALLINT(6) DEFAULT 0, " +
                 "'min_flooring_tiles' SMALLINT(6) DEFAULT 0, " +
-				"'practical_completed' SMALLINT(6) DEFAULT 0, " +
+                "'practical_completed' SMALLINT(6) DEFAULT 0, " +
                 "'grout_samples' SMALLINT(6) DEFAULT 0, " +
                 "'barrel_code' TEXT DEFAULT NULL, " +
                 "'created_by' INTEGER NOT NULL DEFAULT 48, " + 

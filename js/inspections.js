@@ -80,6 +80,7 @@ var Inspections = function()
         // Ensure all keys are cleared
         objApp.clearKeys();
         this.inspection = false;
+        self.user_type = localStorage.getItem("user_type");
         
         objDBUtils.orderBy = "name";
         $("#inspectionList .bottomBtns").find("a").removeClass("active");
@@ -439,7 +440,6 @@ var Inspections = function()
                         alert("Sorry, the inspection could not be loaded.  Please report this error.");
                         return;
                     }
-
                     objApp.objInspection.editInspection(row);	
                     
                 }, inspection_id);
@@ -922,6 +922,9 @@ var Inspections = function()
                 $('#practical_completed_selector').prop('disabled', false);
             }
         }, inspection_id);
+
+		
+		
     }
 
     this.showStep4 = function()
@@ -1370,6 +1373,7 @@ var Inspections = function()
 
 		// Check to see if the user is restricted
 		self.restricted = localStorage.getItem("restricted");
+        self.user_type = localStorage.getItem("user_type");
 
 		self.checkCanDelete();
 
@@ -1494,11 +1498,12 @@ var Inspections = function()
 
 		self.handleYesNoButtons(inspection);
         $("#barrel_code").val(inspection.barrel_code);
+		
 		// Show the inspection screen.
 		$("#inspection").removeClass("hidden");
 
 		// Bind events to UI objects
-        console.log("BIND 4")
+        console.log("BIND 4");
 		this.unbindEvents();
 
 		// Setup client and site popselectors
@@ -1506,8 +1511,8 @@ var Inspections = function()
 
 		// Load the defect items for this inspection
 		self.loadInspectionItems();
-
         self.updateInspectionPhotoCount(inspection.id);
+        self.applyPermission();
 
 		// Show the Add Defect button.
 		$("#btnAddDefect").removeClass("hidden");
@@ -1610,6 +1615,8 @@ var Inspections = function()
         $('#frmInspectionDetails #state').bind('change', objApp.objInspection.handleStateChanged);
         $('#frmInspectionDetails #state').val(objApp.keys.state);
         $('#frmInspectionDetails #state').trigger('change');
+
+        $("#frmInspectionDetails #supervisor_id").bind('change', function(){self.checkSaveInspection(false)});
 	}
 
     this.loadAddressBookList = function(callback)
@@ -1682,6 +1689,37 @@ var Inspections = function()
 	*/
 	this.handleBuilderChanged = function()
 	{
+	    var builder_id = $('#frmInspectionDetails #builder_id').val();
+        if (builder_id){
+            var sql = "SELECT users.id, users.first_name, users.last_name " +
+                "FROM users INNER JOIN builders_supervisors ON builders_supervisors.supervisor_id = users.id " +
+                "WHERE builders_supervisors.builder_id = ? AND users.deleted = 0";
+
+            $('#frmInspectionDetails #supervisor_id').empty();
+            $('#frmInspectionDetails #supervisor_id').append('<option value="">Choose</option>');
+
+            objDBUtils.loadRecordsSQL(sql, [builder_id], function(param, items)
+            {
+                if(items)
+                {
+                    var maxLength = items.rows.length;
+                    for (var r = 0; r < maxLength; r++)
+                    {
+                        var item = items.rows.item(r);
+                        $('#frmInspectionDetails #supervisor_id').
+                            append($("<option></option>").
+                            attr("value", item.id).
+                            text(item.first_name + ' ' + item.last_name));
+                    }
+                    if ($('#frmInspectionDetails #supervisor_id').hasClass('select2-hidden-accessible'))
+                        $('#frmInspectionDetails #supervisor_id').select2('destroy');
+                    $('#frmInspectionDetails #supervisor_id').select2({dropdownParent: $("#inspection")});
+                }
+            }, "");
+            $('.supervisor_container').show();
+        }else{
+            $('.supervisor_container').hide();
+        }
 		// Save the inspection if possible
 		self.checkSaveInspection();
 	}
@@ -1951,6 +1989,7 @@ var Inspections = function()
                             return;
                         }
                         removeChartFromQueue(inspection_id);
+						
                         alert("The inspection was sent successfully");
 
                         // Hide the reveal window.
@@ -2087,8 +2126,7 @@ var Inspections = function()
             self.setDefaultNotes();
         });
 
-        $(".report_type_options").change(function() {
-                        
+        $(".report_type_options").change(function() {     
             selected_report_type = $(this).val();
             $("#inspection #report_type").val(selected_report_type);  
             if (selected_report_type == 'Client: PCI/Final inspections'){
@@ -2420,6 +2458,8 @@ var Inspections = function()
             }
 
             self.checkSaveInspection(0);
+
+			
             self.showStep2();
 			return false;
 		});
@@ -3147,6 +3187,7 @@ var Inspections = function()
             else {
                 self.checkSaveInspection();
             }
+			
             e.preventDefault();
             // Also ensure we have a valid inspection ID
             var inspection_id = objApp.getKey("inspection_id");

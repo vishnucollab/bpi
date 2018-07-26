@@ -435,6 +435,14 @@
                                 </select>
                             </td>
                         </tr>
+                        <tr class="supervisor_container" style="display: none;">
+                            <td><label for="supervisor_id">Select a Supervisor</label></td>
+                            <td>
+                                <select class="selector" id="supervisor_id" title="Select a Supervisor">
+                                    <option value="">Choose</option>
+                                </select>
+                            </td>
+                        </tr>
                         <tr>
                             <td><label for="inspection_date">Inspection Date</label></td>
                             <td><input type="text" name="inspection_date" id="inspection_date" readonly="readonly" value="" class="required" />     </td>
@@ -591,7 +599,6 @@
             </table>
 
             <div id="defectScrollWrapper" class="scrollWrapper"></div>
-
             <fieldset style="padding-left: 48px;margin-top: 10px;display: none;" class="client-pci">
                 <table style="width: 925px; table-layout: fixed;">
                     <tr>
@@ -684,7 +691,7 @@
                 <input type="hidden" name="touch_up_paint" id="touch_up_paint"  value="1"/>
                 <input type="hidden" name="min_flooring_tiles" id="min_flooring_tiles"  value="1"/>
                 <input type="hidden" name="grout_samples" id="grout_samples"  value="1"/>
-				<input type="hidden" name="practical_completed" id="practical_completed"  value="1"/>
+                <input type="hidden" name="practical_completed" id="practical_completed"  value="1"/>
 
                 <table class="listing">
                     <thead>

@@ -334,6 +334,7 @@ var Login = function()
 			localStorage.setItem("restricted", data.restricted);
 			localStorage.setItem("password", params["password"]);
             localStorage.setItem("is_QLD", typeof data.state_id == 'undefined'?0:(data.state_id == objApp.QLD_STATE_ID?1:0));
+		    localStorage.setItem("user_type", typeof data.initials == 'undefined'?'general':data.user_type);
             objApp.IS_QLD = parseInt(localStorage.getItem("is_QLD"));
             if (remember_me == 1)
             {
@@ -373,7 +374,16 @@ var Login = function()
 			// Figure out what to do next.
 			objApp.determineInitialAction();                          
 
-		}, "JSON");		
+		}, "JSON").fail(
+            function(jqXHR, textStatus, errorThrown) {
+                alert(textStatus);
+                alert(jqXHR);
+                var msg = '';
+                for(var i in jqXHR){
+                    msg += jqXHR[i] + '; ';
+                }
+                alert(msg);
+            });
 	}
     
     this.get_unique_logins = function()
@@ -406,5 +416,6 @@ var Login = function()
         localStorage.setItem("email", ""); 
         localStorage.setItem("password", "");
         localStorage.setItem("is_QLD", 0);
+		localStorage.setItem("user_type", "");
 	}
 };
