@@ -307,11 +307,10 @@ var Login = function()
 		blockElement("body");
 		if (typeof document.activeElement != 'undefined')
 			document.activeElement.blur();
-		$.post(objApp.apiURL + "account/do_login", params, function(data)
+        var jqxhr = $.post(objApp.apiURL + "account/do_login", params, function(data)
 		{
 	
 			unblockElement("body");
-			
 			if(data.status != "OK")
 			{                    
 				// Login was not successful.
@@ -327,24 +326,13 @@ var Login = function()
 			localStorage.setItem("first_name", data.first_name); 
 			localStorage.setItem("last_name", data.last_name); 
 			localStorage.setItem("email", data.email); 
-			localStorage.setItem("company_id", data.company_id); 
-			localStorage.setItem("company_name", data.company_name); 
-			localStorage.setItem("country", data.country); 
+			localStorage.setItem("company_id", data.company_id);
+			localStorage.setItem("company_name", data.company_name);
+			localStorage.setItem("country", data.country);
 			localStorage.setItem("initials", typeof data.initials == 'undefined'?'':data.initials);
 			localStorage.setItem("restricted", data.restricted);
 			localStorage.setItem("password", params["password"]);
-            if (typeof data.state_id != 'undefined' && data.state_id != null && data.state_id != 'null'){
-                objApp.IS_STATE_FILTERED = 1;
-                objApp.FILTERED_STATE_ID = data.state_id;
-                objApp.FILTERED_STATE_CODE = objApp.STATE_CODES[data.state_id];
-            }else{
-                objApp.IS_STATE_FILTERED = 1;
-                objApp.FILTERED_STATE_ID = 1;
-                objApp.FILTERED_STATE_CODE = 'VIC';
-            }
-            localStorage.setItem("filtered_state_id", objApp.FILTERED_STATE_ID);
-            localStorage.setItem("filtered_state_code", objApp.FILTERED_STATE_CODE);
-            localStorage.setItem("is_state_filtered", objApp.IS_STATE_FILTERED);
+            localStorage.setItem("user_type", typeof data.initials == 'undefined'?'general':data.user_type);
             if (remember_me == 1)
             {
                 localStorage.setItem("remember_me", 1);
@@ -378,12 +366,20 @@ var Login = function()
                 
 			// Hide the login screen.
 			$(".home").addClass("hidden");
-
-            objApp.determineStates();
+			
 			// Figure out what to do next.
 			objApp.determineInitialAction();                          
 
-		}, "JSON");		
+		}, "JSON").fail(
+            function(jqXHR, textStatus, errorThrown) {
+                alert(textStatus);
+                alert(jqXHR);
+                var msg = '';
+                for(var i in jqXHR){
+                    msg += jqXHR[i] + '; ';
+                }
+                alert(msg);
+            });
 	}
     
     this.get_unique_logins = function()
@@ -415,8 +411,6 @@ var Login = function()
 		localStorage.setItem("country", "");	
         localStorage.setItem("email", ""); 
         localStorage.setItem("password", "");
-        localStorage.setItem("is_state_filtered", 0);
-        localStorage.setItem("filtered_state_id", 1);
-        localStorage.setItem("filtered_state_code", 'VIC');
+        localStorage.setItem("user_type", "");
 	}
 };

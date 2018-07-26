@@ -974,7 +974,7 @@ input[type="text"], input[type="password"], input[type="email"], input[type="num
     border-radius: 0px;
     font-size: 21px;
     margin: 5px 0 10px;
-    padding: 15px;
+    padding: 10px 15px;
     width: 390px;
     color: #5c5756;
 }
@@ -1824,7 +1824,7 @@ ul.historygallery{
 {
     margin: 5px 0;
     width: 380px;
-    height: 56px;
+    height: 46px;
     font-size: 21px;
     color: #5c5756;
 }

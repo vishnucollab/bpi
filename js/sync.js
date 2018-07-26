@@ -275,6 +275,8 @@ function Sync()
         self.syncingCounter++;
         self.syncingTotalRequest++;
 
+        if (tableName == 'builders_supervisors')
+            objDBUtils.emptyTable('builders_supervisors');
         if(!self.silentMode) $("#accountMessage #general").text("Processing: " + (self.syncingTotalRequest - self.syncingCounter) + '/' + self.syncingTotalRequest);
         if(!self.silentMode) blockElement("body");
         $.post(objApp.apiURL + 'account/get_data_table/' + tableName +'/' + refreshSync, parameters , function(data)
@@ -700,6 +702,10 @@ function Sync()
         self.saveData.push('0'); /* dirty = 0 */
 		sql += header + ", dirty) " + footer + ", ?);";
 
+		if (tableName == 'builders_supervisors'){
+		    console.log(sql);
+            console.log(self.saveData);
+        }
 		
 		return sql;		
 	};	
