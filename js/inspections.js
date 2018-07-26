@@ -79,7 +79,7 @@ var Inspections = function()
         
         // Ensure all keys are cleared
         objApp.clearKeys();
-        this.inspection = false;
+        self.inspection = false;
         self.user_type = localStorage.getItem("user_type");
         
         objDBUtils.orderBy = "name";
@@ -321,8 +321,11 @@ var Inspections = function()
                     html += '<a href="#" data-reveal-id="historyReinspection" class="action view showhistory" data-id="' + row.id + '">History</a>';
                 }
 
-                html += '<a href="#" class="action delete" data-id="' + row.id + '">Delete</a>';
+                if (self.user_type == 'admin'){
+                    html += '<a href="#" class="action delete" data-id="' + row.id + '">Delete</a>';
+                }
                 
+		
                 // If the inspection is finalised but failed, the user may reinspect it.
                 /*
                 if((row.finalised == 1) && (row.failed == 1)) {
@@ -410,7 +413,6 @@ var Inspections = function()
                         alert("Sorry, the inspection could not be loaded.  Please report this error.");
                         return;
                     }
-
                     objApp.objInspection.editInspection(row);
 
                 }, inspection_id);
@@ -924,7 +926,6 @@ var Inspections = function()
         }, inspection_id);
 
 		
-		
     }
 
     this.showStep4 = function()
@@ -952,6 +953,7 @@ var Inspections = function()
                     alert("Couldn't load the reinspection record!");
                     return;
                 }
+				
 				self.handleYesNoButtons(reinspection);
                 $("#barrel_code").val(reinspection.barrel_code);
             }, "");
@@ -1248,6 +1250,7 @@ var Inspections = function()
         $('#practical_completed_selector').val(0);
         $('#practical_completed_selector').trigger('change');
         $('#practical_completed_selector').prop('disabled', false);
+			
         // Hide the camera button until the inspection is created.
         $(".inspectionDetails #btnCapturePhoto").hide();
 
@@ -2357,7 +2360,6 @@ var Inspections = function()
                             if (!use_image)
                                 alert('No captured image');
                         }
-
 						*/
                     }
                     else
@@ -2459,7 +2461,6 @@ var Inspections = function()
 
             self.checkSaveInspection(0);
 
-			
             self.showStep2();
 			return false;
 		});
@@ -4039,7 +4040,7 @@ var Inspections = function()
                                             delete_node = "";
                                         }
 
-				    					html += '<li>' + delete_node + '<a rel="' + row.id + '"><img width="90" height="60" src="data:image/jpeg;base64,' + evt.target.result + '" /></a><div class="imageNotes">' + row.notes + '</div></li>';
+				    					html += '<li>' + delete_node + '<a rel="' + row.id + '"><img width="90" height="60" src="data:image/jpeg;base64,' + (evt.target && evt.target.result?evt.target.result:row.photodata_tmb) + '" /></a><div class="imageNotes">' + row.notes + '</div></li>';
 						    			num_items++;
 
 										r++;
@@ -4705,7 +4706,6 @@ var Inspections = function()
                                 alert("Couldn't load the inspection record!");
                                 return;
                             }
-
                             self.editInspection(inspection);
                         }, "");
                     }
@@ -5791,8 +5791,6 @@ var Inspections = function()
 
                 current_inspection_id = objApp.keys.inspection_id;
                 
-
-
 				html += '</table>';
 
 				$("#defectScrollWrapper").html(html);
@@ -7341,7 +7339,6 @@ var Inspections = function()
         }
     }
 	
-	
 	this.handleYesNoButtons = function(obj) {
         if(obj.min_roof_tiles == 1) {
             $("#btnMinRoofTilesYes").removeClass("yesno_disabled").addClass("yesno_enabled");
@@ -7585,6 +7582,14 @@ var Inspections = function()
             $("#practical_completed").val("0");
             return false;
         });
+    }
+
+    this.applyPermission = function(){
+        if (self.user_type == 'admin'){
+            $('#btnStep3DeleteInspection').show();
+        }else{
+            $('#btnStep3DeleteInspection').hide();
+        }
     }
 };
 

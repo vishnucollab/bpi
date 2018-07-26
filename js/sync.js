@@ -274,7 +274,6 @@ function Sync()
 
         if (tableName == 'builders_supervisors')
             objDBUtils.emptyTable('builders_supervisors');
-		
         if(!self.silentMode) $("#accountMessage #general").text("Processing: " + (self.syncingTotalRequest - self.syncingCounter) + '/' + self.syncingTotalRequest);
         if(!self.silentMode) blockElement("body");
         $.post(objApp.apiURL + 'account/get_data_table/' + tableName +'/' + refreshSync, parameters , function(data)
@@ -540,6 +539,7 @@ function Sync()
         return data.replace(/â€™/g,"'").replace(/â€˜/g,"'");
     }
 
+
 	this.sendData = function()
 	{
 		// Setup the request data.
@@ -703,6 +703,7 @@ function Sync()
 		    console.log(sql);
             console.log(self.saveData);
         }
+		
 		return sql;		
 	};	
 	
@@ -718,6 +719,7 @@ function Sync()
 
 			// Set all dirty records as not dirty
 			var sql = "UPDATE " + tableName + " SET dirty = 0 WHERE dirty = 1";
+			
 			if(tableName == "inspections")
 			{
 				// For the inspections table, only set dirty to 0 when the inspection has been finalised.
