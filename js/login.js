@@ -307,11 +307,10 @@ var Login = function()
 		blockElement("body");
 		if (typeof document.activeElement != 'undefined')
 			document.activeElement.blur();
-		$.post(objApp.apiURL + "account/do_login", params, function(data)
+        var jqxhr = $.post(objApp.apiURL + "account/do_login", params, function(data)
 		{
 	
 			unblockElement("body");
-			
 			if(data.status != "OK")
 			{                    
 				// Login was not successful.
@@ -333,7 +332,7 @@ var Login = function()
 			localStorage.setItem("initials", typeof data.initials == 'undefined'?'':data.initials);
 			localStorage.setItem("restricted", data.restricted);
 			localStorage.setItem("password", params["password"]);
-            localStorage.setItem("user_type", data.user_type);
+            localStorage.setItem("user_type", typeof data.initials == 'undefined'?'general':data.user_type);
             if (remember_me == 1)
             {
                 localStorage.setItem("remember_me", 1);
@@ -371,7 +370,16 @@ var Login = function()
 			// Figure out what to do next.
 			objApp.determineInitialAction();                          
 
-		}, "JSON");		
+		}, "JSON").fail(
+            function(jqXHR, textStatus, errorThrown) {
+                alert(textStatus);
+                alert(jqXHR);
+                var msg = '';
+                for(var i in jqXHR){
+                    msg += jqXHR[i] + '; ';
+                }
+                alert(msg);
+            });
 	}
     
     this.get_unique_logins = function()

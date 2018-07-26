@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <widget xmlns = "http://www.w3.org/ns/widgets"
         xmlns:gap = "http://phonegap.com/ns/1.0"
-        id = "com.simb.Blueprint"
+        id = "net.wearebuilding.bpi-api"
         version = "2.0.12">
-    <name>Blueprint</name>
+    <name>Blueprint Test</name>
 
     <description>
-        Conduct onsite buidling inspections with Blueprint and produce beautiful reports that your clients will love.
+        This is using for testing Blueprint iPad app.
     </description>
 
-    <author href="http://www.simb.com.au" email="andy@simb.com.au">
+    <author href="http://www.simb.com.au" email="dev3@simb.com.au">
         SIMB Digital Developers
     </author>
 
