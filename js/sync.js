@@ -733,7 +733,7 @@ function Sync()
 
 			// Remove deleted records from local storage.  However, dont delete deleted contactfavourite records
             // as the deleted flag in this table simply means that the contact is not infact a favourite of this user.
-            if(tableName != "contactsfavourites") {
+            if(tableName != "contactsfavourites" && tableName != "builders_supervisors") {
 			    var sql = "DELETE FROM " + tableName + " WHERE deleted = 1;";
 			    objDBUtils.execute(sql, null, null);			
             }
