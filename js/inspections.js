@@ -1341,6 +1341,7 @@ var Inspections = function()
         objApp.keys.report_type = inspection.report_type;
         objApp.keys.builder_id = inspection.builder_id;
         objApp.keys.state = inspection.state;
+        objApp.keys.supervisor_id = inspection.supervisor_id;
 
 		self.inAudit = false;
 		self.lastKeyPress = null;
@@ -1690,6 +1691,8 @@ var Inspections = function()
                             attr("value", item.id).
                             text(item.first_name + ' ' + item.last_name));
                     }
+                    if(objApp.keys.supervisor_id != "")
+                        $('#frmInspectionDetails #supervisor_id').val(objApp.keys.supervisor_id);
                     if ($('#frmInspectionDetails #supervisor_id').hasClass('select2-hidden-accessible'))
                         $('#frmInspectionDetails #supervisor_id').select2('destroy');
                     $('#frmInspectionDetails #supervisor_id').select2({dropdownParent: $("#inspection")});
