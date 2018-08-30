@@ -1336,6 +1336,7 @@ var Inspections = function()
     */
 	this.editInspection = function(inspection)
 	{
+	    console.log(inspection);
         // Set keys
         objApp.keys.inspection_id = inspection.id;
         objApp.keys.report_type = inspection.report_type;
@@ -1592,6 +1593,14 @@ var Inspections = function()
             self.objPopBuilders.select2({dropdownParent: $("#inspection")});
 		}, 'option');
 
+        if(objApp.keys.builder_id != ""){
+            this.loadSupervisors(objApp.keys.builder_id);
+            $('.supervisor_container').show();
+        }else{
+            $('.supervisor_container').hide();
+        }
+
+
         $('#frmInspectionDetails #state').bind('change', objApp.objInspection.handleStateChanged);
         $('#frmInspectionDetails #state').val(objApp.keys.state);
         $('#frmInspectionDetails #state').trigger('change');
@@ -1663,6 +1672,37 @@ var Inspections = function()
         }, "");
     }
 
+    this.loadSupervisors = function(builder_id)
+    {
+        var sql = "SELECT users.id, users.first_name, users.last_name " +
+            "FROM users INNER JOIN builders_supervisors ON builders_supervisors.supervisor_id = users.id " +
+            "WHERE builders_supervisors.builder_id = ? AND users.deleted = 0";
+
+        $('#frmInspectionDetails #supervisor_id').empty();
+        $('#frmInspectionDetails #supervisor_id').append('<option value="">Choose</option>');
+
+        objDBUtils.loadRecordsSQL(sql, [builder_id], function(param, items)
+        {
+            if(items)
+            {
+                var maxLength = items.rows.length;
+                for (var r = 0; r < maxLength; r++)
+                {
+                    var item = items.rows.item(r);
+                    $('#frmInspectionDetails #supervisor_id').
+                    append($("<option></option>").
+                    attr("value", item.id).
+                    text(item.first_name + ' ' + item.last_name));
+                }
+                if(objApp.keys.supervisor_id != "")
+                    $('#frmInspectionDetails #supervisor_id').val(objApp.keys.supervisor_id);
+                if ($('#frmInspectionDetails #supervisor_id').hasClass('select2-hidden-accessible'))
+                    $('#frmInspectionDetails #supervisor_id').select2('destroy');
+                $('#frmInspectionDetails #supervisor_id').select2({dropdownParent: $("#inspection")});
+            }
+        }, "");
+    }
+
 	/***
 	* handleBuilderChanged is called when the user changes the selected
 	* builder.
@@ -1671,33 +1711,7 @@ var Inspections = function()
 	{
 	    var builder_id = $('#frmInspectionDetails #builder_id').val();
         if (builder_id){
-            var sql = "SELECT users.id, users.first_name, users.last_name " +
-                "FROM users INNER JOIN builders_supervisors ON builders_supervisors.supervisor_id = users.id " +
-                "WHERE builders_supervisors.builder_id = ? AND users.deleted = 0";
-
-            $('#frmInspectionDetails #supervisor_id').empty();
-            $('#frmInspectionDetails #supervisor_id').append('<option value="">Choose</option>');
-
-            objDBUtils.loadRecordsSQL(sql, [builder_id], function(param, items)
-            {
-                if(items)
-                {
-                    var maxLength = items.rows.length;
-                    for (var r = 0; r < maxLength; r++)
-                    {
-                        var item = items.rows.item(r);
-                        $('#frmInspectionDetails #supervisor_id').
-                            append($("<option></option>").
-                            attr("value", item.id).
-                            text(item.first_name + ' ' + item.last_name));
-                    }
-                    if(objApp.keys.supervisor_id != "")
-                        $('#frmInspectionDetails #supervisor_id').val(objApp.keys.supervisor_id);
-                    if ($('#frmInspectionDetails #supervisor_id').hasClass('select2-hidden-accessible'))
-                        $('#frmInspectionDetails #supervisor_id').select2('destroy');
-                    $('#frmInspectionDetails #supervisor_id').select2({dropdownParent: $("#inspection")});
-                }
-            }, "");
+            this.loadSupervisors(builder_id);
             $('.supervisor_container').show();
         }else{
             $('.supervisor_container').hide();
