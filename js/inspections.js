@@ -7364,12 +7364,12 @@ var Inspections = function()
             $('#btnUncertificatedRe').addClass('hidden');
             $('#btnCertificatedRe').removeClass('hidden');
             $('#frmReinspection #certificated').val(1);
-            objApp.objInspection.checkUpdateInspection();
+            objDBUtils.execute("UPDATE reinspections SET weather = ?, dirty = 1 WHERE id = ?",[1, objApp.keys.reinspection_id], null);
         }else{
             $('#btnCertificatedRe').addClass('hidden');
             $('#btnUncertificatedRe').removeClass('hidden');
             $('#frmReinspection #certificated').val(0);
-            objApp.objInspection.checkUpdateInspection();
+            objDBUtils.execute("UPDATE reinspections SET weather = ?, dirty = 1 WHERE id = ?",[0, objApp.keys.reinspection_id], null);
         }
     }
 
