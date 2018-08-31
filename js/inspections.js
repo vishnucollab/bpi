@@ -7364,12 +7364,12 @@ var Inspections = function()
             $('#btnUncertificatedRe').addClass('hidden');
             $('#btnCertificatedRe').removeClass('hidden');
             $('#certificatedre').val(1);
-            objApp.objInspection.checkSaveRateInspection();
+            objApp.objInspection.checkUpdateInspection();
         }else{
             $('#btnCertificatedRe').addClass('hidden');
             $('#btnUncertificatedRe').removeClass('hidden');
             $('#certificatedre').val(0);
-            objApp.objInspection.checkSaveRateInspection();
+            objApp.objInspection.checkUpdateInspection();
         }
     }
 
