@@ -224,7 +224,7 @@ aside
     background: url('../images/btn-red-bg-w81.png') bottom right;
     width: 81px;
     height: 48px;
-    font-size: 21px;
+    font-size: 18px;
     font-family: 'SourceSansPro-SemiBold', sans-serif;
     font-weight: normal;
     color: #fff;
@@ -1447,6 +1447,9 @@ aside textarea
         margin: 10px;
         height: 80px;
         position: relative;
+    }
+    #reinspection.inspectionDetails .bottomBtns .btnContainer:not(.w80){
+        width: 60px;
     }
         .inspectionDetails .bottomBtns .btnContainer span{
             font-size: 14px;

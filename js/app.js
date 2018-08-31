@@ -17,14 +17,14 @@ function App()
 {
 	var self = this;	// Create a reference to the object itself
 	//this.apiURL = "http://localhost/nycran/blueprintapi/";
-	//this.apiURL = "http://bpi-api.wearebuilding.net/";
-    this.apiURL = "http://blueprint.simb.com.au/api/";
+	this.apiURL = "http://bpi-api.wearebuilding.net/";
+    //this.apiURL = "http://blueprint.simb.com.au/api/";
 	//this.apiURL = "http://blue.print/BlueprintAPI/";
 	//this.apiURL = "http://projects.loc/blueprintapi/";
     //this.apiURL = "http://192.168.0.52/blueprint/api/";
 	this.phonegapBuild = true; 	// Set this to true when phonegap is the target
-	this.version = '2.0.13';				// Identifies the app version to the server
-    this.patch = '13';
+	this.version = '2.0.14';				// Identifies the app version to the server
+    this.patch = '14';
 	this.versionStatus = "Product";
 	this.localMode = false;
 	this.context = "";

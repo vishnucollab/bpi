@@ -530,10 +530,10 @@ var Inspections = function()
                 var reinspection_id = objDBUtils.makeInsertKey(objApp.sync_prefix);
                 var values = [reinspection_id, inspection_id, curdate, 1, 1,self.reinspectionNotes,
                 row.min_roof_tiles, row.min_ridge_tiles, row.touch_up_paint, row.min_flooring_tiles, row.grout_samples,
-                    row.practical_completed, row.barrel_code];
+                    row.practical_completed, row.barrel_code, row.certificated];
                 
                 sql = "INSERT INTO reinspections(id, inspection_id, reinspection_date, failed, most_recent,notes, " +
-                    "min_roof_tiles, min_ridge_tiles, touch_up_paint, min_flooring_tiles, grout_samples, practical_completed, barrel_code) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                    "min_roof_tiles, min_ridge_tiles, touch_up_paint, min_flooring_tiles, grout_samples, practical_completed, barrel_code, certificated ) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
                 objDBUtils.execute(sql, values, function(){
                     
@@ -920,10 +920,13 @@ var Inspections = function()
         objApp.setSubHeading("Materials to be left on site");
         
         //if((self.inspection.report_type == "Builder: PCI/Final inspections" && objApp.keys.reinspection_id != "") || self.inspection.report_type == "Fix / Plaster Inspection") {
+        console.log(self.inspection.report_type);
         if( (self.inspection.report_type == "Quality Inspection" || self.inspection.report_type == "Builder: PCI/Final inspections") && objApp.keys.reinspection_id != "") {
             objApp.setSubExtraHeading("Step 4 of 4", true);
+            $('#inspectionStep4 > .bottomBtns > .btnContainer.right > a#btnStep4Next').html('Done');
         } else {
             objApp.setSubExtraHeading("Step 4 of 5", true);
+            $('#inspectionStep4 > .bottomBtns > .btnContainer.right > a#btnStep4Next').html('Next');
         }
 
         objApp.clearMain();
@@ -954,7 +957,7 @@ var Inspections = function()
             $('#inspectionStep4 > .bottomBtns > .btnContainer.right > a#btnStep4Next').html('Next &rsaquo;&rsaquo;');
         }
         */
-        $('#inspectionStep4 > .bottomBtns > .btnContainer.right > a#btnStep4Next').html('Next');
+
         $("#inspectionStep4").removeClass("hidden");
 
         self.setTableWidths2('tblRateListingHeader', 'tblRateListing', 2, 500);
@@ -1336,7 +1339,6 @@ var Inspections = function()
     */
 	this.editInspection = function(inspection)
 	{
-	    console.log(inspection);
         // Set keys
         objApp.keys.inspection_id = inspection.id;
         objApp.keys.report_type = inspection.report_type;
@@ -1594,7 +1596,7 @@ var Inspections = function()
 		}, 'option');
 
         if(objApp.keys.builder_id != ""){
-            this.loadSupervisors(objApp.keys.builder_id);
+            self.loadSupervisors(objApp.keys.builder_id);
             $('.supervisor_container').show();
         }else{
             $('.supervisor_container').hide();
@@ -1711,7 +1713,7 @@ var Inspections = function()
 	{
 	    var builder_id = $('#frmInspectionDetails #builder_id').val();
         if (builder_id){
-            this.loadSupervisors(builder_id);
+            self.loadSupervisors(builder_id);
             $('.supervisor_container').show();
         }else{
             $('.supervisor_container').hide();
@@ -2633,7 +2635,10 @@ var Inspections = function()
         $(".inspectionDetails .gotoStep3").bind(objApp.touchEvent, function(e)
 		{
 			e.preventDefault();
-            self.showStep3();
+            if ($(this).attr('id') == 'btnStep4Back' && objApp.keys.reinspection_id)
+                self.loadReinspectionItems(objApp.keys.reinspection_id);
+            else
+                self.showStep3();
 			return false;
 		});
 
@@ -2761,6 +2766,22 @@ var Inspections = function()
         {
             e.preventDefault();
             self.handleCertificated();
+            return false;
+        });
+
+        $(".inspectionDetails #btnCertificatedRe").unbind(objApp.touchEvent);
+        $(".inspectionDetails #btnCertificatedRe").bind(objApp.touchEvent, function(e)
+        {
+            e.preventDefault();
+            self.handleCertificatedRe();
+            return false;
+        });
+
+        $(".inspectionDetails #btnUncertificatedRe").unbind(objApp.touchEvent);
+        $(".inspectionDetails #btnUncertificatedRe").bind(objApp.touchEvent, function(e)
+        {
+            e.preventDefault();
+            self.handleCertificatedRe();
             return false;
         });
 
@@ -6001,6 +6022,14 @@ var Inspections = function()
             self.reinspectionKey = reinspection_id;
             self.finalised = 0;
 
+            if (reinspection.certificated == 1){
+                $('#btnCertificatedRe').removeClass('hidden');
+                $('#btnUncertificatedRe').addClass('hidden');
+            }else{
+                $('#btnCertificatedRe').addClass('hidden');
+                $('#btnUncertificatedRe').removeClass('hidden');
+            }
+
             // We also need to load the inspection record
 
             objDBUtils.loadRecord("inspections", reinspection.inspection_id, function(param, inspection) {
@@ -7316,7 +7345,7 @@ var Inspections = function()
         return result;
     }
 
-    this.handleCertificated = function(inspection) {
+    this.handleCertificated = function() {
         if(confirm("Are you sure to make it certificated?")){
             $('#btnUncertificated').addClass('hidden');
             $('#btnCertificated').removeClass('hidden');
@@ -7326,6 +7355,20 @@ var Inspections = function()
             $('#btnCertificated').addClass('hidden');
             $('#btnUncertificated').removeClass('hidden');
             $('#certificated').val(0);
+            objApp.objInspection.checkSaveRateInspection();
+        }
+    }
+
+    this.handleCertificatedRe = function() {
+        if(confirm("Are you sure to make it certificated?")){
+            $('#btnUncertificatedRe').addClass('hidden');
+            $('#btnCertificatedRe').removeClass('hidden');
+            $('#certificatedre').val(1);
+            objApp.objInspection.checkSaveRateInspection();
+        }else{
+            $('#btnCertificatedRe').addClass('hidden');
+            $('#btnUncertificatedRe').removeClass('hidden');
+            $('#certificatedre').val(0);
             objApp.objInspection.checkSaveRateInspection();
         }
     }
