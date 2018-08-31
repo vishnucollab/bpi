@@ -5346,7 +5346,6 @@ var Inspections = function()
         $("#reinspection input#failed").removeClass("ignore");
         // $("#reinspection input#finalised").removeClass("ignore");
         $("#reinspection select#rectified").addClass("ignore");
-        alert("HERE");
 
 	    setTimeout(function()
 	    {
@@ -6022,6 +6021,7 @@ var Inspections = function()
             self.reinspectionKey = reinspection_id;
             self.finalised = 0;
 
+            $('#frmReinspection #certificated').val(reinspection.certificated?1:0);
             if (reinspection.certificated == 1){
                 $('#btnCertificatedRe').removeClass('hidden');
                 $('#btnUncertificatedRe').addClass('hidden');
@@ -7349,12 +7349,12 @@ var Inspections = function()
         if(confirm("Are you sure to make it certificated?")){
             $('#btnUncertificated').addClass('hidden');
             $('#btnCertificated').removeClass('hidden');
-            $('#certificated').val(1);
+            $('#inspection #certificated').val(1);
             objApp.objInspection.checkSaveRateInspection();
         }else{
             $('#btnCertificated').addClass('hidden');
             $('#btnUncertificated').removeClass('hidden');
-            $('#certificated').val(0);
+            $('#inspection #certificated').val(0);
             objApp.objInspection.checkSaveRateInspection();
         }
     }
@@ -7363,12 +7363,12 @@ var Inspections = function()
         if(confirm("Are you sure to make it certificated?")){
             $('#btnUncertificatedRe').addClass('hidden');
             $('#btnCertificatedRe').removeClass('hidden');
-            $('#certificatedre').val(1);
+            $('#frmReinspection #certificated').val(1);
             objApp.objInspection.checkUpdateInspection();
         }else{
             $('#btnCertificatedRe').addClass('hidden');
             $('#btnUncertificatedRe').removeClass('hidden');
-            $('#certificatedre').val(0);
+            $('#frmReinspection #certificated').val(0);
             objApp.objInspection.checkUpdateInspection();
         }
     }
