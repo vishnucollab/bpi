@@ -972,7 +972,7 @@ var Inspections = function()
             $('#inspectionStep4 > .bottomBtns > .btnContainer.right > a#btnStep4Next').html('Next &rsaquo;&rsaquo;');
         }
         */
-        $('#inspectionStep4 > .bottomBtns > .btnContainer.right > a#btnStep4Next').html('Next');
+
         $("#inspectionStep4").removeClass("hidden");
 
         self.setTableWidths2('tblRateListingHeader', 'tblRateListing', 2, 500);
@@ -1615,6 +1615,13 @@ var Inspections = function()
             self.objPopBuilders.select2({dropdownParent: $("#inspection")});
 		}, 'option');
 
+        if(objApp.keys.builder_id != ""){
+            self.loadSupervisors(objApp.keys.builder_id);
+            $('.supervisor_container').show();
+        }else{
+            $('.supervisor_container').hide();
+        }
+
         $('#frmInspectionDetails #state').bind('change', objApp.objInspection.handleStateChanged);
         $('#frmInspectionDetails #state').val(objApp.keys.state);
         $('#frmInspectionDetails #state').trigger('change');
@@ -1685,6 +1692,37 @@ var Inspections = function()
 
         }, "");
     }
+	
+	this.loadSupervisors = function(builder_id)
+    {
+        var sql = "SELECT users.id, users.first_name, users.last_name " +
+            "FROM users INNER JOIN builders_supervisors ON builders_supervisors.supervisor_id = users.id " +
+            "WHERE builders_supervisors.builder_id = ? AND users.deleted = 0";
+
+        $('#frmInspectionDetails #supervisor_id').empty();
+        $('#frmInspectionDetails #supervisor_id').append('<option value="">Choose</option>');
+
+        objDBUtils.loadRecordsSQL(sql, [builder_id], function(param, items)
+        {
+            if(items)
+            {
+                var maxLength = items.rows.length;
+                for (var r = 0; r < maxLength; r++)
+                {
+                    var item = items.rows.item(r);
+                    $('#frmInspectionDetails #supervisor_id').
+                    append($("<option></option>").
+                    attr("value", item.id).
+                    text(item.first_name + ' ' + item.last_name));
+                }
+                if(objApp.keys.supervisor_id != "")
+                    $('#frmInspectionDetails #supervisor_id').val(objApp.keys.supervisor_id);
+                if ($('#frmInspectionDetails #supervisor_id').hasClass('select2-hidden-accessible'))
+                    $('#frmInspectionDetails #supervisor_id').select2('destroy');
+                $('#frmInspectionDetails #supervisor_id').select2({dropdownParent: $("#inspection")});
+            }
+        }, "");
+    }
 
 	/***
 	* handleBuilderChanged is called when the user changes the selected
@@ -1694,31 +1732,7 @@ var Inspections = function()
 	{
 	    var builder_id = $('#frmInspectionDetails #builder_id').val();
         if (builder_id){
-            var sql = "SELECT users.id, users.first_name, users.last_name " +
-                "FROM users INNER JOIN builders_supervisors ON builders_supervisors.supervisor_id = users.id " +
-                "WHERE builders_supervisors.builder_id = ? AND users.deleted = 0";
-
-            $('#frmInspectionDetails #supervisor_id').empty();
-            $('#frmInspectionDetails #supervisor_id').append('<option value="">Choose</option>');
-
-            objDBUtils.loadRecordsSQL(sql, [builder_id], function(param, items)
-            {
-                if(items)
-                {
-                    var maxLength = items.rows.length;
-                    for (var r = 0; r < maxLength; r++)
-                    {
-                        var item = items.rows.item(r);
-                        $('#frmInspectionDetails #supervisor_id').
-                            append($("<option></option>").
-                            attr("value", item.id).
-                            text(item.first_name + ' ' + item.last_name));
-                    }
-                    if ($('#frmInspectionDetails #supervisor_id').hasClass('select2-hidden-accessible'))
-                        $('#frmInspectionDetails #supervisor_id').select2('destroy');
-                    $('#frmInspectionDetails #supervisor_id').select2({dropdownParent: $("#inspection")});
-                }
-            }, "");
+            self.loadSupervisors(builder_id);
             $('.supervisor_container').show();
         }else{
             $('.supervisor_container').hide();
@@ -2771,6 +2785,21 @@ var Inspections = function()
             return false;
         });
 
+        $(".inspectionDetails #btnCertificatedRe").unbind(objApp.touchEvent);
+        $(".inspectionDetails #btnCertificatedRe").bind(objApp.touchEvent, function(e)
+        {
+            e.preventDefault();
+            self.handleCertificatedRe();
+            return false;
+        });
+
+        $(".inspectionDetails #btnUncertificatedRe").unbind(objApp.touchEvent);
+        $(".inspectionDetails #btnUncertificatedRe").bind(objApp.touchEvent, function(e)
+        {
+            e.preventDefault();
+            self.handleCertificatedRe();
+            return false;
+        });
         $(".inspectionDetails .preview").bind(objApp.touchEvent, function(e)
 		{
 			e.preventDefault();
@@ -4675,8 +4704,6 @@ var Inspections = function()
                     
                     // inspection / reinspection id
                     var id = $(this).attr('data-id');
-                    objApp.keys.reinspection_id = id;
-                    self.setReturnReinspectionID(id);
 
                     // Close the reveal window
                     //$('#historyReinspection a.close-reveal-modal').click();
@@ -4686,6 +4713,8 @@ var Inspections = function()
 
                     // If it's a reinspection, show the reinspection screen, otherwise show the editInspection screen.
                     if($(this).hasClass("reinspection")) {
+                        objApp.keys.reinspection_id = id;
+                        self.setReturnReinspectionID(id);
                         // Load the reinspection record
                         objDBUtils.loadRecord("reinspections", id, function(param, reinspection) {
                             if(!reinspection) {
@@ -4700,6 +4729,8 @@ var Inspections = function()
                         }, "");
 
                     } else {
+                        objApp.keys.reinspection_id = '';
+                        self.setReturnReinspectionID('');
                         // Load the inspection record
                         objDBUtils.loadRecord("inspections", id, function(param, inspection) {
                             if(!inspection) {
@@ -6008,6 +6039,14 @@ var Inspections = function()
             self.reinspectionKey = reinspection_id;
             self.finalised = 0;
 
+            $('#frmReinspection #certificated').val(reinspection.certificated?1:0);
+            if (reinspection.certificated == 1){
+                $('#btnCertificatedRe').removeClass('hidden');
+                $('#btnUncertificatedRe').addClass('hidden');
+            }else{
+                $('#btnCertificatedRe').addClass('hidden');
+                $('#btnUncertificatedRe').removeClass('hidden');
+            }
             // We also need to load the inspection record
 
             objDBUtils.loadRecord("inspections", reinspection.inspection_id, function(param, inspection) {
@@ -7329,16 +7368,29 @@ var Inspections = function()
         if(confirm("Are you sure to make it certificated?")){
             $('#btnUncertificated').addClass('hidden');
             $('#btnCertificated').removeClass('hidden');
-            $('#certificated').val(1);
+            $('#inspection #certificated').val(1);
             objApp.objInspection.checkSaveRateInspection();
         }else{
             $('#btnCertificated').addClass('hidden');
             $('#btnUncertificated').removeClass('hidden');
-            $('#certificated').val(0);
+            $('#inspection #certificated').val(0);
             objApp.objInspection.checkSaveRateInspection();
         }
     }
 	
+    this.handleCertificatedRe = function() {
+        if(confirm("Are you sure to make it certificated?")){
+            $('#btnUncertificatedRe').addClass('hidden');
+            $('#btnCertificatedRe').removeClass('hidden');
+            $('#frmReinspection #certificated').val(1);
+            objDBUtils.execute("UPDATE reinspections SET certificated = ?, dirty = 1 WHERE id = ?",[1, objApp.keys.reinspection_id], null);
+        }else{
+            $('#btnCertificatedRe').addClass('hidden');
+            $('#btnUncertificatedRe').removeClass('hidden');
+            $('#frmReinspection #certificated').val(0);
+            objDBUtils.execute("UPDATE reinspections SET certificated = ?, dirty = 1 WHERE id = ?",[0, objApp.keys.reinspection_id], null);
+        }
+    }
 	this.handleYesNoButtons = function(obj) {
         if(obj.min_roof_tiles == 1) {
             $("#btnMinRoofTilesYes").removeClass("yesno_disabled").addClass("yesno_enabled");
