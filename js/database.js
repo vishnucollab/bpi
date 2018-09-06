@@ -1333,6 +1333,7 @@ function DBUtils()
                 "'practical_completed' SMALLINT(6) DEFAULT 0, " +
                 "'grout_samples' SMALLINT(6) DEFAULT 0, " +
                 "'barrel_code' TEXT DEFAULT NULL, " +
+				"'certificated' SMALLINT(6) DEFAULT 0, " +
                 "'created_by' INTEGER NOT NULL DEFAULT 48, " + 
                 "'deleted' INTEGER NOT NULL DEFAULT 0, " + 
                 "'dirty' INTEGER NOT NULL DEFAULT 1)";
