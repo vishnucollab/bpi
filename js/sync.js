@@ -698,10 +698,6 @@ function Sync()
         self.saveData.push('0'); /* dirty = 0 */
 		sql += header + ", dirty) " + footer + ", ?);";
 
-		if (tableName == 'builders_supervisors'){
-		    console.log(sql);
-            console.log(self.saveData);
-        }
 		return sql;		
 	};	
 	
