@@ -7211,7 +7211,7 @@ var Inspections = function()
         $("#frmEmailTo ul#list_email input[type='checkbox']").unbind();
 
         blockElement('body');
-        objDBUtils.loadRecord("users", self.inspection.supervisor_id, function(param, supervisor) {
+        objDBUtils.loadRecord("users", self.inspection.supervisor_id.length==0?-1:self.inspection.supervisor_id, function(param, supervisor) {
             console.log(supervisor);
             if (supervisor){
                 supervisor_email = supervisor.email;
