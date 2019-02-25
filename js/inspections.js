@@ -541,10 +541,10 @@ var Inspections = function()
                 var reinspection_id = objDBUtils.makeInsertKey(objApp.sync_prefix);
                 var values = [reinspection_id, inspection_id, curdate, 1, 1,self.reinspectionNotes,
                 row.min_roof_tiles, row.min_ridge_tiles, row.touch_up_paint, row.min_flooring_tiles, row.grout_samples,
-                row.practical_completed,row.barrel_code];
+                row.practical_completed,row.barrel_code, row.certificated];
                 
                 sql = "INSERT INTO reinspections(id, inspection_id, reinspection_date, failed, most_recent,notes, " +
-                    "min_roof_tiles, min_ridge_tiles, touch_up_paint, min_flooring_tiles, grout_samples, practical_completed, barrel_code) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                    "min_roof_tiles, min_ridge_tiles, touch_up_paint, min_flooring_tiles, grout_samples, practical_completed, barrel_code, certificated) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
                 objDBUtils.execute(sql, values, function(){
                     
@@ -718,12 +718,6 @@ var Inspections = function()
     this.checkIfNeedPhotos = function()
     {
         if ($("#inspection #report_type2").val() == 'Client inspection'){
-            /*
-            $('a[id="btnCapturePhoto"]').show();
-            if (!$('#btnStep1Next').is(':visible')){
-                $('a[id="btnCapturePhoto"].step1-capture-btn').hide();
-            }
-            */
             $('a[id="btnReportPhotos"]').removeClass('hidden');
         }else{
             //$('a[id="btnCapturePhoto"]').hide();
@@ -940,8 +934,10 @@ var Inspections = function()
         //if((self.inspection.report_type == "Builder: PCI/Final inspections" && objApp.keys.reinspection_id != "") || self.inspection.report_type == "Fix / Plaster Inspection") {
         if( (self.inspection.report_type == "Quality Inspection" || self.inspection.report_type == "Builder: PCI/Final inspections") && objApp.keys.reinspection_id != "") {
             objApp.setSubExtraHeading("Step 4 of 4", true);
+			$('#inspectionStep4 > .bottomBtns > .btnContainer.right > a#btnStep4Next').html('Done');			
         } else {
             objApp.setSubExtraHeading("Step 4 of 5", true);
+			$('#inspectionStep4 > .bottomBtns > .btnContainer.right > a#btnStep4Next').html('Next');			
         }
 
         objApp.clearMain();
@@ -1359,6 +1355,7 @@ var Inspections = function()
         objApp.keys.report_type = inspection.report_type;
         objApp.keys.builder_id = inspection.builder_id;
         objApp.keys.state = inspection.state;
+		objApp.keys.supervisor_id = inspection.supervisor_id;												 
 
 		self.inAudit = false;
 		self.lastKeyPress = null;
@@ -2587,6 +2584,7 @@ var Inspections = function()
             }
         });
 
+		$(".inspectionDetails #btnStep4Next").unbind(objApp.touchEvent);
         $(".inspectionDetails #btnStep4Next").bind(objApp.touchEvent, function(e)
         {
             if(objApp.keys.reinspection_id != "") {
@@ -2654,7 +2652,10 @@ var Inspections = function()
         $(".inspectionDetails .gotoStep3").bind(objApp.touchEvent, function(e)
 		{
 			e.preventDefault();
-            self.showStep3();
+            if ($(this).attr('id') == 'btnStep4Back' && objApp.keys.reinspection_id)
+                self.loadReinspectionItems(objApp.keys.reinspection_id);
+            else
+                self.showStep3();
 			return false;
 		});
 
@@ -5363,8 +5364,7 @@ var Inspections = function()
         $("#reinspection input#failed").removeClass("ignore");
         // $("#reinspection input#finalised").removeClass("ignore");
         $("#reinspection select#rectified").addClass("ignore");
-        alert("HERE");
-
+        
 	    setTimeout(function()
 	    {
 			objDBUtils.autoSave("inspections", objApp.keys.inspection_id, "frmReinspection", function()
@@ -7216,6 +7216,7 @@ var Inspections = function()
 
         var office_email = 'info@bpigrp.com.au';
         var builder_email = "";
+        var supervisor_email = "";
         var user_email = localStorage.getItem("email");
         if(!self.inspection) {
             return false;
@@ -7224,132 +7225,163 @@ var Inspections = function()
         $("#frmEmailTo ul#list_email input[type='checkbox']").unbind();
 
         blockElement('body');
-
-        objDBUtils.loadRecord("builders", self.inspection.builder_id, function(param, builder) {
-            unblockElement('body');
-            if(builder) {
-                builder_email = builder.email;
+        objDBUtils.loadRecord("users", self.inspection.supervisor_id.length==0?-1:self.inspection.supervisor_id, function(param, supervisor) {
+            console.log(supervisor);
+            if (supervisor){
+                supervisor_email = supervisor.email;
             }
-
-            var determineRecipients = function() {
-
-                var recipients = user_email;
-                var old_recipients = $("#recipients").val();
-                
-                if($("#emailToOffice").is(":checked")) {
-                    recipients += "," + office_email;
+            objDBUtils.loadRecord("builders", self.inspection.builder_id, function(param, builder) {
+                unblockElement('body');
+                if(builder) {
+                    builder_email = builder.email;
                 }
-                else
-                {
-                    if(old_recipients != null)
+
+                var determineRecipients = function() {
+
+                    var recipients = user_email;
+                    var old_recipients = $("#recipients").val();
+
+                    if($("#emailToOffice").is(":checked")) {
+                        recipients += "," + office_email;
+                    }
+                    else
                     {
-                        old_recipients = jQuery.grep(old_recipients, function(value) {
-                          return value != office_email;
-                        });                         
-                    }
-                   
-                }
+                        if(old_recipients != null)
+                        {
+                            old_recipients = jQuery.grep(old_recipients, function(value) {
+                              return value != office_email;
+                            });
+                        }
 
-                var need_builder_email = 0;
-                if(($("#emailToBuilder").is(":checked")) && (!objApp.empty(builder_email))) {
-                    if(!objApp.empty(recipients)) {
-                        recipients += ",";
                     }
-                    need_builder_email = 1;
-                    recipients += builder_email;
-                                             
-                }
-                else
-                {
-                    if(old_recipients != null)
-                    {
-                        old_recipients = jQuery.grep(old_recipients, function(value) {
-                          return value != builder_email;
-                        });                         
-                    }
-                   
-                }                
-                /*
-                $('#emailList input[type=checkbox]').each(function () {
-                    if( $(this).is(":checked") ) {
+
+                    var need_builder_email = 0;
+                    if(($("#emailToBuilder").is(":checked")) && (!objApp.empty(builder_email))) {
                         if(!objApp.empty(recipients)) {
                             recipients += ",";
                         }
-
-                        recipients += $("label[for='"+$(this).val()+"']").text();
-                    }
-                });
-                */
-                if(old_recipients != null)
-                    var recipients_array = $.merge(old_recipients, recipients.split(','));
-                else
-                    var recipients_array = recipients.split(',');
-
-                var builder_email_not_in_address_book = 1;
-                var options = "";
-                $.each( email_options, function( key, value ) {   
-                    if(jQuery.inArray(value, recipients_array) != -1) {   
-                        options += "<option value='"+value+"' selected>"+value+"</option>";
+                        need_builder_email = 1;
+                        recipients += builder_email;
                     }
                     else
                     {
-                        options += "<option value='"+value+"' >"+value+"</option>";
+                        if(old_recipients != null)
+                        {
+                            old_recipients = jQuery.grep(old_recipients, function(value) {
+                              return value != builder_email;
+                            });
+                        }
                     }
-                    if (value == builder_email){
-                        builder_email_not_in_address_book = 0;
+
+                    var need_supervisor_email = 0;
+                    if(($("#emailToSupervisor").is(":checked")) && (!objApp.empty(supervisor_email))) {
+                        if(!objApp.empty(recipients)) {
+                            recipients += ",";
+                        }
+                        need_supervisor_email = 1;
+                        recipients += supervisor_email;
                     }
-                });
-                if (builder_email_not_in_address_book){
-                    if (need_builder_email)
-                        options += "<option value='"+builder_email+"' selected>"+builder_email+"</option>";
                     else
-                        options += "<option value='"+builder_email+"'>"+builder_email+"</option>";
+                    {
+                        if(old_recipients != null)
+                        {
+                            old_recipients = jQuery.grep(old_recipients, function(value) {
+                                return value != supervisor_email;
+                            });
+                        }
+
+                    }
+                    /*
+                    $('#emailList input[type=checkbox]').each(function () {
+                        if( $(this).is(":checked") ) {
+                            if(!objApp.empty(recipients)) {
+                                recipients += ",";
+                            }
+
+                            recipients += $("label[for='"+$(this).val()+"']").text();
+                        }
+                    });
+                    */
+                    if(old_recipients != null)
+                        var recipients_array = $.merge(old_recipients, recipients.split(','));
+                    else
+                        var recipients_array = recipients.split(',');
+
+                    var builder_email_not_in_address_book = 1;
+                    var supervisor_email_not_in_address_book = 1;
+                    var options = "";
+                    $.each( email_options, function( key, value ) {
+                        if(jQuery.inArray(value, recipients_array) != -1) {
+                            options += "<option value='"+value+"' selected>"+value+"</option>";
+                        }
+                        else
+                        {
+                            options += "<option value='"+value+"' >"+value+"</option>";
+                        }
+                        if (value == builder_email){
+                            builder_email_not_in_address_book = 0;
+                        }
+                        if (value == supervisor_email){
+                            supervisor_email_not_in_address_book = 0;
+                        }
+                    });
+                    if (builder_email_not_in_address_book){
+                        if (need_builder_email)
+                            options += "<option value='"+builder_email+"' selected>"+builder_email+"</option>";
+                        else
+                            options += "<option value='"+builder_email+"'>"+builder_email+"</option>";
+                    }
+                    if (supervisor_email_not_in_address_book && !objApp.empty(supervisor_email)){
+                        if (need_supervisor_email)
+                            options += "<option value='"+supervisor_email+"' selected>"+supervisor_email+"</option>";
+                        else
+                            options += "<option value='"+supervisor_email+"'>"+supervisor_email+"</option>";
+                    }
+
+                    $("#recipients").html(options);
+
+                    $("#recipients").select2({
+                          tags: true,
+                          tokenSeparators: [',', ' '],
+                          createTag: function(params) {
+                                var email = params.term;
+                                if( objApp.validateEmail(email) ) {
+                                    return {
+                                      id: email,
+                                      text: email
+                                    };
+                                }
+
+                                return null;
+                            }
+                    }).on("change", function(e) {
+                      // mostly used event, fired to the original element when the value changes
+                      if($(this).val() == null)
+                      {
+                           $("#emailTo").val('');
+                      }
+                      else
+                      {
+                           var res = $(this).val().join(",");
+                           $("#emailTo").val(res);
+                      }
+
+                    })
+                    $("#recipients").trigger('change');
+
                 }
 
-                $("#recipients").html(options);
-                
-                $("#recipients").select2({
-                      tags: true,
-                      tokenSeparators: [',', ' '],
-                      createTag: function(params) {
-                            var email = params.term;
-                            if( objApp.validateEmail(email) ) {
-                                return {
-                                  id: email,
-                                  text: email
-                                };
-                            }
-                            
-                            return null;            
-                        }
-                }).on("change", function(e) {
-                  // mostly used event, fired to the original element when the value changes
-                  if($(this).val() == null)
-                  {
-                       $("#emailTo").val('');
-                  }
-                  else
-                  {
-                       var res = $(this).val().join(",");
-                       $("#emailTo").val(res);                    
-                  }
-
-                })                
-                $("#recipients").trigger('change');                
-                
-            }
-
-            determineRecipients();
-
-            $("#frmEmailTo ul#list_email input[type='checkbox']").change(function() {
                 determineRecipients();
-            });
-            $("#emailList input[type=checkbox]").change(function() {
-                determineRecipients();
-            });
 
+                $("#frmEmailTo ul#list_email input[type='checkbox']").change(function() {
+                    determineRecipients();
+                });
+                $("#emailList input[type=checkbox]").change(function() {
+                    determineRecipients();
+                });
+
+            }, "");
         }, "");
-
     }
     
     /**
@@ -7364,7 +7396,7 @@ var Inspections = function()
         return result;
     }
 
-    this.handleCertificated = function(inspection) {
+    this.handleCertificated = function() {
         if(confirm("Are you sure to make it certificated?")){
             $('#btnUncertificated').addClass('hidden');
             $('#btnCertificated').removeClass('hidden');
