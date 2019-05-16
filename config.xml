@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <widget xmlns = "http://www.w3.org/ns/widgets"
         xmlns:gap = "http://phonegap.com/ns/1.0"
-        id = "com.simb.Blueprint"
-        version = "2.0.15">
-    <name>Blueprint</name>
+        id = "net.wearebuilding.bpi-api"
+        version = "2.0.16">
+    <name>Blueprint Test</name>
 
     <description>
-        Conduct onsite buidling inspections with Blueprint and produce beautiful reports that your clients will love.
+        This is using for testing Blueprint iPad app.
     </description>
 
     <author href="http://www.simb.com.au" email="dev3@simb.com.au">
@@ -54,11 +54,11 @@
     <gap:config-file platform="ios" parent="UIStatusBarHidden">
         <true/>
     </gap:config-file>
-    
+
     <gap:config-file platform="ios" parent="UIViewControllerBasedStatusBarAppearance">
         <false/>
     </gap:config-file>
-    <access origin="*" />        
+    <access origin="*" />
 
     <icon src="icon.png" />
     <icon src="res/icon/ios/icon-48.png" gap:platform="ios" width="48" height="48" />
