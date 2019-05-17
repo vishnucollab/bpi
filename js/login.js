@@ -332,6 +332,19 @@ var Login = function()
 			localStorage.setItem("initials", typeof data.initials == 'undefined'?'':data.initials);
 			localStorage.setItem("restricted", data.restricted);
 			localStorage.setItem("password", params["password"]);
+            if (typeof data.state_id != 'undefined' && data.state_id != null && data.state_id != 'null'){
+                objApp.IS_STATE_FILTERED = 1;
+                objApp.FILTERED_STATE_ID = data.state_id;
+                objApp.FILTERED_STATE_CODE = objApp.STATE_CODES[data.state_id];
+            }else{
+                objApp.IS_STATE_FILTERED = 1;
+                objApp.FILTERED_STATE_ID = 1;
+                objApp.FILTERED_STATE_CODE = 'VIC';
+            }
+            localStorage.setItem("filtered_state_id", objApp.FILTERED_STATE_ID);
+            localStorage.setItem("filtered_state_code", objApp.FILTERED_STATE_CODE);
+            localStorage.setItem("is_state_filtered", objApp.IS_STATE_FILTERED);
+
             localStorage.setItem("user_type", typeof data.initials == 'undefined'?'general':data.user_type);
             if (remember_me == 1)
             {
@@ -366,7 +379,7 @@ var Login = function()
                 
 			// Hide the login screen.
 			$(".home").addClass("hidden");
-			
+            objApp.determineStates();
 			// Figure out what to do next.
 			objApp.determineInitialAction();                          
 
