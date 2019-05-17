@@ -425,5 +425,8 @@ var Login = function()
         localStorage.setItem("email", ""); 
         localStorage.setItem("password", "");
         localStorage.setItem("user_type", "");
+        localStorage.setItem("is_state_filtered", 0);
+        localStorage.setItem("filtered_state_id", 1);
+        localStorage.setItem("filtered_state_code", 'VIC');
 	}
 };
