@@ -509,10 +509,10 @@ body.inspection #header, body.reinspect #header{margin-bottom: 10px;}
 .inspectionDetails fieldset.thefs{width: 45%;}
 .inspectionDetails.twocolumn select,
 .inspectionDetails.twocolumn .select2-container{
-    width: 220px !important;max-width: 100%;
+    width: 250px !important;max-width: 100%;
 }
-.inspectionDetails.twocolumn input[type="text"]{width: 190px !important;max-width: 100%;}
-.inspectionDetails.twocolumn textarea{width: 200px;}
+.inspectionDetails.twocolumn input[type="text"]{width: 220px !important;max-width: 100%;}
+.inspectionDetails.twocolumn textarea{width: 230px;}
 
 .inspectionDetails .bottomBtns a[class*='btn-bg'] {
     position: relative;
@@ -1544,23 +1544,7 @@ aside textarea
     width: 28px;
     position: absolute;
 }
-#photoWrapper #addPhoto-wrapper{
-    height: 30px;
-    margin-top: 20px;
-}
-#photoWrapper #addPhoto-wrapper>a#addPhoto-btn{
-    background: url("../images/camera-75.png") top left no-repeat;
-    right: 0px;
-    width: 140px;
-    padding-left: 80px;
-    position: absolute;
-    height: 75px;
-    text-decoration: none;
-    color: black;
-    font-weight: bold;
-    font-size: 14pt;
-}
-#addPhotoFromGallery{
+#addPhotoFromGallery, #addSignatureFromGallery{
     font-size: 14pt;
     background: url("../images/gallery-75.png") top left no-repeat;
     right: 20px;
@@ -1577,7 +1561,17 @@ aside textarea
 .inspectionDetails a#btnCapturePhoto {
     background: url("../images/camera-75.png") left top no-repeat;
     background-size: 100%;
-    right: 150px;
+    right: 120px;
+    bottom: 105px;
+    height: 65px;
+    width: 65px;
+    position: fixed;
+}
+
+.inspectionDetails a.capture-signature-btn{
+    background: url("../images/signature-75.png") left top no-repeat;
+    background-size: 100%;
+    right: 200px;
     bottom: 105px;
     height: 65px;
     width: 65px;
@@ -1602,11 +1596,11 @@ aside textarea
     left: 0;
     top: 5% !important;
 }
-#photoWrapper #controlBtns
+#photoWrapper .controlBtns
 {
     bottom: 10px;
 }
-#photoWrapper #controlBtns #btnDone.close-reveal-modal
+#photoWrapper .controlBtns .btnDone.close-reveal-modal
 {
     position: relative;
     width: 100px;
@@ -1616,6 +1610,70 @@ aside textarea
 }
 #photoWrapper #photoList p{
     padding-left: 35px;
+}
+
+#photoWrapper #addPhoto-wrapper{
+    height: 30px;
+    margin-top: 20px;
+}
+#photoWrapper #addPhoto-wrapper>a#addPhoto-btn{
+    background: url("../images/camera-75.png") top left no-repeat;
+    right: 0px;
+    width: 140px;
+    padding-left: 80px;
+    position: absolute;
+    height: 75px;
+    text-decoration: none;
+    color: black;
+    font-weight: bold;
+    font-size: 14pt;
+}
+
+#signatureWrapper #signatureList{
+    padding-top: 10px;
+    margin-left: 30px;
+    height: 500px;
+    overflow: hidden;
+}
+#signatureWrapper.reveal-modal{
+    width: 95%;
+    height: 86%;
+    padding: 0;
+    margin: 2%;
+    left: 0;
+    top: 5% !important;
+}
+#signatureWrapper .controlBtns
+{
+    bottom: 10px;
+}
+#signatureWrapper .controlBtns .btnDone.close-reveal-modal
+{
+    position: relative;
+    width: 100px;
+    height: 20px;
+    color: white;
+    line-height: 20px;
+}
+#signatureWrapper #signatureList p{
+    padding-left: 35px;
+}
+
+#signatureWrapper #addSignature-wrapper{
+    height: 30px;
+    margin-top: 20px;
+}
+#signatureWrapper #addSignature-wrapper>a#addSignature-btn{
+    background: url("../images/camera-75.png") top left no-repeat;
+    right: 0px;
+    width: 140px;
+    padding-left: 80px;
+    position: absolute;
+    height: 75px;
+    text-decoration: none;
+    color: black;
+    font-weight: bold;
+    font-size: 14pt;
 }
     
 .inspectionDetails #tblDefectListingHeader, .inspectionDetails #tblDefectListing{
@@ -1762,7 +1820,7 @@ ul.historygallery{
        color: initial;
     }
 
-#controlBtns{
+.controlBtns{
     position: absolute;
     left: 0;
     bottom: 0;

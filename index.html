@@ -390,11 +390,12 @@
                                     <option value="Builder inspection">Builder Inspection</option>
                                     <option value="Client inspection">Client Inspection</option>
                                     <option value="Handovers.com">Handovers.com</option>
+                                    <option value="Peet inspection">Peet Inspection</option>
                                 </select>
                                 <div>
                                     <input type="hidden" value="" name="report_type" id="report_type" />
                                     <select class="report_type_options ignore" id="builder_report_type" name="builder_report_type" >
-                                        <option class="handovers-child" value="">--Select</option>
+                                        <option class="builder-child" value="">--Select</option>
                                         <option class="builder-child" value="Builder: Pre-Pour inspections">Pre-Pour Inspection</option>
                                         <option class="builder-child" value="Builder: Slab inspections">Slab Inspection</option>
                                         <option class="builder-child" value="Builder: Frame inspections">Frame Inspection</option>
@@ -407,7 +408,7 @@
                                     </select>
 
                                     <select class="report_type_options ignore" id="client_report_type" name="client_report_type" style="display: none;">
-                                        <option class="handovers-child" value="">--Select</option>
+                                        <option class="client-child" value="">--Select</option>
                                         <option class="client-child" value="Client: Pre-Pour inspections">Pre-Pour Inspection</option>
                                         <option class="client-child" value="Client: Slab inspections">Slab Inspection</option>
                                         <option class="client-child" value="Client: Frame inspections">Frame Inspection</option>
@@ -424,6 +425,10 @@
                                         <option class="handovers-child" value="Handovers">Handovers</option>
                                     </select>
 
+                                    <select class="report_type_options ignore" id="peet_report_type" name="peet_report_type" style="display: none;">
+                                        <option class="peet-child" value="">--Select</option>
+                                        <option class="peet-child" value="Peet PCI">Peet PCI</option>
+                                    </select>
                                 </div>
                             </td>
                         </tr>
@@ -501,15 +506,15 @@
                 <textarea id="notes" name="notes" class="hidden"></textarea>
             </form>
 
-            <div id="controlBtns" class="bottomBtns">
+            <div class="controlBtns bottomBtns">
                 <div class="btnContainer left btnEditNotes" id="btnEditNotes">
                     <a href="#" class="btnNotes "></a>
                     <span>Notes</span>
                 </div>
-
+                <a id="btnCaptureSignature" data-reveal-id="signatureWrapper" class="right capture-signature-btn" href="#"></a>
                 <a id="btnCapturePhoto" data-reveal-id="photoWrapper" class="right step1-capture-btn" href="#"></a>
                 <div class="btnContainer right">
-                    <a id="btnStep1Next" class="mtop20 right rightmargin btn-bg-w81" href="#">Next</a>
+                    <a id="btnStep1Next" class="mtop20 right btn-bg-w81" href="#">Next</a>
                 </div>
             </div>
         </div> <!--! end of inspection details screen wrapper -->
@@ -565,13 +570,14 @@
                 <input type="hidden" id="hash" name="hash" value="" />
             </form>
 
-            <div id="controlBtns" class="bottomBtns" >
+            <div class="controlBtns bottomBtns" >
+                <a id="btnCaptureSignature2" data-reveal-id="signatureWrapper" class="right capture-signature-btn" href="#"></a>
                 <a id="btnCapturePhoto" data-reveal-id="photoWrapper" class="right" href="#"></a>
                 <div class="btnContainer left">
                     <a id="btnStep2Back" class="mtop20 left gotoStep1 btn-bg-w81" href="#">Back</a>
                 </div>
                 <div class="btnContainer right">
-                    <a id="btnStep2Next" class="mtop20 right rightmargin btn-bg-w81" href="#">Next</a>
+                    <a id="btnStep2Next" class="mtop20 right btn-bg-w81" href="#">Next</a>
                 </div>
                 <div class="btnContainer left btnEditNotes" id="btnEditNotes">
                     <a href="#" class="btnNotes "></a>
@@ -656,13 +662,14 @@
                 <a id="btnSendReport" class="button left hidden" href="javascript:void(0);">SEND BPI</a>
 
                 <div class="btnContainer right">
-                    <a id="btnStep3Next" class="right rightmargin mtop20 btn-bg-w81" href="#">Exit</a>
+                    <a id="btnStep3Next" class="right mtop20 btn-bg-w81" href="#">Exit</a>
                 </div>
             </div>
             <div style="clear: both;"></div>
 
 
-            <div id="controlBtns">
+            <div class="controlBtns">
+                <a id="btnCaptureSignature3" data-reveal-id="signatureWrapper" class="right capture-signature-btn" href="#"></a>
                 <a id="btnCapturePhoto" data-reveal-id="photoWrapper" class="right reveal" href="#"></a>
             </div>
 
@@ -678,8 +685,21 @@
             </div>
             <div id="photoList"></div>
             <a class="close-reveal-modal" style="font-size: 40px; color: red;">&#215;</a>
-            <div id="controlBtns">
-                <a id="btnDone" class="button right rightmargin close-reveal-modal" href="#">Done</a>
+            <div class="controlBtns">
+                <a id="btnDone" class="button right rightmargin close-reveal-modal btn-done" href="#">Done</a>
+            </div>
+        </div>
+
+        <div id="signatureWrapper" class="reveal-modal inspectionDetails">
+            <div style="background-color: #eee; border-radius: 5px 5px 0 0; height: 30px; font-weight: bold; padding-left: 5px;">Signature photos</div>
+            <div id="addSignature-wrapper">
+                <a href="#" id="addSignature-btn">Take photo</a>
+                <a href="#" id="addSignatureFromGallery">Take photo from gallery</a>
+            </div>
+            <div id="signatureList"></div>
+            <a class="close-reveal-modal" style="font-size: 40px; color: red;">&#215;</a>
+            <div class="controlBtns">
+                <a id="btnDoneSignature" class="button right rightmargin close-reveal-modal btn-done" href="#">Done</a>
             </div>
         </div>
 
@@ -769,7 +789,7 @@
                 <a id="btnSendReport2" class="button left" href="javascript:void(0);">SEND BPI</a>
 
                 <div class="btnContainer right">
-                    <a id="btnStep4Next" class="mtop20 right rightmargin btn-bg-w81" href="#">Next</a>
+                    <a id="btnStep4Next" class="mtop20 right btn-bg-w81" href="#">Next</a>
                 </div>
             </div>
 
@@ -876,7 +896,7 @@
                 <a id="btnSendReport3" class="button left" href="javascript:void(0);">SEND BPI</a>
 
                 <div class="btnContainer right">
-                    <a id="btnStep5Next" class="mtop20 right rightmargin btn-bg-w81" href="#">Exit</a>
+                    <a id="btnStep5Next" class="mtop20 right btn-bg-w81" href="#">Exit</a>
                 </div>
             </div>
 
@@ -1041,12 +1061,13 @@
 
                 <div class="btnContainer right">
                     <!-- <a id="btnStep3Email" class="button right rightmargin" href="#">Email</a> -->
-                    <a id="btnStep3Next" class="mtop20 right rightmargin btn-bg-w81" href="#">Done</a>
+                    <a id="btnStep3Next" class="mtop20 right btn-bg-w81" href="#">Done</a>
                 </div>
             </div>
             <div style="clear: both;"></div>
 
-            <div id="controlBtns">
+            <div class="controlBtns">
+                <a id="btnCaptureSignature4" data-reveal-id="signatureWrapper" class="right capture-signature-btn" href="#"></a>
                 <a id="btnCapturePhoto" data-reveal-id="photoWrapper" class="right reveal" href="#" style="right: 140px;"></a>
             </div>
         </div>
