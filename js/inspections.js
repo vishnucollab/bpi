@@ -2333,12 +2333,6 @@ var Inspections = function()
                         objResizer = new imageResizer(objImage);
                         var thumbData = objResizer.resize(90);
 
-                        // Save both the thumbnail and the full version to the local file system.
-                        var fail = function(error)
-                        {
-                            alert("storePhotosOnFS::Caught error: " + error.code);
-                        }
-
                         // Make sure the current inspection id is valid - there seems to be a bug sometimes when the id is corrupted
 
                         objDBUtils.loadRecord("inspections", objApp.getKey("inspection_id"), function(param, row)
@@ -2356,8 +2350,6 @@ var Inspections = function()
                                 return;
                             }
 
-
-                            user_id = localStorage.getItem("user_id");
                             if (signature_1 == null)
                                 var new_id = row.id + '_s1';
                             else
@@ -2377,13 +2369,13 @@ var Inspections = function()
                             }
                             else
                             {
-                                alert(new_id);
+                                alert(window.requestFileSystem);
                                 // Phonegap build - save the images to the file system
                                 // Request access to the file system
                                 window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem)
                                 {
+                                    alert(new_id);
                                     var file_name = new_id + "_thumb.jpg";
-                                    alert(filename);
                                     // Get permission to write the file
                                     fileSystem.root.getFile(file_name, {create: true, exclusive: false}, function(fileEntry)
                                     {
@@ -2430,7 +2422,7 @@ var Inspections = function()
                                     alert("storePhotosOnFS::Caught error: " + error.code);
                                 });
                             }
-                        }, function(t){}, "", self.finalised);
+                        }, function(t){});
                     }
                 }
             }
