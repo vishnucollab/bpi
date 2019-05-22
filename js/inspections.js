@@ -7859,12 +7859,12 @@ var Inspections = function()
 
                 if(row.signature_2_thumb)
                 {
-                    var delete_node = '<div class="deleteSignature" data-id="' + row.id + '_s1"></div>';
+                    var delete_node = '<div class="deleteSignature" data-id="' + row.id + '_s2"></div>';
                     if(self.finalised == 1) {
                         delete_node = "";
                     }
 
-                    html += '<li>' + delete_node + '<a rel="' + row.id + '_s1"><img width="90" height="60" src="data:image/jpeg;base64,' + row.signature_2_thumb + '" /></a><div class="imageNotes">Signature 2</div></li>';
+                    html += '<li>' + delete_node + '<a rel="' + row.id + '_s2"><img width="90" height="60" src="data:image/jpeg;base64,' + row.signature_2_thumb + '" /></a><div class="imageNotes">Signature 2</div></li>';
                 }
 
                 self.showSignaturePhotos(html);
