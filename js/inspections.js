@@ -668,7 +668,7 @@ var Inspections = function()
         if ($("#inspection #report_type2").val() == 'Client inspection'){
             $('a[id="btnReportPhotos"]').removeClass("hidden");
         }else{
-            if ($("#inspection #report_type2").val() == 'Peet inspection' && $('#btnStep1Next').is(':visible')){
+            if ($("#inspection #report_type2").val() == 'Peet inspection' && ($('#btnStep1Next').is(':visible') || self.getStep() > 1 )){
                 $('a.capture-signature-btn').show();
             }
             $('a[id="btnReportPhotos"]').addClass("hidden");
@@ -2359,7 +2359,10 @@ var Inspections = function()
 
 
                             user_id = localStorage.getItem("user_id");
-                            var new_id = objDBUtils.makeInsertKey(objApp.sync_prefix);
+                            if (signature_1 == null)
+                                var new_id = row.id + '_s1';
+                            else
+                                var new_id = row.id + '_s2';
                             var notes = "";
 
                             if(!objApp.phonegapBuild)
@@ -6642,7 +6645,7 @@ var Inspections = function()
             $('#btnStep3Back').removeClass('hidden');
             $('#finished').removeClass('active');
             $('#keywords').removeClass('hidden');
-            if ($("#inspection #report_type2").val() != 'Client inspection')
+            if ($("#inspection #report_type2").val() == 'Client inspection')
                 $("#btnReportPhotos").removeClass("hidden");
             $("div.btnReinspect").hide();
             $("#tblRateListing select.ratingSelect").removeAttr("readonly");
