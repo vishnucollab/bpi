@@ -2369,8 +2369,8 @@ var Inspections = function()
                             {
                                 if(!signature_1)
                                     var sql = "UPDATE inspections SET signature_1 = ?, signature_1_thumb = ?, dirty = 1 WHERE id = ?";
-                                elseif(!signature_2)
-                                var sql = "UPDATE inspections SET signature_2 = ?, signature_2_thumb = ?, dirty = 1 WHERE id = ?";
+                                else
+                                    var sql = "UPDATE inspections SET signature_2 = ?, signature_2_thumb = ?, dirty = 1 WHERE id = ?";
 
                                 objDBUtils.execute(sql, [imageData, thumbData, objApp.getKey("inspection_id")], function()
                                 {
@@ -2384,6 +2384,7 @@ var Inspections = function()
                                 window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem)
                                 {
                                     var file_name = new_id + "_thumb.jpg";
+                                    alert(filename);
                                     // Get permission to write the file
                                     fileSystem.root.getFile(file_name, {create: true, exclusive: false}, function(fileEntry)
                                     {
@@ -2396,6 +2397,7 @@ var Inspections = function()
                                                 var uri_thumb = fileEntry.toURI();
                                                 // Now write the full image to the file system
                                                 var file_name = new_id + ".jpg";
+                                                alert(filename);
                                                 fileSystem.root.getFile(file_name, {create: true, exclusive: false}, function(fileEntry)
                                                 {
                                                     // Create the file write object
@@ -2408,8 +2410,8 @@ var Inspections = function()
 
                                                             if(!signature_1)
                                                                 var sql = "UPDATE inspections SET signature_1 = ?, signature_1_thumb = ?, dirty = 1 WHERE id = ?";
-                                                            elseif(!signature_2)
-                                                            var sql = "UPDATE inspections SET signature_2 = ?, signature_2_thumb = ?, dirty = 1 WHERE id = ?";
+                                                            else
+                                                                var sql = "UPDATE inspections SET signature_2 = ?, signature_2_thumb = ?, dirty = 1 WHERE id = ?";
 
                                                             objDBUtils.execute(sql, [uri_thumb, uri, objApp.getKey("inspection_id")], function()
                                                             {
@@ -7870,6 +7872,7 @@ var Inspections = function()
 
     this.showSignaturePhotos = function(html)
     {
+        alert(html);
         // If matching items were found, inject them into the page, otherwise show the no history message.
         if(html == '')
         {
