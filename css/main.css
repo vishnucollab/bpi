@@ -1700,7 +1700,11 @@ aside textarea
         background: none;
         width: 135px;
         vertical-align: top;
-	cursor: pointer;
+	    cursor: pointer;
+    }
+    .inspectionDetails #signatureList ul.gallery li{
+        height: 120px;
+        text-align: center;
     }
     .inspectionDetails ul.gallery li .deletePhoto, .inspectionDetails ul.gallery li .deleteSignature{
         height: 39px;
