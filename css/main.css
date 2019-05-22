@@ -1576,6 +1576,7 @@ aside textarea
     height: 65px;
     width: 65px;
     position: fixed;
+    display: none;
 }
 
 .inspectionDetails .plain{

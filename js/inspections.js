@@ -664,9 +664,13 @@ var Inspections = function()
 
     this.checkIfNeedPhotos = function()
     {
+        $('a.capture-signature-btn').hide();
         if ($("#inspection #report_type2").val() == 'Client inspection'){
             $('a[id="btnReportPhotos"]').removeClass("hidden");
         }else{
+            if ($("#inspection #report_type2").val() == 'Peet inspection' && $('#btnStep1Next').is(':visible')){
+                $('a.capture-signature-btn').show();
+            }
             $('a[id="btnReportPhotos"]').addClass("hidden");
         }
     }
@@ -1194,22 +1198,6 @@ var Inspections = function()
         $('#practical_completed_selector').trigger('change');
         $('#practical_completed_selector').prop('disabled', false);
 
-        // Hide the camera button until the inspection is created.
-        $(".inspectionDetails #btnCapturePhoto").hide();
-
-        // Hide the next button until the inspection is created.
-        $(".inspectionDetails #btnStep1Next").hide();
-
-        // By default an inspection should be set as failed.
-        $("a#passed").removeClass('active');
-        $("a#failed").addClass('active');
-
-        // Make sure the coversheet notes button is hidden.
-        $("div.btnEditNotes").hide();
-        $("a.btnEditClientNotes").hide();
-        $("a.btnEditPrivateNotes").hide();
-        $("#inspection #includeclientnotesonreport").val("0");
-
 		// Set the main heading
         objApp.setHeading("Blueprint Inspections");
         objApp.setSubHeading("Create a New Inspection");
@@ -1283,8 +1271,22 @@ var Inspections = function()
 
 		// Show the inspection screen.
 		$("#inspection").removeClass("hidden");
-		// Bind events to UI objects
-        
+
+        // Hide the camera button until the inspection is created.
+        $(".inspectionDetails #btnCapturePhoto").hide();
+
+        // Hide the next button until the inspection is created.
+        $(".inspectionDetails #btnStep1Next").hide();
+
+        // By default an inspection should be set as failed.
+        $("a#passed").removeClass('active');
+        $("a#failed").addClass('active');
+
+        // Make sure the coversheet notes button is hidden.
+        $("div.btnEditNotes").hide();
+        $("a.btnEditClientNotes").hide();
+        $("a.btnEditPrivateNotes").hide();
+        $("#inspection #includeclientnotesonreport").val("0");
 
 		this.unbindEvents();
 		// Setup client and site popselectors
@@ -2285,6 +2287,7 @@ var Inspections = function()
 			});
 		});
 
+        $(".inspectionDetails .capture-signature-btn").unbind(objApp.touchEvent);
         $(".inspectionDetails .capture-signature-btn").bind(objApp.touchEvent, function(e)
         {
             e.preventDefault();
@@ -2296,6 +2299,7 @@ var Inspections = function()
             self.loadSignaturePhotos();
         });
 
+        $(".inspectionDetails #addSignature-wrapper #addSignature-btn, #addSignatureFromGallery").unbind(objApp.touchEvent);
         $(".inspectionDetails #addSignature-wrapper #addSignature-btn, #addSignatureFromGallery").bind(objApp.touchEvent, function(e)
         {
             e.preventDefault();

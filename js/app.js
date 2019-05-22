@@ -767,6 +767,8 @@ function App()
 	this.formatUserDate = function(objDate)
 	{
 		// AU Format
+        if(objDate == null)
+            return '';
 		return objDate.getDate() + "/" + (objDate.getMonth() + 1) + "/" + objDate.getFullYear();			
 	}
 	
