@@ -1702,7 +1702,7 @@ aside textarea
         vertical-align: top;
 	cursor: pointer;
     }
-    .inspectionDetails ul.gallery li .deletePhoto{
+    .inspectionDetails ul.gallery li .deletePhoto, .inspectionDetails ul.gallery li .deleteSignature{
         height: 39px;
         width: 35px;
         border: none;

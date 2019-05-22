@@ -7777,7 +7777,6 @@ var Inspections = function()
                 // Request access to the file system
                 window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem)
                 {
-                    alert(row.signature_1_thumb);
                     // We have access to the file system.
 
                     // Define the function to load the next image for phonegap builds.
@@ -7876,7 +7875,6 @@ var Inspections = function()
 
     this.showSignaturePhotos = function(html)
     {
-        alert(html);
         // If matching items were found, inject them into the page, otherwise show the no history message.
         if(html == '')
         {
