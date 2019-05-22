@@ -2355,7 +2355,7 @@ var Inspections = function()
                             else
                                 var new_id = row.id + '_s2';
                             var notes = "";
-                            if(!objApp.phonegapBuild)
+                            if(!objApp.phonegapBuild || 1)
                             {
                                 if(!signature_1)
                                     var sql = "UPDATE inspections SET signature_1 = ?, signature_1_thumb = ?, dirty = 1 WHERE id = ?";
@@ -2382,7 +2382,6 @@ var Inspections = function()
                                         {
                                             writer.onwriteend = function(evt)
                                             {
-                                                alert(evt.toString());
                                                 // Get the file URI for the thumbnail image
                                                 var uri_thumb = fileEntry.toURI();
                                                 // Now write the full image to the file system
@@ -7767,7 +7766,7 @@ var Inspections = function()
             }
             var html = '';
 
-            if(objApp.phonegapBuild)
+            if(objApp.phonegapBuild && 0)
             {
                 var fail = function(error)
                 {
