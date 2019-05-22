@@ -2378,7 +2378,6 @@ var Inspections = function()
                                     // Get permission to write the file
                                     fileSystem.root.getFile(file_name, {create: true, exclusive: false}, function(fileEntry)
                                     {
-                                        alert(fileEntry.toString());
                                         // Create the file write object
                                         fileEntry.createWriter(function(writer)
                                         {
@@ -2388,9 +2387,10 @@ var Inspections = function()
                                                 var uri_thumb = fileEntry.toURI();
                                                 // Now write the full image to the file system
                                                 var file_name = new_id + ".jpg";
-                                                alert(filename);
+                                                
                                                 fileSystem.root.getFile(file_name, {create: true, exclusive: false}, function(fileEntry)
                                                 {
+                                                    alert(filename);
                                                     // Create the file write object
                                                     fileEntry.createWriter(function(writer)
                                                     {
