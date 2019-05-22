@@ -2380,7 +2380,6 @@ var Inspections = function()
                                         // Create the file write object
                                         fileEntry.createWriter(function(writer)
                                         {
-                                            alert(writer.toString());
                                             writer.onwriteend = function(evt)
                                             {
                                                 alert(evt.toString());
@@ -2391,7 +2390,6 @@ var Inspections = function()
 
                                                 fileSystem.root.getFile(file_name, {create: true, exclusive: false}, function(fileEntry)
                                                 {
-                                                    alert(file_name);
                                                     // Create the file write object
                                                     fileEntry.createWriter(function(writer)
                                                     {
@@ -2399,12 +2397,10 @@ var Inspections = function()
                                                         {
                                                             // Get the file URI for the thumbnail image
                                                             var uri = fileEntry.toURI();
-                                                            alert(uri);
                                                             if(!signature_1)
                                                                 var sql = "UPDATE inspections SET signature_1 = ?, signature_1_thumb = ?, dirty = 1 WHERE id = ?";
                                                             else
                                                                 var sql = "UPDATE inspections SET signature_2 = ?, signature_2_thumb = ?, dirty = 1 WHERE id = ?";
-                                                            alert(sql);
                                                             objDBUtils.execute(sql, [uri_thumb, uri, objApp.getKey("inspection_id")], function()
                                                             {
                                                                 self.loadSignaturePhotos();
@@ -7770,7 +7766,7 @@ var Inspections = function()
                 return;
             }
             var html = '';
-alert(row.id);
+
             if(objApp.phonegapBuild)
             {
                 var fail = function(error)
@@ -7781,11 +7777,12 @@ alert(row.id);
                 // Request access to the file system
                 window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem)
                 {
+                    alert(row.signature_1_thumb);
                     // We have access to the file system.
 
                     // Define the function to load the next image for phonegap builds.
                     // The thumbnail image data is coming straight from the local file system
-                    if(row.signature_1_thumb != "")
+                    if(row.signature_1_thumb)
                     {
                         var file_name = row.id + "_s1_thumb.jpg";
 
@@ -7808,6 +7805,7 @@ alert(row.id);
                                     }
 
                                     html += '<li>' + delete_node + '<a rel="' + row.id + '_s1"><img width="90" height="60" src="data:image/jpeg;base64,' + (evt.target && evt.target.result?evt.target.result:row.signature_1_thumb) + '" /></a><div class="imageNotes">Signature 1</div></li>';
+                                    self.showSignaturePhotos(html);
                                 };
 
                                 reader.readAsText(file);
@@ -7815,7 +7813,7 @@ alert(row.id);
                         }, fail);
                     }
 
-                    if(row.signature_2_thumb != "")
+                    if(row.signature_2_thumb)
                     {
                         var file_name = row.id + "_s2_thumb.jpg";
 
@@ -7838,21 +7836,20 @@ alert(row.id);
                                     }
 
                                     html += '<li>' + delete_node + '<a rel="' + row.id + '_s2"><img width="90" height="60" src="data:image/jpeg;base64,' + (evt.target && evt.target.result?evt.target.result:row.signature_2_thumb) + '" /></a><div class="imageNotes">Signature 2</div></li>';
+                                    self.showSignaturePhotos(html);
                                 };
 
                                 reader.readAsText(file);
                             }, fail);
                         }, fail);
                     }
-
-                    self.showSignaturePhotos(html);
                 }, fail);
             }
             else
             {
                 // Define the function to load the next image for non-phonegap builds
                 // The thumbnail image data is coming straight from the database in this case.
-                if(row.signature_1_thumb != "")
+                if(row.signature_1_thumb)
                 {
                     var delete_node = '<div class="deleteSignature" data-id="' + row.id + '_s1"></div>';
                     if(self.finalised == 1) {
@@ -7862,7 +7859,7 @@ alert(row.id);
                     html += '<li>' + delete_node + '<a rel="' + row.id + '_s1"><img width="90" height="60" src="data:image/jpeg;base64,' + row.signature_1_thumb + '" /></a><div class="imageNotes">Signature 1</div></li>';
                 }
 
-                if(row.signature_2_thumb != "")
+                if(row.signature_2_thumb)
                 {
                     var delete_node = '<div class="deleteSignature" data-id="' + row.id + '_s1"></div>';
                     if(self.finalised == 1) {
@@ -7883,7 +7880,7 @@ alert(row.id);
         // If matching items were found, inject them into the page, otherwise show the no history message.
         if(html == '')
         {
-            $("#signatureWrapper #signatureList").html("<p>This item has no photos.</p>");
+            $("#signatureWrapper #signatureList").html("<p>This inspection has no signatures.</p>");
         }
         else
         {
