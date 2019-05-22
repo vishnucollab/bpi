@@ -2369,16 +2369,17 @@ var Inspections = function()
                             }
                             else
                             {
-                                alert(window.requestFileSystem);
                                 // Phonegap build - save the images to the file system
                                 // Request access to the file system
                                 window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem)
                                 {
                                     alert(new_id);
                                     var file_name = new_id + "_thumb.jpg";
+                                    alert(file_name);
                                     // Get permission to write the file
                                     fileSystem.root.getFile(file_name, {create: true, exclusive: false}, function(fileEntry)
                                     {
+                                        alert(fileEntry.toString());
                                         // Create the file write object
                                         fileEntry.createWriter(function(writer)
                                         {
