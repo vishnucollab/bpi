@@ -2391,7 +2391,6 @@ var Inspections = function()
                                                 alert(filename);
                                                 fileSystem.root.getFile(file_name, {create: true, exclusive: false}, function(fileEntry)
                                                 {
-                                                    alert(fileEntry.toString());
                                                     // Create the file write object
                                                     fileEntry.createWriter(function(writer)
                                                     {
@@ -2399,12 +2398,12 @@ var Inspections = function()
                                                         {
                                                             // Get the file URI for the thumbnail image
                                                             var uri = fileEntry.toURI();
-
+                                                            alert(uri);
                                                             if(!signature_1)
                                                                 var sql = "UPDATE inspections SET signature_1 = ?, signature_1_thumb = ?, dirty = 1 WHERE id = ?";
                                                             else
                                                                 var sql = "UPDATE inspections SET signature_2 = ?, signature_2_thumb = ?, dirty = 1 WHERE id = ?";
-
+                                                            alert(sql);
                                                             objDBUtils.execute(sql, [uri_thumb, uri, objApp.getKey("inspection_id")], function()
                                                             {
                                                                 self.loadSignaturePhotos();
@@ -7767,7 +7766,7 @@ var Inspections = function()
                 return;
             }
             var html = '';
-
+alert(row.id);
             if(objApp.phonegapBuild)
             {
                 var fail = function(error)
