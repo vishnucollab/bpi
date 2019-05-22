@@ -2374,23 +2374,24 @@ var Inspections = function()
                                 window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem)
                                 {
                                     var file_name = new_id + "_thumb.jpg";
-                                    alert(file_name);
                                     // Get permission to write the file
                                     fileSystem.root.getFile(file_name, {create: true, exclusive: false}, function(fileEntry)
                                     {
                                         // Create the file write object
                                         fileEntry.createWriter(function(writer)
                                         {
+                                            alert(writer.toString());
                                             writer.onwriteend = function(evt)
                                             {
+                                                alert(evt.toString());
                                                 // Get the file URI for the thumbnail image
                                                 var uri_thumb = fileEntry.toURI();
                                                 // Now write the full image to the file system
                                                 var file_name = new_id + ".jpg";
-                                                
+
                                                 fileSystem.root.getFile(file_name, {create: true, exclusive: false}, function(fileEntry)
                                                 {
-                                                    alert(filename);
+                                                    alert(file_name);
                                                     // Create the file write object
                                                     fileEntry.createWriter(function(writer)
                                                     {
