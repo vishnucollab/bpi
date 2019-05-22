@@ -2314,7 +2314,7 @@ var Inspections = function()
                 objImage = new Image();
 
                 objImage.src = 'data:image/jpeg;base64,' + photoData;
-
+                alert(objApp.getKey("inspection_id"));
                 //notes = "";
 
                 // When the image has loaded, setup the image marker object
@@ -2364,7 +2364,7 @@ var Inspections = function()
                             else
                                 var new_id = row.id + '_s2';
                             var notes = "";
-
+                            alert(new_id);
                             if(!objApp.phonegapBuild)
                             {
                                 if(!signature_1)
@@ -2437,7 +2437,7 @@ var Inspections = function()
                 {
                     navigator.camera.getPicture(function(imageData)
                         {
-                            editPhoto2(imageData);
+                            editPhoto3(imageData);
 
                         }, function(message)
                         {
