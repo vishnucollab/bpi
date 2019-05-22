@@ -2421,7 +2421,10 @@ var Inspections = function()
                                             };
                                             // Write the thumbnail data to the file.
                                             writer.write(thumbData);
-                                        }, fail);
+                                        }, function(error)
+                                        {
+                                            alert("storePhotosOnFS::createWriter Caught error: " + error.code);
+                                        });
                                     }, function(error)
                                     {
                                         alert("storePhotosOnFS::getFile Caught error: " + error.code);
