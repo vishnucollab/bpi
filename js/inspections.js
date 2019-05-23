@@ -2354,82 +2354,15 @@ var Inspections = function()
                                 var new_id = row.id + '_s1';
                             else
                                 var new_id = row.id + '_s2';
-                            var notes = "";
-                            if(!objApp.phonegapBuild || 1)
-                            {
-                                if(!signature_1)
-                                    var sql = "UPDATE inspections SET signature_1 = ?, signature_1_thumb = ?, dirty = 1 WHERE id = ?";
-                                else
-                                    var sql = "UPDATE inspections SET signature_2 = ?, signature_2_thumb = ?, dirty = 1 WHERE id = ?";
-
-                                objDBUtils.execute(sql, [imageData, thumbData, objApp.getKey("inspection_id")], function()
-                                {
-                                    self.loadSignaturePhotos();
-                                });
-                            }
+                            if(!signature_1)
+                                var sql = "UPDATE inspections SET signature_1 = ?, signature_1_thumb = ?, dirty = 1 WHERE id = ?";
                             else
-                            {
-                                // Phonegap build - save the images to the file system
-                                // Request access to the file system
-                                window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem)
-                                {
-                                    var file_name = new_id + "_thumb.jpg";
-                                    // Get permission to write the file
-                                    fileSystem.root.getFile(file_name, {create: true, exclusive: false}, function(fileEntry)
-                                    {
-                                        // Create the file write object
-                                        fileEntry.createWriter(function(writer)
-                                        {
-                                            writer.onwriteend = function(evt)
-                                            {
-                                                // Get the file URI for the thumbnail image
-                                                var uri_thumb = fileEntry.toURI();
-                                                // Now write the full image to the file system
-                                                var file_name = new_id + ".jpg";
+                                var sql = "UPDATE inspections SET signature_2 = ?, signature_2_thumb = ?, dirty = 1 WHERE id = ?";
 
-                                                fileSystem.root.getFile(file_name, {create: true, exclusive: false}, function(fileEntry)
-                                                {
-                                                    // Create the file write object
-                                                    fileEntry.createWriter(function(writer)
-                                                    {
-                                                        writer.onwriteend = function(evt)
-                                                        {
-                                                            // Get the file URI for the thumbnail image
-                                                            var uri = fileEntry.toURI();
-                                                            if(!signature_1)
-                                                                var sql = "UPDATE inspections SET signature_1 = ?, signature_1_thumb = ?, dirty = 1 WHERE id = ?";
-                                                            else
-                                                                var sql = "UPDATE inspections SET signature_2 = ?, signature_2_thumb = ?, dirty = 1 WHERE id = ?";
-                                                            objDBUtils.execute(sql, [uri_thumb, uri, objApp.getKey("inspection_id")], function()
-                                                            {
-                                                                self.loadSignaturePhotos();
-                                                            });
-                                                        };
-                                                        writer.write(imageData);
-                                                    }, function(error)
-                                                    {
-                                                        alert("storePhotosOnFS::createWriter Caught error: " + error.code);
-                                                    });
-                                                }, function(error)
-                                                {
-                                                    alert("storePhotosOnFS::getFile2 Caught error: " + error.code);
-                                                });
-                                            };
-                                            // Write the thumbnail data to the file.
-                                            writer.write(thumbData);
-                                        }, function(error)
-                                        {
-                                            alert("storePhotosOnFS::createWriter Caught error: " + error.code);
-                                        });
-                                    }, function(error)
-                                    {
-                                        alert("storePhotosOnFS::getFile Caught error: " + error.code);
-                                    });
-                                }, function(error)
-                                {
-                                    alert("storePhotosOnFS::requestFileSystem Caught error: " + error.code);
-                                });
-                            }
+                            objDBUtils.execute(sql, [imageData, thumbData, objApp.getKey("inspection_id")], function()
+                            {
+                                self.loadSignaturePhotos();
+                            });
                         }, function(t){});
                     }
                 }
