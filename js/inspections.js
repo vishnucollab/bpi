@@ -7649,15 +7649,12 @@ var Inspections = function()
 
                         objImage.onload = function()
                         {
-                            objResizer = new imageResizer(objImage);
-                            var thumbData = objResizer.resize(90);
-
                             if(item_id.indexOf('s1') != -1)
-                                var sql = "UPDATE inspections SET signature_1 = ?, signature_1_thumb = ?, dirty = 1 WHERE id = ?";
+                                var sql = "UPDATE inspections SET signature_1 = ?, dirty = 1 WHERE id = ?";
                             else
-                                var sql = "UPDATE inspections SET signature_2 = ?, signature_2_thumb = ?, dirty = 1 WHERE id = ?";
+                                var sql = "UPDATE inspections SET signature_2 = ?, dirty = 1 WHERE id = ?";
 
-                            objDBUtils.execute(sql, [imageData, thumbData, objApp.getKey("inspection_id")], function()
+                            objDBUtils.execute(sql, [imageData, objApp.getKey("inspection_id")], function()
                             {
                                 self.loadSignaturePhotos();
                             });
@@ -7721,7 +7718,7 @@ var Inspections = function()
     this.initSignature1 = function(reset)
     {
         if(objApp.getKey("inspection_id")){
-            var sql = "UPDATE inspections SET signature_1 = '" + TRANS_600x400 + "', signature_1_thumb = '" + TRANS_150x100 + "', dirty = 1 WHERE id = ?";
+            var sql = "UPDATE inspections SET signature_1 = '" + TRANS_600x400 + "', dirty = 1 WHERE id = ?";
             if (typeof reset == 'undefined' || reset == null || reset == undefined || !reset){
                 objDBUtils.loadRecord("inspections", objApp.getKey("inspection_id"), function(param, inspection) {
                     if(!inspection) {
@@ -7740,7 +7737,7 @@ var Inspections = function()
     this.initSignature2 = function(reset)
     {
         if(objApp.getKey("inspection_id")){
-            var sql = "UPDATE inspections SET signature_2 = '" + TRANS_600x400 + "', signature_2_thumb = '" + TRANS_150x100 + "', dirty = 1 WHERE id = ?";
+            var sql = "UPDATE inspections SET signature_2 = '" + TRANS_600x400 + "', dirty = 1 WHERE id = ?";
             if (typeof reset == 'undefined' || reset == null || reset == undefined || !reset){
                 objDBUtils.loadRecord("inspections", objApp.getKey("inspection_id"), function(param, inspection) {
                     if(!inspection) {
