@@ -7,6 +7,8 @@ OBJECT: INSPECTIONS
 * @author: Andrew Chapman
 */
 var selected_report_type = '';
+var TRANS_600x400 = 'iVBORw0KGgoAAAANSUhEUgAAAlgAAAGQAQMAAABI+4zbAAAAA1BMVEUAAACnej3aAAAAAXRSTlMAQObYZgAAADRJREFUeNrtwQENAAAAwiD7p7bHBwwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgKQDdsAAAWZeCiIAAAAASUVORK5CYII=';
+var TRANS_150x100 = 'iVBORw0KGgoAAAANSUhEUgAAAJYAAABkAQMAAABelVuzAAAAA1BMVEUAAACnej3aAAAAAXRSTlMAQObYZgAAABZJREFUOMtjGAWjYBSMglEwCkbBkAcAB9AAAQtyzRgAAAAASUVORK5CYII=';
 
 var Inspections = function()                              
 {
@@ -665,12 +667,12 @@ var Inspections = function()
     this.checkIfNeedPhotos = function()
     {
         $('a.capture-signature-btn').hide();
-        if ($("#inspection #report_type2").val() == 'Client inspection'){
+        if ($("#inspection #report_type2").val() == 'Client inspection' || $("#inspection #report_type2").val() == 'Peet inspection'){
             $('a[id="btnReportPhotos"]').removeClass("hidden");
-        }else{
             if ($("#inspection #report_type2").val() == 'Peet inspection' && ($('#btnStep1Next').is(':visible') || self.getStep() > 1 )){
                 $('a.capture-signature-btn').show();
             }
+        }else{
             $('a[id="btnReportPhotos"]').addClass("hidden");
         }
     }
@@ -2296,117 +2298,9 @@ var Inspections = function()
                 alert("Please create new inspection");
                 return;
             }
+            self.initSignature1();
+            self.initSignature2();
             self.loadSignaturePhotos();
-        });
-
-        $(".inspectionDetails #addSignature-wrapper #addSignature-btn, #addSignatureFromGallery").unbind(objApp.touchEvent);
-        $(".inspectionDetails #addSignature-wrapper #addSignature-btn, #addSignatureFromGallery").bind(objApp.touchEvent, function(e)
-        {
-            e.preventDefault();
-            // The user may NOT add photos to a finalised inspection.
-            if(self.finalised == 1) {
-                alert("Sorry, this inspection has been finalised. If you wish to add or edit signature photos, please un-finalise the inspection first");
-                return;
-            }
-            var editPhoto3 = function(photoData)
-            {
-                // Setup a new image object, using the photo data as the image source
-                objImage = new Image();
-
-                objImage.src = 'data:image/jpeg;base64,' + photoData;
-                //notes = "";
-
-                // When the image has loaded, setup the image marker object
-                objImage.onload = function()
-                {
-                    // Resize the image so it's 600px wide
-                    objResizer = new imageResizer(objImage);
-                    var imageData = objResizer.resize(600);
-
-
-                    // Create a thumbnail version of the image
-                    objImage = new Image();
-                    objImage.src = 'data:image/jpeg;base64,' + imageData;
-
-                    objImage.onload = function()
-                    {
-                        objResizer = new imageResizer(objImage);
-                        var thumbData = objResizer.resize(90);
-
-                        // Make sure the current inspection id is valid - there seems to be a bug sometimes when the id is corrupted
-
-                        objDBUtils.loadRecord("inspections", objApp.getKey("inspection_id"), function(param, row)
-                        {
-                            if(!row)
-                            {
-                                alert("The current inspection id is NOT valid");
-                                return;
-                            }
-                            signature_1 = row.signature_1;
-                            signature_2 = row.signature_2;
-                            if (signature_1 && signature_2)
-                            {
-                                alert("You can only upload 2 signatures.");
-                                return;
-                            }
-
-                            if (signature_1 == null)
-                                var new_id = row.id + '_s1';
-                            else
-                                var new_id = row.id + '_s2';
-                            if(!signature_1)
-                                var sql = "UPDATE inspections SET signature_1 = ?, signature_1_thumb = ?, dirty = 1 WHERE id = ?";
-                            else
-                                var sql = "UPDATE inspections SET signature_2 = ?, signature_2_thumb = ?, dirty = 1 WHERE id = ?";
-
-                            objDBUtils.execute(sql, [imageData, thumbData, objApp.getKey("inspection_id")], function()
-                            {
-                                self.loadSignaturePhotos();
-                            });
-                        }, function(t){});
-                    }
-                }
-            }
-            if(e.target.id=='addSignature-btn'){
-                if(objApp.phonegapBuild)
-                {
-                    navigator.camera.getPicture(function(imageData)
-                        {
-                            editPhoto3(imageData);
-
-                        }, function(message)
-                        {
-                            alert("Image load failed because: " + message);
-                        },
-                        {
-                            quality: 50,
-                            destinationType: Camera.DestinationType.DATA_URL
-                        });
-                }
-            }
-            if(e.target.id=='addSignatureFromGallery'){
-
-                if(objApp.phonegapBuild)
-                {
-                    // Invoke the camera API to allow the user to take a photo
-                    navigator.camera.getPicture(function(imageData)
-                        {
-                            // The image data will be a ele URI
-                            // Show the photo in the image editor.
-                            editPhoto3(imageData);
-
-                        }, function(message)
-                        {
-                            alert("Image load failed because: " + message);
-                        },
-                        {
-                            quality: 50,
-                            destinationType: Camera.DestinationType.DATA_URL,
-                            sourceType : Camera.PictureSourceType.PHOTOLIBRARY,
-                            correctOrientation: true
-                        });
-                }
-            }
         });
 
         $("#btnDone.close-reveal-modal").unbind(objApp.touchEvent);
@@ -6582,7 +6476,7 @@ var Inspections = function()
             $('#btnStep3Back').removeClass('hidden');
             $('#finished').removeClass('active');
             $('#keywords').removeClass('hidden');
-            if ($("#inspection #report_type2").val() == 'Client inspection')
+            if ($("#inspection #report_type2").val() == 'Client inspection' || $("#inspection #report_type2").val() == 'Peet inspection')
                 $("#btnReportPhotos").removeClass("hidden");
             $("div.btnReinspect").hide();
             $("#tblRateListing select.ratingSelect").removeAttr("readonly");
@@ -7692,116 +7586,32 @@ var Inspections = function()
 
         objDBUtils.loadRecord("inspections", objApp.getKey("inspection_id"), function(param, row)
         {
-            if(!row.signature_1 && !row.signature_2)
-            {
-                $("#signatureWrapper #signatureList").html("<p>This inspection has no signatures.</p>");
-                return;
-            }
+            if(!row.signature_1)
+                self.initSignature1();
+            if(!row.signature_2)
+                self.initSignature2();
             var html = '';
-
-            if(objApp.phonegapBuild && 0)
+            if(row.signature_1)
             {
-                var fail = function(error)
-                {
-                    alert("loadPhotos::Caught error: " + error.code);
+                var delete_node = '<div class="deleteSignature" data-id="' + row.id + '_s1"></div>';
+                if(self.finalised == 1) {
+                    delete_node = "";
                 }
 
-                // Request access to the file system
-                window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem)
-                {
-                    // We have access to the file system.
-
-                    // Define the function to load the next image for phonegap builds.
-                    // The thumbnail image data is coming straight from the local file system
-                    if(row.signature_1_thumb)
-                    {
-                        var file_name = row.id + "_s1_thumb.jpg";
-
-                        // Get permission to access the file entry
-                        fileSystem.root.getFile(file_name, {create: true}, function(fileEntry)
-                        {
-                            // Get access to the file object
-                            fileEntry.file(function(file)
-                            {
-                                // Create a file reader and read the file data.
-                                var reader = new FileReader();
-
-                                // When we've finished loading the file,
-                                // build the HTML string and move to the next item
-                                reader.onloadend = function(evt)
-                                {
-                                    var delete_node = '<div class="deleteSignature" data-id="' + row.id + '_s1"></div>';
-                                    if(self.finalised == 1) {
-                                        delete_node = "";
-                                    }
-
-                                    html += '<li>' + delete_node + '<a rel="' + row.id + '_s1"><img width="90" height="60" src="data:image/jpeg;base64,' + (evt.target && evt.target.result?evt.target.result:row.signature_1_thumb) + '" /></a><div class="imageNotes">Signature 1</div></li>';
-                                    self.showSignaturePhotos(html);
-                                };
-
-                                reader.readAsText(file);
-                            }, fail);
-                        }, fail);
-                    }
-
-                    if(row.signature_2_thumb)
-                    {
-                        var file_name = row.id + "_s2_thumb.jpg";
-
-                        // Get permission to access the file entry
-                        fileSystem.root.getFile(file_name, {create: true}, function(fileEntry)
-                        {
-                            // Get access to the file object
-                            fileEntry.file(function(file)
-                            {
-                                // Create a file reader and read the file data.
-                                var reader = new FileReader();
-
-                                // When we've finished loading the file,
-                                // build the HTML string and move to the next item
-                                reader.onloadend = function(evt)
-                                {
-                                    var delete_node = '<div class="deleteSignature" data-id="' + row.id + '_s2"></div>';
-                                    if(self.finalised == 1) {
-                                        delete_node = "";
-                                    }
-
-                                    html += '<li>' + delete_node + '<a rel="' + row.id + '_s2"><img width="90" height="60" src="data:image/jpeg;base64,' + (evt.target && evt.target.result?evt.target.result:row.signature_2_thumb) + '" /></a><div class="imageNotes">Signature 2</div></li>';
-                                    self.showSignaturePhotos(html);
-                                };
-
-                                reader.readAsText(file);
-                            }, fail);
-                        }, fail);
-                    }
-                }, fail);
+                html += '<li>' + delete_node + '<a rel="' + row.id + '_s1"><img width="250" src="data:image/jpeg;base64,' + row.signature_1 + '" /></a><div class="imageNotes">Signature 1</div></li>';
             }
-            else
+
+            if(row.signature_2)
             {
-                // Define the function to load the next image for non-phonegap builds
-                // The thumbnail image data is coming straight from the database in this case.
-                if(row.signature_1_thumb)
-                {
-                    var delete_node = '<div class="deleteSignature" data-id="' + row.id + '_s1"></div>';
-                    if(self.finalised == 1) {
-                        delete_node = "";
-                    }
-
-                    html += '<li>' + delete_node + '<a rel="' + row.id + '_s1"><img width="90" height="60" src="data:image/jpeg;base64,' + row.signature_1_thumb + '" /></a><div class="imageNotes">Signature 1</div></li>';
+                var delete_node = '<div class="deleteSignature" data-id="' + row.id + '_s2"></div>';
+                if(self.finalised == 1) {
+                    delete_node = "";
                 }
 
-                if(row.signature_2_thumb)
-                {
-                    var delete_node = '<div class="deleteSignature" data-id="' + row.id + '_s2"></div>';
-                    if(self.finalised == 1) {
-                        delete_node = "";
-                    }
-
-                    html += '<li>' + delete_node + '<a rel="' + row.id + '_s2"><img width="90" height="60" src="data:image/jpeg;base64,' + row.signature_2_thumb + '" /></a><div class="imageNotes">Signature 2</div></li>';
-                }
-
-                self.showSignaturePhotos(html);
+                html += '<li>' + delete_node + '<a rel="' + row.id + '_s2"><img width="250" src="data:image/jpeg;base64,' + row.signature_2 + '" /></a><div class="imageNotes">Signature 2</div></li>';
             }
+
+            self.showSignaturePhotos(html);
         }, "");
     }
 
@@ -7816,7 +7626,69 @@ var Inspections = function()
         {
             html = '<ul class="gallery">' + html + '</ul>' + '<div style="clear:both;"></div>';
             $("#signatureWrapper #signatureList").html(html);
-            $("#signatureWrapper #signatureList a").unbind();
+
+            var editSignature = function(item_id, signatureData)
+            {
+                // Setup a new image object, using the photo data as the image source
+                objImage = new Image();
+                objImage.src = 'data:image/jpeg;base64,' + signatureData;
+
+                //notes = "";
+
+                // When the image has loaded, setup the image marker object
+                objImage.onload = function()
+                {
+                    objSignMarker = new signatureMarker(objImage, "Capture Signature", function(signatureMarkerResult)
+                    {
+                        // Handle the save event
+                        var imageData = signatureMarkerResult.imageData;
+
+                        // Create a thumbnail version of the image
+                        objImage = new Image();
+                        objImage.src = 'data:image/png;base64,' + imageData;
+
+                        objImage.onload = function()
+                        {
+                            objResizer = new imageResizer(objImage);
+                            var thumbData = objResizer.resize(90);
+
+                            if(item_id.indexOf('s1') != -1)
+                                var sql = "UPDATE inspections SET signature_1 = ?, signature_1_thumb = ?, dirty = 1 WHERE id = ?";
+                            else
+                                var sql = "UPDATE inspections SET signature_2 = ?, signature_2_thumb = ?, dirty = 1 WHERE id = ?";
+
+                            objDBUtils.execute(sql, [imageData, thumbData, objApp.getKey("inspection_id")], function()
+                            {
+                                self.loadSignaturePhotos();
+                            });
+                        }
+                    }, self.deleteSignature, item_id, false);
+
+                    objSignMarker.show();
+                }
+            }
+
+            $("#signatureWrapper #signatureList a").unbind(objApp.touchEvent);
+            $("#signatureWrapper #signatureList a").bind(objApp.touchEvent, function(e)
+            {
+                e.preventDefault();
+
+                // Get the id of the selected photo
+                var item_id = $(this).attr("rel");
+
+                objDBUtils.loadRecord("inspections", objApp.getKey("inspection_id"), function(item_id, inspection) {
+                    if(!inspection) {
+                        return;
+                    }
+                    if(item_id.indexOf('s1') != -1){
+                        editSignature(item_id, inspection.signature_1);
+                    }else{
+                        editSignature(item_id, inspection.signature_2);
+                    }
+                }, item_id);
+            });
+
+            $("#signatureWrapper .deleteSignature").unbind();
             $("#signatureWrapper .deleteSignature").bind(objApp.touchEvent, function(e)
             {
                 e.preventDefault();
@@ -7839,15 +7711,49 @@ var Inspections = function()
             return;
 
         if(item_id.indexOf('s1') != -1)
-            var sql = "UPDATE inspections SET signature_1 = NULL, signature_1_thumb = NULL, dirty = 1 WHERE id = ?";
+            self.initSignature1(1);
         else
-            var sql = "UPDATE inspections SET signature_2 = NULL, signature_2_thumb = NULL, dirty = 1 WHERE id = ?";
+            self.initSignature2(1);
 
-        objDBUtils.execute(sql, [objApp.getKey("inspection_id")], function()
-        {
-            // Reload the inspection photos listing
-            self.loadSignaturePhotos();
-        });
+        self.loadSignaturePhotos();
+    }
+
+    this.initSignature1 = function(reset)
+    {
+        if(objApp.getKey("inspection_id")){
+            var sql = "UPDATE inspections SET signature_1 = '" + TRANS_600x400 + "', signature_1_thumb = '" + TRANS_150x100 + "', dirty = 1 WHERE id = ?";
+            if (typeof reset == 'undefined' || reset == null || reset == undefined || !reset){
+                objDBUtils.loadRecord("inspections", objApp.getKey("inspection_id"), function(param, inspection) {
+                    if(!inspection) {
+                        return;
+                    }
+                    if(inspection.signature_1 == null || inspection.signature_1 == ''){
+                        objDBUtils.execute(sql, [objApp.getKey("inspection_id")]);
+                    }
+                }, "");
+            }else{
+                objDBUtils.execute(sql, [objApp.getKey("inspection_id")]);
+            }
+        }
+    }
+
+    this.initSignature2 = function(reset)
+    {
+        if(objApp.getKey("inspection_id")){
+            var sql = "UPDATE inspections SET signature_2 = '" + TRANS_600x400 + "', signature_2_thumb = '" + TRANS_150x100 + "', dirty = 1 WHERE id = ?";
+            if (typeof reset == 'undefined' || reset == null || reset == undefined || !reset){
+                objDBUtils.loadRecord("inspections", objApp.getKey("inspection_id"), function(param, inspection) {
+                    if(!inspection) {
+                        return;
+                    }
+                    if(inspection.signature_2 == null || inspection.signature_2 == ''){
+                        objDBUtils.execute(sql, [objApp.getKey("inspection_id")]);
+                    }
+                }, "");
+            }else{
+                objDBUtils.execute(sql, [objApp.getKey("inspection_id")]);
+            }
+        }
     }
 };
 

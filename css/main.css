@@ -1544,7 +1544,7 @@ aside textarea
     width: 28px;
     position: absolute;
 }
-#addPhotoFromGallery, #addSignatureFromGallery{
+#addPhotoFromGallery{
     font-size: 14pt;
     background: url("../images/gallery-75.png") top left no-repeat;
     right: 20px;
@@ -1637,11 +1637,11 @@ aside textarea
     overflow: hidden;
 }
 #signatureWrapper.reveal-modal{
-    width: 95%;
-    height: 86%;
+    width: 80%;
+    height: 60%;
     padding: 0;
     margin: 2%;
-    left: 0;
+    left: 10%;
     top: 5% !important;
 }
 #signatureWrapper .controlBtns
@@ -1658,23 +1658,6 @@ aside textarea
 }
 #signatureWrapper #signatureList p{
     padding-left: 35px;
-}
-
-#signatureWrapper #addSignature-wrapper{
-    height: 30px;
-    margin-top: 20px;
-}
-#signatureWrapper #addSignature-wrapper>a#addSignature-btn{
-    background: url("../images/camera-75.png") top left no-repeat;
-    right: 0px;
-    width: 140px;
-    padding-left: 80px;
-    position: absolute;
-    height: 75px;
-    text-decoration: none;
-    color: black;
-    font-weight: bold;
-    font-size: 14pt;
 }
     
 .inspectionDetails #tblDefectListingHeader, .inspectionDetails #tblDefectListing{
@@ -1698,14 +1681,17 @@ aside textarea
         float: left;
         margin: 0;
         background: none;
-        width: 135px;
+        width: 300px;
         vertical-align: top;
 	    cursor: pointer;
     }
     .inspectionDetails #signatureList ul.gallery li{
-        height: 120px;
+        height: 230px;
         text-align: center;
     }
+        .inspectionDetails #signatureList ul.gallery li img{
+            border: 1px solid #888;
+        }
     .inspectionDetails ul.gallery li .deletePhoto, .inspectionDetails ul.gallery li .deleteSignature{
         height: 39px;
         width: 35px;
