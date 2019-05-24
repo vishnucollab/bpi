@@ -667,12 +667,12 @@ var Inspections = function()
     this.checkIfNeedPhotos = function()
     {
         $('a.capture-signature-btn').hide();
-        if ($("#inspection #report_type2").val() == 'Client inspection' || $("#inspection #report_type2").val() == 'Peet inspection'){
+        if ($("#inspection #report_type2").val() == 'Client inspection'){
             $('a[id="btnReportPhotos"]').removeClass("hidden");
+        }else{
             if ($("#inspection #report_type2").val() == 'Peet inspection' && ($('#btnStep1Next').is(':visible') || self.getStep() > 1 )){
                 $('a.capture-signature-btn').show();
             }
-        }else{
             $('a[id="btnReportPhotos"]').addClass("hidden");
         }
     }
@@ -6476,7 +6476,7 @@ var Inspections = function()
             $('#btnStep3Back').removeClass('hidden');
             $('#finished').removeClass('active');
             $('#keywords').removeClass('hidden');
-            if ($("#inspection #report_type2").val() == 'Client inspection' || $("#inspection #report_type2").val() == 'Peet inspection')
+            if ($("#inspection #report_type2").val() == 'Client inspection')
                 $("#btnReportPhotos").removeClass("hidden");
             $("div.btnReinspect").hide();
             $("#tblRateListing select.ratingSelect").removeAttr("readonly");
@@ -7586,10 +7586,15 @@ var Inspections = function()
 
         objDBUtils.loadRecord("inspections", objApp.getKey("inspection_id"), function(param, row)
         {
-            if(!row.signature_1)
+            if(!row.signature_1){
                 self.initSignature1();
-            if(!row.signature_2)
+                return;
+            }
+            if(!row.signature_2){
                 self.initSignature2();
+                return;
+            }
+
             var html = '';
             if(row.signature_1)
             {
@@ -7690,7 +7695,7 @@ var Inspections = function()
             {
                 e.preventDefault();
 
-                if(!confirm("Are you sure you want to delete this signature? Once the photo has been deleted you cannot recover it."))
+                if(!confirm("Are you sure you want to delete this signature? Once the signature has been deleted you cannot recover it."))
                 {
                     return false;
                 }
@@ -7725,11 +7730,15 @@ var Inspections = function()
                         return;
                     }
                     if(inspection.signature_1 == null || inspection.signature_1 == ''){
-                        objDBUtils.execute(sql, [objApp.getKey("inspection_id")]);
+                        objDBUtils.execute(sql, [objApp.getKey("inspection_id")], function(){
+                            self.loadSignaturePhotos();
+                        });
                     }
                 }, "");
             }else{
-                objDBUtils.execute(sql, [objApp.getKey("inspection_id")]);
+                objDBUtils.execute(sql, [objApp.getKey("inspection_id")], function(){
+                    self.loadSignaturePhotos();
+                });
             }
         }
     }
@@ -7744,11 +7753,15 @@ var Inspections = function()
                         return;
                     }
                     if(inspection.signature_2 == null || inspection.signature_2 == ''){
-                        objDBUtils.execute(sql, [objApp.getKey("inspection_id")]);
+                        objDBUtils.execute(sql, [objApp.getKey("inspection_id")], function(){
+                            self.loadSignaturePhotos();
+                        });
                     }
                 }, "");
             }else{
-                objDBUtils.execute(sql, [objApp.getKey("inspection_id")]);
+                objDBUtils.execute(sql, [objApp.getKey("inspection_id")], function(){
+                    self.loadSignaturePhotos();
+                });
             }
         }
     }
