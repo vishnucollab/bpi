@@ -7645,7 +7645,7 @@ var Inspections = function()
 
                         // Create a thumbnail version of the image
                         objImage = new Image();
-                        objImage.src = 'data:image/png;base64,' + imageData;
+                        objImage.src = 'data:image/jpeg;base64,' + imageData;
 
                         objImage.onload = function()
                         {

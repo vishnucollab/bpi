@@ -1263,9 +1263,7 @@ function DBUtils()
                 "'grout_samples' SMALLINT(6) DEFAULT 0, " +
                 "'barrel_code' TEXT DEFAULT NULL, " +
                 "'signature_1' TEXT DEFAULT NULL, " +
-                "'signature_1_thumb' TEXT DEFAULT NULL, " +
                 "'signature_2' TEXT DEFAULT NULL, " +
-                "'signature_2_thumb' TEXT DEFAULT NULL, " +
 				"'certificated' SMALLINT(6) DEFAULT 0, " +
                 "'created_by' INTEGER NOT NULL, " +
 				"'deleted' INTEGER NOT NULL DEFAULT 0 , " + 

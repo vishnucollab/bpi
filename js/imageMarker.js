@@ -559,7 +559,7 @@ var signatureMarker = function(objsignature, heading, saveMethod, deleteMethod, 
 
             // Get the signature data in base64 encoding.
             var strDataURI = self.canvas.toDataURL("image/png");
-console.log(strDataURI);
+
             // Chop off the base64 header.
             var b64pos = strDataURI.indexOf("base64,");
             strDataURI = strDataURI.substring(b64pos + 7);
