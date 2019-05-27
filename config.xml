@@ -3,10 +3,10 @@
         xmlns:gap = "http://phonegap.com/ns/1.0"
         id = "net.wearebuilding.bpi-api"
         version = "2.0.16">
-    <name>Blueprint Test</name>
+    <name>Blueprint</name>
 
     <description>
-        This is using for testing Blueprint iPad app.
+        Conduct onsite buidling inspections with Blueprint and produce beautiful reports that your clients will love.
     </description>
 
     <author href="http://www.simb.com.au" email="dev3@simb.com.au">
