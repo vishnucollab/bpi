@@ -1681,12 +1681,13 @@ aside textarea
         float: left;
         margin: 0;
         background: none;
-        width: 300px;
+        width: 135px;
         vertical-align: top;
 	    cursor: pointer;
     }
     .inspectionDetails #signatureList ul.gallery li{
         height: 230px;
+        width: 300px;
         text-align: center;
     }
         .inspectionDetails #signatureList ul.gallery li img{
