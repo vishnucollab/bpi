@@ -3631,7 +3631,6 @@ var Inspections = function()
                 $(".capture-significant-image, .select-significant-image").unbind(objApp.touchEvent);
                 $(".capture-significant-image, .select-significant-image").bind(objApp.touchEvent, function(e)
                 {
-                    console.log($('select.defect-selector').val());
                     e.preventDefault();
                     if($('select.defect-selector').val() == ''){
                         alert('Please select the defect first.');
@@ -3784,7 +3783,8 @@ var Inspections = function()
                                 }
                             }
                         }
-                        if($this.hasClass('capture-signficant-image')){
+
+                        if($this.hasClass('capture-significant-image')){
                             if(objApp.phonegapBuild)
                             {
                                 navigator.camera.getPicture(function(imageData)
@@ -3801,7 +3801,7 @@ var Inspections = function()
                                     });
                             }
                         }
-                        if($this.hasClass('select-signficant-image')){
+                        if($this.hasClass('select-significant-image')){
 
                             if(objApp.phonegapBuild)
                             {
