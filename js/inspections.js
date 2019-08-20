@@ -3827,6 +3827,33 @@ var Inspections = function()
 
                     });
                 });
+
+                $(".delete-significant-item").unbind(objApp.touchEvent);
+                $(".delete-significant-item").bind(objApp.touchEvent, function(e)
+                {
+                    e.preventDefault();
+                    if(confirm("Are you sure that you want to delete this failed item?"))
+                    {
+                        var photo_id = $(this).attr('rel');
+                        if (photo_id == "")
+                            return;
+
+                        var current_table = "inspectionitemphotos";
+                        if(!objApp.empty(objApp.getKey("reinspection_id"))) {
+                            current_table = "reinspectionitemphotos";
+                        }
+
+                        // Flag all related photo records as deleted.
+                        var sql = "UPDATE " + current_table + " " +
+                            "SET deleted = 1, dirty = 1 " +
+                            "WHERE id = ?";
+
+                        objDBUtils.execute(sql, [photo_id], function()
+                        {
+                            self.showSignificantItems();
+                        });
+                    }
+                });
             }
 
             if(objApp.phonegapBuild && maxLoop)
@@ -3867,7 +3894,7 @@ var Inspections = function()
                                     reader.onloadend = function(evt)
                                     {
                                         html += '<tr>';
-                                        html += '<td>#'+ self.defectsObjects[row.defect_id].seq_no + ' ' + self.defectsObjects[row.defect_id].location +'</td>';
+                                        html += '<td><a href="#" rel="'+row.id+'" class="delete-significant-item">Delele</a>#' + self.defectsObjects[row.defect_id].seq_no + ' ' + self.defectsObjects[row.defect_id].location +'</td>';
                                         html += '<td><img width="150" height="100" src="data:image/jpeg;base64,' + evt.target.result + '" /></td>';
                                         html += '<td>'+ self.defectsObjects[row.defect_id].observation+'</td>';
                                         html += '</tr>';
@@ -3908,7 +3935,7 @@ var Inspections = function()
                     if(row.photodata != "")
                     {
                         html += '<tr>';
-                        html += '<td>#'+ self.defectsObjects[row.defect_id].seq_no + ' ' + self.defectsObjects[row.defect_id].location +'</td>';
+                        html += '<td><a href="#" rel="'+row.id+'" class="delete-significant-item">Delele</a>#'+ self.defectsObjects[row.defect_id].seq_no + ' ' + self.defectsObjects[row.defect_id].location +'</td>';
                         html += '<td><img width="150" height="100" src="data:image/jpeg;base64,' + row.photodata_tmb + '" /></td>';
                         html += '<td>'+ self.defectsObjects[row.defect_id].observation+'</td>';
                         html += '</tr>';

@@ -583,6 +583,17 @@ div#subheader .right h1{
 
 #significantItems{max-height: 500px;}
 #significantItemsList{max-height: 388px;}
+#significantItemsList #tblSignificantItemsListing a.delete-significant-item {
+    display: inline-block;
+    margin-right: 5px;
+    text-decoration: none;
+    color: #FFF;
+    background: #ff4539;
+    padding: 0 10px;
+    font-size: .9em;
+    border-radius: 10px;
+    -webkit-border-radius: 10px;
+}
 /* End simb-dev3 */
 
 /* footer ------------------------------ */
