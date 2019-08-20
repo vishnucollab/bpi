@@ -1499,12 +1499,13 @@ function DBUtils()
                 "'company_id' VARCHAR KEY NULL DEFAULT 0 , " +
 				"'inspection_id' VARCHAR NOT NULL, " +
 				"'seq_no' INTEGER NOT NULL, " +
+                "'defect_id' VARCHAR NULL , " +
 				"'photodata_tmb' VARCHAR, " +
 				"'photodata' VARCHAR, " +	
 				"'notes' VARCHAR, " +	
                 "'is_cover_photo' INTEGER NOT NULL DEFAULT 0 , " + 
-                "'is_report_photo' INTEGER NOT NULL DEFAULT 0 , " + 
-				"'created_by' INTEGER NOT NULL, " +				
+                "'is_report_photo' INTEGER NOT NULL DEFAULT 0 , " +
+                "'created_by' INTEGER NOT NULL, " +
 				//"'modified' TIMESTAMP NOT NULL, " +				
                 "'modified' TIMESTAMP, " +                
 				"'deleted' INTEGER NOT NULL DEFAULT 0 , " + 
@@ -1558,6 +1559,7 @@ function DBUtils()
 			    "'company_id' VARCHAR KEY NULL DEFAULT 0 , " +
 				"'reinspection_id' VARCHAR NOT NULL, " +
 				"'seq_no' INTEGER NOT NULL, " +
+                "'defect_id' VARCHAR NULL , " +
 				"'photodata_tmb' VARCHAR, " +
 				"'photodata' VARCHAR, " +	
 				"'notes' VARCHAR, " +	

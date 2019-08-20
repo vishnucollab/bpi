@@ -580,6 +580,9 @@ div#subheader .right h1{
 
 #reportPhotos{max-height: 500px;}
 #reportPhotoList{max-height: 388px;}
+
+#significantItems{max-height: 500px;}
+#significantItemsList{max-height: 388px;}
 /* End simb-dev3 */
 
 /* footer ------------------------------ */
@@ -1243,7 +1246,7 @@ aside textarea
     padding: 2px 5px;
 }
     
-#btnAddDefect, a.btnEditNotes, #btnStep3Email, #btnReportPhotos, #btnStep4Email, #btnSendReport, #btnSendReport2, #btnSendReport3 {
+#btnAddDefect, a.btnEditNotes, #btnStep3Email, #btnReportPhotos, #btnSignificantItems, #btnStep4Email, #btnSendReport, #btnSendReport2, #btnSendReport3 {
     margin-left: 10px;
     top: 35px;
 }
@@ -1443,10 +1446,13 @@ aside textarea
     }
     
     .inspectionDetails .bottomBtns .btnContainer{
-        width: 80px;
+        width: 65px;
         margin: 10px;
         height: 80px;
         position: relative;
+    }
+    .inspectionDetails .bottomBtns .btnContainer.w80{
+        width: 80px;
     }
     #reinspection.inspectionDetails .bottomBtns .btnContainer:not(.w80){
         width: 60px;

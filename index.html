@@ -658,6 +658,7 @@
                 </div>
 
                 <a id="btnReportPhotos" class="button left hidden" href="javascript:void(0);">Set Report Photos</a>
+                <a id="btnSignificantItems" class="button left hidden" href="javascript:void(0);">Sig Items</a>
                 <a id="btnSendReport" class="button left hidden" href="javascript:void(0);">SEND BPI</a>
 
                 <div class="btnContainer right">
@@ -761,7 +762,7 @@
             </form>
 
             <div class="bottomBtns">
-                <div class="btnContainer left">
+                <div class="btnContainer left w80">
                     <a id="btnStep4Back" class="gotoStep3 mtop20 left btn-bg-w81" href="#">Back</a>
                 </div>
 
@@ -863,7 +864,7 @@
             </form>
 
             <div class="bottomBtns">
-                <div class="btnContainer left">
+                <div class="btnContainer left w80">
                     <a id="btnStep5Back" class="gotoStep4 mtop20 left btn-bg-w81" href="#">Back</a>
                 </div>
 
@@ -918,6 +919,29 @@
             </div>
         </div>
 
+
+        <!-- inspection step 4 screen -->
+        <div id="significantItems" class="hidden panel">
+            <form action="#" id="frmSignificantItems" method="post">
+                <table id="tblSignificantItems" class="listing">
+                    <thead>
+                    <tr>
+                        <th>Defect</th>
+                        <th>Photo</th>
+                        <th>Details</th>
+                    </tr>
+                    </thead>
+                </table>
+
+                <div id="significantItemsList" class="scrollWrapper"></div>
+            </form>
+
+            <div class="bottomBtns">
+                <div class="btnContainer left">
+                    <a id="btnSignificantItemsBack" class="button left gotoStep3" href="#">Back</a>
+                </div>
+            </div>
+        </div>
 
         <!-- inspection listing screen -->
         <div id="inspectionList" class="hidden panel">

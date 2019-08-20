@@ -37,6 +37,8 @@ var Inspections = function()
     this.isEditing = 0;
     this.itemSortBy = 'seq_no';
     this.itemSortDir = 'DESC';
+    this.defectsArray = [];
+    this.defectsObjects = {};
     this.numberOfIssues = 0;
     this.numberOfAcknowledgements = 0;
     this.historyPhotosHtml = '';
@@ -667,7 +669,7 @@ var Inspections = function()
     this.checkIfNeedPhotos = function()
     {
         $('a.capture-signature-btn').hide();
-        if ($("#inspection #report_type2").val() == 'Client inspection'){
+        if ($("#inspection #report_type2").val() == 'Client inspection' && !self.finalised){
             $('a[id="btnReportPhotos"]').removeClass("hidden");
         }else{
             if ($("#inspection #report_type2").val() == 'Peet inspection' && ($('#btnStep1Next').is(':visible') || self.getStep() > 1 )){
@@ -1575,6 +1577,7 @@ var Inspections = function()
         $('#frmInspectionDetails #state').val(objApp.keys.state);
         $('#frmInspectionDetails #state').trigger('change');
 
+        $("#frmInspectionDetails #supervisor_id").bind('change');
         $("#frmInspectionDetails #supervisor_id").bind('change', function(){self.checkSaveInspection(false)});
 	}
 
@@ -1644,15 +1647,12 @@ var Inspections = function()
 
     this.loadSupervisors = function(builder_id)
     {
-        var sql = "SELECT users.id, users.first_name, users.last_name " +
+        var sql = "SELECT DISTINCT users.id, users.first_name, users.last_name " +
             "FROM users INNER JOIN builders_supervisors ON builders_supervisors.supervisor_id = users.id " +
             "WHERE builders_supervisors.builder_id = ? AND users.deleted = 0";
-
-        $('#frmInspectionDetails #supervisor_id').empty();
-        $('#frmInspectionDetails #supervisor_id').append('<option value="">Choose</option>');
-
         objDBUtils.loadRecordsSQL(sql, [builder_id], function(param, items)
         {
+            $('#frmInspectionDetails #supervisor_id').html('<option value="">Choose</option>');
             if(items)
             {
                 var maxLength = items.rows.length;
@@ -1776,6 +1776,7 @@ var Inspections = function()
         $("#reinspection a.failed").unbind();
         $('#reinspection select#rectified').unbind();
         $("#btnReportPhotos").unbind();
+        $("#btnSignificantItems").unbind();
         $("#frmEmailTo").unbind();
         $("a.sendEmailButton").unbind();
         $("a.btnViewChart").unbind();
@@ -3098,6 +3099,11 @@ var Inspections = function()
             self.showReportPhotos();
         });
 
+        $("#btnSignificantItems").bind(objApp.touchEvent, function(e) {
+            e.preventDefault();
+            self.showSignificantItems();
+        });
+
         $("#btnSendReport, #btnSendReport2, #btnSendReport3").unbind(objApp.touchEvent);
         $("#btnSendReport, #btnSendReport2, #btnSendReport3").bind(objApp.touchEvent, function(e) {
             if(objApp.keys.reinspection_id != "") {
@@ -3520,6 +3526,415 @@ var Inspections = function()
             self.showStep3();
         });
 
+    }
+
+    this.showSignificantItems = function()
+    {
+        objApp.clearMain();
+        objApp.setSubHeading("Significant Failed Items");
+        $("#significantItems").removeClass("hidden");
+
+        // Unbind events
+        $("#btnSignificantItemsBack").unbind();
+        $("#tblSignificantItemsListing input").unbind();
+
+        // Load the inspection photos (if any)
+        if(objApp.empty(objApp.getKey("inspection_id"))) {
+            alert("showSignificantItems - Invalid inspection");
+            return;
+        }
+
+        if(self.defectsArray.length == 0){
+            $("#significantItemsList").html("<p>Sorry, this inspection currently has no defects.</p>");
+            return;
+        }
+        var defectsSelector = '<select style="width: 100%;" class="defect-selector">';
+        for(var d in self.defectsArray){
+            defectsSelector += '<option data-index="'+d+'" value="'+self.defectsArray[d].id+'">'+ self.defectsArray[d].seq_no + ' - ' + self.defectsArray[d].location +'</option>';
+        }
+        defectsSelector += '</select>';
+
+        objDBUtils.orderBy = "seq_no ASC";
+
+        var filters = [];
+        filters.push(new Array("inspection_id = '" + objApp.getKey("inspection_id") + "'"));
+        filters.push(new Array("defect_id IS NOT NULL"));
+
+        objDBUtils.loadRecords('inspectionitemphotos', filters, function(param, items)
+        {
+            // Loop through the items, building the output list as we go.
+            var maxLoop = items?items.rows.length:0;
+            var r = 0;
+            var num_items = 0;
+
+            var html = '<table id="tblSignificantItemsListing" class="listing">';
+
+            /**
+             * Shows the generated photo table listing HTML and also sets the table widths
+             *
+             * @param {String} html  The HTML to be used for the table listing
+             */
+            var showSignificantItemsHTML = function(html) {
+                // Finish the table HTML
+                html += '<tr>';
+                html += '<td>'+defectsSelector+'</td>';
+                html += '<td><a href="#" class="capture-significant-image left"><img width="40" src="images/camera-75.png" /></a>&nbsp;<a href="#" class="select-significant-image left"><img width="40" src="images/gallery-75.png" /></a></td>';
+                html += '<td></td>';
+                html += '</tr>';
+                html += '</table>';
+
+                // Kill iScroll if it already exists
+                if(this.scroller) {
+                    this.scroller.destroy();
+                    this.scroller = null;
+                }
+
+                // Inject the HTML
+                $("#significantItemsList").html(html);
+
+                // Set the listing table widths
+                var orientation = objApp.getOrientation();
+                var screenWidth = screen.width;
+
+                if(orientation == "landscape") {
+                    screenWidth = screen.width > screen.height?screen.width:screen.height;
+                }
+
+                var tableWidth = screenWidth - 50;
+
+                $("#significantItemsList").css("width", tableWidth + 20 + "px");
+
+                var tableHeader = $("#tblSignificantItems");
+                var tableBody = $("#tblSignificantItemsListing");
+                $(tableHeader).css("table-layout", "fixed");
+                $(tableBody).css("table-layout", "fixed");
+                $(tableHeader).css("width", tableWidth + "px");
+                $(tableBody).css("width", tableWidth + "px");
+
+                tableWidth = tableWidth - 45;
+
+                var average_width = Math.floor(tableWidth / 3);
+                average_width = average_width - 22;  // Take into account 10px padding left and right, 10 + 10 = 20, plus 1px border left and right
+
+                $(tableHeader).find("th:eq(0)").css("width", average_width + "px");
+                $(tableHeader).find("th:eq(1)").css("width", average_width + "px");
+                $(tableHeader).find("th:eq(2)").css("width", average_width + "px");
+
+                $(tableBody).find("tr td:eq(0)").css("width", average_width + "px");
+                $(tableBody).find("tr td:eq(1)").css("width", average_width + "px");
+                $(tableBody).find("tr td:eq(2)").css("width", average_width + "px");
+
+                if(objUtils.isMobileDevice()) {
+                    self.scroller = new IScroll5('#significantItemsList', { hScrollbar: false, vScrollbar: false, scrollbarClass: 'myScrollbar', tap: true});
+                }
+
+                $(".capture-significant-image, .select-significant-image").unbind(objApp.touchEvent);
+                $(".capture-significant-image, .select-significant-image").bind(objApp.touchEvent, function(e)
+                {
+                    console.log($('select.defect-selector').val());
+                    e.preventDefault();
+                    if($('select.defect-selector').val() == ''){
+                        alert('Please select the defect first.');
+                        return;
+                    }
+                    var $this = $(this);
+                    // The user may NOT add photos to a finalised inspection.
+                    if(self.finalised == 1) {
+                        alert("Sorry, this inspection has been finalised.  If you wish to add more photos, please un-finalise the inspection first");
+                        return;
+                    }
+                    self.current_table = "inspectionitemphotos";
+                    self.current_key = "inspection_id";
+
+                    if(!objApp.empty(objApp.getKey("reinspection_id"))) {
+                        self.current_table = "reinspectionitemphotos";
+                        self.current_key = "reinspection_id";
+                    }
+
+                    // Get the current maximum photo sequence number for this inspection item
+                    var sql = "SELECT MAX(seq_no) as seq_no " +
+                        "FROM " + self.current_table + " " +
+                        "WHERE " + self.current_key + " = ? " +
+                        "AND deleted = 0";
+                    objDBUtils.loadRecordSQL(sql, [objApp.getKey(self.current_key)], function(row)
+                    {
+                        var seq_no = 1;  // Default sequence number to 1.
+                        if(row)
+                        {
+                            seq_no = row.seq_no;
+
+                            if((seq_no == null) || (seq_no == 0))
+                            {
+                                seq_no = 0;
+                            }
+                            seq_no += 1;
+                        }
+                        var editPhoto2 = function(photoData)
+                        {
+                            // Setup a new image object, using the photo data as the image source
+                            objImage = new Image();
+
+                            objImage.src = 'data:image/jpeg;base64,' + photoData;
+
+                            //notes = "";
+
+                            // When the image has loaded, setup the image marker object
+                            objImage.onload = function()
+                            {
+                                // Resize the image so it's 600px wide
+                                objResizer = new imageResizer(objImage);
+                                var imageData = objResizer.resize(600);
+
+
+                                // Create a thumbnail version of the image
+                                objImage = new Image();
+                                objImage.src = 'data:image/jpeg;base64,' + imageData;
+
+                                objImage.onload = function()
+                                {
+                                    objResizer = new imageResizer(objImage);
+                                    var thumbData = objResizer.resize(90);
+
+                                    // Save both the thumbnail and the full version to the local file system.
+                                    var fail = function(error)
+                                    {
+                                        alert("storePhotosOnFS::Caught error: " + error.code);
+                                    }
+
+                                    // Make sure the current inspection id is valid - there seems to be a bug sometimes when the id is corrupted
+
+                                    var check_table = "inspections";
+                                    if(self.current_table == "reinspectionitemphotos") {
+                                        check_table = "reinspections";
+                                    }
+
+                                    objDBUtils.loadRecord(check_table, objApp.getKey(self.current_key), function(param, row)
+                                    {
+                                        if(!row)
+                                        {
+                                            alert("The current inspection id is NOT valid");
+                                            return;
+                                        }
+
+                                        user_id = localStorage.getItem("user_id");
+                                        var new_id = objDBUtils.makeInsertKey(objApp.sync_prefix);
+                                        var notes = "";
+
+                                        if(!objApp.phonegapBuild)
+                                        {
+                                            // Save the image data and notes back to the database
+                                            var sql = "INSERT INTO " + self.current_table + "(id, " + self.current_key + ", seq_no, photodata_tmb, photodata, notes, defect_id, created_by, dirty) " +
+                                                "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                                            var values = [new_id, objApp.getKey(self.current_key), seq_no, thumbData, imageData, notes, $('select.defect-selector').val(), user_id, "1"];
+                                            objDBUtils.execute(sql, values, function()
+                                            {
+                                                // The photo was saved.
+                                                self.showSignificantItems();
+                                            });
+                                        }
+                                        else
+                                        {
+                                            // Phonegap build - save the images to the file system
+                                            // Request access to the file system
+                                            window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem)
+                                            {
+                                                var file_name = new_id + "_thumb.jpg";
+                                                // Get permission to write the file
+                                                fileSystem.root.getFile(file_name, {create: true, exclusive: false}, function(fileEntry)
+                                                {
+                                                    // Create the file write object
+                                                    fileEntry.createWriter(function(writer)
+                                                    {
+                                                        writer.onwriteend = function(evt)
+                                                        {
+                                                            // Get the file URI for the thumbnail image
+                                                            var uri_thumb = fileEntry.toURI();
+                                                            // Now write the full image to the file system
+                                                            var file_name = new_id + ".jpg";
+                                                            fileSystem.root.getFile(file_name, {create: true, exclusive: false}, function(fileEntry)
+                                                            {
+                                                                // Create the file write object
+                                                                fileEntry.createWriter(function(writer)
+                                                                {
+                                                                    writer.onwriteend = function(evt)
+                                                                    {
+                                                                        // Get the file URI for the thumbnail image
+                                                                        var uri = fileEntry.toURI();
+                                                                        // Save the image data and notes back to the database
+                                                                        var sql = "INSERT INTO " + self.current_table + "(id, " + self.current_key + ", seq_no, photodata_tmb, photodata, notes, defect_id, created_by, dirty) " +
+                                                                            "VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
+                                                                        var values = [new_id, objApp.getKey(self.current_key), seq_no, uri_thumb, uri, notes, $('select.defect-selector').val(), user_id, "1"];
+                                                                        objDBUtils.execute(sql, values, function()
+                                                                        {
+                                                                            // The photo was saved.
+                                                                            self.showSignificantItems();
+                                                                        });
+                                                                    };
+                                                                    writer.write(imageData);
+                                                                }, fail);
+                                                            }, fail);
+                                                        };
+                                                        // Write the thumbnail data to the file.
+                                                        writer.write(thumbData);
+                                                    }, fail);
+                                                }, fail);
+                                            }, fail);
+                                        }
+                                    }, function(t){}, "", self.finalised);
+                                }
+                            }
+                        }
+                        if($this.hasClass('capture-signficant-image')){
+                            if(objApp.phonegapBuild)
+                            {
+                                navigator.camera.getPicture(function(imageData)
+                                    {
+                                        editPhoto2(imageData);
+
+                                    }, function(message)
+                                    {
+                                        alert("Image load failed because: " + message);
+                                    },
+                                    {
+                                        quality: 50,
+                                        destinationType: Camera.DestinationType.DATA_URL
+                                    });
+                            }
+                        }
+                        if($this.hasClass('select-signficant-image')){
+
+                            if(objApp.phonegapBuild)
+                            {
+                                // Invoke the camera API to allow the user to take a photo
+                                navigator.camera.getPicture(function(imageData)
+                                    {
+                                        // The image data will be a ele URI
+                                        // Show the photo in the image editor.
+                                        editPhoto2(imageData);
+
+                                    }, function(message)
+                                    {
+                                        alert("Image load failed because: " + message);
+                                    },
+                                    {
+                                        quality: 50,
+                                        destinationType: Camera.DestinationType.DATA_URL,
+                                        sourceType : Camera.PictureSourceType.PHOTOLIBRARY,
+                                        correctOrientation: true
+                                    });
+                            }
+                        }
+
+                    });
+                });
+            }
+
+            if(objApp.phonegapBuild && maxLoop)
+            {
+                var fail = function(error)
+                {
+                    alert("loadPhotos::Caught error: " + error.code);
+                };
+
+                // Request access to the file system
+                window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem)
+                {
+                    // We have access to the file system.
+
+                    // Define the function to load the next image for phonegap builds.
+                    // The thumbnail image data is coming straight from the local file system
+                    var doNext = function()
+                    {
+                        var row = items.rows.item(r);
+
+                        if(row.photodata != "")
+                        {
+                            // Define the file name that the thumbnail should have
+                            var file_name = row.id + "_thumb.jpg";
+                            //var file_name = row.id;
+
+                            // Get permission to access the file entry
+                            fileSystem.root.getFile(file_name, {create: true}, function(fileEntry)
+                            {
+                                // Get access to the file object
+                                fileEntry.file(function(file)
+                                {
+                                    // Create a file reader and read the file data.
+                                    var reader = new FileReader();
+
+                                    // When we've finished loading the file,
+                                    // build the HTML string and move to the next item
+                                    reader.onloadend = function(evt)
+                                    {
+                                        html += '<tr>';
+                                        html += '<td><img width="150" height="100" src="data:image/jpeg;base64,' + evt.target.result + '" /></td>';
+                                        html += '<td>'+ self.defectsObjects[row.defect_id].seq_no + ' ' + self.defectsObjects[row.defect_id].location +'</td>';
+                                        html += '<td>'+ self.defectsObjects[row.defect_id].observation+'</td>';
+                                        html += '</tr>';
+                                        num_items++;
+                                        r++;
+                                        if(r < maxLoop)
+                                            doNext();
+                                        else
+                                            showSignificantItemsHTML(html);
+                                    };
+                                    reader.readAsText(file);
+                                }, fail);
+                            }, fail);
+                        }
+                        else
+                        {
+                            r++;
+                            if(r < maxLoop)
+                                doNext();
+                            else
+                                showSignificantItemsHTML(html);
+                        }
+                    }
+                    if(r < maxLoop)
+                        doNext();
+                    else
+                        showSignificantItemsHTML(html);
+                }, fail);
+            }
+            else
+            {
+                // Define the function to load the next image for non-phonegap builds
+                // The thumbnail image data is coming straight from the database in this case.
+                var doNext = function()
+                {
+                    var row = items.rows.item(r);
+
+                    if(row.photodata != "")
+                    {
+                        html += '<tr>';
+                        html += '<td><img width="150" height="100" src="data:image/jpeg;base64,' + row.photodata_tmb + '" /></td>';
+                        html += '<td>'+ self.defectsObjects[row.defect_id].seq_no + ' ' + self.defectsObjects[row.defect_id].location +'</td>';
+                        html += '<td>'+ self.defectsObjects[row.defect_id].observation+'</td>';
+                        html += '</tr>';
+                        num_items++;
+                    }
+                    r++;
+                    if(r < maxLoop)
+                        doNext();
+                    else
+                        showPhotoHTML(html);
+                }
+            }
+
+            if(r < maxLoop)
+            {
+                if (typeof doNext == 'function')
+                    doNext();
+            }
+            else
+                showSignificantItemsHTML(html);
+        }, "");
+
+        $("#btnSignificantItemsBack").bind(objApp.touchEvent, function(e) {
+            e.preventDefault();
+            self.showStep3();
+        });
     }
 
 
@@ -5563,7 +5978,8 @@ var Inspections = function()
 				var html = '<table id="tblDefectListing" class="listing">';
                
 				var maxLoop = items.rows.length;
-
+                self.defectsArray = [];
+                self.defectsObjects = {};
                 self.numberOfIssues = 0;
                 self.numberOfAcknowledgements = 0;
                 var sq = 2;
@@ -5579,7 +5995,8 @@ var Inspections = function()
                     if (added_items.indexOf(row.id) != -1)
                         continue;
                     added_items.push(row.id);
-                    
+                    self.defectsArray.push(row);
+                    self.defectsObjects[row.id] = row;
                     // Store the current sequence order of the row so we can quickly sort the
                     // items on move up / move down event.
                     self.keySortArray[sq] = row.id;
@@ -6453,7 +6870,7 @@ var Inspections = function()
             $('#btnStep3AddAnotherIssue').addClass('hidden');
             $('#btnStep3Back').addClass('hidden');
             $('#keywords').addClass('hidden');
-            $("#btnReportPhotos").addClass("hidden");
+            $("#btnReportPhotos, #btnSignificantItems").addClass("hidden");
             $("div.btnReinspect").show();
 
             // Show the next button
@@ -6478,6 +6895,7 @@ var Inspections = function()
             $('#keywords').removeClass('hidden');
             if ($("#inspection #report_type2").val() == 'Client inspection')
                 $("#btnReportPhotos").removeClass("hidden");
+            $("#btnSignificantItems").removeClass("hidden");
             $("div.btnReinspect").hide();
             $("#tblRateListing select.ratingSelect").removeAttr("readonly");
             $("#tblRateListing select.ratingSelect").removeAttr("disabled");
