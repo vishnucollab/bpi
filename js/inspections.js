@@ -3867,8 +3867,8 @@ var Inspections = function()
                                     reader.onloadend = function(evt)
                                     {
                                         html += '<tr>';
+                                        html += '<td>#'+ self.defectsObjects[row.defect_id].seq_no + ' ' + self.defectsObjects[row.defect_id].location +'</td>';
                                         html += '<td><img width="150" height="100" src="data:image/jpeg;base64,' + evt.target.result + '" /></td>';
-                                        html += '<td>'+ self.defectsObjects[row.defect_id].seq_no + ' ' + self.defectsObjects[row.defect_id].location +'</td>';
                                         html += '<td>'+ self.defectsObjects[row.defect_id].observation+'</td>';
                                         html += '</tr>';
                                         num_items++;
@@ -3908,8 +3908,8 @@ var Inspections = function()
                     if(row.photodata != "")
                     {
                         html += '<tr>';
+                        html += '<td>#'+ self.defectsObjects[row.defect_id].seq_no + ' ' + self.defectsObjects[row.defect_id].location +'</td>';
                         html += '<td><img width="150" height="100" src="data:image/jpeg;base64,' + row.photodata_tmb + '" /></td>';
-                        html += '<td>'+ self.defectsObjects[row.defect_id].seq_no + ' ' + self.defectsObjects[row.defect_id].location +'</td>';
                         html += '<td>'+ self.defectsObjects[row.defect_id].observation+'</td>';
                         html += '</tr>';
                         num_items++;

@@ -942,6 +942,7 @@ function Sync()
 					params["photodata_tmb"] = photodata_tmb;
 					params["notes"] = row.notes;
                     params["photo_type"] = photo_type;
+                    params["defect_id"] = row.defect_id;
                     
                     // The normal inspection table has the cover photo and report photos fields.
                     if(photo_type == "inspection") {
