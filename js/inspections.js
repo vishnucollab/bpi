@@ -669,7 +669,7 @@ var Inspections = function()
     this.checkIfNeedPhotos = function()
     {
         $('a.capture-signature-btn').hide();
-        if ($("#inspection #report_type2").val() == 'Client inspection' && !self.finalised){
+        if ($("#inspection #report_type2").val() == 'Client inspection' && self.finalised != 1){
             $('a[id="btnReportPhotos"]').removeClass("hidden");
         }else{
             if ($("#inspection #report_type2").val() == 'Peet inspection' && ($('#btnStep1Next').is(':visible') || self.getStep() > 1 )){
@@ -3761,7 +3761,7 @@ var Inspections = function()
                                                                         var uri = fileEntry.toURI();
                                                                         // Save the image data and notes back to the database
                                                                         var sql = "INSERT INTO " + self.current_table + "(id, " + self.current_key + ", seq_no, photodata_tmb, photodata, notes, defect_id, created_by, dirty) " +
-                                                                            "VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
+                                                                            "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
                                                                         var values = [new_id, objApp.getKey(self.current_key), seq_no, uri_thumb, uri, notes, $('select.defect-selector').val(), user_id, "1"];
                                                                         objDBUtils.execute(sql, values, function()
                                                                         {
