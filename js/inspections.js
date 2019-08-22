@@ -3875,18 +3875,53 @@ console.log('Photos loaded');
                         if (photo_id == "")
                             return;
 
-                        var current_table = "inspectionitemphotos";
                         if(!objApp.empty(objApp.getKey("reinspection_id"))) {
-                            current_table = "reinspectionitemphotos";
+                            self.current_table = "reinspectionitemphotos";
+                            self.current_key = "reinspection_id";
+                        } else {
+                            self.current_table = "inspectionitemphotos";
+                            self.current_key = "inspection_id";
                         }
 
                         // Flag all related photo records as deleted.
-                        var sql = "UPDATE " + current_table + " " +
+                        var sql = "UPDATE " + self.current_table + " " +
                             "SET deleted = 1, dirty = 1 " +
                             "WHERE id = ?";
 
                         objDBUtils.execute(sql, [photo_id], function()
                         {
+                            objDBUtils.loadRecord(self.current_table, photo_id, function(photoID, row)
+                            {
+                                if(!row)
+                                    return;
+
+                                if(row.defect_id){
+                                    // Now delete the inspection item record itself
+                                    objDBUtils.deleteRecord(self.current_table.replace('photo',''), row.defect_id, function()
+                                    {
+                                        // Final step is to update the inspection record with the correct stats.
+                                        // Get the number of defects associated with this inspection
+                                        var sql = "SELECT COUNT(*) as num_defects " +
+                                            "FROM inspectionitems " +
+                                            "WHERE inspection_id = ? AND deleted = 0";
+
+                                        objDBUtils.loadRecordSQL(sql, [objApp.keys.inspection_id], function(row)
+                                        {
+                                            if(row)
+                                            {
+                                                // Now update the parent inspection record with the defect count.
+                                                var num_defects = row.num_defects;
+
+                                                sql = "UPDATE inspections " +
+                                                    "SET num_defects = ?, dirty = 1 " +
+                                                    "WHERE id = ?";
+
+                                                objDBUtils.execute(sql, [num_defects, objApp.keys.inspection_id], function(){});
+                                            }
+                                        });
+                                    });
+                                }
+                            }, photo_id);
                             self.showSignificantItems();
                         });
                     }
@@ -4274,7 +4309,7 @@ console.log('Photos loaded');
 		// Flag all related photo records as deleted.
 		var sql = "UPDATE inspectionitemphotos " +
 			"SET deleted = 1, dirty = 1 " +
-			"WHERE inspection_id = ?";
+			"WHERE defect_id = ?";
 
 		objDBUtils.execute(sql, [item_id], function()
 		{
