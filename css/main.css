@@ -583,6 +583,7 @@ div#subheader .right h1{
 
 #significantItems{max-height: 500px;}
 #significantItemsList{max-height: 388px;}
+#significantItemsList #tblSignificantItemsListing td{border-bottom: 1px solid #000;vertical-align: top;}
 #significantItemsList #tblSignificantItemsListing a.delete-significant-item {
     display: inline-block;
     margin-right: 5px;

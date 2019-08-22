@@ -550,6 +550,10 @@
                             <td>&nbsp;</td>
                             <td>
                                 <a class="button left" id="searchObservation" href="#">Search</a>
+                                <div class="left leftmargin hidden add-sig-item-btn">
+                                    <a href="#" class="capture-significant-image left"><img width="40" src="images/camera-75.png" /></a>&nbsp;
+                                    <a href="#" class="select-significant-image left"><img width="40" src="images/gallery-75.png" /></a>
+                                </div>
                             </td>
                         </tr>
                     </table>
@@ -576,7 +580,10 @@
                     <a id="btnStep2Back" class="mtop20 left gotoStep1 btn-bg-w81" href="#">Back</a>
                 </div>
                 <div class="btnContainer right">
-                    <a id="btnStep2Next" class="mtop20 right btn-bg-w81" href="#">Next</a>
+                     <a id="btnStep2Next" class="mtop20 right btn-bg-w81" href="#">Next</a>
+                </div>
+                <div class="btnContainer right hidden add-sig-item-btn">
+                    <a id="btnBackToSigList" class="mtop20 right btn-bg-w81" href="#">Back</a>
                 </div>
                 <div class="btnContainer left btnEditNotes" id="btnEditNotes">
                     <a href="#" class="btnNotes "></a>
@@ -926,9 +933,10 @@
                 <table id="tblSignificantItems" class="listing">
                     <thead>
                     <tr>
-                        <th>Defect</th>
+                        <th>Item</th>
+                        <th>Location</th>
+                        <th>Observation</th>
                         <th>Photo</th>
-                        <th>Details</th>
                     </tr>
                     </thead>
                 </table>
@@ -938,7 +946,8 @@
 
             <div class="bottomBtns">
                 <div class="btnContainer left">
-                    <a id="btnSignificantItemsBack" class="button left gotoStep3" href="#">Back</a>
+                    <a id="btnSignificantItemsBack" class="button left gotoStep3" href="#">BACK</a>
+                    <a id="btnAddSignificantItem" class="button left leftmargin" href="#">ADD</a>
                 </div>
             </div>
         </div>

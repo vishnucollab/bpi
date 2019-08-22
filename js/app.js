@@ -420,8 +420,9 @@ function App()
 		$("#popSelector").remove();
 		objApp.clearKeys();
         objApp.objInspection.setStep(0);
-        objApp.objInspection.isEditing = 0;       
-		objFilters.hide();	
+        objApp.objInspection.isEditing = 0;
+        objApp.objInspection.isAddingSignificantItem = 0;
+        objFilters.hide();
         $("form.search").hide();
 		
 		if(!$("#defect").hasClass("hidden"))
