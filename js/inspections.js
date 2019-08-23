@@ -1315,6 +1315,7 @@ var Inspections = function()
     */
 	this.editInspection = function(inspection)
 	{
+	    console.log(inspection);
         // Set keys
         objApp.keys.inspection_id = inspection.id;
         objApp.keys.report_type = inspection.report_type;
@@ -1501,7 +1502,7 @@ var Inspections = function()
         var sql = "SELECT COUNT(*) as num_photos " +
             "FROM inspectionitemphotos " +
             "WHERE inspection_id = ? " +
-            "AND deleted = 0 AND defect_id IS NULL";
+            "AND deleted = 0 AND (defect_id IS NULL OR defect_id = '')";
 
         objDBUtils.loadRecordSQL(sql, [inspection_id], function(row) {
             if(!row) {
@@ -3441,7 +3442,7 @@ var Inspections = function()
         var filters = [];
         filters.push(new Array("inspection_id = '" + objApp.getKey("inspection_id") + "'"));
         filters.push(new Array("deleted", 0));
-        filters.push(new Array("defect_id IS NULL"));
+        filters.push(new Array("defect_id IS NULL OR defect_id = ''"));
 
         objDBUtils.loadRecords('inspectionitemphotos', filters, function(param, items)
         {
@@ -3782,17 +3783,21 @@ var Inspections = function()
         $("#tblSignificantItemsListing input").unbind();
 
         // Load the inspection photos (if any)
-        if(objApp.empty(objApp.getKey("inspection_id"))) {
+        if(objApp.empty(objApp.keys.inspection_id)) {
             alert("showSignificantItems - Invalid inspection");
             return;
         }
 
-
+        if(self.defectsArray.length == 0){
+            $("#significantItemsList").html("<p>Sorry, this inspection currently has no significant items.</p>");
+            return;
+        }
         objDBUtils.orderBy = "seq_no ASC";
 
         var filters = [];
-        filters.push(new Array("inspection_id = '" + objApp.getKey("inspection_id") + "'"));
+        filters.push(new Array("inspection_id = '" + objApp.keys.inspection_id + "'"));
         filters.push(new Array("defect_id IS NOT NULL"));
+        filters.push(new Array("defect_id <> ''"));
 
         objDBUtils.loadRecords('inspectionitemphotos', filters, function(param, items)
         {
