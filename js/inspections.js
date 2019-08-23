@@ -3319,6 +3319,8 @@ var Inspections = function()
                                         objDBUtils.execute(sql, values, function()
                                         {
                                             // The photo was saved.
+                                            var filters = [];
+                                            filters.push(new Array("inspection_id = '" + objApp.keys.inspection_id + "'"));
                                             objDBUtils.loadRecords("inspectionitems", filters, function(param, items)
                                             {
                                                 if(!items)
@@ -3374,6 +3376,8 @@ var Inspections = function()
                                                                     objDBUtils.execute(sql, values, function()
                                                                     {
                                                                         // The photo was saved.
+                                                                        var filters = [];
+                                                                        filters.push(new Array("inspection_id = '" + objApp.keys.inspection_id + "'"));
                                                                         objDBUtils.loadRecords("inspectionitems", filters, function(param, items)
                                                                         {
                                                                             if(!items)
