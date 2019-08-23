@@ -3319,7 +3319,24 @@ var Inspections = function()
                                         objDBUtils.execute(sql, values, function()
                                         {
                                             // The photo was saved.
-                                            self.showSignificantItems();
+                                            objDBUtils.loadRecords("inspectionitems", filters, function(param, items)
+                                            {
+                                                if(!items)
+                                                {
+                                                    // Handle no items
+                                                }
+                                                else
+                                                {
+                                                    var maxLoop = items.rows.length;
+                                                    for(var idx = 0; idx < maxLoop; idx++)
+                                                    {
+                                                        var r = items.rows.item(idx);
+                                                        self.defectsArray.push(r);
+                                                        self.defectsObjects[r.id] = r;
+                                                    }
+                                                    self.showSignificantItems();
+                                                }
+                                            });
                                         });
                                     }
                                     else
@@ -3357,7 +3374,24 @@ var Inspections = function()
                                                                     objDBUtils.execute(sql, values, function()
                                                                     {
                                                                         // The photo was saved.
-                                                                        self.showSignificantItems();
+                                                                        objDBUtils.loadRecords("inspectionitems", filters, function(param, items)
+                                                                        {
+                                                                            if(!items)
+                                                                            {
+                                                                                // Handle no items
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                var maxLoop = items.rows.length;
+                                                                                for(var idx = 0; idx < maxLoop; idx++)
+                                                                                {
+                                                                                    var r = items.rows.item(idx);
+                                                                                    self.defectsArray.push(r);
+                                                                                    self.defectsObjects[r.id] = r;
+                                                                                }
+                                                                                self.showSignificantItems();
+                                                                            }
+                                                                        });
                                                                     });
                                                                 };
                                                                 writer.write(imageData);
@@ -3950,7 +3984,7 @@ var Inspections = function()
                     var doNextSig = function()
                     {
                         var row = items.rows.item(r);
-                        alert(self.defectsObjects[row.defect_id].seq_no);
+
                         if(row.photodata != "")
                         {
                             // Define the file name that the thumbnail should have
