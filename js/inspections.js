@@ -3319,9 +3319,7 @@ var Inspections = function()
                                         objDBUtils.execute(sql, values, function()
                                         {
                                             // The photo was saved.
-                                            setTimeout(function(){
-                                                self.showSignificantItems();
-                                            }, 1000);
+                                            self.showSignificantItems();
                                         });
                                     }
                                     else
@@ -3359,9 +3357,7 @@ var Inspections = function()
                                                                     objDBUtils.execute(sql, values, function()
                                                                     {
                                                                         // The photo was saved.
-                                                                        setTimeout(function(){
-                                                                            self.showSignificantItems();
-                                                                        }, 1000);
+                                                                        self.showSignificantItems();
                                                                     });
                                                                 };
                                                                 writer.write(imageData);
@@ -3809,6 +3805,7 @@ var Inspections = function()
                 $("#significantItemsList").html("<p>Sorry, this inspection currently has no significant items.</p>");
                 return;
             }
+            alert(items.rows.length);
 
             // Loop through the items, building the output list as we go.
             var maxLoop = items?items.rows.length:0;
