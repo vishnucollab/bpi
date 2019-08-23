@@ -3319,7 +3319,9 @@ var Inspections = function()
                                         objDBUtils.execute(sql, values, function()
                                         {
                                             // The photo was saved.
-                                            self.showSignificantItems();
+                                            setTimeout(function(){
+                                                self.showSignificantItems();
+                                            }, 500);
                                         });
                                     }
                                     else
@@ -3357,7 +3359,9 @@ var Inspections = function()
                                                                     objDBUtils.execute(sql, values, function()
                                                                     {
                                                                         // The photo was saved.
-                                                                        self.showSignificantItems();
+                                                                        setTimeout(function(){
+                                                                            self.showSignificantItems();
+                                                                        }, 500);
                                                                     });
                                                                 };
                                                                 writer.write(imageData);
