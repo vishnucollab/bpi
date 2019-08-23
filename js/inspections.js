@@ -3321,7 +3321,7 @@ var Inspections = function()
                                             // The photo was saved.
                                             setTimeout(function(){
                                                 self.showSignificantItems();
-                                            }, 500);
+                                            }, 1000);
                                         });
                                     }
                                     else
@@ -3361,7 +3361,7 @@ var Inspections = function()
                                                                         // The photo was saved.
                                                                         setTimeout(function(){
                                                                             self.showSignificantItems();
-                                                                        }, 500);
+                                                                        }, 1000);
                                                                     });
                                                                 };
                                                                 writer.write(imageData);
