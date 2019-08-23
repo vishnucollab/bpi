@@ -3805,7 +3805,6 @@ var Inspections = function()
                 $("#significantItemsList").html("<p>Sorry, this inspection currently has no significant items.</p>");
                 return;
             }
-            alert(items.rows.length);
 
             // Loop through the items, building the output list as we go.
             var maxLoop = items?items.rows.length:0;
@@ -3948,10 +3947,10 @@ var Inspections = function()
 
                     // Define the function to load the next image for phonegap builds.
                     // The thumbnail image data is coming straight from the local file system
-                    var doNext = function()
+                    var doNextSig = function()
                     {
                         var row = items.rows.item(r);
-
+                        alert(self.defectsObjects[row.defect_id].seq_no);
                         if(row.photodata != "")
                         {
                             // Define the file name that the thumbnail should have
@@ -3980,7 +3979,7 @@ var Inspections = function()
                                         num_items++;
                                         r++;
                                         if(r < maxLoop)
-                                            doNext();
+                                            doNextSig();
                                         else
                                             showSignificantItemsHTML(html);
                                     };
@@ -3992,13 +3991,13 @@ var Inspections = function()
                         {
                             r++;
                             if(r < maxLoop)
-                                doNext();
+                                doNextSig();
                             else
                                 showSignificantItemsHTML(html);
                         }
                     }
                     if(r < maxLoop)
-                        doNext();
+                        doNextSig();
                     else
                         showSignificantItemsHTML(html);
                 }, fail);
@@ -4007,7 +4006,7 @@ var Inspections = function()
             {
                 // Define the function to load the next image for non-phonegap builds
                 // The thumbnail image data is coming straight from the database in this case.
-                var doNext = function()
+                var doNextSig = function()
                 {
                     var row = items.rows.item(r);
 
@@ -4023,16 +4022,16 @@ var Inspections = function()
                     }
                     r++;
                     if(r < maxLoop)
-                        doNext();
+                        doNextSig();
                     else
-                        showPhotoHTML(html);
+                        showSignificantItemsHTML(html);
                 }
             }
 
             if(r < maxLoop)
             {
-                if (typeof doNext == 'function')
-                    doNext();
+                if (typeof doNextSig == 'function')
+                    doNextSig();
             }
             else
                 showSignificantItemsHTML(html);
