@@ -2404,7 +2404,7 @@ var Inspections = function()
                     self.showStep3();
                 else{
                     self.isAddingSignificantItem = 0;
-                    self.showSignificantItems();
+                    self.showSignificantItems(self.stepBackFromSignList);
                 }
                 return;    
             }
@@ -3370,7 +3370,7 @@ var Inspections = function()
                                                     self.defectsArray.push(r);
                                                     self.defectsObjects[r.id] = r;
                                                 }
-                                                self.showSignificantItems();
+                                                self.showSignificantItems(self.stepBackFromSignList);
                                             }
                                         });
                                     }else{
@@ -3391,7 +3391,7 @@ var Inspections = function()
                                                     self.defectsArray.push(r);
                                                     self.defectsObjects[r.id] = r;
                                                 }
-                                                self.showSignificantItems();
+                                                self.showSignificantItems(self.stepBackFromSignList);
                                             }
                                         });
                                     }
@@ -3449,7 +3449,7 @@ var Inspections = function()
                                                                             self.defectsArray.push(r);
                                                                             self.defectsObjects[r.id] = r;
                                                                         }
-                                                                        self.showSignificantItems();
+                                                                        self.showSignificantItems(self.stepBackFromSignList);
                                                                     }
                                                                 });
                                                             });
@@ -4038,7 +4038,7 @@ var Inspections = function()
                                     });
                                 }
                             }, photo_id);
-                            self.showSignificantItems();
+                            self.showSignificantItems(self.stepBackFromSignList);
                         });
                     }
                 });
