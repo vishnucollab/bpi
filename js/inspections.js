@@ -3912,7 +3912,10 @@ var Inspections = function()
         objDBUtils.loadRecords(current_table, filters, function(param, items)
         {
             if(!items){
-                $("#significantItemsList").html("<p>Sorry, this inspection currently has no significant items.</p>");
+                if(!objApp.empty(objApp.getKey("reinspection_id")))
+                    $("#significantItemsList").html("<p>Sorry, this reinspection currently has no significant items.</p>");
+                else
+                    $("#significantItemsList").html("<p>Sorry, this inspection currently has no significant items.</p>");
                 return;
             }
 
@@ -6153,9 +6156,10 @@ var Inspections = function()
 		objDBUtils.loadRecords("inspectionitems", filters, function(param, items)
 		{
 		    unblockElement('body');
-			$("#defectScrollWrapper").html("");            
+			$("#defectScrollWrapper").html("");
 
-            
+            self.defectsArray = [];
+            self.defectsObjects = {};
 			if(!items)
 			{
 				// Handle no items
@@ -6166,8 +6170,6 @@ var Inspections = function()
 				var html = '<table id="tblDefectListing" class="listing">';
                
 				var maxLoop = items.rows.length;
-                self.defectsArray = [];
-                self.defectsObjects = {};
                 self.numberOfIssues = 0;
                 self.numberOfAcknowledgements = 0;
                 var sq = 2;
@@ -6533,6 +6535,8 @@ var Inspections = function()
             this.scroller.destroy();
             this.scroller = null;
         }
+        self.defectsArray = [];
+        self.defectsObjects = {};
         $('body').addClass('reinspect');
         objDBUtils.loadRecord("reinspections", reinspection_id, function(param, reinspection) {
             if(!reinspection) {
@@ -6634,6 +6638,8 @@ var Inspections = function()
                 objDBUtils.loadRecordsSQL(sql, [reinspection_id], function(param, items) {
                     objApp.showHideSpinner(false, "#reinspection");
 
+                    self.defectsArray = [];
+                    self.defectsObjects = {};
                     if(!items) {
                         return;
                     }
@@ -6643,8 +6649,6 @@ var Inspections = function()
 
                     var maxLoop = items.rows.length;
                     var r = 0;
-                    self.defectsArray = [];
-                    self.defectsObjects = {};
                     for(r = 0; r < maxLoop; r++) {
 
                         var row = items.rows.item(r);
