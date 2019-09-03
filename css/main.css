@@ -581,6 +581,8 @@ div#subheader .right h1{
 #reportPhotos{max-height: 500px;}
 #reportPhotoList{max-height: 388px;}
 
+#btnSignificantItems{padding: 15px; top: 30px;margin-left: 10px;}
+#btnSignificantItems2{top: 35px;margin-left: 10px;}
 #significantItems{max-height: 500px;}
 #significantItemsList{max-height: 388px;}
 #significantItemsList #tblSignificantItemsListing td{border-bottom: 1px solid #000;vertical-align: top;}
@@ -1258,7 +1260,7 @@ aside textarea
     padding: 2px 5px;
 }
     
-#btnAddDefect, a.btnEditNotes, #btnStep3Email, #btnReportPhotos, #btnSignificantItems, #btnStep4Email, #btnSendReport, #btnSendReport2, #btnSendReport3 {
+#btnAddDefect, a.btnEditNotes, #btnStep3Email, #btnReportPhotos, #btnStep4Email, #btnSendReport, #btnSendReport2, #btnSendReport3 {
     margin-left: 10px;
     top: 35px;
 }
