@@ -3905,7 +3905,7 @@ var Inspections = function()
         }
 
         var filters = [];
-        filters.push(new Array(current_key + " = '" + objApp.keys.inspection_id + "'"));
+        filters.push(new Array(current_key + " = '" + objApp.getKey(current_key) + "'"));
         filters.push(new Array("defect_id IS NOT NULL"));
         filters.push(new Array("defect_id <> ''"));
 
