@@ -6788,7 +6788,7 @@ var Inspections = function()
     * Updates the reinspection photo count.
     */
     this.refreshReinspectionPhotoCount = function(reinspection_id) {
-        objDBUtils.countTableRows("reinspectionitemphotos", "reinspection_id = ? AND deleted = 0", [reinspection_id], function(row) {
+        objDBUtils.countTableRows("reinspectionitemphotos", "reinspection_id = ? AND deleted = 0 AND (defect_id IS NULL OR defect_id = '')", [reinspection_id], function(row) {
             if(!row) {
                 alert("Unable to load reinspection photo count");
                 return;
