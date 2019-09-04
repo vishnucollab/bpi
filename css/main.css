@@ -584,7 +584,9 @@ div#subheader .right h1{
 #btnSignificantItems{padding: 15px; top: 30px;margin-left: 10px;}
 #btnSignificantItems2{top: 35px;margin-left: 10px;}
 #significantItems{max-height: 500px;}
+#significantItems .bottomBtns a{padding: 10px 15px;}
 #significantItemsList{max-height: 388px;}
+#significantItemsList.on-reinspection-page{max-height: unset;}
 #significantItemsList #tblSignificantItemsListing td{border-bottom: 1px solid #000;vertical-align: top;}
 #significantItemsList #tblSignificantItemsListing a.delete-significant-item {
     display: inline-block;

@@ -3955,6 +3955,11 @@ var Inspections = function()
                 var tableWidth = screenWidth - 50;
 
                 $("#significantItemsList").css("width", tableWidth + 20 + "px");
+                if(!objApp.empty(objApp.getKey("reinspection_id"))) {
+                    $("#significantItemsList").addClass('on-reinspection-page');
+                }else{
+                    $("#significantItemsList").removeClass('on-reinspection-page');
+                }
 
                 var tableHeader = $("#tblSignificantItems");
                 var tableBody = $("#tblSignificantItemsListing");
