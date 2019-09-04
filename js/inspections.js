@@ -41,6 +41,8 @@ var Inspections = function()
     this.itemSortDir = 'DESC';
     this.defectsArray = [];
     this.defectsObjects = {};
+    this.defectsReArray = [];
+    this.defectsReObjects = {};
     this.numberOfIssues = 0;
     this.numberOfAcknowledgements = 0;
     this.historyPhotosHtml = '';
@@ -3367,8 +3369,8 @@ var Inspections = function()
                                                 for(var idx = 0; idx < maxLoop; idx++)
                                                 {
                                                     var r = items.rows.item(idx);
-                                                    self.defectsArray.push(r);
-                                                    self.defectsObjects[r.id] = r;
+                                                    self.defectsReArray.push(r);
+                                                    self.defectsReObjects[r.id] = r;
                                                 }
                                                 self.showSignificantItems(self.stepBackFromSignList);
                                             }
@@ -3891,10 +3893,11 @@ var Inspections = function()
         if(!objApp.empty(objApp.getKey("reinspection_id"))) {
             var current_table = "reinspectionitemphotos";
             var current_key = "reinspection_id";
-            if(self.defectsArray.length == 0){
+            if(self.defectsReArray.length == 0){
                 $("#significantItemsList").html("<p>Sorry, this reinspection currently has no significant items.</p>");
                 return;
             }
+            $("#significantItemsList").addClass('on-reinspection-page');
         } else {
             var current_table = "inspectionitemphotos";
             var current_key = "inspection_id";
@@ -3902,6 +3905,7 @@ var Inspections = function()
                 $("#significantItemsList").html("<p>Sorry, this inspection currently has no significant items.</p>");
                 return;
             }
+            $("#significantItemsList").removeClass('on-reinspection-page');
         }
 
         var filters = [];
@@ -3953,13 +3957,6 @@ var Inspections = function()
                 }
 
                 var tableWidth = screenWidth - 50;
-
-                $("#significantItemsList").css("width", tableWidth + 20 + "px");
-                if(!objApp.empty(objApp.getKey("reinspection_id"))) {
-                    $("#significantItemsList").addClass('on-reinspection-page');
-                }else{
-                    $("#significantItemsList").removeClass('on-reinspection-page');
-                }
 
                 var tableHeader = $("#tblSignificantItems");
                 var tableBody = $("#tblSignificantItemsListing");
@@ -4089,10 +4086,16 @@ var Inspections = function()
                                     // build the HTML string and move to the next item
                                     reader.onloadend = function(evt)
                                     {
+                                        var sourceArray = self.defectsObjects;
+                                        if(!objApp.empty(objApp.getKey("reinspection_id")))
+                                            sourceArray = self.defectsReObjects;
+                                        console.log(self.defectsObjects);
+                                        console.log(self.defectsReObjects);
+                                        console.log(row);
                                         html += '<tr>';
-                                        html += '<td><a href="#" rel="'+row.id+'" class="delete-significant-item">Delele</a>#' + self.defectsObjects[row.defect_id].seq_no + '</td>';
-                                        html += '<td>' + self.defectsObjects[row.defect_id].location +'</td>';
-                                        html += '<td>' + self.defectsObjects[row.defect_id].observation +'</td>';
+                                        html += '<td><a href="#" rel="'+row.id+'" class="delete-significant-item">Delele</a>#' + sourceArray[row.defect_id].seq_no + '</td>';
+                                        html += '<td>' + sourceArray[row.defect_id].location +'</td>';
+                                        html += '<td>' + sourceArray[row.defect_id].observation +'</td>';
                                         html += '<td><img width="150" height="100" src="data:image/jpeg;base64,' + (evt.target && evt.target.result?evt.target.result:row.photodata_tmb) + '" /></td>';
                                         html += '</tr>';
                                         num_items++;
@@ -4131,10 +4134,13 @@ var Inspections = function()
 
                     if(row.photodata != "")
                     {
+                        var sourceArray = self.defectsObjects;
+                        if(!objApp.empty(objApp.getKey("reinspection_id")))
+                            sourceArray = self.defectsReObjects;
                         html += '<tr>';
-                        html += '<td><a href="#" rel="'+row.id+'" class="delete-significant-item">Delele</a>#' + self.defectsObjects[row.defect_id].seq_no + '</td>';
-                        html += '<td>' + self.defectsObjects[row.defect_id].location +'</td>';
-                        html += '<td>' + self.defectsObjects[row.defect_id].observation +'</td>';
+                        html += '<td><a href="#" rel="'+row.id+'" class="delete-significant-item">Delele</a>#' + sourceArray[row.defect_id].seq_no + '</td>';
+                        html += '<td>' + sourceArray[row.defect_id].location +'</td>';
+                        html += '<td>' + sourceArray[row.defect_id].observation +'</td>';
                         html += '<td><img width="150" height="100" src="data:image/jpeg;base64,' + row.photodata_tmb + '" /></td>';
                         html += '</tr>';
                         num_items++;
@@ -6639,12 +6645,11 @@ var Inspections = function()
                 $("#reinspectionScrollWrapper").html("");
 
                 objApp.showHideSpinner(true, "#reinspection");
-
                 objDBUtils.loadRecordsSQL(sql, [reinspection_id], function(param, items) {
                     objApp.showHideSpinner(false, "#reinspection");
 
-                    self.defectsArray = [];
-                    self.defectsObjects = {};
+                    self.defectsReArray = [];
+                    self.defectsReObjects = {};
                     if(!items) {
                         return;
                     }
@@ -6657,8 +6662,8 @@ var Inspections = function()
                     for(r = 0; r < maxLoop; r++) {
 
                         var row = items.rows.item(r);
-                        self.defectsArray.push(row);
-                        self.defectsObjects[row.id] = row;
+                        self.defectsReArray.push(row);
+                        self.defectsReObjects[row.id] = row;
                         html += '<tr data-id="' + row.id + '">';
                         html += '<td>' + row.seq_no + '</td>';
                         html += '<td>' + row.location + '</td>';
