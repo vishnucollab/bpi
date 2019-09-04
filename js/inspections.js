@@ -3717,7 +3717,7 @@ var Inspections = function()
                                     reader.onloadend = function(evt)
                                     {
                                         html += '<tr>';
-                                        html += '<td><img width="150" height="100" src="data:image/jpeg;base64,' + evt.target.result + '" /></td>';
+                                        html += '<td><img width="150" height="100" src="data:image/jpeg;base64,' + (evt.target && evt.target.result?evt.target.result:row.photodata_tmb) + '" /></td>';
                                         html += '<td><input type="radio" name="is_cover_photo" value="' + row.id + '" ';
 
                                         if(row.is_cover_photo == 1) {
@@ -4088,7 +4088,7 @@ var Inspections = function()
                                         html += '<td><a href="#" rel="'+row.id+'" class="delete-significant-item">Delele</a>#' + self.defectsObjects[row.defect_id].seq_no + '</td>';
                                         html += '<td>' + self.defectsObjects[row.defect_id].location +'</td>';
                                         html += '<td>' + self.defectsObjects[row.defect_id].observation +'</td>';
-                                        html += '<td><img width="150" height="100" src="data:image/jpeg;base64,' + evt.target.result + '" /></td>';
+                                        html += '<td><img width="150" height="100" src="data:image/jpeg;base64,' + (evt.target && evt.target.result?evt.target.result:row.photodata_tmb) + '" /></td>';
                                         html += '</tr>';
                                         num_items++;
                                         r++;
@@ -5335,7 +5335,7 @@ var Inspections = function()
 							    	// build the HTML string and move to the next item
 									reader.onloadend = function(evt)
 									{
-				    					html += '<li><a rel="' + row.id + '"><img width="90" height="60" src="data:image/jpeg;base64,' + evt.target.result + '" /></a></li>';
+				    					html += '<li><a rel="' + row.id + '"><img width="90" height="60" src="data:image/jpeg;base64,' + (evt.target && evt.target.result?evt.target.result:row.photodata_tmb) + '" /></a></li>';
 						    			num_items++;
 
 										r++;
