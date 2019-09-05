@@ -441,7 +441,13 @@ ul.selector{border-radius: 0;  height: auto;font-size: 21px;}
     float: left;
     margin-right: 5px;
 }
-
+.builderFilters #filter_limit {
+    display: inline-block;
+    height: 51px;
+    width: 70px;
+    float: left;
+    margin-right: 5px;
+}
 .searchBuilderContainer{
     display: inline-block;
 }

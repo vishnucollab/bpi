@@ -141,7 +141,7 @@ var Inspections = function()
 		// Set the filters search method
 		objFilters.searchMethod = objApp.objInspection.doInspectionSearch;
 		
-	    //objFilters.show();
+	    objFilters.show();
 
 		// Do the client search
 		self.doInspectionSearch(selected_il_builder_id);
@@ -207,8 +207,11 @@ var Inspections = function()
         if (typeof selected_il_builder_id == 'undefined')
             selected_il_builder_id = $("#inspectionList #il_builder_id").val();
 
-        objFilters.builder_id = selected_il_builder_id;
-        objFilters.finalised = $("#inspectionList #is_finalised").val();
+        var filter_builder_id = selected_il_builder_id;
+        var filter_finalised = $("#inspectionList #is_finalised").val();
+        var filter_limit = $("#inspectionList #filter_limit").val();
+        if((filter_limit != "") && (filter_limit != "all"))
+            filter_limit = 50;
           
         if(searchText != "")
         {
@@ -227,38 +230,27 @@ var Inspections = function()
         }        
 		
 	    // Apply advanced search filters  
-	    if((objFilters.builder_id != undefined) && (objFilters.builder_id != ""))
+	    if((filter_builder_id != undefined) && (filter_builder_id != ""))
 	    {
 	    	sql += "AND i.builder_id = ? ";
-            values.push(objFilters.builder_id);
+            values.push(filter_builder_id);
 	    }
 
-	    if(objFilters.finalised != "")
+	    if(filter_finalised != "")
 	    {
 	    	sql += "AND i.finalised = ? ";
-	    	values.push(objFilters.finalised);
+	    	values.push(filter_finalised);
 	    }
-	    /*
-	    if(objFilters.name != "")
-	    {
-	    	sql += "AND i.initials LIKE '%" + objFilters.name + "%' ";
-	    }
-	    */
-        
-        if((objFilters.user != "") && (objFilters.user != "all"))
-        {
-            sql += "AND i.created_by = ? ";
-            values.push(objFilters.user);
-        }
 		
 	    sql += "ORDER BY " + self.sortBy + " " + self.sortDir + " ";	// Show the most recent inspections first.
         
-	    if((objFilters.recordLimit != "") && (objFilters.recordLimit != "all"))
+	    if((filter_limit != "") && (filter_limit != "all"))
 	    {            
 	    	sql += "LIMIT ?";
-	    	values.push(objFilters.recordLimit);
+	    	values.push(filter_limit);
 	    }
-	    
+	    console.log(sql);
+        console.log(values);
 	    objApp.showHideSpinner(true, "#inspectionList");
         
         objDBUtils.primaryKey = "id";
@@ -1865,6 +1857,10 @@ var Inspections = function()
         });
 
         $("#inspectionList #is_finalised").change(function(){
+            self.doInspectionSearch();
+        });
+
+        $("#inspectionList #filter_limit").change(function(){
             self.doInspectionSearch();
         });
         
