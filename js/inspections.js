@@ -3365,6 +3365,8 @@ var Inspections = function()
                                             }
                                             else
                                             {
+                                                self.defectsReArray = [];
+                                                self.defectsReObjects = {};
                                                 var maxLoop = items.rows.length;
                                                 for(var idx = 0; idx < maxLoop; idx++)
                                                 {
@@ -3372,6 +3374,7 @@ var Inspections = function()
                                                     self.defectsReArray.push(r);
                                                     self.defectsReObjects[r.id] = r;
                                                 }
+                                                alert(self.defectsReArray.length);
                                                 self.showSignificantItems(self.stepBackFromSignList);
                                             }
                                         });
@@ -3386,6 +3389,8 @@ var Inspections = function()
                                             }
                                             else
                                             {
+                                                self.defectsArray = [];
+                                                self.defectsObjects = {};
                                                 var maxLoop = items.rows.length;
                                                 for(var idx = 0; idx < maxLoop; idx++)
                                                 {
@@ -4089,9 +4094,6 @@ var Inspections = function()
                                         var sourceArray = self.defectsObjects;
                                         if(!objApp.empty(objApp.getKey("reinspection_id")))
                                             sourceArray = self.defectsReObjects;
-                                        console.log(self.defectsObjects);
-                                        console.log(self.defectsReObjects);
-                                        console.log(row);
                                         html += '<tr>';
                                         html += '<td><a href="#" rel="'+row.id+'" class="delete-significant-item">Delele</a>#' + sourceArray[row.defect_id].seq_no + '</td>';
                                         html += '<td>' + sourceArray[row.defect_id].location +'</td>';
