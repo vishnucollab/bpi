@@ -3370,7 +3370,6 @@ var Inspections = function()
                                                     self.defectsReArray.push(r);
                                                     self.defectsReObjects[r.id] = r;
                                                 }
-                                                alert(self.defectsReArray.length);
                                                 self.showSignificantItems(self.stepBackFromSignList);
                                             }
                                         });
@@ -3435,26 +3434,58 @@ var Inspections = function()
                                                             objDBUtils.execute(sql, values, function()
                                                             {
                                                                 // The photo was saved.
-                                                                var filters = [];
-                                                                filters.push(new Array("inspection_id = '" + objApp.keys.inspection_id + "'"));
-                                                                objDBUtils.loadRecords("inspectionitems", filters, function(param, items)
-                                                                {
-                                                                    if(!items)
-                                                                    {
-                                                                        // Handle no items
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        var maxLoop = items.rows.length;
-                                                                        for(var idx = 0; idx < maxLoop; idx++)
+                                                                if(!objApp.empty(objApp.getKey("reinspection_id"))) {
+                                                                    // Load the reinspection items
+                                                                    var sql = "SELECT ri.id, ii.seq_no, ii.location, ii.action, ii.observation, ri.rectified, r.failed " +
+                                                                        "FROM inspectionitems ii " +
+                                                                        "INNER JOIN reinspectionitems ri ON ri.inspectionitem_id = ii.id " +
+                                                                        "INNER JOIN reinspections r ON r.id = ri.reinspection_id " +
+                                                                        "WHERE ii.deleted = 0 " +
+                                                                        "AND r.id = ? " +
+                                                                        "ORDER BY ii.seq_no ASC";
+                                                                    objDBUtils.loadRecordsSQL(sql, [objApp.keys.reinspection_id], function (param, items) {
+                                                                        if(!items)
                                                                         {
-                                                                            var r = items.rows.item(idx);
-                                                                            self.defectsArray.push(r);
-                                                                            self.defectsObjects[r.id] = r;
+                                                                            // Handle no items
                                                                         }
-                                                                        self.showSignificantItems(self.stepBackFromSignList);
-                                                                    }
-                                                                });
+                                                                        else
+                                                                        {
+                                                                            self.defectsReArray = [];
+                                                                            self.defectsReObjects = {};
+                                                                            var maxLoop = items.rows.length;
+                                                                            for(var idx = 0; idx < maxLoop; idx++)
+                                                                            {
+                                                                                var r = items.rows.item(idx);
+                                                                                self.defectsReArray.push(r);
+                                                                                self.defectsReObjects[r.id] = r;
+                                                                            }
+                                                                            self.showSignificantItems(self.stepBackFromSignList);
+                                                                        }
+                                                                    });
+                                                                }else{
+                                                                    var filters = [];
+                                                                    filters.push(new Array("inspection_id = '" + objApp.keys.inspection_id + "'"));
+                                                                    objDBUtils.loadRecords("inspectionitems", filters, function(param, items)
+                                                                    {
+                                                                        if(!items)
+                                                                        {
+                                                                            // Handle no items
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            self.defectsArray = [];
+                                                                            self.defectsObjects = {};
+                                                                            var maxLoop = items.rows.length;
+                                                                            for(var idx = 0; idx < maxLoop; idx++)
+                                                                            {
+                                                                                var r = items.rows.item(idx);
+                                                                                self.defectsArray.push(r);
+                                                                                self.defectsObjects[r.id] = r;
+                                                                            }
+                                                                            self.showSignificantItems(self.stepBackFromSignList);
+                                                                        }
+                                                                    });
+                                                                }
                                                             });
                                                         };
                                                         writer.write(imageData);
