@@ -3455,7 +3455,7 @@ var Inspections = function()
         $(".capture-significant-image-re, .select-significant-image-re").bind(objApp.touchEvent, function(e)
         {
             e.preventDefault();
-            if(!objApp.empty(objApp.getKey("reinspection_id"))) {
+            if(objApp.empty(objApp.getKey("reinspection_id"))) {
                 return;
             }
             var location =	self.objPopLocation.getText();
