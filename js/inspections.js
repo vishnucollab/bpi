@@ -3458,15 +3458,6 @@ var Inspections = function()
             if(objApp.empty(objApp.getKey("reinspection_id"))) {
                 return;
             }
-            var location =	self.objPopLocation.getText();
-            var action = self.objPopAction.getText();
-            var observation =  $("#frmDefectDetails #observation").val();
-
-            if((location == "") || (location.toUpperCase() == "CHOOSE") || observation == "")
-            {
-                alert('Please enter other fields before selecting the image.');
-                return;
-            }
             var $this = $(this);
 
             // Get the current maximum photo sequence number for this reinspection item
