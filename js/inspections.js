@@ -3946,7 +3946,6 @@ var Inspections = function()
     this.showSignificantItems = function(currentStep)
     {
         self.stepBackFromSignList = currentStep;
-        self.isAddingSignificantItem = 0;
         objApp.clearMain();
         objApp.setSubHeading("Significant Failed Items");
         $("#significantItems").removeClass("hidden");
@@ -5639,8 +5638,6 @@ var Inspections = function()
                     }
 
                     self.inAudit = true;
-                    self.isAddingSignificantItem = 0;
-                    $('#frmDefectDetails #is_significant').prop('selected', false);
 
                     if(self.restricted == 0)
                     {
