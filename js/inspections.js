@@ -3450,6 +3450,208 @@ var Inspections = function()
 
             });
         });
+
+        $(".capture-significant-image-re, .select-significant-image-re").unbind(objApp.touchEvent);
+        $(".capture-significant-image-re, .select-significant-image-re").bind(objApp.touchEvent, function(e)
+        {
+            e.preventDefault();
+            if(!objApp.empty(objApp.getKey("reinspection_id"))) {
+                return;
+            }
+            var location =	self.objPopLocation.getText();
+            var action = self.objPopAction.getText();
+            var observation =  $("#frmDefectDetails #observation").val();
+
+            if((location == "") || (location.toUpperCase() == "CHOOSE") || observation == "")
+            {
+                alert('Please enter other fields before selecting the image.');
+                return;
+            }
+            var $this = $(this);
+
+            // Get the current maximum photo sequence number for this reinspection item
+            var sql = "SELECT MAX(seq_no) as seq_no " +
+                "FROM reinspectionitemphotos " +
+                "WHERE reinspection_id = ? " +
+                "AND deleted = 0";
+            objDBUtils.loadRecordSQL(sql, [objApp.getKey('reinspection_id')], function(row)
+            {
+                var seq_no = 1;  // Default sequence number to 1.
+                if(row)
+                {
+                    seq_no = row.seq_no;
+
+                    if((seq_no == null) || (seq_no == 0))
+                    {
+                        seq_no = 0;
+                    }
+                    seq_no += 1;
+                }
+                var editPhoto4 = function(photoData, defect_id)
+                {
+                    if(typeof defect_id == 'undefined' || defect_id == '' || defect_id == 0)
+                        return false;
+
+                    // Setup a new image object, using the photo data as the image source
+                    objImage = new Image();
+
+                    objImage.src = 'data:image/jpeg;base64,' + photoData;
+
+                    //notes = "";
+
+                    // When the image has loaded, setup the image marker object
+                    objImage.onload = function()
+                    {
+                        // Resize the image so it's 600px wide
+                        objResizer = new imageResizer(objImage);
+                        var imageData = objResizer.resize(600);
+
+
+                        // Create a thumbnail version of the image
+                        objImage = new Image();
+                        objImage.src = 'data:image/jpeg;base64,' + imageData;
+
+                        objImage.onload = function()
+                        {
+                            objResizer = new imageResizer(objImage);
+                            var thumbData = objResizer.resize(90);
+
+                            // Save both the thumbnail and the full version to the local file system.
+                            var fail = function(error)
+                            {
+                                alert("storePhotosOnFS::Caught error: " + error.code);
+                            }
+
+                            // Make sure the current inspection id is valid - there seems to be a bug sometimes when the id is corrupted
+                            objDBUtils.loadRecord('reinspections', objApp.getKey('reinspection_id'), function(param, row)
+                            {
+                                if(!row)
+                                {
+                                    alert("The current reinspection id is NOT valid");
+                                    return;
+                                }
+
+                                user_id = localStorage.getItem("user_id");
+                                var new_id = objDBUtils.makeInsertKey(objApp.sync_prefix);
+                                var notes = "";
+
+                                if(objApp.phonegapBuild)
+                                {
+                                    // Phonegap build - save the images to the file system
+                                    // Request access to the file system
+                                    window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem)
+                                    {
+                                        var file_name = new_id + "_thumb.jpg";
+                                        // Get permission to write the file
+                                        fileSystem.root.getFile(file_name, {create: true, exclusive: false}, function(fileEntry)
+                                        {
+                                            // Create the file write object
+                                            fileEntry.createWriter(function(writer)
+                                            {
+                                                writer.onwriteend = function(evt)
+                                                {
+                                                    // Get the file URI for the thumbnail image
+                                                    var uri_thumb = fileEntry.toURI();
+                                                    // Now write the full image to the file system
+                                                    var file_name = new_id + ".jpg";
+                                                    fileSystem.root.getFile(file_name, {create: true, exclusive: false}, function(fileEntry)
+                                                    {
+                                                        // Create the file write object
+                                                        fileEntry.createWriter(function(writer)
+                                                        {
+                                                            writer.onwriteend = function(evt)
+                                                            {
+                                                                // Get the file URI for the thumbnail image
+                                                                var uri = fileEntry.toURI();
+                                                                // Save the image data and notes back to the database
+                                                                var sql = "INSERT INTO reinspectionitemphotos(id, reinspection_id, seq_no, photodata_tmb, photodata, notes, defect_id, created_by, dirty) " +
+                                                                    "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                                                                var values = [new_id, objApp.getKey('reinspection_id'), seq_no, uri_thumb, uri, notes, defect_id, user_id, "1"];
+                                                                objDBUtils.execute(sql, values, function()
+                                                                {
+                                                                    // The photo was saved.
+                                                                    if(!objApp.empty(objApp.getKey("reinspection_id"))) {
+                                                                        // Load the reinspection items
+                                                                        var sql = "SELECT ri.id, ii.seq_no, ii.location, ii.action, ii.observation, ri.rectified, r.failed " +
+                                                                            "FROM inspectionitems ii " +
+                                                                            "INNER JOIN reinspectionitems ri ON ri.inspectionitem_id = ii.id " +
+                                                                            "INNER JOIN reinspections r ON r.id = ri.reinspection_id " +
+                                                                            "WHERE ii.deleted = 0 " +
+                                                                            "AND r.id = ? " +
+                                                                            "ORDER BY ii.seq_no ASC";
+                                                                        objDBUtils.loadRecordsSQL(sql, [objApp.keys.reinspection_id], function (param, items) {
+                                                                            if (!items) {
+                                                                                // Handle no items
+                                                                            }
+                                                                            else {
+                                                                                self.defectsReArray = [];
+                                                                                self.defectsReObjects = {};
+                                                                                var maxLoop = items.rows.length;
+                                                                                for (var idx = 0; idx < maxLoop; idx++) {
+                                                                                    var r = items.rows.item(idx);
+                                                                                    self.defectsReArray.push(r);
+                                                                                    self.defectsReObjects[r.id] = r;
+                                                                                }
+                                                                            }
+                                                                        });
+                                                                    }
+                                                                });
+                                                            };
+                                                            writer.write(imageData);
+                                                        }, fail);
+                                                    }, fail);
+                                                };
+                                                // Write the thumbnail data to the file.
+                                                writer.write(thumbData);
+                                            }, fail);
+                                        }, fail);
+                                    }, fail);
+                                }
+                            }, function(t){}, "", self.finalised);
+                        }
+                    }
+                }
+
+                var reinspectionItemID = $(self.reinspectionItemRow).attr("data-id").trim();
+
+                if($this.hasClass('capture-significant-image-re')){
+                    if(objApp.phonegapBuild)
+                    {
+                        navigator.camera.getPicture(function(imageData)
+                            {
+                                editPhoto4(imageData, reinspectionItemID);
+                            }, function(message)
+                            {
+                                alert("Image load failed because: " + message);
+                            },
+                            {
+                                quality: 50,
+                                destinationType: Camera.DestinationType.DATA_URL
+                            });
+                    }
+                }else if($this.hasClass('select-significant-image-re')){
+
+                    if(objApp.phonegapBuild)
+                    {
+                        // Invoke the camera API to allow the user to take a photo
+                        navigator.camera.getPicture(function(imageData)
+                            {
+                                editPhoto4(imageData, reinspectionItemID);
+                            }, function(message)
+                            {
+                                alert("Image load failed because: " + message);
+                            },
+                            {
+                                quality: 50,
+                                destinationType: Camera.DestinationType.DATA_URL,
+                                sourceType : Camera.PictureSourceType.PHOTOLIBRARY,
+                                correctOrientation: true
+                            });
+                    }
+                }
+
+            });
+        });
 	}
 
     this.showReportPhotos = function()
@@ -5517,7 +5719,7 @@ var Inspections = function()
         blockElement('body');
 
         // Step 1 - Load the reinspection item
-        var reinspectionItemID = $(this.reinspectionItemRow).attr("data-id").trim();
+        var reinspectionItemID = $(self.reinspectionItemRow).attr("data-id").trim();
 
         objDBUtils.loadRecord("reinspectionitems", reinspectionItemID, function(rectified_status, reinspectionItem) {
             if(!reinspectionItem) {
@@ -6448,6 +6650,7 @@ var Inspections = function()
                         $('#reinspection select#rectified').val(rectifiedText);
                         $('#reinspection .infomation p').html(text);
                         $('#reinspection .infomation select#rectified').show();
+                        $('#reinspection .infomation .capture-buttons').removeClass('hidden');
                     });
 
                     // Handle the event when the rectified status of the item is updated
