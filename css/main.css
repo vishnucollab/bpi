@@ -1299,6 +1299,18 @@ aside textarea
     width: 252px;
     height: 150px;
 }
+#inspectionStep2 ul.selector {
+    padding: 4px;
+    width: 260px;
+    margin: 0;
+}
+#inspectionStep2 #frmDefectDetails table td{
+    padding: 5px 10px !important;
+}
+#inspectionStep2 #searchObservation{
+    padding: 11px 10px;
+    margin: 0;
+}
 #inspectionStep3 #breadcrumbs{
     width: 70%;
     float: left;

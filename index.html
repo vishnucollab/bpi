@@ -537,6 +537,10 @@
                             <td><label for="observation">Observation</label>  </td>
                             <td><textarea id="observation" name="observation"></textarea></td>
                         </tr>
+                        <tr>
+                            <td><label for="is_significant">Is significant?</label>  </td>
+                            <td><input class="ignore" type="checkbox" id="is_significant" /></td>
+                        </tr>
                         <tr id="action_wrapper">
                             <td><label for="popAction">Action</label></td>
                             <td>
@@ -550,7 +554,7 @@
                             <td>&nbsp;</td>
                             <td>
                                 <a class="button left" id="searchObservation" href="#">Search</a>
-                                <div class="left leftmargin hidden add-sig-item-btn">
+                                <div class="left leftmargin hidden for-significant-items">
                                     <a href="#" class="capture-significant-image left"><img width="40" src="images/camera-75.png" /></a>&nbsp;
                                     <a href="#" class="select-significant-image left"><img width="40" src="images/gallery-75.png" /></a>
                                 </div>
@@ -581,9 +585,6 @@
                 </div>
                 <div class="btnContainer right">
                      <a id="btnStep2Next" class="mtop20 right btn-bg-w81" href="#">Next</a>
-                </div>
-                <div class="btnContainer right hidden add-sig-item-btn">
-                    <a id="btnBackToSigList" class="mtop20 right btn-bg-w81" href="#">Back</a>
                 </div>
                 <div class="btnContainer left btnEditNotes" id="btnEditNotes">
                     <a href="#" class="btnNotes "></a>
@@ -947,7 +948,6 @@
             <div class="bottomBtns">
                 <div class="btnContainer left">
                     <a id="btnSignificantItemsBack" class="button left gotoStep3" href="#">BACK</a>
-                    <a id="btnAddSignificantItem" class="button left leftmargin" href="#">ADD</a>
                 </div>
             </div>
         </div>
