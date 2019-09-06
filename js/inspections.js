@@ -3586,6 +3586,7 @@ var Inspections = function()
                                                                             }
                                                                         });
                                                                     }
+                                                                    alert('New significant image has been added successfully.');
                                                                 });
                                                             };
                                                             writer.write(imageData);
