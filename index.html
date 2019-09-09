@@ -286,7 +286,7 @@
     <div class="center">
         <br/>
         <img class="mbottom30" width="440" src="images/logo.png" />
-        <br/><br/><br/>
+        <br/>
         <button id="btnNewInspection" type="button" class="btn-bg-w400 submit">Start New Inspection</button>
         <br/><br/>
         <button id="btnCompleteReinspection" type="button" class="btn-bg-w400 submit">Complete Re-Inspection</button>
@@ -389,12 +389,12 @@
                                 <select name="report_type2" id="report_type2" class="ignore">
                                     <option value="Builder inspection">Builder Inspection</option>
                                     <option value="Client inspection">Client Inspection</option>
-                                    <option value="Handovers.com">Handovers.com</option>
+                                    <option value="Peet inspection">Peet Inspection</option>
                                 </select>
                                 <div>
                                     <input type="hidden" value="" name="report_type" id="report_type" />
                                     <select class="report_type_options ignore" id="builder_report_type" name="builder_report_type" >
-                                        <option class="handovers-child" value="">--Select</option>
+                                        <option class="builder-child" value="">--Select</option>
                                         <option class="builder-child" value="Builder: Pre-Pour inspections">Pre-Pour Inspection</option>
                                         <option class="builder-child" value="Builder: Slab inspections">Slab Inspection</option>
                                         <option class="builder-child" value="Builder: Frame inspections">Frame Inspection</option>
@@ -407,7 +407,7 @@
                                     </select>
 
                                     <select class="report_type_options ignore" id="client_report_type" name="client_report_type" style="display: none;">
-                                        <option class="handovers-child" value="">--Select</option>
+                                        <option class="client-child" value="">--Select</option>
                                         <option class="client-child" value="Client: Pre-Pour inspections">Pre-Pour Inspection</option>
                                         <option class="client-child" value="Client: Slab inspections">Slab Inspection</option>
                                         <option class="client-child" value="Client: Frame inspections">Frame Inspection</option>
@@ -424,6 +424,10 @@
                                         <option class="handovers-child" value="Handovers">Handovers</option>
                                     </select>
 
+                                    <select class="report_type_options ignore" id="peet_report_type" name="peet_report_type" style="display: none;">
+                                        <option class="peet-child" value="">--Select</option>
+                                        <option class="peet-child" value="Peet PCI">Peet PCI</option>
+                                    </select>
                                 </div>
                             </td>
                         </tr>
@@ -501,15 +505,15 @@
                 <textarea id="notes" name="notes" class="hidden"></textarea>
             </form>
 
-            <div id="controlBtns" class="bottomBtns">
+            <div class="controlBtns bottomBtns">
                 <div class="btnContainer left btnEditNotes" id="btnEditNotes">
                     <a href="#" class="btnNotes "></a>
                     <span>Notes</span>
                 </div>
-
+                <a id="btnCaptureSignature" data-reveal-id="signatureWrapper" class="right capture-signature-btn" href="#"></a>
                 <a id="btnCapturePhoto" data-reveal-id="photoWrapper" class="right step1-capture-btn" href="#"></a>
                 <div class="btnContainer right">
-                    <a id="btnStep1Next" class="mtop20 right rightmargin btn-bg-w81" href="#">Next</a>
+                    <a id="btnStep1Next" class="mtop20 right btn-bg-w81" href="#">Next</a>
                 </div>
             </div>
         </div> <!--! end of inspection details screen wrapper -->
@@ -533,6 +537,10 @@
                             <td><label for="observation">Observation</label>  </td>
                             <td><textarea id="observation" name="observation"></textarea></td>
                         </tr>
+                        <tr>
+                            <td><label for="is_significant">Is significant?</label>  </td>
+                            <td><input class="ignore" type="checkbox" id="is_significant" /></td>
+                        </tr>
                         <tr id="action_wrapper">
                             <td><label for="popAction">Action</label></td>
                             <td>
@@ -546,6 +554,10 @@
                             <td>&nbsp;</td>
                             <td>
                                 <a class="button left" id="searchObservation" href="#">Search</a>
+                                <div class="left leftmargin hidden for-significant-items">
+                                    <a href="#" class="capture-significant-image left"><img width="40" src="images/camera-75.png" /></a>&nbsp;
+                                    <a href="#" class="select-significant-image left"><img width="40" src="images/gallery-75.png" /></a>
+                                </div>
                             </td>
                         </tr>
                     </table>
@@ -565,19 +577,20 @@
                 <input type="hidden" id="hash" name="hash" value="" />
             </form>
 
-            <div id="controlBtns" class="bottomBtns" >
+            <div class="controlBtns bottomBtns" >
+                <a id="btnCaptureSignature2" data-reveal-id="signatureWrapper" class="right capture-signature-btn" href="#"></a>
                 <a id="btnCapturePhoto" data-reveal-id="photoWrapper" class="right" href="#"></a>
                 <div class="btnContainer left">
                     <a id="btnStep2Back" class="mtop20 left gotoStep1 btn-bg-w81" href="#">Back</a>
                 </div>
                 <div class="btnContainer right">
-                    <a id="btnStep2Next" class="mtop20 right rightmargin btn-bg-w81" href="#">Next</a>
+                     <a id="btnStep2Next" class="mtop20 right btn-bg-w81" href="#">Next</a>
                 </div>
                 <div class="btnContainer left btnEditNotes" id="btnEditNotes">
                     <a href="#" class="btnNotes "></a>
                     <span>Notes</span>
                 </div>
-
+                <a id="btnSignificantItems" class="button left hidden btnSignificantItems" href="javascript:void(0);">Sig Items</a>
             </div>
         </div> <!--! end of inspection step 2 screen wrapper -->
 
@@ -653,16 +666,18 @@
                 </div>
 
                 <a id="btnReportPhotos" class="button left hidden" href="javascript:void(0);">Set Report Photos</a>
+                <a id="btnSignificantItems2" class="button left hidden btnSignificantItems" href="javascript:void(0);">Sig Items</a>
                 <a id="btnSendReport" class="button left hidden" href="javascript:void(0);">SEND BPI</a>
 
                 <div class="btnContainer right">
-                    <a id="btnStep3Next" class="right rightmargin mtop20 btn-bg-w81" href="#">Exit</a>
+                    <a id="btnStep3Next" class="right mtop20 btn-bg-w81" href="#">Exit</a>
                 </div>
             </div>
             <div style="clear: both;"></div>
 
 
-            <div id="controlBtns">
+            <div class="controlBtns">
+                <a id="btnCaptureSignature3" data-reveal-id="signatureWrapper" class="right capture-signature-btn" href="#"></a>
                 <a id="btnCapturePhoto" data-reveal-id="photoWrapper" class="right reveal" href="#"></a>
             </div>
 
@@ -675,11 +690,18 @@
             <div id="addPhoto-wrapper">
                 <a href="#" id="addPhoto-btn">Take photo</a>
                 <a href="#" id="addPhotoFromGallery">Take photo from gallery</a>
+                <a style="padding: 20px;color: white;top: 240px;right: 95px;font-size: 24px;" id="btnDone" class="button right rightmargin close-reveal-modal btn-done" href="#">Done</a>
             </div>
             <div id="photoList"></div>
             <a class="close-reveal-modal" style="font-size: 40px; color: red;">&#215;</a>
-            <div id="controlBtns">
-                <a id="btnDone" class="button right rightmargin close-reveal-modal" href="#">Done</a>
+        </div>
+
+        <div id="signatureWrapper" class="reveal-modal inspectionDetails">
+            <div style="background-color: #eee; border-radius: 5px 5px 0 0; height: 40px; font-weight: bold; padding: 5px;">Signature photos</div>
+            <div id="signatureList"></div>
+            <a class="close-reveal-modal" style="font-size: 40px; color: red;">&#215;</a>
+            <div class="controlBtns">
+                <a id="btnDoneSignature" style="color: white;padding: 15px;bottom: 10px;top: auto;" class="button right rightmargin close-reveal-modal btn-done" href="#">Done</a>
             </div>
         </div>
 
@@ -748,7 +770,7 @@
             </form>
 
             <div class="bottomBtns">
-                <div class="btnContainer left">
+                <div class="btnContainer left w80">
                     <a id="btnStep4Back" class="gotoStep3 mtop20 left btn-bg-w81" href="#">Back</a>
                 </div>
 
@@ -769,7 +791,7 @@
                 <a id="btnSendReport2" class="button left" href="javascript:void(0);">SEND BPI</a>
 
                 <div class="btnContainer right">
-                    <a id="btnStep4Next" class="mtop20 right rightmargin btn-bg-w81" href="#">Next</a>
+                    <a id="btnStep4Next" class="mtop20 right btn-bg-w81" href="#">Next</a>
                 </div>
             </div>
 
@@ -850,7 +872,7 @@
             </form>
 
             <div class="bottomBtns">
-                <div class="btnContainer left">
+                <div class="btnContainer left w80">
                     <a id="btnStep5Back" class="gotoStep4 mtop20 left btn-bg-w81" href="#">Back</a>
                 </div>
 
@@ -906,10 +928,39 @@
         </div>
 
 
+        <!-- inspection step 4 screen -->
+        <div id="significantItems" class="hidden panel">
+            <form action="#" id="frmSignificantItems" method="post">
+                <table id="tblSignificantItems" class="listing">
+                    <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Location</th>
+                        <th>Observation</th>
+                        <th>Photo</th>
+                    </tr>
+                    </thead>
+                </table>
+
+                <div id="significantItemsList" class="scrollWrapper"></div>
+            </form>
+
+            <div class="bottomBtns">
+                <div class="btnContainer left">
+                    <a id="btnSignificantItemsBack" class="button left gotoStep3" href="#">BACK</a>
+                </div>
+            </div>
+        </div>
+
         <!-- inspection listing screen -->
         <div id="inspectionList" class="hidden panel">
             <button id="addInspection" type="button" class="btn-green-bg-51x81">Add</button>
             <div class="builderFilters">
+                <select name="filter_limit" id="filter_limit">
+                    <option value="50" selected="selected">50</option>
+                    <option value="100">100</option>
+                    <option value="200">200</option>
+                </select>
                 <select name="is_finalised" id="is_finalised">
                     <option value="">All</option>
                     <option value="1">Is Finalised</option>
@@ -983,8 +1034,12 @@
                 </table>
                 <div id="reinspectionScrollWrapper" class="scrollWrapper"></div>
                 <div class="infomation">
-                    <div style="float: left; width: 70%; overflow-y: auto; height: 60px;">
-                        <p>Please click a tag/item in the list above to begin the reinspection.</p>
+                    <div style="float: left; width: 67%; overflow-y: auto; height: 85px;">
+                        <p>Please click a tag/item in the list above to begin the reinspection.<br/>Please select image if it is significant.</p>
+                    </div>
+                    <div class="capture-buttons left leftmargin hidden" style="margin-top: 12px;">
+                        <a href="#" class="capture-significant-image-re left"><img width="40" src="images/camera-75.png" /></a>&nbsp;
+                        <a href="#" class="select-significant-image-re left"><img width="40" src="images/gallery-75.png" /></a>
                     </div>
                     <select name="rectified" id="rectified" style="display: none">
                         <option value="Not Rectified">Not Rectified</option>
@@ -1034,20 +1089,23 @@
                 <div class="btnContainer left w80" style="margin: 10px 5px;">
                     <a id="btnSendReinspectReport" class="button mtop20 right " href="javascript:void(0);">SEND BPI</a>
                 </div>
-                <div class="btnContainer left" style="width: auto;margin: 10px 5px;">
-                    <a id="btnCertificatedRe" class="mtop20 right button" style="font-size: 18px; top: 20px; height: 35px;line-height: 35px;" href="javascript:void(0);">Certificated</a>
-                    <a id="btnUncertificatedRe" class="mtop20 right button hidden" style="font-size: 18px; top: 20px; height: 35px;line-height: 35px;" href="javascript:void(0);">Uncertificated</a>
+                <div class="btnContainer left w80" style="width: auto;margin: 10px 5px;">
+                    <a id="btnCertificatedRe" class="mtop20 right button" style="font-size: 18px; top: 20px; height: 35px;line-height: 35px;" href="javascript:void(0);">Cert</a>
+                    <a id="btnUncertificatedRe" class="mtop20 right button hidden" style="font-size: 18px; top: 20px; height: 35px;line-height: 35px;" href="javascript:void(0);">Uncert</a>
                 </div>
-
+                <div class="btnContainer left" style="width: auto;margin: 10px 5px;">
+                    <a id="btnSignificantItemsRe" class="button left hidden btnSignificantItems" style="font-size: 18px; top: 20px; height: 35px;" href="javascript:void(0);">Sig<br/>Items</a>
+                </div>
                 <div class="btnContainer right">
                     <!-- <a id="btnStep3Email" class="button right rightmargin" href="#">Email</a> -->
-                    <a id="btnStep3Next" class="mtop20 right rightmargin btn-bg-w81" href="#">Done</a>
+                    <a id="btnStep3Next" class="mtop20 right btn-bg-w81" href="#">Done</a>
                 </div>
             </div>
             <div style="clear: both;"></div>
 
-            <div id="controlBtns">
-                <a id="btnCapturePhoto" data-reveal-id="photoWrapper" class="right reveal" href="#" style="right: 140px;"></a>
+            <div class="controlBtns">
+                <a id="btnCaptureSignature4" data-reveal-id="signatureWrapper" class="right capture-signature-btn" href="#"></a>
+                <a id="btnCapturePhoto" data-reveal-id="photoWrapper" class="right reveal" href="#" style="right: 120px;"></a>
             </div>
         </div>
 
@@ -1172,7 +1230,7 @@
                 <ul id="list_email">
                     <li><input type="checkbox" id="emailToOffice" value="1"  /> <label for="emailToOffice">Office</label></li>
                     <li><input type="checkbox" id="emailToBuilder" value="1" /> <label for="emailToBuilder">Builder</label></li>
-                    <li><input type="checkbox" id="emailToSupervisor" value="1" /> <label for="emailToSupervisor">Supervisor</label></li>  
+                    <li><input type="checkbox" id="emailToSupervisor" value="1" /> <label for="emailToSupervisor">Supervisor</label></li>
                 </ul>
 
                 <div class="clear"></div>

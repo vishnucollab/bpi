@@ -16,16 +16,12 @@ window.requestFileSystem  = window.requestFileSystem || window.webkitRequestFile
 function App() 
 {
 	var self = this;	// Create a reference to the object itself
-	//this.apiURL = "http://localhost/nycran/blueprintapi/";
-	//this.apiURL = "http://qa.simb.com.au/blueprint/api/";  
+	//this.apiURL = "http://bpi-api.wearebuilding.net/";
     this.apiURL = "http://blueprint.simb.com.au/api/";
-	//this.apiURL = "http://blue.print/BlueprintAPI/";
-	//this.apiURL = "http://projects.loc/blueprintapi/";
-    //this.apiURL = "http://192.168.0.52/blueprint/api/";
 	this.phonegapBuild = true; 	// Set this to true when phonegap is the target
-	this.version = '2.1.15';				// Identifies the app version to the server
-	this.patch = '15';
-	this.versionStatus = "Production";
+	this.version = '2.1.17';				// Identifies the app version to the server
+    this.patch = '17';
+	this.versionStatus = "Product";
 	this.localMode = false;
 	this.context = "";
 
@@ -457,8 +453,9 @@ function App()
 		$("#popSelector").remove();
 		objApp.clearKeys();
         objApp.objInspection.setStep(0);
-        objApp.objInspection.isEditing = 0;       
-		objFilters.hide();	
+        objApp.objInspection.isEditing = 0;
+        objApp.objInspection.isAddingSignificantItem = 0;
+        objFilters.hide();
         $("form.search").hide();
 		
 		if(!$("#defect").hasClass("hidden"))
@@ -800,6 +797,8 @@ function App()
 	this.formatUserDate = function(objDate)
 	{
 		// AU Format
+        if(objDate == null)
+            return '';
 		return objDate.getDate() + "/" + (objDate.getMonth() + 1) + "/" + objDate.getFullYear();			
 	}
 	
