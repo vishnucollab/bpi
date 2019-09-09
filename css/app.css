@@ -670,6 +670,9 @@ div.pack a.button
     margin-top: 20px;
 }
 
+#significantItems div.bottomBtns {
+    margin-top: 20px;
+}
 /* Send Report */
 fieldset legend {
     font-weight: bold;

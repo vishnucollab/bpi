@@ -237,7 +237,7 @@ function Sync()
         parameters['email'] = localStorage.getItem("email");
         parameters['password'] = localStorage.getItem("password");
         parameters['version'] = objApp.version;
-		parameters['patch'] = objApp.patch;
+        parameters['patch'] = objApp.patch;
         parameters['is_QLD'] = objApp.IS_QLD;
         parameters['data'] = objDBUtils.data;
         parameters['anticache'] = Math.floor(Math.random() * 999999);
@@ -274,6 +274,7 @@ function Sync()
 
         if (tableName == 'builders_supervisors')
             objDBUtils.emptyTable('builders_supervisors');
+
         if(!self.silentMode) $("#accountMessage #general").text("Processing: " + (self.syncingTotalRequest - self.syncingCounter) + '/' + self.syncingTotalRequest);
         if(!self.silentMode) blockElement("body");
         $.post(objApp.apiURL + 'account/get_data_table/' + tableName +'/' + refreshSync, parameters , function(data)
@@ -348,7 +349,7 @@ function Sync()
 
                                                 function DBErrorHandler(transaction, error)
                                                 {
-                                                    var text_context = (typeof context != 'undefined' && context != "")  ? "(" + context + ") " : "";
+                                                    var text_context = (typeof context != 'undefined' && context != "") ? "(" + context + ") " : "";
                                                     self.doServerLog("Error "+text_context+": " + error.message + " in " + sql + " (params : "+self.saveData.join(", ")+")");
                                                     self.syncingCounter--;
                                                     if(!self.silentMode) $("#accountMessage #general").text("Processing: " + (self.syncingTotalRequest - self.syncingCounter) + '/' + self.syncingTotalRequest);
@@ -447,7 +448,7 @@ function Sync()
 
                                     function DBErrorHandler(transaction, error)
                                     {
-                                        var text_context = (typeof context != 'undefined' && context != "")  ? "(" + context + ") " : "";
+                                        var text_context = (typeof context != 'undefined' && context != "") ? "(" + context + ") " : "";
                                         self.doServerLog("Error "+text_context+": " + error.message + " in " + sql + " (params : "+self.saveData.join(", ")+")");
                                         self.syncingCounter--;
                                         if(!self.silentMode) $("#accountMessage #general").text("Processing: " + (self.syncingTotalRequest - self.syncingCounter) + '/' + self.syncingTotalRequest);
@@ -538,7 +539,6 @@ function Sync()
     {
         return data.replace(/â€™/g,"'").replace(/â€˜/g,"'");
     }
-
 
 	this.sendData = function()
 	{
@@ -699,11 +699,6 @@ function Sync()
         self.saveData.push('0'); /* dirty = 0 */
 		sql += header + ", dirty) " + footer + ", ?);";
 
-		if (tableName == 'builders_supervisors'){
-		    console.log(sql);
-            console.log(self.saveData);
-        }
-		
 		return sql;		
 	};	
 	
@@ -719,7 +714,6 @@ function Sync()
 
 			// Set all dirty records as not dirty
 			var sql = "UPDATE " + tableName + " SET dirty = 0 WHERE dirty = 1";
-			
 			if(tableName == "inspections")
 			{
 				// For the inspections table, only set dirty to 0 when the inspection has been finalised.
@@ -949,6 +943,7 @@ function Sync()
 					params["photodata_tmb"] = photodata_tmb;
 					params["notes"] = row.notes;
                     params["photo_type"] = photo_type;
+                    params["defect_id"] = row.defect_id;
                     
                     // The normal inspection table has the cover photo and report photos fields.
                     if(photo_type == "inspection") {
