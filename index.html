@@ -261,7 +261,7 @@
                     <input type="submit" class="submit" value="Reset Password" />
                 </div>
                 <div id="passverification" class="hidden">
-                    <label for="verifypasscode">Please enter verification code below</label>
+                    <label for="verification_code">Please enter verification code below</label>
                     <input type="text" name="verification_code" id="verification_code" value="" />
                     <input type="hidden" name="thecode" id="thecode" value=""/>
                     <a id="resetmypass" class="button" href="#"  style="width: 160px; padding: 15px 20px">Reset My Password</a>
@@ -537,7 +537,7 @@
                             <td><label for="observation">Observation</label>  </td>
                             <td><textarea id="observation" name="observation"></textarea></td>
                         </tr>
-                        <tr>
+                        <tr class="unfinalised-builder-report-only">
                             <td><label for="is_significant">Is significant?</label>  </td>
                             <td><input class="ignore" type="checkbox" id="is_significant" /></td>
                         </tr>
@@ -590,7 +590,7 @@
                     <a href="#" class="btnNotes "></a>
                     <span>Notes</span>
                 </div>
-                <a id="btnSignificantItems" class="button left hidden btnSignificantItems" href="javascript:void(0);">Sig Items</a>
+                <a id="btnSignificantItems" class="button left hidden btnSignificantItems unfinalised-builder-report-only" href="javascript:void(0);">Sig Items</a>
             </div>
         </div> <!--! end of inspection step 2 screen wrapper -->
 
@@ -666,7 +666,7 @@
                 </div>
 
                 <a id="btnReportPhotos" class="button left hidden" href="javascript:void(0);">Set Report Photos</a>
-                <a id="btnSignificantItems2" class="button left hidden btnSignificantItems" href="javascript:void(0);">Sig Items</a>
+                <a id="btnSignificantItems2" class="button left hidden btnSignificantItems unfinalised-builder-report-only" href="javascript:void(0);">Sig Items</a>
                 <a id="btnSendReport" class="button left hidden" href="javascript:void(0);">SEND BPI</a>
 
                 <div class="btnContainer right">
@@ -1094,7 +1094,7 @@
                     <a id="btnUncertificatedRe" class="mtop20 right button hidden" style="font-size: 18px; top: 20px; height: 35px;line-height: 35px;" href="javascript:void(0);">Uncert</a>
                 </div>
                 <div class="btnContainer left" style="width: auto;margin: 10px 5px;">
-                    <a id="btnSignificantItemsRe" class="button left hidden btnSignificantItems" style="font-size: 18px; top: 20px; height: 35px;" href="javascript:void(0);">Sig<br/>Items</a>
+                    <a id="btnSignificantItemsRe" class="button left hidden btnSignificantItems reinspection-builder-report" style="font-size: 18px; top: 20px; height: 35px;" href="javascript:void(0);">Sig<br/>Items</a>
                 </div>
                 <div class="btnContainer right">
                     <!-- <a id="btnStep3Email" class="button right rightmargin" href="#">Email</a> -->
