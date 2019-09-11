@@ -237,11 +237,7 @@ function Sync()
         parameters['email'] = localStorage.getItem("email");
         parameters['password'] = localStorage.getItem("password");
         parameters['version'] = objApp.version;
-		parameters['patch'] = objApp.patch;
-        if (objApp.IS_STATE_FILTERED == 1){
-            parameters['filtered_state_code'] = objApp.FILTERED_STATE_CODE;
-            parameters['filtered_state_id'] = objApp.FILTERED_STATE_ID;
-        }
+        parameters['patch'] = objApp.patch;
         parameters['data'] = objDBUtils.data;
         parameters['anticache'] = Math.floor(Math.random() * 999999);
         parameters['start_time'] = objApp.objSync.startTime;
@@ -946,7 +942,6 @@ function Sync()
 					params["photodata_tmb"] = photodata_tmb;
 					params["notes"] = row.notes;
                     params["photo_type"] = photo_type;
-                    params["defect_id"] = row.defect_id;
                     
                     // The normal inspection table has the cover photo and report photos fields.
                     if(photo_type == "inspection") {
