@@ -4504,53 +4504,66 @@ var Inspections = function()
 	*/
 	this.deleteDefect = function(item_id)
 	{
-		// Flag all related photo records as deleted.
-		var sql = "UPDATE inspectionitemphotos ip " +
-            "INNER JOIN significant_items si ON si.photo_id = ip.id " +
-			"SET ip.deleted = 1, ip.dirty = 1 " +
-			"WHERE si.foreign_id = ?";
+        // Flag all related photo records as deleted.
+        var sql = "SELECT inspectionitemphotos.* FROM inspectionitemphotos " +
+            "INNER JOIN significant_items ON significant_items.photo_id = inspectionitemphotos.id " +
+            "WHERE significant_items.foreign_id = ?";
 
-		objDBUtils.execute(sql, [item_id], function()
-		{
-			// Now delete the inspection item record itself
-			objDBUtils.deleteRecord("inspectionitems", item_id, function()
-			{
-				// Final step is to update the inspection record with the correct stats.
-				// Get the number of defects associated with this inspection
-				var sql = "SELECT COUNT(*) as num_defects " +
-				    "FROM inspectionitems " +
-				    "WHERE inspection_id = ? AND deleted = 0";
+        objDBUtils.loadRecordSQL(sql, [item_id], function(row)
+        {
+            if(row)
+            {
+                // Now update the parent inspection record with the defect count.
+                var num_defects = row.num_defects;
 
-				objDBUtils.loadRecordSQL(sql, [objApp.keys.inspection_id], function(row)
-				{
-					if(row)
-					{
-						// Now update the parent inspection record with the defect count.
-						var num_defects = row.num_defects;
+                sql = "UPDATE inspectionitemphotos " +
+                    "SET deleted = 1, dirty = 1 " +
+                    "WHERE id = ?";
 
-						sql = "UPDATE inspections " +
-							"SET num_defects = ?, dirty = 1 " +
-							"WHERE id = ?";
+                objDBUtils.execute(sql, [row.id], function(){});
+            }
+        });
 
-						objDBUtils.execute(sql, [num_defects, objApp.keys.inspection_id], function()
-						{
-							// Hide the delete button
-							$("#btnDeleteDefect").css("visibility", "hidden");
 
-							// Reload the inspection items listing
-							self.loadInspectionItems();
+        // Now delete the inspection item record itself
+        objDBUtils.deleteRecord("inspectionitems", item_id, function()
+        {
+            // Final step is to update the inspection record with the correct stats.
+            // Get the number of defects associated with this inspection
+            var sql = "SELECT COUNT(*) as num_defects " +
+                "FROM inspectionitems " +
+                "WHERE inspection_id = ? AND deleted = 0";
 
-							// Hide the defect panel
-							$("#defect").addClass("hidden");
+            objDBUtils.loadRecordSQL(sql, [objApp.keys.inspection_id], function(row)
+            {
+                if(row)
+                {
+                    // Now update the parent inspection record with the defect count.
+                    var num_defects = row.num_defects;
 
-						});
-					}
-				});
-			});
-		});
-        var sql = "UPDATE significant_items si " +
-            "SET si.deleted = 1, si.dirty = 1 " +
-            "WHERE si.foreign_id = ?";
+                    sql = "UPDATE inspections " +
+                        "SET num_defects = ?, dirty = 1 " +
+                        "WHERE id = ?";
+
+                    objDBUtils.execute(sql, [num_defects, objApp.keys.inspection_id], function()
+                    {
+                        // Hide the delete button
+                        $("#btnDeleteDefect").css("visibility", "hidden");
+
+                        // Reload the inspection items listing
+                        self.loadInspectionItems();
+
+                        // Hide the defect panel
+                        $("#defect").addClass("hidden");
+
+                    });
+                }
+            });
+        });
+        
+        var sql = "UPDATE significant_items " +
+            "SET deleted = 1, dirty = 1 " +
+            "WHERE foreign_id = ?";
         objDBUtils.execute(sql, [item_id], function(){});
         // two time doing arrow down functionality to update wrong tag ID's
         self.handleMoveInspectionItem(item_id, 'down');
@@ -5613,6 +5626,22 @@ var Inspections = function()
    		{
 			$("#frmDefectDetails #location").val(location);
    		}
+
+        if((action == "") || (action.toUpperCase() == "CHOOSE"))
+        {
+            $("#inspectionStep2 textarea#observation").val('');
+            $("#inspectionStep2 ul#popAction li:first-child").text('Choose');
+
+            if((callback != undefined) && (callback != "")) {
+                callback()
+            }
+
+            return;
+        }
+        else
+        {
+            $("#frmDefectDetails #action").val(action);
+        }
 
    		// Set the current inspection id into the form.
    		$("#frmDefectDetails #inspection_id").val(objApp.keys.inspection_id);
