@@ -2356,7 +2356,11 @@ var Inspections = function()
 
             self.checkSaveInspection(0);
 
-            self.showStep2();
+            if(self.isReportsWithQuestions()){
+                self.addQuestionItems();
+            }else{
+                self.showStep2();
+            }
 			return false;
 		});
 
@@ -3660,6 +3664,207 @@ var Inspections = function()
                 }
 
             });
+        });
+
+        $(".capture-question-image, .select-question-image").unbind(objApp.touchEvent);
+        $(".capture-question-image, .select-question-image").bind(objApp.touchEvent, function(e)
+        {
+            e.preventDefault();
+            if(self.finalised == 1) {
+                alert("Sorry, this inspection has been finalised.  If you wish to add more issues, please un-finalise the inspection first");
+                return;
+            }
+            var $this = $(this);
+            var question_id = $this.attr('data-id');
+            self.current_table = "inspectionitemphotos";
+            self.current_key = "inspection_id";
+
+            if(!objApp.empty(objApp.getKey("reinspection_id"))) {
+                self.current_table = "reinspectionitemphotos";
+                self.current_key = "reinspection_id";
+            }
+
+            // Get the current maximum photo sequence number for this inspection item
+            var sql = "SELECT MAX(seq_no) as seq_no " +
+                "FROM " + self.current_table + " " +
+                "WHERE " + self.current_key + " = ? " +
+                "AND deleted = 0";
+            objDBUtils.loadRecordSQL(sql, [objApp.getKey(self.current_key)], function(row)
+            {
+                var seq_no = 1;  // Default sequence number to 1.
+                if(row)
+                {
+                    seq_no = row.seq_no;
+
+                    if((seq_no == null) || (seq_no == 0))
+                    {
+                        seq_no = 0;
+                    }
+                    seq_no += 1;
+                }
+                var editPhoto5 = function(photoData, defect_id)
+                {
+                    if(typeof defect_id == 'undefined' || defect_id == '' || defect_id == 0)
+                        return false;
+
+                    // Setup a new image object, using the photo data as the image source
+                    objImage = new Image();
+
+                    objImage.src = 'data:image/jpeg;base64,' + photoData;
+
+                    //notes = "";
+
+                    // When the image has loaded, setup the image marker object
+                    objImage.onload = function()
+                    {
+                        // Resize the image so it's 600px wide
+                        objResizer = new imageResizer(objImage);
+                        var imageData = objResizer.resize(600);
+
+
+                        // Create a thumbnail version of the image
+                        objImage = new Image();
+                        objImage.src = 'data:image/jpeg;base64,' + imageData;
+
+                        objImage.onload = function()
+                        {
+                            objResizer = new imageResizer(objImage);
+                            var thumbData = objResizer.resize(90);
+
+                            // Save both the thumbnail and the full version to the local file system.
+                            var fail = function(error)
+                            {
+                                alert("storePhotosOnFS::Caught error: " + error.code);
+                            }
+
+                            // Make sure the current inspection id is valid - there seems to be a bug sometimes when the id is corrupted
+
+                            var check_table = "inspections";
+                            if(self.current_table == "reinspectionitemphotos") {
+                                check_table = "reinspections";
+                            }
+
+                            objDBUtils.loadRecord(check_table, objApp.getKey(self.current_key), function(param, row)
+                            {
+                                if(!row)
+                                {
+                                    alert("The current inspection id is NOT valid");
+                                    return;
+                                }
+
+                                user_id = localStorage.getItem("user_id");
+                                var new_id = objDBUtils.makeInsertKey(objApp.sync_prefix);
+                                var notes = "";
+
+                                if(objApp.phonegapBuild)
+                                {
+                                    // Phonegap build - save the images to the file system
+                                    // Request access to the file system
+                                    window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem)
+                                    {
+                                        var file_name = new_id + "_thumb.jpg";
+                                        // Get permission to write the file
+                                        fileSystem.root.getFile(file_name, {create: true, exclusive: false}, function(fileEntry)
+                                        {
+                                            // Create the file write object
+                                            fileEntry.createWriter(function(writer)
+                                            {
+                                                writer.onwriteend = function(evt)
+                                                {
+                                                    // Get the file URI for the thumbnail image
+                                                    var uri_thumb = fileEntry.toURI();
+                                                    // Now write the full image to the file system
+                                                    var file_name = new_id + ".jpg";
+                                                    fileSystem.root.getFile(file_name, {create: true, exclusive: false}, function(fileEntry)
+                                                    {
+                                                        // Create the file write object
+                                                        fileEntry.createWriter(function(writer)
+                                                        {
+                                                            writer.onwriteend = function(evt)
+                                                            {
+                                                                // Get the file URI for the thumbnail image
+                                                                var uri = fileEntry.toURI();
+                                                                // Save the image data and notes back to the database
+                                                                var sql = "INSERT INTO " + self.current_table + "(id, " + self.current_key + ", seq_no, photodata_tmb, photodata, notes, created_by, dirty) " +
+                                                                    "VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
+                                                                var values = [new_id, objApp.getKey(self.current_key), seq_no, uri_thumb, uri, notes, user_id, "1"];
+                                                                objDBUtils.executeWithCBParam(sql, values, function(param)
+                                                                    {
+                                                                        // After the photo was saved, saving record for significant items
+                                                                        var insert_sql = "INSERT INTO significant_items(id, `type`, foreign_id, photo_id, created_by, dirty) " +
+                                                                            "VALUES(?, ?, ?, ?, ?, ?)";
+                                                                        var insert_values = [objDBUtils.makeInsertKey(objApp.sync_prefix), self.current_table.replace('photos', ''), param.defect_id, param.photo_id, localStorage.getItem("user_id"), "1"];
+                                                                        objDBUtils.execute(insert_sql, insert_values, function(){
+                                                                            self.loadQuestionItems();
+                                                                        });
+                                                                    },
+                                                                    {
+                                                                        photo_id: new_id,
+                                                                        defect_id: defect_id
+                                                                    });
+                                                            };
+                                                            writer.write(imageData);
+                                                        }, fail);
+                                                    }, fail);
+                                                };
+                                                // Write the thumbnail data to the file.
+                                                writer.write(thumbData);
+                                            }, fail);
+                                        }, fail);
+                                    }, fail);
+                                }
+                            }, function(t){}, "", self.finalised);
+                        }
+                    }
+                }
+
+                if($this.hasClass('capture-significant-image')){
+                    if(objApp.phonegapBuild)
+                    {
+                        navigator.camera.getPicture(function(imageData)
+                            {
+                                editPhoto5(imageData, question_id);
+                            }, function(message)
+                            {
+                                alert("Image load failed because: " + message);
+                            },
+                            {
+                                quality: 50,
+                                destinationType: Camera.DestinationType.DATA_URL
+                            });
+                    }
+                }else if($this.hasClass('select-significant-image')){
+
+                    if(objApp.phonegapBuild)
+                    {
+                        // Invoke the camera API to allow the user to take a photo
+                        navigator.camera.getPicture(function(imageData)
+                            {
+                                editPhoto5(imageData, question_id)
+
+                            }, function(message)
+                            {
+                                alert("Image load failed because: " + message);
+                            },
+                            {
+                                quality: 50,
+                                destinationType: Camera.DestinationType.DATA_URL,
+                                sourceType : Camera.PictureSourceType.PHOTOLIBRARY,
+                                correctOrientation: true
+                            });
+                    }
+                }
+
+            });
+        });
+
+        $("select.select-answer").unbind("change");
+        $("select.select-answer").change(function(){
+            var inspection_item_id = $(this).attr('data-id');
+            var sql = "UPDATE inspectionitems " +
+                "SET notes = ?, dirty = 1 " +
+                "WHERE id = ?";
+            objDBUtils.execute(sql, [$(this).val(), inspection_item_id], function() {});
         });
 	}
 
@@ -6091,12 +6296,152 @@ var Inspections = function()
         }
     }
 
+    this.loadQuestionItems = function()
+    {
+        $('#btnStep3AddAnotherIssue').addClass('hidden');
+        $('.btnSignificantItems').addClass('hidden');
+        // Ensure a valid inspection id is set
+        if(objApp.keys.inspection_id == "")
+        {
+            return;
+        }
+
+        this.keySortArray = {};
+        var listDeleteMode = true;
+
+        $("#tblDefectListingHeader th").eq(2).text('Question');
+        $("#tblDefectListingHeader th").eq(3).text('Photo');
+        $("#tblDefectListingHeader th").eq(4).text('Answer');
+
+        // Unbind any more button events
+        $("#defectScrollWrapper").unbind();
+        $("#tblDefectListing td").unbind();
+        $("#tblDefectListing a.edit_issue_btn").unbind();
+
+        // Kill iScroll if it already exists
+        if(this.scroller) {
+            this.scroller.destroy();
+            this.scroller = null;
+        }
+
+        var filter_string = '';
+        var keyword = $('#keywords').val();
+        if (keyword != '')
+        {
+            filter_string = " AND (ii.location LIKE '%"+keyword+"%' OR ii.observation LIKE '%"+keyword+"%' OR ii.action LIKE '%"+keyword+"%' OR ii.notes LIKE '%"+keyword+"%') ";
+        }
+
+        var sql = "SELECT ii.*, iip.photodata_tmb " +
+            "FROM inspectionitems ii " +
+            "LEFT JOIN significant_items si ON si.foreign_id = ii.id " +
+            "LEFT JOIN inspectionitemphotos iip ON iip.id = si.photo_id " +
+            "WHERE ii.deleted = ? " +
+            "AND ii.inspection_id = ? " +
+            filter_string +
+            "ORDER BY ii.seq_no ASC";
+
+        blockElement('body');
+
+        objDBUtils.loadRecordsSQL(sql, [0, objApp.keys.inspection_id], function (param, items) {
+            unblockElement('body');
+            $("#defectScrollWrapper").html("");
+
+            self.defectsArray = [];
+            self.defectsObjects = {};
+            if(!items)
+            {
+
+            }
+            else
+            {
+                // Loop through the items and put them into the table.
+                var html = '<table id="tblDefectListing" class="listing">';
+
+                var maxLoop = items.rows.length;
+                self.numberOfIssues = 0;
+                self.numberOfAcknowledgements = 0;
+                var sq = 2;
+
+                var r = 0;
+
+                var added_items = [];
+
+                for(r = 0; r < maxLoop; r++)
+                {
+                    var row = items.rows.item(r);
+                    var seq_no = row.seq_no;
+                    if (added_items.indexOf(row.id) != -1)
+                        continue;
+                    added_items.push(row.id);
+                    self.defectsArray.push(row);
+                    self.defectsObjects[row.id] = row;
+                    // Store the current sequence order of the row so we can quickly sort the
+                    // items on move up / move down event.
+                    self.keySortArray[sq] = row.id;
+                    sq = sq + 2;
+
+                    html += '<tr rel="' + row.id + '">';
+                    html += '<td class="nodelete"></td>';
+                    html += '<td><span class="seq_no">' + seq_no + '</span>';
+                    if(self.finalised == 0) {
+                        html += '<div class="capture-buttons left leftmargin" style="margin-top: 12px;">' +
+                            '<a href="#" data-id="'+ row.id +'" class="capture-question-image left"><img width="40" src="images/camera-75.png" /></a>&nbsp;' +
+                            '<a href="#" data-id="'+ row.id +'" class="select-question-image left"><img width="40" src="images/gallery-75.png" /></a>' +
+                            '</div>';
+                    }
+
+                    html += '<td>' + row.observation + '</td>';
+                    html += '<td>' + (row.photodata_tmb?row.photodata_tmb:'') + '</td>';
+
+                    var answer = '<select style="width: auto;" data-id="'+ row.id +'" autocomplete="off" class="selector select-answer">' +
+                        '<option value="">NA</option>' +
+                        '<option value="Yes" '+(row.notes=='Yes'?'selected':'')+'>Yes</option>' +
+                        '<option value="No" '+(row.notes=='No'?'selected':'')+'>No</option>' +
+                        '</select>';
+
+                    html += '<td>' + answer + '</td>';
+                    html += '</tr>';
+
+                    if(row.itemtype == 0) {
+                        self.numberOfIssues++;
+                    } else {
+                        self.numberOfAcknowledgements++;
+                    }
+                }
+
+                html += '</table>';
+
+                $("#defectScrollWrapper").html(html);
+
+                self.setTableWidths2('tblDefectListingHeader', 'tblDefectListing', 5);
+
+                self.scroller = new IScroll5("#defectScrollWrapper", { click: true, hScrollbar: false, vScrollbar: false, scrollbarClass: 'myScrollbarSm'});
+
+                if(self.last_scroller_y != -1)
+                {
+                    self.scroller.scrollTo(self.last_scroller_x, self.last_scroller_y);
+                    self.last_scroller_x = -1;
+                    self.last_scroller_y = -1;
+                }
+            }
+        }, "");
+    }
+
 	/* **
 	* loadInspectionItems loads the inspection items that belong to this inspection
 	* and shows them in the items table
 	 */
 	this.loadInspectionItems = function()
-	{  
+	{
+	    if(self.isReportsWithQuestions()){
+	        self.loadQuestionItems();
+	        return;
+        }
+        if(!self.finalised){
+            $('#btnStep3AddAnotherIssue').removeClass('hidden');
+            if($("#inspection #report_type2").val() == 'Builder inspection')
+                $('.unfinalised-builder-report-only').removeClass("hidden");
+        }
 	    locations = {};
         actions = {};
 		// Ensure a valid inspection id is set
@@ -6109,20 +6454,9 @@ var Inspections = function()
 
 		var listDeleteMode = true;
 
-		if(objApp.keys.report_type == 'Handovers' || 1)
-		{
-			$("#tblDefectListingHeader th").eq(4).show();
-		}
-		else
-		{
-			$("#tblDefectListingHeader th").eq(4).hide();
-		}
-
-        // Remove the triangle from the table header cells
-		//$("#tblDefectListingHeader th .triangle").remove();
-
-        // Inject the triangle
-		//$("#tblDefectListingHeader th[class='" + self.itemSortBy + "']").append('<span class="triangle ' + self.itemSortDir + '"></span>');
+        $("#tblDefectListingHeader th").eq(2).text('Location');
+        $("#tblDefectListingHeader th").eq(3).text('Observation');
+        $("#tblDefectListingHeader th").eq(4).text('Action');
 
 		// Unbind any more button events
 		$("#defectScrollWrapper").unbind();
@@ -6201,7 +6535,7 @@ var Inspections = function()
 			        html += '<td><span class="seq_no">' + seq_no + '</span>';
 
                     if(self.finalised == 0) {
-			            html += '<a href="#" rel="' + row.id + '" class="edit_issue_btn">Edit Issue</a>';
+                        html += '<a href="#" rel="' + row.id + '" class="edit_issue_btn">Edit Issue</a>';
 
                         if (maxLoop > 1)
                         {
@@ -6211,7 +6545,7 @@ var Inspections = function()
                                 html += '<span class="arrow up"></span></td>';
                             else
                                 html += '<span class="arrow up"></span><span class="arrow down"></span></td>';
-			            }
+                        }
                     }
                     
                     var key = row.location.trim();
@@ -6223,22 +6557,18 @@ var Inspections = function()
                     {
                         locations[key] = 1; 
                     }
-                    
+
                     html += '<td>' + row.location + '</td>';
 			        html += '<td>' + row.observation + '</td>';
-
-					if(objApp.keys.report_type == 'Handovers' || 1)
-					{
-					    html += '<td>' + row.action + '</td>';
-                        if (row.action)
-                        {
-                            row.action = $.trim(row.action.replace(/"/g, ''));
-                            if (actions.hasOwnProperty(row.action))
-                                actions[row.action] += 1;
-                            else
-                                actions[row.action] = 1;
-                        }
-					}
+                    html += '<td>' + row.action + '</td>';
+                    if (row.action)
+                    {
+                        row.action = $.trim(row.action.replace(/"/g, ''));
+                        if (actions.hasOwnProperty(row.action))
+                            actions[row.action] += 1;
+                        else
+                            actions[row.action] = 1;
+                    }
 
 			        html += '</tr>';
 
@@ -8365,6 +8695,93 @@ var Inspections = function()
                 });
             }
         }
+    }
+
+    this.isReportsWithQuestions = function()
+    {
+        return objApp.keys.report_type == 'Builder: Pre-plaster and lock up inspections' || objApp.keys.report_type == 'Builder: Pre-paint/fixing inspections';
+    }
+
+    this.addQuestionItems = function()
+    {
+        if(objApp.keys.report_type == 'Builder: Pre-plaster and lock up inspections')
+            var questions = [
+                'Is site sign visible',
+                'Is the site clean with safe access',
+                'Have external doors been installed to secure house',
+                'Has roof cover been Installed',
+                'Has antiponding boards been installed (required to roofs sarked with No eaves)',
+                'Has all flashings and lead work been carried out',
+                'Is the dwelling watertight',
+                'Has the electrical rough in been carried out',
+                'Have ducts been installed for exhaust fans (external venting)',
+                'Have ducts been installed for rangehood (external venting)',
+                'Has the plumbing rough in been carried out including gas points',
+                'Are the water lines under pressure',
+                'Has stack work been carried out including waste traps connections',
+                'Has shower base been installed',
+                'Has the bath been installed and supported accordingly',
+                'Has the heating rough in been carried out including walkway to AH',
+                'Has the cooling rough in been carried out',
+                'Has sisalation paper to walls been installed and sealed correctly',
+                'Has sisalation paper to roof been installed and sealed correctly',
+                'Has wall insulation been installed',
+                'Has ceiling insulation been installed or loaded',
+
+                'Have all beams and connections been checked against the plans',
+                'Have all point loads been supported correctly',
+                'Has the bracing that is visible been installed correctly',
+                'Have any holes larger than 25mm been drilled through the top plate and re- enforced',
+                'Are all holes drilled through studs more than 270mm apart',
+                'Have service pipes that are overlapping been Insulated or separated',
+
+                'Are walls plumb in accordance with the code',
+                'Are rooms the correct size as per plans',
+                'Are door openings correct width & height as per plans',
+                'Is ceiling the correct height as per plans',
+                'Have wall intersection blocks been installed & nailed accordingly',
+                'Have all bulkheads been installed as per plans',
+                'Have ceiling noggins been installed over all walls (Min 150mm from internal corner)',
+                'Has change of direction noggins been installed',
+                'Have noggins been installed to bath hob and under bulkheads (Min 300mm apart)',
+                'Have ceiling noggins been installed to perimeter of garage',
+                'Have ceiling noggins been installed to support motor for garage door',
+                'Has roof access hole been framed out',
+                'Have wall noggins been installed for towel rail and toilet roll holder',
+                'Has roof access hole been framed out',
+                'Have windows been installed and supported as per manufactures instructions',
+                'Have walls been straightened',
+                'Have ceilings been straightened',
+                'Is parapet framing complete',
+                'Have box gutter boards been installed as required'
+            ];
+
+        self._addQuestionItems(questions, 0);
+    }
+
+    this._addQuestionItems = function(questions, index){
+        if(typeof questions[index] == 'undefined')
+            return self.showStep3();
+        var sql = "SELECT * " +
+            "FROM inspectionitems " +
+            "WHERE inspection_id = ? AND observation = ? AND deleted = 0";
+        var seq_no = parseInt(index) + 1;
+
+        var inspection_item_id = objDBUtils.makeInsertKey(objApp.sync_prefix) + seq_no;
+        objDBUtils.loadRecordSQL(sql, [objApp.keys.inspection_id, questions[index]], function(row)
+        {
+            if(row)
+            {
+                console.log('This inspection item has been added');
+                console.log(row);
+            }
+            else
+            {
+                var insert_sql = "INSERT INTO inspectionitems(id, inspection_id, seq_no, location, observation, action, hash, created_by, dirty) VALUES(?,?,?,?,?,?,?,?,?)";
+                objDBUtils.execute(insert_sql, [inspection_item_id, objApp.keys.inspection_id, seq_no, '', questions[index], '', objUtils.MD5(questions[index].toUpperCase()), localStorage.getItem("user_id"), 1], function(){});
+            }
+            self._addQuestionItems(questions, seq_no);
+        });
     }
 };
 
