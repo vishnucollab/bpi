@@ -5856,11 +5856,7 @@ var Inspections = function()
                     unblockElement('body');
 
                     // Update the table row with the modified text
-                    if(self.isReportsWithQuestions()){
-                        $(self.reinspectionItemRow).find("td:eq(2)").text(rectified_status);
-                    } else {
-                        $(self.reinspectionItemRow).find("td:eq(4)").text(rectified_status);
-                    }
+                    $(self.reinspectionItemRow).find("td:eq(4)").text(rectified_status);
                 });
             });
 
@@ -7033,14 +7029,12 @@ var Inspections = function()
                 $("#reinspection").removeClass("hidden");
 
                 if(self.isReportsWithQuestions()){
-                    $("#tblReinspectionHeader th").eq(0).text('Item');
-                    $("#tblReinspectionHeader th").eq(1).hide();
-                    $("#tblReinspectionHeader th").eq(2).text('Question');
+                    $("#tblReinspectionHeader th").eq(0).text('Question');
+                    $("#tblReinspectionHeader th").eq(1).text('Location/Action');
                     $("#tblReinspectionHeader th").eq(3).text('Photo');
                 }else{
                     $("#tblReinspectionHeader th").eq(0).text('Tag Id');
-                    $("#tblReinspectionHeader th").eq(1).show();
-                    $("#tblReinspectionHeader th").eq(2).text('Observation');
+                    $("#tblReinspectionHeader th").eq(1).text('Location');
                     $("#tblReinspectionHeader th").eq(3).text('Action');
                 }
 
@@ -7071,7 +7065,7 @@ var Inspections = function()
                 }
 
                 // Load the reinspection items
-                var sql = "SELECT ri.id, ii.seq_no, ii.location, ii.action, ii.observation, ri.rectified, r.failed, iip.photodata_tmb " +
+                var sql = "SELECT ri.id, ii.seq_no, ii.location, ii.question, ii.action, ii.observation, ri.rectified, r.failed, iip.photodata_tmb " +
                     "FROM inspectionitems ii " +
                     "INNER JOIN reinspectionitems ri ON ri.inspectionitem_id = ii.id " +
                     "INNER JOIN reinspections r ON r.id = ri.reinspection_id " +
@@ -7102,16 +7096,29 @@ var Inspections = function()
                         var row = items.rows.item(r);
                         self.defectsReArray.push(row);
                         self.defectsReObjects[row.id] = row;
+
                         html += '<tr data-id="' + row.id + '">';
-                        html += '<td>' + row.seq_no + '</td>';
-                        if(!self.isReportsWithQuestions())
-                            html += '<td>' + row.location + '</td>';
-                        html += '<td>' + row.observation + '</td>';
-                        if(!self.isReportsWithQuestions())
-                            html += '<td>' + row.action + '</td>';
-                        else
+                        if(self.isReportsWithQuestions()){
+                            html += '<td>' + row.seq_no + '. ' + row.question + '</td>';
+                            var cell2 = '';
+                            if(row.location)
+                                cell2 += 'Location: ' + row.location;
+                            if(cell2)
+                                cell2 += '<br/>';
+                            if(row.action)
+                                cell2 += 'Action: ' + row.action;
+                            html += '<td>' + cell2 + '</td>';
+                            html += '<td>' + row.observation + '</td>';
                             html += '<td>' + (row.photodata_tmb?'<img width="150" height="100" src="data:image/jpeg;base64,' + row.photodata_tmb + '" />':'') + '</td>';
-                        html += '<td>' + row.rectified + '</td>';
+                            html += '<td>' + row.rectified + '</td>';
+                        }else{
+                            html += '<td>' + row.seq_no + '</td>';
+                            html += '<td>' + row.location + '</td>';
+                            html += '<td>' + row.observation + '</td>';
+                            html += '<td>' + row.action + '</td>';
+                            html += '<td>' + row.rectified + '</td>';
+                        }
+
                         html += '</tr>';
                     }
                     html += '</table>';
@@ -7134,12 +7141,11 @@ var Inspections = function()
                         var text = $(this).find("td:eq(0)").text() + ". ";
                         if(self.isReportsWithQuestions()){
                             text += $(this).find("td:eq(1)").text();
-                            var rectifiedText = $(this).find("td:eq(2)").text();
                         }else{
                             text += $(this).find("td:eq(1)").text() + ", ";
                             text += $(this).find("td:eq(2)").text();
-                            var rectifiedText = $(this).find("td:eq(4)").text();
                         }
+                        var rectifiedText = $(this).find("td:eq(4)").text();
                         $('#reinspection select#rectified').val(rectifiedText);
                         $('#reinspection .infomation p').html(text);
                         $('#reinspection .infomation select#rectified').show();
