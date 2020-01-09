@@ -761,9 +761,8 @@ function Sync()
 			var sql = "SELECT iip.*, i.report_type, si.id as sig_id " +
 				"FROM inspectionitemphotos iip " +
                 "INNER JOIN inspections i ON i.id = iip.inspection_id " +
-                "LEFT JOIN significant_items si ON si.foreign_id = iip.id AND si.deleted != 1 " +
+                "LEFT JOIN significant_items si ON si.photo_id = iip.id AND si.deleted != 1 " +
 				"WHERE length(iip.photodata_tmb) > 500";
-				
 			objDBUtils.loadRecordsSQL(sql, [], function(param, items)
 			{
 				if(!items)

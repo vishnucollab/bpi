@@ -6169,23 +6169,25 @@ var Inspections = function()
                 var item_ids = [];
                 var inspection_items = [];
                 var thumbnails = {};
-                console.log(items.rows);
+
                 for(var i = 0; i < items.rows.length; i++){
                     var item = items.rows.item(i);
                     if(item_ids.indexOf(item.id) == -1){
                         inspection_items.push(item);
                         item_ids.push(item.id);
                     }
-                    if(typeof thumbnails[item.id] == 'undefined')
-                        thumbnails[item.id] = [];
 
-                    if(item.photodata_tmb)
+
+                    if(item.photodata_tmb){
+                        if(typeof thumbnails[item.id] == 'undefined')
+                            thumbnails[item.id] = [];
                         thumbnails[item.id].push({
                             sig_id: item.sig_id,
                             photodata_tmb: item.photodata_tmb
                         });
-                }
+                    }
 
+                }
                 // Loop through the items and put them into the table.
                 var html = '<table id="tblDefectListing" class="listing">';
 
@@ -6238,12 +6240,12 @@ var Inspections = function()
                     html += '<td>' + row.question + (details?'<br/>-------'+details:'') + '</td>';
 
                     /* Photo list */
-                    if(thumbnails.length){
+                    if(typeof thumbnails[row.id] != 'undefined' && thumbnails[row.id].length){
                         html += '<td>';
-                        for(var i in thumbnails){
+                        for(var j in thumbnails[row.id]){
                             html += '<div>';
-                            html += '<img style="display: inline;" width="150" height="100" src="data:image/jpeg;base64,' + thumbnails[i].photodata_tmb + '" />';
-                            html += '&nbsp;<a href="#" style="display: inline;" class="remove-photo" data-id="' + thumbnails[i].sig_id + '">Remove</a>';
+                            html += '<img style="display: inline;" width="150" height="100" src="data:image/jpeg;base64,' + thumbnails[row.id][j].photodata_tmb + '" />';
+                            html += '&nbsp;<a href="#" style="display: inline;" class="remove-photo" data-id="' + thumbnails[row.id][j].sig_id + '">Remove</a>';
                             html += '</div>';
                         }
                         html += '</td>';
