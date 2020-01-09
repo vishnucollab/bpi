@@ -997,50 +997,46 @@ function Sync()
 					}, "json");
 				}				
 				
-				if(objApp.phonegapBuild)
+				if(row.photodata)
 				{
-					// If phonegap is being used, the image data is on the file system. 
-					// Get the thumbnail
-					var file_name = row.id + "_thumb.jpg";
-					 
-					objUtils.readFile(file_name, function(success, data)
-					{
-						if(!success)	
-						{
-							alert("Couldn't read file: " + file_name);
-							return;
-						}
-						
-						photodata_tmb = data;
-						
-						// Now get the big image
-						file_name = row.id + ".jpg";
-						
-						objUtils.readFile(file_name, function(success, data)
-						{
-							if(!success)	
-							{
-								alert("Couldn't read file: " + file_name);
-								return;
-							}
+				    if(row.photodata.indexOf('file:///') == -1){
+                        photodata = row.photodata;
+                        photodata_tmb = row.photodata_tmb;
+                        uploadPhoto(photodata_tmb, photodata);
+                    }else{
+                        // If phonegap is being used, the image data is on the file system.
+                        // Get the thumbnail
+                        var file_name = row.id + "_thumb.jpg";
 
-							photodata = data;
-							
-							uploadPhoto(photodata_tmb, photodata);
-						});						
-					});			
+                        objUtils.readFile(file_name, function(success, data)
+                        {
+                            if(!success)
+                            {
+                                alert("Couldn't read file: " + file_name);
+                                return;
+                            }
+
+                            photodata_tmb = data;
+
+                            // Now get the big image
+                            file_name = row.id + ".jpg";
+
+                            objUtils.readFile(file_name, function(success, data)
+                            {
+                                if(!success)
+                                {
+                                    alert("Couldn't read file: " + file_name);
+                                    return;
+                                }
+
+                                photodata = data;
+
+                                uploadPhoto(photodata_tmb, photodata);
+                            });
+                        });
+                    }
 				}
-				else
-				{
-					// If phonegap is not being used, the image data
-					// is stored in the database itself.
-					photodata = row.photodata;	
-					photodata_tmb = row.photodata_tmb;
-                    
-					uploadPhoto(photodata_tmb, photodata);
-				}
-				
-			}	
+			}
 			
 			if(r < maxLoop)				
 			{

@@ -6371,65 +6371,24 @@ var Inspections = function()
                                         var new_id = objDBUtils.makeInsertKey(objApp.sync_prefix);
                                         var notes = "";
 
-                                        if(objApp.phonegapBuild)
-                                        {
-                                            // Phonegap build - save the images to the file system
-                                            // Request access to the file system
-                                            window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem)
+                                        // Save the image data and notes back to the database
+                                        var sql = "INSERT INTO " + self.current_table + "(id, " + self.current_key + ", seq_no, photodata_tmb, photodata, notes, created_by, dirty) " +
+                                            "VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
+                                        var values = [new_id, objApp.getKey(self.current_key), seq_no, thumbData, imageData, notes, user_id, "1"];
+                                        objDBUtils.executeWithCBParam(sql, values, function(param)
                                             {
-                                                var file_name = new_id + "_thumb.jpg";
-                                                // Get permission to write the file
-                                                fileSystem.root.getFile(file_name, {create: true, exclusive: false}, function(fileEntry)
-                                                {
-                                                    // Create the file write object
-                                                    fileEntry.createWriter(function(writer)
-                                                    {
-                                                        writer.onwriteend = function(evt)
-                                                        {
-                                                            // Get the file URI for the thumbnail image
-                                                            var uri_thumb = fileEntry.toURI();
-                                                            // Now write the full image to the file system
-                                                            var file_name = new_id + ".jpg";
-                                                            fileSystem.root.getFile(file_name, {create: true, exclusive: false}, function(fileEntry)
-                                                            {
-                                                                // Create the file write object
-                                                                fileEntry.createWriter(function(writer)
-                                                                {
-                                                                    writer.onwriteend = function(evt)
-                                                                    {
-                                                                        self.deleteSignificantItem(defect_id);
-
-                                                                        // Get the file URI for the thumbnail image
-                                                                        var uri = fileEntry.toURI();
-                                                                        // Save the image data and notes back to the database
-                                                                        var sql = "INSERT INTO " + self.current_table + "(id, " + self.current_key + ", seq_no, photodata_tmb, photodata, notes, created_by, dirty) " +
-                                                                            "VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
-                                                                        var values = [new_id, objApp.getKey(self.current_key), seq_no, uri_thumb, uri, notes, user_id, "1"];
-                                                                        objDBUtils.executeWithCBParam(sql, values, function(param)
-                                                                            {
-                                                                                // After the photo was saved, saving record for significant items
-                                                                                var insert_sql = "INSERT INTO significant_items(id, `type`, foreign_id, photo_id, created_by, dirty) " +
-                                                                                    "VALUES(?, ?, ?, ?, ?, ?)";
-                                                                                var insert_values = [objDBUtils.makeInsertKey(objApp.sync_prefix), self.current_table.replace('photos', ''), param.defect_id, param.photo_id, localStorage.getItem("user_id"), "1"];
-                                                                                objDBUtils.execute(insert_sql, insert_values, function(){
-                                                                                    self.loadQuestionItems();
-                                                                                });
-                                                                            },
-                                                                            {
-                                                                                photo_id: new_id,
-                                                                                defect_id: defect_id
-                                                                            });
-                                                                    };
-                                                                    writer.write(imageData);
-                                                                }, fail);
-                                                            }, fail);
-                                                        };
-                                                        // Write the thumbnail data to the file.
-                                                        writer.write(thumbData);
-                                                    }, fail);
-                                                }, fail);
-                                            }, fail);
-                                        }
+                                                // After the photo was saved, saving record for significant items
+                                                var insert_sql = "INSERT INTO significant_items(id, `type`, foreign_id, photo_id, created_by, dirty) " +
+                                                    "VALUES(?, ?, ?, ?, ?, ?)";
+                                                var insert_values = [objDBUtils.makeInsertKey(objApp.sync_prefix), self.current_table.replace('photos', ''), param.defect_id, param.photo_id, localStorage.getItem("user_id"), "1"];
+                                                objDBUtils.execute(insert_sql, insert_values, function(){
+                                                    self.loadQuestionItems();
+                                                });
+                                            },
+                                            {
+                                                photo_id: new_id,
+                                                defect_id: defect_id
+                                            });
                                     }, function(t){}, "", self.finalised);
                                 }
                             }
