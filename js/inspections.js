@@ -6144,14 +6144,13 @@ var Inspections = function()
             filter_string = " AND (ii.location LIKE '%"+keyword+"%' OR ii.observation LIKE '%"+keyword+"%' OR ii.action LIKE '%"+keyword+"%' OR ii.notes LIKE '%"+keyword+"%' OR ii.question LIKE '%"+keyword+"%') ";
         }
 
-        var sql = "SELECT ii.*, GROUP_CONCAT(iip.photodata_tmb) as thumbnails, GROUP_CONCAT(si.id) as sig_ids " +
+        var sql = "SELECT ii.*, iip.photodata_tmb, si.id as sig_id " +
             "FROM inspectionitems ii " +
             "LEFT JOIN significant_items si ON si.foreign_id = ii.id AND si.deleted != 1 " +
             "LEFT JOIN inspectionitemphotos iip ON iip.id = si.photo_id " +
             "WHERE ii.deleted = ? " +
             "AND ii.inspection_id = ? " +
             filter_string +
-            "GROUP BY ii.id "+
             "ORDER BY ii.seq_no ASC";
         blockElement('body');
 
@@ -6167,10 +6166,30 @@ var Inspections = function()
             }
             else
             {
+                var item_ids = [];
+                var inspection_items = [];
+                var thumbnails = {};
+                console.log(items.rows);
+                for(var i = 0; i < items.rows.length; i++){
+                    var item = items.rows.item(i);
+                    if(item_ids.indexOf(item.id) == -1){
+                        inspection_items.push(item);
+                        item_ids.push(item.id);
+                    }
+                    if(typeof thumbnails[item.id] == 'undefined')
+                        thumbnails[item.id] = [];
+
+                    if(item.photodata_tmb)
+                        thumbnails[item.id].push({
+                            sig_id: item.sig_id,
+                            photodata_tmb: item.photodata_tmb
+                        });
+                }
+
                 // Loop through the items and put them into the table.
                 var html = '<table id="tblDefectListing" class="listing">';
 
-                var maxLoop = items.rows.length;
+                var maxLoop = inspection_items.length;
                 self.numberOfIssues = 0;
                 self.numberOfAcknowledgements = 0;
                 var sq = 2;
@@ -6181,7 +6200,7 @@ var Inspections = function()
 
                 for(r = 0; r < maxLoop; r++)
                 {
-                    var row = items.rows.item(r);
+                    var row = inspection_items[r];
                     var seq_no = row.seq_no;
                     if (added_items.indexOf(row.id) != -1)
                         continue;
@@ -6219,19 +6238,15 @@ var Inspections = function()
                     html += '<td>' + row.question + (details?'<br/>-------'+details:'') + '</td>';
 
                     /* Photo list */
-                    if(row.thumbnails){
-                        var thumbnails = row.thumbnails.split(',');
-                        if(thumbnails.length){
-                            var sig_ids = row.sig_ids.split(',');
-                            html += '<td>';
-                            for(var i in thumbnails){
-                                html += '<div>';
-                                html += '<img style="display: inline;" width="150" height="100" src="data:image/jpeg;base64,' + thumbnails[i] + '" />';
-                                html += '&nbsp;<a href="#" style="display: inline;" class="remove-photo" data-id="'+sig_ids[i]+'">Remove</a>';
-                                html += '</div>';
-                            }
-                            html += '</td>';
+                    if(thumbnails.length){
+                        html += '<td>';
+                        for(var i in thumbnails){
+                            html += '<div>';
+                            html += '<img style="display: inline;" width="150" height="100" src="data:image/jpeg;base64,' + thumbnails[i].photodata_tmb + '" />';
+                            html += '&nbsp;<a href="#" style="display: inline;" class="remove-photo" data-id="' + thumbnails[i].sig_id + '">Remove</a>';
+                            html += '</div>';
                         }
+                        html += '</td>';
                     }else{
                         html += '<td></td>';
                     }
