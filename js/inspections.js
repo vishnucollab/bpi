@@ -3522,7 +3522,7 @@ var Inspections = function()
                                 var notes = "";
 
                                 // Save the image data and notes back to the database
-                                var sql = "INSERT INTO reinspectionitemphotos(id, reinspection_id, seq_no, thumbData, imageData, notes, created_by, dirty) " +
+                                var sql = "INSERT INTO reinspectionitemphotos(id, reinspection_id, seq_no, photodata_tmb, photodata, notes, created_by, dirty) " +
                                     "VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
                                 var values = [new_id, objApp.getKey('reinspection_id'), seq_no, thumbData, imageData, notes, user_id, "1"];
 
