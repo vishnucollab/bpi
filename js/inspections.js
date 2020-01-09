@@ -3524,7 +3524,7 @@ var Inspections = function()
                                 // Save the image data and notes back to the database
                                 var sql = "INSERT INTO reinspectionitemphotos(id, reinspection_id, seq_no, thumbData, imageData, notes, created_by, dirty) " +
                                     "VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
-                                var values = [new_id, objApp.getKey('reinspection_id'), seq_no, uri_thumb, uri, notes, user_id, "1"];
+                                var values = [new_id, objApp.getKey('reinspection_id'), seq_no, thumbData, imageData, notes, user_id, "1"];
 
                                 objDBUtils.executeWithCBParam(sql, values, function(param)
                                 {
@@ -3560,9 +3560,9 @@ var Inspections = function()
                                                         }
                                                     }
                                                 });
+                                                alert('New significant image has been added successfully.');
                                             }
                                         }
-                                        alert('New significant image has been added successfully.');
                                     });
                                 },
                                 {
