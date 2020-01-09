@@ -453,7 +453,7 @@ var Inspections = function()
         } 
         
         blockElement('body');
-        
+        self.updateInspectionPassFail(1);
         // Load the original inspection
         objDBUtils.loadRecord("inspections", inspection_id, function(inspection_id, row)
         {
@@ -532,17 +532,10 @@ var Inspections = function()
                                 }
                             }, last_item);
                         }
-
                     },"");
-
-
                 });
-     
             });
-
-            
         }, inspection_id);
-
     }
 
     /***
@@ -794,6 +787,19 @@ var Inspections = function()
         $("a.btnReinspect").unbind();
 
         $("#inspectionStep3").removeClass("hidden");
+
+        if(self.isReportsWithQuestions()){
+            $("#inspectionStep3 a.passed").bind(objApp.touchEvent, function(){
+                self.updateInspectionPassFail(0);
+            });
+
+            $("#inspectionStep3 a.failed").bind(objApp.touchEvent, function(){
+                self.updateInspectionPassFail(1);
+            });
+            $('.btnPassed-container, .btnFailed-container').removeClass('hidden');
+        }else{
+            $('.btnPassed-container, .btnFailed-container').addClass('hidden');
+        }
         
         // Load the inspection object
         objDBUtils.loadRecord("inspections", objApp.keys.inspection_id, function(inspection_id, inspection) {
@@ -1299,8 +1305,10 @@ var Inspections = function()
         $(".inspectionDetails #btnStep1Next").hide();
 
         // By default an inspection should be set as failed.
-        $("a#passed").removeClass('active');
-        $("a#failed").addClass('active');
+        if(self.isReportsWithQuestions()){
+            $("#inspectionStep3 a.failed").addClass('active');
+            $("#inspectionStep3 a.passed").removeClass('active');
+        }
 
         // Make sure the coversheet notes button is hidden.
         $("div.btnEditNotes").hide();
@@ -1781,10 +1789,6 @@ var Inspections = function()
         $(".inspectionDetails #addPhoto-wrapper #addPhotoFromGallery").unbind();
         $(".inspectionDetails #btnCapturePhoto").unbind();
         $("#tblInspectionListing a.action").unbind();
-        $('#inspectionList .btnContainer a#passed').unbind();
-        $('#inspectionList .btnContainer a#failed').unbind();
-        $(".inspectionDetails a#failed").unbind();
-        $(".inspectionDetails a#passed").unbind();
         $("#historyReinspection td a.action").unbind();
         $("#inspection #report_type").unbind();
         $('#reportComments').unbind();
@@ -1832,25 +1836,6 @@ var Inspections = function()
             self.loadAddressBookList();
 
             self.resolveEmailReportRecipients();
-        });
-        
-
-        $('#inspectionList .btnContainer a#passed').bind(objApp.touchEvent, function() {
-            if (!$(this).hasClass("active"))
-            {
-                $(this).parent().parent().find("a#failed.active").removeClass("active");
-                $(this).addClass("active");
-                self.doInspectionSearch();
-            }
-        });
-        
-        $('#inspectionList .btnContainer a#failed').bind(objApp.touchEvent, function() {
-            if (!$(this).hasClass("active"))
-            {
-                $(this).parent().parent().find("a#passed.active").removeClass("active");
-                $(this).addClass("active");
-                self.doInspectionSearch();
-            } 
         });
         
         $("#doInspectionSearch").bind(objApp.touchEvent, function() {
@@ -3093,35 +3078,6 @@ var Inspections = function()
   		{
             objApp.objInspection.checkSaveInspection();
   		});
-
-        $(".inspectionDetails a#failed").bind(objApp.touchEvent, function(e) {
-            e.preventDefault();
-
-            if(self.finalised == 0) {
-                if(objApp.context == "reinspections")
-                {
-                    $("#reinspection input#failed").val(1);
-                    objApp.objInspection.checkUpdateInspection();
-                }
-                else
-                    objApp.objInspection.checkSaveInspection();
-
-            }
-        });
-
-        $(".inspectionDetails a#passed").bind(objApp.touchEvent, function(e) {
-            e.preventDefault();
-
-            if(self.finalised == 0) {
-            if(objApp.context == "reinspections")
-            {
-                $("#reinspection input#failed").val(0);
-                objApp.objInspection.checkUpdateInspection();
-            }
-            else
-                objApp.objInspection.checkSaveInspection();
-            }
-        });
 
         $("#btnReportPhotos").bind(objApp.touchEvent, function(e) {
             e.preventDefault();
@@ -7247,6 +7203,26 @@ var Inspections = function()
             var num_photos = row.num_items;
 
             $("#reinspection #btnCapturePhoto div.numImgCurr").html(num_photos);
+        });
+    }
+
+    this.updateInspectionPassFail = function(failed)
+    {
+        blockElement('body');
+        var sql = "UPDATE inspections " +
+            "SET failed = ?, dirty = 1 " +
+            "WHERE id = ?";
+
+        objDBUtils.execute(sql, [failed, objApp.keys.inspection_id], function() {
+            // All done.
+            if(failed) {
+                $("#inspectionStep3 a.failed").addClass('active');
+                $("#inspectionStep3 a.passed").removeClass('active');
+            } else {
+                $("#inspectionStep3 a.failed").removeClass('active');
+                $("#inspectionStep3 a.passed").addClass('active');
+            }
+            unblockElement('body');
         });
     }
 
