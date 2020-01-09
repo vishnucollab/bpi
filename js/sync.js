@@ -756,8 +756,9 @@ function Sync()
 		window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem)
 		{
 			// Get a recordset of any photos that have not yet been moved to the filesystem
-			var sql = "SELECT iip.* " +
+			var sql = "SELECT iip.*, i.report_type " +
 				"FROM inspectionitemphotos iip " +
+                "INNER JOIN inspections i ON i.id = iip.inspection_id " +
 				"WHERE length(iip.photodata_tmb) > 500";
 				
 			objDBUtils.loadRecordsSQL(sql, [], function(param, items)
@@ -776,55 +777,60 @@ function Sync()
 				var doNext = function()
 				{
 					var row = items.rows.item(r);
-					var tmb_data = row.photodata_tmb;       
-					
-					var file_name = row.id + "_thumb.jpg";
-					
-					// Get permission to write the file
-					fileSystem.root.getFile(file_name, {create: true, exclusive: false}, function(fileEntry)
-					{
-						// Create the file write object
-						fileEntry.createWriter(function(writer)
-						{
-					        writer.onwriteend = function(evt) 
-					        {
-								// Get the file URI
-                                if (is_on_simulator)
-                                    var uri = fileEntry.fullPath;
-                                else
-								    var uri = fileEntry.toURI();
-								
-								// Update the database with the URI
-								sql = "UPDATE inspectionitemphotos " +
-									"SET photodata_tmb = ? " +
-									"WHERE id = ?";
-									
-								objDBUtils.execute(sql, [uri, row.id], function()
-								{
-									r++;
-									
-									if(r < maxLoop)
-									{
-										doNext();
-									}
-									else
-									{
-										self.syncFinished();						
-									}					
-								});									
-					        };
-							
-							// Write the thumbnail data to the file.
-                            if (is_on_simulator) {
-                                writer.write(new Blob([tmb_data]));
-                            } else {
-                                writer.write(tmb_data);
-                            }
-							
-							
-						}, fail);
-							
-					}, fail);
+					/* Do not convert raw data to image for pre-plaster and pre-paint report */
+                    if(row.report_type == 'Builder: Pre-plaster and lock up inspections' || row.report_type == 'Builder: Pre-paint/fixing inspections') {
+                        r++;
+                        if(r < maxLoop)
+                            doNext();
+                        else
+                            self.syncFinished();
+                    }else{
+                        var tmb_data = row.photodata_tmb;
+                        var file_name = row.id + "_thumb.jpg";
+
+                        // Get permission to write the file
+                        fileSystem.root.getFile(file_name, {create: true, exclusive: false}, function(fileEntry)
+                        {
+                            // Create the file write object
+                            fileEntry.createWriter(function(writer)
+                            {
+                                writer.onwriteend = function(evt)
+                                {
+                                    // Get the file URI
+                                    if (is_on_simulator)
+                                        var uri = fileEntry.fullPath;
+                                    else
+                                        var uri = fileEntry.toURI();
+
+                                    // Update the database with the URI
+                                    sql = "UPDATE inspectionitemphotos " +
+                                        "SET photodata_tmb = ? " +
+                                        "WHERE id = ?";
+
+                                    objDBUtils.execute(sql, [uri, row.id], function()
+                                    {
+                                        r++;
+
+                                        if(r < maxLoop)
+                                        {
+                                            doNext();
+                                        }
+                                        else
+                                        {
+                                            self.syncFinished();
+                                        }
+                                    });
+                                };
+                                // Write the thumbnail data to the file.
+                                if (is_on_simulator) {
+                                    writer.write(new Blob([tmb_data]));
+                                } else {
+                                    writer.write(tmb_data);
+                                }
+                            }, fail);
+
+                        }, fail);
+                    }
 				}
 				
 				if(r < maxLoop)
@@ -833,10 +839,8 @@ function Sync()
 					{     
 						 $("#accountMessage #general").text("Moving thumbnails to local file system");	
 					}
-										
 					doNext();
-				}								
-
+				}
 			}, "");				
 
 		}, fail);  
@@ -999,7 +1003,7 @@ function Sync()
 				
 				if(row.photodata)
 				{
-				    if(row.photodata.indexOf('file:///') == -1){
+				    if(row.photodata_tmb.indexOf('_thumb') == -1){
                         photodata = row.photodata;
                         photodata_tmb = row.photodata_tmb;
                         uploadPhoto(photodata_tmb, photodata);

@@ -646,8 +646,8 @@ function DBUtils()
 		// Execute the query
 	    this.db.transaction(function(transaction) 
 	    {
-            //console.log(sql);
-            //console.log(values);
+            console.log(sql);
+            console.log(values);
 	        transaction.executeSql(sql, values, function (transaction, result)
 	        {
 				// The query executed successfully.  Call the callback function
@@ -1393,6 +1393,7 @@ function DBUtils()
 				"'seq_no' INTEGER NOT NULL, " +
 				"'location' VARCHAR NOT NULL, " +
 				"'action' VARCHAR NOT NULL, " +
+                "'question' VARCHAR NULL, " +
 				"'observation' VARCHAR NOT NULL, " +
                 "'rectified' VARCHAR NOT NULL DEFAULT 'Not Rectified', " +
 				"'hash' VARCHAR NOT NULL, " +

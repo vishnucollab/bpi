@@ -725,7 +725,18 @@ var Inspections = function()
         if(( objApp.keys.report_type == "Quality Inspection") || (objApp.keys.report_type == "Builder: PCI/Final inspections")) {
             objApp.setSubExtraHeading("Step 2 of 5", true);
         }else {
-            objApp.setSubExtraHeading("Step 2 of 3", true);
+            if(self.isReportsWithQuestions()){
+                $('#btnStep2Back').removeClass('gotoStep1').addClass('gotoStep3');
+                $('#btnAddDefect').addClass('hidden');
+                $('.is_significant_option, #inspectionStep2 #btnCapturePhoto, #inspectionStep2 #btnEditNotes').addClass('hidden');
+                objApp.setSubExtraHeading("", false);
+            }else{
+                $('#btnStep2Back').removeClass('gotoStep3').addClass('gotoStep1');
+                $('#btnAddDefect').removeClass('hidden');
+                $('.is_significant_option, #inspectionStep2 #btnCapturePhoto, #inspectionStep2 #btnEditNotes').removeClass('hidden');
+                objApp.setSubExtraHeading("Step 2 of 3", true);
+            }
+
         }
         $('#btnStep2Back').show();
         $('#inspectionStep2 #btnCapturePhoto').show();
@@ -3532,7 +3543,8 @@ var Inspections = function()
                                     alert("The current reinspection id is NOT valid");
                                     return;
                                 }
-                                self.deleteSignificantItem(defect_id, objApp.getKey('reinspection_id'));
+                                if(!self.isReportsWithQuestions())
+                                    self.deleteSignificantItems(defect_id, objApp.getKey('reinspection_id'));
                                 user_id = localStorage.getItem("user_id");
                                 var new_id = objDBUtils.makeInsertKey(objApp.sync_prefix);
                                 var notes = "";
@@ -3958,7 +3970,7 @@ var Inspections = function()
             $("#significantItemsList").addClass('on-reinspection-page');
             var sql = "SELECT rip.*, si.foreign_id as defect_id " +
                 "FROM reinspectionitemphotos rip " +
-                "INNER JOIN significant_items si ON si.photo_id = rip.id " +
+                "INNER JOIN significant_items si ON si.photo_id = rip.id AND si.deleted = 0 " +
                 "INNER JOIN reinspectionitems rii ON rii.id = si.foreign_id " +
                 "INNER JOIN inspectionitems ii ON ii.id = rii.inspectionitem_id " +
                 "WHERE rip.deleted = ? " +
@@ -3974,7 +3986,7 @@ var Inspections = function()
             $("#significantItemsList").removeClass('on-reinspection-page');
             var sql = "SELECT ip.*, si.foreign_id as defect_id " +
                 "FROM inspectionitemphotos ip " +
-                "INNER JOIN significant_items si ON si.photo_id = ip.id " +
+                "INNER JOIN significant_items si ON si.photo_id = ip.id AND si.deleted = 0 " +
                 "INNER JOIN inspectionitems ii ON ii.id = si.foreign_id " +
                 "WHERE ip.deleted = ? " +
                 "AND ip.inspection_id = ? " +
@@ -4135,9 +4147,9 @@ var Inspections = function()
                     {
                         var row = items.rows.item(r);
 
-                        if(row.photodata != "")
+                        if(row.photodata_tmb != "")
                         {
-                            if(row.photodata.indexOf('file:///') == -1){
+                            if(row.photodata_tmb.indexOf('_thumb') == -1){
                                 var sourceArray = self.defectsObjects;
                                 if(!objApp.empty(objApp.getKey("reinspection_id")))
                                     sourceArray = self.defectsReObjects;
@@ -4485,18 +4497,45 @@ var Inspections = function()
             }
         }, 'td');
     }
+
+    this.deleteSignificantItem = function(sig_id)
+    {
+        var sql = "SELECT inspectionitemphotos.* FROM inspectionitemphotos " +
+            "INNER JOIN significant_items ON significant_items.photo_id = inspectionitemphotos.id " +
+            "WHERE significant_items.id = ?";
+        objDBUtils.loadRecordSQL(sql, [sig_id], function(row)
+        {
+            if(row)
+            {
+                // Now update the parent inspection record with the defect count.
+                var num_defects = row.num_defects;
+
+                sql = "UPDATE inspectionitemphotos " +
+                    "SET deleted = 1, dirty = 1 " +
+                    "WHERE id = ?";
+
+                objDBUtils.execute(sql, [row.id], function(){});
+            }
+        });
+
+        var sql = "UPDATE significant_items " +
+            "SET deleted = 1, dirty = 1 " +
+            "WHERE id = ?";
+        objDBUtils.execute(sql, [sig_id], function(){});
+    }
+
 	/***
 	* Delete the specified inspection item (defect)
 	* We need to delete all related inspection item photos, and then the inspection item itself
 	*/
-	this.deleteSignificantItem = function(item_id, reinspection_id)
+	this.deleteSignificantItems = function(foreign_id, reinspection_id)
     {
         // Flag all related photo records as deleted.
         if(typeof reinspection_id == 'undefined'){
             var sql = "SELECT inspectionitemphotos.* FROM inspectionitemphotos " +
                 "INNER JOIN significant_items ON significant_items.photo_id = inspectionitemphotos.id " +
                 "WHERE significant_items.foreign_id = ?";
-            objDBUtils.loadRecordSQL(sql, [item_id], function(row)
+            objDBUtils.loadRecordSQL(sql, [foreign_id], function(row)
             {
                 if(row)
                 {
@@ -4514,7 +4553,7 @@ var Inspections = function()
             var sql = "SELECT reinspectionitemphotos.* FROM reinspectionitemphotos " +
                 "INNER JOIN significant_items ON significant_items.photo_id = reinspectionitemphotos.id " +
                 "WHERE significant_items.foreign_id = ?";
-            objDBUtils.loadRecordSQL(sql, [item_id], function(row)
+            objDBUtils.loadRecordSQL(sql, [foreign_id], function(row)
             {
                 if(row)
                 {
@@ -4533,12 +4572,12 @@ var Inspections = function()
         var sql = "UPDATE significant_items " +
             "SET deleted = 1, dirty = 1 " +
             "WHERE foreign_id = ?";
-        objDBUtils.execute(sql, [item_id], function(){});
+        objDBUtils.execute(sql, [foreign_id], function(){});
     }
 
 	this.deleteDefect = function(item_id)
 	{
-        self.deleteSignificantItem(item_id);
+        self.deleteSignificantItems(item_id);
 
         // Now delete the inspection item record itself
         objDBUtils.deleteRecord("inspectionitems", item_id, function()
@@ -6135,18 +6174,18 @@ var Inspections = function()
         var keyword = $('#keywords').val();
         if (keyword != '')
         {
-            filter_string = " AND (ii.location LIKE '%"+keyword+"%' OR ii.observation LIKE '%"+keyword+"%' OR ii.action LIKE '%"+keyword+"%' OR ii.notes LIKE '%"+keyword+"%') ";
+            filter_string = " AND (ii.location LIKE '%"+keyword+"%' OR ii.observation LIKE '%"+keyword+"%' OR ii.action LIKE '%"+keyword+"%' OR ii.notes LIKE '%"+keyword+"%' OR ii.question LIKE '%"+keyword+"%') ";
         }
 
-        var sql = "SELECT ii.*, iip.photodata_tmb " +
+        var sql = "SELECT ii.*, GROUP_CONCAT(iip.photodata_tmb) as thumbnails, GROUP_CONCAT(si.id) as photo_ids " +
             "FROM inspectionitems ii " +
-            "LEFT JOIN significant_items si ON si.foreign_id = ii.id " +
+            "LEFT JOIN significant_items si ON si.foreign_id = ii.id AND si.deleted != 1 " +
             "LEFT JOIN inspectionitemphotos iip ON iip.id = si.photo_id " +
             "WHERE ii.deleted = ? " +
             "AND ii.inspection_id = ? " +
             filter_string +
+            "GROUP BY ii.id "+
             "ORDER BY ii.seq_no ASC";
-
         blockElement('body');
 
         objDBUtils.loadRecordsSQL(sql, [0, objApp.keys.inspection_id], function (param, items) {
@@ -6188,21 +6227,47 @@ var Inspections = function()
                     sq = sq + 2;
 
                     html += '<tr rel="' + row.id + '">';
-                    if(self.finalised == 0) {
-                        html += '<td class="delete"></td>';
-                    } else {
-                        html += '<td class="nodelete"></td>';
-                    }
+                    html += '<td class="nodelete"></td>';
                     html += '<td><span class="seq_no">' + seq_no + '</span>';
                     if(self.finalised == 0) {
-                        html += '<div class="capture-buttons left leftmargin" style="margin-top: 12px;">' +
+                        html += '<div class="capture-buttons leftmargin">' +
                             '<a href="#" data-id="'+ row.id +'" class="capture-question-image left"><img width="40" src="images/camera-75.png" /></a>&nbsp;' +
-                            '<a href="#" data-id="'+ row.id +'" class="select-question-image left"><img width="40" src="images/gallery-75.png" /></a>' +
+                            '<a href="#" data-id="'+ row.id +'" class="select-question-image left"><img width="40" src="images/gallery-75.png" /></a>&nbsp;' +
+                            '<a href="#" style="margin-top: 5px;" rel="' + row.id + '" class="edit_issue_btn">Edit</a>' +
                             '</div>';
                     }
+                    var details = '';
+                    if(row.observation){
+                        details += '<br/>';
+                        details += 'Observation: ' + row.observation;
+                    }
+                    if(row.location){
+                        details += '<br/>';
+                        details += 'Location: ' + row.location;
+                    }
+                    if(row.action){
+                        details += '<br/>';
+                        details += 'Action: ' + row.action;
+                    }
+                    html += '<td>' + row.question + (details?'<br/>-------'+details:'') + '</td>';
 
-                    html += '<td>' + row.observation + '</td>';
-                    html += '<td>' + (row.photodata_tmb?'<img width="150" height="100" src="data:image/jpeg;base64,' + row.photodata_tmb + '" />':'') + '</td>';
+                    /* Photo list */
+                    if(row.thumbnails){
+                        var thumbnails = row.thumbnails.split(',');
+                        if(thumbnails.length){
+                            var photo_ids = row.photo_ids.split(',');
+                            html += '<td>';
+                            for(var i in thumbnails){
+                                html += '<div>';
+                                html += '<img style="display: inline;" width="150" height="100" src="data:image/jpeg;base64,' + thumbnails[i] + '" />';
+                                html += '&nbsp;<a href="#" style="display: inline;" class="remove-photo" data-id="'+photo_ids[i]+'">Remove</a>';
+                                html += '</div>';
+                            }
+                            html += '</td>';
+                        }
+                    }else{
+                        html += '<td></td>';
+                    }
 
                     if(self.finalised == 1){
                         var answer = row.notes?row.notes:'NA';
@@ -6212,6 +6277,7 @@ var Inspections = function()
                             '<option value="Yes" '+(row.notes=='Yes'?'selected':'')+'>Yes</option>' +
                             '<option value="No" '+(row.notes=='No'?'selected':'')+'>No</option>' +
                             '</select>';
+
                     }
 
                     html += '<td>' + answer + '</td>';
@@ -6239,49 +6305,53 @@ var Inspections = function()
                     self.last_scroller_y = -1;
                 }
 
-                $("#tblDefectListing tr td.delete").bind(objApp.touchEvent, function(e)
+                $("#tblDefectListing tr td .remove-photo").bind(objApp.touchEvent, function(e)
                 {
-                    if(self.is_change_order)
-                    {
-                        is_change_order = false;
-                        return;
-                    }
-
                     e.preventDefault();
-
                     // If the inspection is finalised - do nothing
                     if(self.finalised == 1) {
                         return;
                     }
 
-                    var inspection_item_id = $(this).parent().attr("rel");
+                    var significant_id = $(this).attr("data-id");
+                    self.deleteSignificantItem(significant_id);
+                    self.loadQuestionItems();
+                });
 
-                    var parent = $(this).parent();
-                    var table = $(parent).parent();
-
-                    // Remove any active states of the list items
-                    $(table).find("tr").removeClass("active");
-
-                    if(listDeleteMode)
+                $('#tblDefectListing a.edit_issue_btn').bind(objApp.touchEvent, function(e){
+                    // if(objUtils.isMobileDevice())
                     {
-                        // Did the user click on the first column
-                        var idx = $(this).index();
-
-                        if(idx == 0)
-                        {
-                            // Setup delete
-                            // Get the item name
-                            var item_name = $(parent).find("td:eq(1)").text();
-                            item_name += ". " + $(parent).find("td:eq(2)").text();
-
-                            if(confirm("Delete '" + item_name + "', are you sure?"))
-                            {
-                                self.deleteDefect(inspection_item_id);
-                                return;
-                            }
-                        }
+                        self.last_scroller_x = self.scroller.x;
+                        self.last_scroller_y = self.scroller.y;
                     }
-                    return false;
+                    e.preventDefault();
+                    if(self.is_change_order)
+                    {
+                        is_change_order = false;
+                        return;
+                    }
+                    var $t = $(this)
+                        , inspection_item_id = this.rel;
+
+                    if(confirm("Would you like to edit this item?"))
+                    {
+                        blockElement('body');
+
+                        // Load the inspection item record
+                        objDBUtils.loadRecord("inspectionitems", inspection_item_id, function(inspection_item_id, item)
+                        {
+                            unblockElement('body');
+                            if(!item)
+                                return;
+
+                            objApp.keys.inspection_item_id = item.id;
+                            objApp.keys.level = item.level;
+                            objApp.keys.area = item.area;
+                            objApp.keys.issue = item.issue;
+                            objApp.keys.detail = item.detail;
+                            self.showStep2(item);
+                        }, inspection_item_id);
+                    }
                 });
 
                 $(".capture-question-image, .select-question-image").unbind(objApp.touchEvent);
@@ -6369,7 +6439,6 @@ var Inspections = function()
                                             alert("The current inspection id is NOT valid");
                                             return;
                                         }
-                                        self.deleteSignificantItem(defect_id);
                                         user_id = localStorage.getItem("user_id");
                                         var new_id = objDBUtils.makeInsertKey(objApp.sync_prefix);
                                         var notes = "";
@@ -8855,21 +8924,20 @@ var Inspections = function()
             return self.showStep3();
         var sql = "SELECT * " +
             "FROM inspectionitems " +
-            "WHERE inspection_id = ? AND observation = ? AND deleted = 0";
+            "WHERE inspection_id = ? AND question = ? AND deleted = 0";
         var seq_no = parseInt(index) + 1;
-        console.log(seq_no);
         var inspection_item_id = objDBUtils.makeInsertKey(objApp.sync_prefix) + seq_no;
         objDBUtils.loadRecordSQL(sql, [objApp.keys.inspection_id, questions[index]], function(row)
         {
             if(row)
             {
-                console.log('This inspection item has been added');
+                console.log('This question item has been added');
                 console.log(row);
             }
             else
             {
-                var insert_sql = "INSERT INTO inspectionitems(id, inspection_id, seq_no, location, observation, action, hash, created_by, dirty) VALUES(?,?,?,?,?,?,?,?,?)";
-                objDBUtils.execute(insert_sql, [inspection_item_id, objApp.keys.inspection_id, seq_no, '', questions[index], '', objUtils.MD5(questions[index].toUpperCase()), localStorage.getItem("user_id"), 1], function(){});
+                var insert_sql = "INSERT INTO inspectionitems(id, inspection_id, seq_no, location, question, observation, action, hash, created_by, dirty) VALUES(?,?,?,?,?,?,?,?,?,?)";
+                objDBUtils.execute(insert_sql, [inspection_item_id, objApp.keys.inspection_id, seq_no, '', questions[index], '', '', objUtils.MD5(questions[index].toUpperCase()), localStorage.getItem("user_id"), 1], function(){});
             }
             self._addQuestionItems(questions, seq_no);
         });
