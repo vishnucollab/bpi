@@ -57,6 +57,7 @@ var Inspections = function()
     this.inspection = false;
     this.keySortArray = false;
     this.MAX_REPORT_PHOTOS = 12;
+    this.isProcessing = false;
 	
 	this.current_table = "inspectionitemphotos";
 	this.current_key = "inspection_id";
@@ -253,7 +254,7 @@ var Inspections = function()
         
         objDBUtils.primaryKey = "id";
 		objDBUtils.showColumn = "name";
-console.log(sql);
+
 	    objDBUtils.loadRecordsSQL(sql, values, function(param, items)
 	    {
 			objApp.showHideSpinner(false, "#inspectionList");
@@ -778,6 +779,7 @@ console.log(sql);
     
     this.showStep3 = function()
     {
+        self.isProcessing = false;
         self.isAddingSignificantItem = 0;
         self.setStep(3);
         objApp.clearMain();
@@ -2396,7 +2398,10 @@ console.log(sql);
             }
 
 			e.preventDefault();
+            if(self.isProcessing)
+                return;
 
+            self.isProcessing = true;
             /* This step is ONLY for normal issues, NOT the significant issue */
             self.saveDefect(function() {
                 // Update the finish time of the audit
@@ -2430,7 +2435,6 @@ console.log(sql);
                         {
                             unblockElement('body');
                             self.doingSave = false;
-
                             self.showStep3();
                         });
                     }
@@ -5637,7 +5641,6 @@ console.log(sql);
             if((callback != undefined) && (callback != "")) {
                 callback()
             }
-
 			return;
    		}
    		else
@@ -8814,6 +8817,8 @@ console.log(sql);
 
     this.addQuestionItems = function()
     {
+        if(self.isProcessing)
+            return false;
         if(objApp.keys.report_type == 'Builder: Pre-plaster and lock up inspections')
             var questions = [
                 'Is site sign visible',
@@ -8909,13 +8914,16 @@ console.log(sql);
                 'Has the vapour barrier been turned up against the slab and backfilled as required by NCC 3.2.2.6(c)',
                 'Is garage opening correct'
             ];
-
+        self.isProcessing = true;
         self._addQuestionItems(questions, 0);
     }
 
     this._addQuestionItems = function(questions, index){
-        if(typeof questions[index] == 'undefined')
+        if(typeof questions[index] == 'undefined'){
+            self.isProcessing = false;
             return self.showStep3();
+        }
+
         var sql = "SELECT * " +
             "FROM inspectionitems " +
             "WHERE inspection_id = ? AND question = ? AND deleted = 0";
