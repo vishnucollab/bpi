@@ -6199,7 +6199,7 @@ var Inspections = function()
                     }
 
                     html += '<td>' + row.observation + '</td>';
-                    html += '<td>' + (row.photodata_tmb?row.photodata_tmb:'') + '</td>';
+                    html += '<td>' + (row.photodata_tmb?'<img width="150" height="100" src="data:image/jpeg;base64,' + row.photodata_tmb + '" />':'') + '</td>';
 
                     if(self.finalised == 1){
                         var answer = row.notes?row.notes:'NA';
@@ -6366,7 +6366,7 @@ var Inspections = function()
                                             alert("The current inspection id is NOT valid");
                                             return;
                                         }
-
+                                        self.deleteSignificantItem(defect_id);
                                         user_id = localStorage.getItem("user_id");
                                         var new_id = objDBUtils.makeInsertKey(objApp.sync_prefix);
                                         var notes = "";
