@@ -253,7 +253,7 @@ var Inspections = function()
         
         objDBUtils.primaryKey = "id";
 		objDBUtils.showColumn = "name";
-
+console.log(sql);
 	    objDBUtils.loadRecordsSQL(sql, values, function(param, items)
 	    {
 			objApp.showHideSpinner(false, "#inspectionList");

@@ -167,7 +167,7 @@ function Sync()
 
 	this.smartSync = function()
 	{
-        objApp.objSync.startTime = '-3 days';
+        objApp.objSync.startTime = '-2 weeks';
 		if(!self.silentMode)
 		{
 			// Make sure the username and pass have been entered.
@@ -241,6 +241,7 @@ function Sync()
         parameters['data'] = objDBUtils.data;
         parameters['anticache'] = Math.floor(Math.random() * 999999);
         parameters['start_time'] = objApp.objSync.startTime;
+        parameters["z"] = 'Here is dummy text. Post data will be cut off a part. This will fix that issue.';
         objApp.objSync.startTime = '';
         objApp.objSync.lastSyncDatetime = new Date();
         for(var i = 1; i < objDBUtils.tables.length; i++){
@@ -549,6 +550,7 @@ function Sync()
         parameters['data'] = $.base64('encode', self.validData(objDBUtils.data));
         parameters['anticache'] = Math.floor(Math.random() * 999999);
         parameters['start_time'] = objApp.objSync.startTime;
+        parameters["z"] = 'Here is dummy text. Post data will be cut off a part. This will fix that issue.';
         objApp.objSync.startTime = '';
 		var refreshSync = "false";
         self.doServerLog(self.validData(objDBUtils.data));
