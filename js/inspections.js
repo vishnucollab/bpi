@@ -726,12 +726,24 @@ var Inspections = function()
             objApp.setSubExtraHeading("Step 2 of 5", true);
         }else {
             if(self.isReportsWithQuestions()){
-                $('#btnStep2Back').removeClass('gotoStep1').addClass('gotoStep3');
+                $('#btnStep2Back').unbind();
+                $("#btnStep2Back").bind(objApp.touchEvent, function(e)
+                {
+                    e.preventDefault();
+                    self.showStep3();
+                    return false;
+                });
                 $('#btnAddDefect').addClass('hidden');
                 $('.is_significant_option, #inspectionStep2 #btnCapturePhoto, #inspectionStep2 #btnEditNotes').addClass('hidden');
                 objApp.setSubExtraHeading("", false);
             }else{
-                $('#btnStep2Back').removeClass('gotoStep3').addClass('gotoStep1');
+                $('#btnStep2Back').unbind();
+                $("#btnStep2Back").bind(objApp.touchEvent, function(e)
+                {
+                    e.preventDefault();
+                    self.showStep1();
+                    return false;
+                });
                 $('#btnAddDefect').removeClass('hidden');
                 $('.is_significant_option, #inspectionStep2 #btnCapturePhoto, #inspectionStep2 #btnEditNotes').removeClass('hidden');
                 objApp.setSubExtraHeading("Step 2 of 3", true);
@@ -6177,7 +6189,7 @@ var Inspections = function()
             filter_string = " AND (ii.location LIKE '%"+keyword+"%' OR ii.observation LIKE '%"+keyword+"%' OR ii.action LIKE '%"+keyword+"%' OR ii.notes LIKE '%"+keyword+"%' OR ii.question LIKE '%"+keyword+"%') ";
         }
 
-        var sql = "SELECT ii.*, GROUP_CONCAT(iip.photodata_tmb) as thumbnails, GROUP_CONCAT(si.id) as photo_ids " +
+        var sql = "SELECT ii.*, GROUP_CONCAT(iip.photodata_tmb) as thumbnails, GROUP_CONCAT(si.id) as sig_ids " +
             "FROM inspectionitems ii " +
             "LEFT JOIN significant_items si ON si.foreign_id = ii.id AND si.deleted != 1 " +
             "LEFT JOIN inspectionitemphotos iip ON iip.id = si.photo_id " +
@@ -6255,12 +6267,12 @@ var Inspections = function()
                     if(row.thumbnails){
                         var thumbnails = row.thumbnails.split(',');
                         if(thumbnails.length){
-                            var photo_ids = row.photo_ids.split(',');
+                            var sig_ids = row.sig_ids.split(',');
                             html += '<td>';
                             for(var i in thumbnails){
                                 html += '<div>';
                                 html += '<img style="display: inline;" width="150" height="100" src="data:image/jpeg;base64,' + thumbnails[i] + '" />';
-                                html += '&nbsp;<a href="#" style="display: inline;" class="remove-photo" data-id="'+photo_ids[i]+'">Remove</a>';
+                                html += '&nbsp;<a href="#" style="display: inline;" class="remove-photo" data-id="'+sig_ids[i]+'">Remove</a>';
                                 html += '</div>';
                             }
                             html += '</td>';

@@ -167,7 +167,7 @@ function Sync()
 
 	this.smartSync = function()
 	{
-        objApp.objSync.startTime = '-2 weeks';
+        objApp.objSync.startTime = '-3 days';
 		if(!self.silentMode)
 		{
 			// Make sure the username and pass have been entered.
@@ -756,9 +756,10 @@ function Sync()
 		window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem)
 		{
 			// Get a recordset of any photos that have not yet been moved to the filesystem
-			var sql = "SELECT iip.*, i.report_type " +
+			var sql = "SELECT iip.*, i.report_type, si.id as sig_id " +
 				"FROM inspectionitemphotos iip " +
                 "INNER JOIN inspections i ON i.id = iip.inspection_id " +
+                "LEFT JOIN significant_items si ON si.foreign_id = iip.id AND si.deleted != 1 " +
 				"WHERE length(iip.photodata_tmb) > 500";
 				
 			objDBUtils.loadRecordsSQL(sql, [], function(param, items)
@@ -777,8 +778,8 @@ function Sync()
 				var doNext = function()
 				{
 					var row = items.rows.item(r);
-					/* Do not convert raw data to image for pre-plaster and pre-paint report */
-                    if(row.report_type == 'Builder: Pre-plaster and lock up inspections' || row.report_type == 'Builder: Pre-paint/fixing inspections') {
+					/* Do not convert raw data to image for significant photos of pre-plaster and pre-paint report */
+                    if(row.sig_id && (row.report_type == 'Builder: Pre-plaster and lock up inspections' || row.report_type == 'Builder: Pre-paint/fixing inspections')) {
                         r++;
                         if(r < maxLoop)
                             doNext();
