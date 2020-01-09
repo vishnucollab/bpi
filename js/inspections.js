@@ -4470,25 +4470,46 @@ var Inspections = function()
         }, 'td');
     }
 
-    this.deleteSignificantItem = function(sig_id)
+    this.deleteSignificantItem = function(sig_id, reinspection_id)
     {
-        var sql = "SELECT inspectionitemphotos.* FROM inspectionitemphotos " +
-            "INNER JOIN significant_items ON significant_items.photo_id = inspectionitemphotos.id " +
-            "WHERE significant_items.id = ?";
-        objDBUtils.loadRecordSQL(sql, [sig_id], function(row)
-        {
-            if(row)
+        if(typeof reinspection_id == 'undefined'){
+            var sql = "SELECT inspectionitemphotos.* FROM inspectionitemphotos " +
+                "INNER JOIN significant_items ON significant_items.photo_id = inspectionitemphotos.id " +
+                "WHERE significant_items.id = ?";
+            objDBUtils.loadRecordSQL(sql, [sig_id], function(row)
             {
-                // Now update the parent inspection record with the defect count.
-                var num_defects = row.num_defects;
+                if(row)
+                {
+                    // Now update the parent inspection record with the defect count.
+                    var num_defects = row.num_defects;
 
-                sql = "UPDATE inspectionitemphotos " +
-                    "SET deleted = 1, dirty = 1 " +
-                    "WHERE id = ?";
+                    sql = "UPDATE inspectionitemphotos " +
+                        "SET deleted = 1, dirty = 1 " +
+                        "WHERE id = ?";
 
-                objDBUtils.execute(sql, [row.id], function(){});
-            }
-        });
+                    objDBUtils.execute(sql, [row.id], function(){});
+                }
+            });
+        }else{
+            var sql = "SELECT reinspectionitemphotos.* FROM reinspectionitemphotos " +
+                "INNER JOIN significant_items ON significant_items.photo_id = reinspectionitemphotos.id " +
+                "WHERE significant_items.id = ?";
+            objDBUtils.loadRecordSQL(sql, [sig_id], function(row)
+            {
+                if(row)
+                {
+                    // Now update the parent inspection record with the defect count.
+                    var num_defects = row.num_defects;
+
+                    sql = "UPDATE reinspectionitemphotos " +
+                        "SET deleted = 1, dirty = 1 " +
+                        "WHERE id = ?";
+
+                    objDBUtils.execute(sql, [row.id], function(){});
+                }
+            });
+        }
+
 
         var sql = "UPDATE significant_items " +
             "SET deleted = 1, dirty = 1 " +
@@ -6176,8 +6197,6 @@ var Inspections = function()
                         inspection_items.push(item);
                         item_ids.push(item.id);
                     }
-
-
                     if(item.photodata_tmb){
                         if(typeof thumbnails[item.id] == 'undefined')
                             thumbnails[item.id] = [];
@@ -6186,7 +6205,6 @@ var Inspections = function()
                             photodata_tmb: item.photodata_tmb
                         });
                     }
-
                 }
                 // Loop through the items and put them into the table.
                 var html = '<table id="tblDefectListing" class="listing">';
@@ -7041,12 +7059,12 @@ var Inspections = function()
                 }
 
                 // Load the reinspection items
-                var sql = "SELECT ri.id, ii.seq_no, ii.location, ii.question, ii.action, ii.observation, ri.rectified, r.failed, iip.photodata_tmb " +
+                var sql = "SELECT ri.id, ii.seq_no, ii.location, ii.question, ii.action, ii.observation, ri.rectified, r.failed, riip.photodata_tmb, si.id as sig_id " +
                     "FROM inspectionitems ii " +
                     "INNER JOIN reinspectionitems ri ON ri.inspectionitem_id = ii.id " +
                     "INNER JOIN reinspections r ON r.id = ri.reinspection_id " +
                     "LEFT JOIN significant_items si ON si.foreign_id = ri.id " +
-                    "LEFT JOIN inspectionitemphotos iip ON iip.id = si.photo_id " +
+                    "LEFT JOIN reinspectionitemphotos riip ON riip.id = si.photo_id " +
                     "WHERE ii.deleted = 0 " +
                     "AND r.id = ? " +
                     "ORDER BY ii.seq_no ASC";
@@ -7063,13 +7081,32 @@ var Inspections = function()
                         return;
                     }
 
+                    var item_ids = [];
+                    var reinspection_items = [];
+                    var thumbnails = {};
+
+                    for(var i = 0; i < items.rows.length; i++){
+                        var item = items.rows.item(i);
+                        if(item_ids.indexOf(item.id) == -1){
+                            reinspection_items.push(item);
+                            item_ids.push(item.id);
+                        }
+                        if(item.photodata_tmb){
+                            if(typeof thumbnails[item.id] == 'undefined')
+                                thumbnails[item.id] = [];
+                            thumbnails[item.id].push({
+                                sig_id: item.sig_id,
+                                photodata_tmb: item.photodata_tmb
+                            });
+                        }
+                    }
                     // Loop through the items and put them into the table.
                     var html = '<table id="tblReinspectionListing" class="listing">';
 
                     var maxLoop = items.rows.length;
                     var r = 0;
                     for(r = 0; r < maxLoop; r++) {
-                        var row = items.rows.item(r);
+                        var row = reinspection_items[r];;
                         self.defectsReArray.push(row);
                         self.defectsReObjects[row.id] = row;
 
@@ -7085,7 +7122,21 @@ var Inspections = function()
                                 cell2 += 'Action: ' + row.action;
                             html += '<td>' + cell2 + '</td>';
                             html += '<td>' + row.observation + '</td>';
-                            html += '<td>' + (row.photodata_tmb?'<img width="150" height="100" src="data:image/jpeg;base64,' + row.photodata_tmb + '" />':'') + '</td>';
+
+                            /* Photo list */
+                            if(typeof thumbnails[row.id] != 'undefined' && thumbnails[row.id].length){
+                                html += '<td>';
+                                for(var j in thumbnails[row.id]){
+                                    html += '<div>';
+                                    html += '<img style="display: inline;" width="150" height="100" src="data:image/jpeg;base64,' + thumbnails[row.id][j].photodata_tmb + '" />';
+                                    html += '&nbsp;<a href="#" style="display: inline;" class="remove-re-photo" data-id="' + thumbnails[row.id][j].sig_id + '">Remove</a>';
+                                    html += '</div>';
+                                }
+                                html += '</td>';
+                            }else{
+                                html += '<td></td>';
+                            }
+
                             html += '<td>' + row.rectified + '</td>';
                         }else{
                             html += '<td>' + row.seq_no + '</td>';
@@ -7116,7 +7167,7 @@ var Inspections = function()
 
                         var text = $(this).find("td:eq(0)").text() + ". ";
                         if(self.isReportsWithQuestions()){
-                            text += $(this).find("td:eq(1)").text();
+                            text += '<br/>' + $(this).find("td:eq(1)").html();
                         }else{
                             text += $(this).find("td:eq(1)").text() + ", ";
                             text += $(this).find("td:eq(2)").text();
@@ -7129,6 +7180,14 @@ var Inspections = function()
                         if(objApp.keys.report_type == "Quality Inspection" || objApp.keys.report_type.indexOf('Builder') != -1){
                             $('#reinspection .capture-buttons').removeClass('hidden');
                         }
+                    });
+
+                    $("#tblReinspectionListing tr td .remove-re-photo").bind(objApp.touchEvent, function(e)
+                    {
+                        e.preventDefault();
+                        var significant_id = $(this).attr("data-id");
+                        self.deleteSignificantItem(significant_id, objApp.keys.reinspection_id);
+                        self.loadReinspectionItems(objApp.keys.reinspection_id);
                     });
 
                     // Handle the event when the rectified status of the item is updated
