@@ -660,7 +660,7 @@ var Inspections = function()
         if ($("#inspection #report_type2").val() == 'Client inspection' && self.finalised != 1){
             $('a[id="btnReportPhotos"]').removeClass("hidden");
         }else{
-            if ($("#inspection #report_type2").val() == 'Peet inspection' && ($('#btnStep1Next').is(':visible') || self.getStep() > 1 )){
+            if (($("#inspection #report_type2").val() == 'Peet inspection' || $("#inspection #builder_report_type").val() == 'Builder: Pre-paint/fixing inspections') && ($('#btnStep1Next').is(':visible') || self.getStep() > 1 )){
                 $('a.capture-signature-btn').show();
             }
             $('a[id="btnReportPhotos"]').addClass("hidden");
@@ -2813,7 +2813,8 @@ var Inspections = function()
                     }
                 });
             }
-			objNoteModal.show();
+            if(typeof objNoteModal != 'undefined')
+			    objNoteModal.show();
 
 			if(self.finalised == 1)
 			{
@@ -7115,7 +7116,7 @@ var Inspections = function()
                             html += '<td>' + row.seq_no + '. ' + row.question + '</td>';
                             var cell2 = '';
                             if(row.location)
-                                cell2 += 'Location: ' + row.location;
+                                cell2 += 'Location: ' + row.location + ' ';
                             if(cell2)
                                 cell2 += '<br/>';
                             if(row.action)
@@ -7167,7 +7168,7 @@ var Inspections = function()
 
                         var text = $(this).find("td:eq(0)").text() + ". ";
                         if(self.isReportsWithQuestions()){
-                            text += '<br/>' + $(this).find("td:eq(1)").html();
+                            text += '<br/>' + $(this).find("td:eq(1)").text();
                         }else{
                             text += $(this).find("td:eq(1)").text() + ", ";
                             text += $(this).find("td:eq(2)").text();
