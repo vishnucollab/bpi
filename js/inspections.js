@@ -451,8 +451,8 @@ var Inspections = function()
     {
         if(!confirm("You are about to start a reinspection.  Are you sure you wish to continue?")) {
             return;
-        } 
-        
+        }
+        $('a.capture-signature-btn').hide();
         blockElement('body');
         self.updateInspectionPassFail(1);
         // Load the original inspection
@@ -1006,10 +1006,22 @@ var Inspections = function()
         // set the default notes.
         if($("#inspection #notes").val() == "") {
             report_type = $("#inspection #report_type").val();
-
             if( (report_type == "Quality Inspection") || (report_type == "Builder: PCI/Final inspections") || (report_type == "Fix / Plaster Inspection")) {
                 $("#inspection #notes").val(self.default_notes);
+            }else if(report_type == "Builder: Pre-plaster and lock up inspections"){
+                var notes = "1. Quality of brickwork to be checked and any defects to be noted.\n\n"+
+                    "2. Confirm if any damage to wall bracing has occurred\n\n"+
+                    "3. Have downpipes been checked (pops in right position as per plans)\n\n" +
+                    "4. Site Manager to confirm that frame has been approved by authorties before plaster commences.\n";
+                $("#inspection #notes").val(notes);
+            }else if(report_type == "Builder: Pre-paint/fixing inspections"){
+                var notes = "1. Have downpipes been Installed and connected to SWD\n\n"+
+                    "2. Has the Gas line been Installed\n\n"+
+                    "3. Has the Garage door been Installed\n\n" +
+                    "4. Is there any reinforcement bars visible around the house.\n";
+                $("#inspection #notes").val(notes);
             }
+
         }
     }
 
@@ -2796,7 +2808,10 @@ var Inspections = function()
             self.setDefaultNotes();
 
             if (objApp.keys.reinspection_id == "") {
-                var objNoteModal = new noteModal("Coversheet Notes", $("#inspection #notes").val(), function(notes) {
+                var modalTitle = "Coversheet Notes"
+                if(self.isReportsWithQuestions())
+                    var modalTitle = "Notes";
+                var objNoteModal = new noteModal(modalTitle, $("#inspection #notes").val(), function(notes) {
                     // The user has updated the notes value.
                     // Update the toggle (and therefore the form) with the new value.
                     $("#inspection #notes").val(notes);
@@ -6951,7 +6966,7 @@ var Inspections = function()
             alert("Inspections::loadReinspectionItems - Invalid reinspection id");
             return;
         }
-        
+        $('a.capture-signature-btn').hide();
         // Kill iScroll if it already exists
         if(this.scroller) {
             this.scroller.destroy();
