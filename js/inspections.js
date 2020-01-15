@@ -6154,7 +6154,8 @@ var Inspections = function()
         {
             return;
         }
-
+        locations = {};
+        actions = {};
         this.keySortArray = {};
         var listDeleteMode = true;
 
@@ -6301,12 +6302,112 @@ var Inspections = function()
                     html += '<td>' + answer + '</td>';
                     html += '</tr>';
 
+                    var key = row.location.trim();
+                    if(key)
+                    {
+                        if(locations.hasOwnProperty(key) )
+                        {
+                            locations[key] += 1;
+                        }
+                        else
+                        {
+                            locations[key] = 1;
+                        }
+                    }
+
+                    if (row.action)
+                    {
+                        row.action = $.trim(row.action.replace(/"/g, ''));
+                        if (actions.hasOwnProperty(row.action))
+                            actions[row.action] += 1;
+                        else
+                            actions[row.action] = 1;
+                    }
+
                     if(row.itemtype == 0) {
                         self.numberOfIssues++;
                     } else {
                         self.numberOfAcknowledgements++;
                     }
                 }
+
+                /* If have actions, so graph with actions, if not, show graph with locations */
+                if(!jQuery.isEmptyObject(actions))
+                {
+                    var data = new google.visualization.DataTable();
+                    data.addColumn('string', 'Actions');
+                    data.addColumn('number', 'Quantity');
+
+                    var keys = [];
+                    var total_defects = 0;
+                    $.each( actions, function( key, value ) {
+                        total_defects += parseInt(value);
+                    });
+                    $.each( actions, function( key, value ) {
+                        if (keys.indexOf(key) == -1)
+                            keys.push(key);
+                        key += ': ' + value + ' (' + Math.round(value/total_defects*1000)/10.0 + '%)';
+                        data.addRow([key, value]);
+                    });
+
+                    var fontSize = 14;
+                    if (keys.length > 19){
+                        fontSize = 13;
+                    }
+                    if (keys.length > 22){
+                        fontSize = 12;
+                    }
+                    if (keys.length > 24){
+                        fontSize = 11;
+                    }
+                    if (keys.length > 26){
+                        fontSize = 10;
+                    }
+                    var options = {
+                        title: '',
+                        width: '100%',
+                        height: '100%',
+                        pieSliceText: 'value',
+                        is3D: true,
+                        chartArea:{
+                            left:50,
+                            height: '99%',
+                            top: '1%',
+                            width: '100%'
+                        },
+                        legend: {
+                            alignment: 'center',
+                            width: '100%',
+                            textStyle: {
+                                fontSize: fontSize
+                            }
+                        }
+                    };
+
+                    chart.draw(data, options);
+                }
+                else if(!jQuery.isEmptyObject(locations))
+                {
+                    var data = new google.visualization.DataTable();
+                    data.addColumn('string', 'Location');
+                    data.addColumn('number', 'Quantity');
+
+                    $.each( locations, function( key, value ) {
+                        data.addRow([key, value]);
+                    });
+
+                    var options = {
+                        title: '',
+                        width: '100%',
+                        height: '100%',
+                        pieSliceText: 'percentage',
+                        is3D: true,
+                    };
+
+                    chart.draw(data, options);
+                }
+
+                current_inspection_id = objApp.keys.inspection_id;
 
                 html += '</table>';
 
