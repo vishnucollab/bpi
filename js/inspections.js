@@ -3659,8 +3659,8 @@ var Inspections = function()
             });
         });
 
-        $('#inspectionStep3 #score').unbind('change');
-        $('#inspectionStep3 #score').change(function(){
+        $('#inspectionStep3 #score').unbind();
+        $('#inspectionStep3 #score').bind('keyup', function(){
             self.updateScore();
         });
 	}
@@ -7462,7 +7462,7 @@ var Inspections = function()
         var sql = "UPDATE inspections " +
             "SET initials = ?, dirty = 1 " +
             "WHERE id = ?";
-
+        self.inspection.initials = score;
         objDBUtils.execute(sql, [score, objApp.keys.inspection_id], function() {});
     }
 
