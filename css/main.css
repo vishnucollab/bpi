@@ -1456,13 +1456,24 @@ aside textarea
 .inspectionDetails #searchItemsContainer{
     float: right;
     width: 223px;
-    margin-right: 10px;
+    margin-right: 50px;
 }
     .inspectionDetails #searchItemsContainer #keywords{
         font-size: 18px;
         width: 200px;
         padding: 10px;
     }
+
+.inspectionDetails #scoreContainer{
+    float: right;
+    width: 140px;
+    margin-right: 45px;
+}
+.inspectionDetails #scoreContainer #score{
+    font-size: 18px;
+    width: 60px;
+    padding: 10px;
+}
 
 .inspectionDetails .bottomBtns {
     width: 100%;

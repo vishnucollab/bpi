@@ -804,8 +804,17 @@ var Inspections = function()
             else
                 $(".inspectionDetails .passed").addClass('active');
 
+            $('#inspectionStep3 #scoreContainer').removeClass('hidden');
+            $("#inspectionStep3 #score").val(self.inspection.initials);
+            if(inspection.finalised == 1){
+                $("#inspectionStep3 #score").prop('disabled', true);
+            }else{
+                $("#inspectionStep3 #score").prop('disabled', false);
+            }
         }else{
             $('.btnPassed-container, .btnFailed-container').addClass('hidden');
+            $('#inspectionStep3 #scoreContainer').addClass('hidden');
+            $("#inspectionStep3 #score").val('');
         }
         
         // Load the inspection object
@@ -3649,6 +3658,11 @@ var Inspections = function()
 
             });
         });
+
+        $('#inspectionStep3 #score').unbind('change');
+        $('#inspectionStep3 #score').change(function(){
+            self.updateScore();
+        });
 	}
 
     this.showReportPhotos = function()
@@ -6071,7 +6085,7 @@ var Inspections = function()
                     objApp.keys.report_type = inspection.report_type;
 
                     // If we have an active inspection then show the coversheet notes button
-                    if(self.finalised == 0) {
+                    if(inspection.finalised == 0) {
                         $("div.btnEditNotes").show();
                         $("a.btnEditClientNotes").show();
                         $("a.btnEditPrivateNotes").show();
@@ -7441,6 +7455,17 @@ var Inspections = function()
         });
     }
 
+    this.updateScore = function()
+    {
+        var score = $("#inspectionStep3 #score").val();
+        /* Reuse initials for score */
+        var sql = "UPDATE inspections " +
+            "SET initials = ?, dirty = 1 " +
+            "WHERE id = ?";
+
+        objDBUtils.execute(sql, [score, objApp.keys.inspection_id], function() {});
+    }
+
     // Update the reinspection and master inspection record with the new status
 	this.updateReinspectionPassFail = function(failed)
     {
@@ -7717,6 +7742,7 @@ var Inspections = function()
             $("#tblRateListing select.ratingSelect").attr("disabled", "disabled");
 
             $('#barrel_code').prop('disabled', true);
+            $("#inspectionStep3 #score").prop('disabled', true);
         }
         else
         {
@@ -7739,6 +7765,7 @@ var Inspections = function()
             $("#tblRateListing select.ratingSelect").removeAttr("disabled");
 
             $('#barrel_code').prop('disabled', false);
+            $("#inspectionStep3 #score").prop('disabled', false);
         }   
         
         this.setReadOnly();     
