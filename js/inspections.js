@@ -799,6 +799,11 @@ var Inspections = function()
                 self.updateInspectionPassFail(1);
             });
             $('.btnPassed-container, .btnFailed-container').removeClass('hidden');
+            if (self.inspection.failed == 1)
+                $(".inspectionDetails .failed").addClass('active');
+            else
+                $(".inspectionDetails .passed").addClass('active');
+
         }else{
             $('.btnPassed-container, .btnFailed-container').addClass('hidden');
         }
@@ -2101,6 +2106,20 @@ var Inspections = function()
                 $('.client-pci').show();
             }else{
                 $('.client-pci').hide();
+            }
+            /* Change the default notes */
+            if(selected_report_type == "Builder: Pre-plaster and lock up inspections"){
+                var notes = "1. Quality of brickwork to be checked and any defects to be noted.\n\n"+
+                    "2. Confirm if any damage to wall bracing has occurred\n\n"+
+                    "3. Have downpipes been checked (pops in right position as per plans)\n\n" +
+                    "4. Site Manager to confirm that frame has been approved by authorties before plaster commences.\n";
+                $("#inspection #notes").val(notes);
+            }else if(selected_report_type == "Builder: Pre-paint/fixing inspections"){
+                var notes = "1. Have downpipes been Installed and connected to SWD\n\n"+
+                    "2. Has the Gas line been Installed\n\n"+
+                    "3. Has the Garage door been Installed\n\n" +
+                    "4. Is there any reinforcement bars visible around the house.\n";
+                $("#inspection #notes").val(notes);
             }
         });
         
