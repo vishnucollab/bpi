@@ -2406,8 +2406,8 @@ var Inspections = function()
 
             self.checkSaveInspection(0);
 
-            if(self.isReportsWithQuestions()){
-                self.addQuestionItems();
+            if(self.isReportsWithQuestions($('#inspection #report_type').val())){
+                self.addQuestionItems($('#inspection #report_type').val());
             }else{
                 self.showStep2();
             }
@@ -9049,16 +9049,20 @@ var Inspections = function()
         }
     }
 
-    this.isReportsWithQuestions = function()
+    this.isReportsWithQuestions = function(reportType)
     {
-        return objApp.keys.report_type == 'Builder: Pre-plaster and lock up inspections' || objApp.keys.report_type == 'Builder: Pre-paint/fixing inspections';
+        if(typeof reportType == 'undefined')
+            reportType = objApp.keys.report_type;
+        return reportType == 'Builder: Pre-plaster and lock up inspections' || reportType == 'Builder: Pre-paint/fixing inspections';
     }
 
-    this.addQuestionItems = function()
+    this.addQuestionItems = function(reportType)
     {
         if(self.isProcessing)
             return false;
-        if(objApp.keys.report_type == 'Builder: Pre-plaster and lock up inspections')
+        if(typeof reportType == 'undefined')
+            reportType = objApp.keys.report_type;
+        if(reportType == 'Builder: Pre-plaster and lock up inspections')
             var questions = [
                 'Is site sign visible',
                 'Is the site clean with safe access',
@@ -9106,7 +9110,7 @@ var Inspections = function()
                 'Is parapet framing complete',
                 'Have box gutter boards been installed as required'
             ];
-        else if(objApp.keys.report_type == 'Builder: Pre-paint/fixing inspections')
+        else if(reportType == 'Builder: Pre-paint/fixing inspections')
             var questions = [
                 'Is site sign installed',
                 'Is the site clean with safe access',
