@@ -1285,9 +1285,6 @@ var Inspections = function()
 		var last_name = localStorage.getItem("last_name");
 		var user_id = localStorage.getItem("user_id");
 		var email = localStorage.getItem("email");
-		var initials = localStorage.getItem("initials");
-        if (typeof initials == 'undefined')
-            initials = '';
 		if((first_name == null) || (first_name == "") || (last_name == null) || (last_name == "") ||
 			(email == null) || (email == "") || (user_id == null) || (user_id == "") )
 		{
@@ -1298,7 +1295,7 @@ var Inspections = function()
 		var inspector = first_name + " " + last_name;
 		$("#inspection #inspectionInspector").val(inspector);
 		$("#inspection #inspectionInspector").attr("readonly", "readonly");
-		$("#inspection #initials").val(initials);
+		$("#inspection #initials").val('');
 
 		$("#inspection #duration").val("0");
 		$("#inspection #created_by").val(user_id);
@@ -7463,6 +7460,7 @@ var Inspections = function()
             "SET initials = ?, dirty = 1 " +
             "WHERE id = ?";
         self.inspection.initials = score;
+        $('#frmInspectionDetails #initials').val(score);
         objDBUtils.execute(sql, [score, objApp.keys.inspection_id], function() {});
     }
 
