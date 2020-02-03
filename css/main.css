@@ -1326,7 +1326,7 @@ aside textarea
 #inspectionStep3 #tblDefectListing span.seq_no{
     float: left;
 }
-#inspectionStep3 #tblDefectListing a.edit_issue_btn{
+#inspectionStep3 #tblDefectListing a.edit_issue_btn, #inspectionStep3 #tblDefectListing a.add_issue_btn{
     float: left;
     margin-left:10px;
     text-decoration:none;

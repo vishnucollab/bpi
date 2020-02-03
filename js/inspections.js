@@ -660,7 +660,7 @@ var Inspections = function()
         if ($("#inspection #report_type2").val() == 'Client inspection' && self.finalised != 1){
             $('a[id="btnReportPhotos"]').removeClass("hidden");
         }else{
-            if (($("#inspection #report_type2").val() == 'Peet inspection' || $("#inspection #builder_report_type").val() == 'Builder: Pre-paint/fixing inspections') && ($('#btnStep1Next').is(':visible') || self.getStep() > 1 )){
+            if ($("#inspection #report_type2").val() == 'Peet inspection' && ($('#btnStep1Next').is(':visible') || self.getStep() > 1 )){
                 $('a.capture-signature-btn').show();
             }
             $('a[id="btnReportPhotos"]').addClass("hidden");
@@ -707,10 +707,11 @@ var Inspections = function()
         }
     }
     
-    this.showStep2 = function(inspectionItem)
+    this.showStep2 = function(inspectionItem, addNewQuestionIssue)
     {
         self.setStep(2);
-
+        if(typeof addNewQuestionIssue == 'undefined')
+            addNewQuestionIssue = 0;
 		// Set the main heading
         self.checkIfNeedPhotos();
         objApp.setSubHeading("Add Issues");
@@ -720,6 +721,8 @@ var Inspections = function()
             objApp.setSubExtraHeading("Step 2 of 5", true);
         }else {
             if(self.isReportsWithQuestions()){
+                if(inspectionItem.question)
+                    objApp.setSubHeading("Add Issue: " + inspectionItem.question);
                 $('#btnStep2Back').unbind();
                 $("#btnStep2Back").bind(objApp.touchEvent, function(e)
                 {
@@ -727,7 +730,9 @@ var Inspections = function()
                     self.showStep3();
                     return false;
                 });
+                $('#btnStep2Next').text('Save');
                 $('#btnAddDefect').addClass('hidden');
+                $('#btnStep2NewIssue, .for-questions-issues').removeClass('hidden');
                 $('.is_significant_option, #inspectionStep2 #btnCapturePhoto, #inspectionStep2 #btnEditNotes').addClass('hidden');
                 objApp.setSubExtraHeading("", false);
             }else{
@@ -738,7 +743,9 @@ var Inspections = function()
                     self.showStep1();
                     return false;
                 });
+                $('#btnStep2Next').text('Next');
                 $('#btnAddDefect').removeClass('hidden');
+                $('#btnStep2NewIssue, .for-questions-issues').addClass('hidden');
                 $('.is_significant_option, #inspectionStep2 #btnCapturePhoto, #inspectionStep2 #btnEditNotes').removeClass('hidden');
                 objApp.setSubExtraHeading("Step 2 of 3", true);
             }
@@ -746,7 +753,6 @@ var Inspections = function()
         }
         $('#btnStep2Back').show();
         $('#inspectionStep2 #btnCapturePhoto').show();
-        $("#btnAddDefect").remove('hidden');
         $('#btnStep2Next').parent().show();
 
         $('#inspectionStep2 #frmDefectDetails tr#action_wrapper').show();
@@ -762,9 +768,10 @@ var Inspections = function()
         $("#inspectionStep2 textarea#observation").val('');
         $("#inspectionStep2 ul#popAction li:first-child").text('Choose');
         $("#historyModal").hide();
-		
+
         if (inspectionItem) {
-            self.initDefectForm(inspectionItem);
+            self.initDefectForm(inspectionItem, true, addNewQuestionIssue);
+            objApp.keys.question = inspectionItem.question;
         }
         else
         {
@@ -772,6 +779,7 @@ var Inspections = function()
 			objApp.keys.location = '';
 			objApp.keys.observation = '';
 			objApp.keys.action = '';
+            objApp.keys.question = '';
             self.initDefectForm(null);
         }
             	
@@ -2609,6 +2617,8 @@ var Inspections = function()
         $(".inspectionDetails #tblDefectListingHeader th").bind(objApp.touchEvent, function(e)
 		{
 			e.preventDefault();
+			if(self.isReportsWithQuestions())
+			    return false;
 
 			var newSortBy = $(this).attr("class");
 
@@ -2946,10 +2956,24 @@ var Inspections = function()
 		/***
 		* Capture the event when the user clicks on the Add Issue button
 		*/
-		$("#btnAddDefect").bind(objApp.touchEvent, function(e)
+        $("#btnAddDefect, #btnStep2NewIssue").unbind();
+		$("#btnAddDefect, #btnStep2NewIssue").bind(objApp.touchEvent, function(e)
 		{
+            var location =	self.objPopLocation.getText();
+            var action = self.objPopAction.getText();
+
+            if(location == '' || location.toUpperCase() == "CHOOSE"){
+                alert('Please select location');
+                return;
+            }
+
             if($('#observation').val().trim()==''){
                 alert('Please insert the observation');
+                return;
+            }
+
+            if(action == '' || action.toUpperCase() == "CHOOSE"){
+                alert('Please select action');
                 return;
             }
 
@@ -2969,15 +2993,28 @@ var Inspections = function()
                 // When adding a new defect, hide the delete defect button
                 $("#btnDeleteDefect").css("visibility", "hidden");
 
-                // Increment the sequence number
-                var seq_no = $("#frmDefectDetails #seq_no").val();
-                if(seq_no == "") {
-                    seq_no = 1;
-                } else {
-                    seq_no = seq_no * 1;
-                    seq_no++;
+                if(objApp.keys.question == ''){
+                    // Increment the sequence number
+                    var seq_no = $("#frmDefectDetails #seq_no").val();
+                    if(seq_no == "") {
+                        seq_no = 1;
+                    } else {
+                        seq_no = seq_no * 1;
+                        seq_no++;
 
-                    $("#frmDefectDetails #seq_no").val(seq_no);
+                        $("#frmDefectDetails #seq_no").val(seq_no);
+                    }
+                }else{
+                    // Increment the sub-sequence number
+                    var seq_no2 = $("#frmDefectDetails #seq_no2").val();
+                    if(seq_no2 == "") {
+                        seq_no2 = 1;
+                    } else {
+                        seq_no2 = seq_no2 * 1;
+                        seq_no2++;
+
+                        $("#frmDefectDetails #seq_no2").val(seq_no2);
+                    }
                 }
 
                 // Remove event binding
@@ -3640,6 +3677,215 @@ var Inspections = function()
                         navigator.camera.getPicture(function(imageData)
                             {
                                 editPhoto4(imageData, reinspectionItemID);
+                            }, function(message)
+                            {
+                                alert("Image load failed because: " + message);
+                            },
+                            {
+                                quality: 50,
+                                destinationType: Camera.DestinationType.DATA_URL,
+                                sourceType : Camera.PictureSourceType.PHOTOLIBRARY,
+                                correctOrientation: true
+                            });
+                    }
+                }
+
+            });
+        });
+
+        $(".capture-question-image, .select-question-image").unbind(objApp.touchEvent);
+        $(".capture-question-image, .select-question-image").bind(objApp.touchEvent, function(e)
+        {
+            self.last_scroller_x = self.scroller.x;
+            self.last_scroller_y = self.scroller.y;
+            e.preventDefault();
+            if(self.finalised == 1) {
+                alert("Sorry, this inspection has been finalised.  If you wish to add more issues, please un-finalise the inspection first");
+                return;
+            }
+
+            var $this = $(this);
+
+            if($this.hasClass('on-issue-form')){
+                var location =	self.objPopLocation.getText();
+                var action = self.objPopAction.getText();
+                var observation =  $("#frmDefectDetails #observation").val();
+
+                if((location == "") || (location.toUpperCase() == "CHOOSE") || (action == "") || (action.toUpperCase() == "CHOOSE")  || observation == "")
+                {
+                    alert('Please enter other fields before selecting the image.');
+                    return;
+                }
+            }
+
+            var question_id = $this.attr('data-id');
+            self.current_table = "inspectionitemphotos";
+            self.current_key = "inspection_id";
+
+            if(!objApp.empty(objApp.getKey("reinspection_id"))) {
+                self.current_table = "reinspectionitemphotos";
+                self.current_key = "reinspection_id";
+            }
+
+            // Get the current maximum photo sequence number for this inspection item
+            var sql = "SELECT MAX(seq_no) as seq_no " +
+                "FROM " + self.current_table + " " +
+                "WHERE " + self.current_key + " = ? " +
+                "AND deleted = 0";
+            objDBUtils.loadRecordSQL(sql, [objApp.getKey(self.current_key)], function(row)
+            {
+                var seq_no = 1;  // Default sequence number to 1.
+                if(row)
+                {
+                    seq_no = row.seq_no;
+
+                    if((seq_no == null) || (seq_no == 0))
+                    {
+                        seq_no = 0;
+                    }
+                    seq_no += 1;
+                }
+                var editPhoto5 = function(photoData, defect_id, $this)
+                {
+                    if(typeof defect_id == 'undefined' || defect_id == '' || defect_id == 0)
+                        return false;
+
+                    // Setup a new image object, using the photo data as the image source
+                    objImage = new Image();
+
+                    objImage.src = 'data:image/jpeg;base64,' + photoData;
+
+                    //notes = "";
+
+                    // When the image has loaded, setup the image marker object
+                    objImage.onload = function()
+                    {
+                        // Resize the image so it's 600px wide
+                        objResizer = new imageResizer(objImage);
+                        var imageData = objResizer.resize(600);
+
+
+                        // Create a thumbnail version of the image
+                        objImage = new Image();
+                        objImage.src = 'data:image/jpeg;base64,' + imageData;
+
+                        objImage.onload = function()
+                        {
+                            objResizer = new imageResizer(objImage);
+                            var thumbData = objResizer.resize(90);
+
+                            // Save both the thumbnail and the full version to the local file system.
+                            var fail = function(error)
+                            {
+                                alert("storePhotosOnFS::Caught error: " + error.code);
+                            }
+
+                            // Make sure the current inspection id is valid - there seems to be a bug sometimes when the id is corrupted
+
+                            var check_table = "inspections";
+                            if(self.current_table == "reinspectionitemphotos") {
+                                check_table = "reinspections";
+                            }
+
+                            objDBUtils.loadRecord(check_table, objApp.getKey(self.current_key), function(param, row)
+                            {
+                                if(!row)
+                                {
+                                    alert("The current inspection id is NOT valid");
+                                    return;
+                                }
+                                user_id = localStorage.getItem("user_id");
+                                var new_id = objDBUtils.makeInsertKey(objApp.sync_prefix);
+                                var notes = "";
+
+                                // Save the image data and notes back to the database
+                                var sql = "INSERT INTO " + self.current_table + "(id, " + self.current_key + ", seq_no, photodata_tmb, photodata, notes, created_by, dirty) " +
+                                    "VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
+                                var values = [new_id, objApp.getKey(self.current_key), seq_no, thumbData, imageData, notes, user_id, "1"];
+                                objDBUtils.executeWithCBParam(sql, values, function(param)
+                                    {
+                                        // After the photo was saved, saving record for significant items
+                                        var insert_sql = "INSERT INTO significant_items(id, `type`, foreign_id, photo_id, created_by, dirty) " +
+                                            "VALUES(?, ?, ?, ?, ?, ?)";
+                                        var insert_values = [objDBUtils.makeInsertKey(objApp.sync_prefix), self.current_table.replace('photos', ''), param.defect_id, param.photo_id, localStorage.getItem("user_id"), "1"];
+                                        objDBUtils.execute(insert_sql, insert_values, function(){
+                                            if($this.hasClass('on-issue-form')){
+                                                alert('New issue has been added successfully.');
+                                                $("#inspectionStep2 textarea#observation").val('');
+                                                $("#inspectionStep2 ul#popAction li:first-child").text('Choose');
+                                                // Clear all defect related keys
+                                                objApp.keys.inspection_item_id = "";
+                                                objApp.keys.observation = '';
+                                                objApp.keys.action = '';
+
+                                                // Increment the sequence number
+                                                var seq_no2 = $("#frmDefectDetails #seq_no2").val();
+                                                if(seq_no2 == "") {
+                                                    seq_no2 = 1;
+                                                } else {
+                                                    seq_no2 = seq_no2 * 1;
+                                                    seq_no2++;
+
+                                                    $("#frmDefectDetails #seq_no2").val(seq_no);
+                                                }
+
+                                                $("#frmDefectDetails #observation_suggestion tr td").unbind();
+                                                $("#frmDefectDetails #observation_suggestion").empty();
+                                            }else{
+                                                self.loadQuestionItems();
+                                            }
+                                        });
+                                    },
+                                    {
+                                        photo_id: new_id,
+                                        defect_id: defect_id
+                                    });
+                            }, function(t){}, "", self.finalised);
+                        }
+                    }
+                }
+
+                if($this.hasClass('capture-question-image')){
+                    if(objApp.phonegapBuild)
+                    {
+                        navigator.camera.getPicture(function(imageData)
+                            {
+                                if($this.hasClass('on-issue-form')){
+                                    self.saveDefect(function(defect_id){
+                                        if(typeof defect_id == 'undefined')
+                                            return false;
+
+                                        editPhoto5(imageData, defect_id, $this);
+                                    });
+                                }else{
+                                    editPhoto5(imageData, question_id, $this);
+                                }
+                            }, function(message)
+                            {
+                                alert("Image load failed because: " + message);
+                            },
+                            {
+                                quality: 50,
+                                destinationType: Camera.DestinationType.DATA_URL
+                            });
+                    }
+                }else if($this.hasClass('select-question-image')){
+
+                    if(objApp.phonegapBuild)
+                    {
+                        // Invoke the camera API to allow the user to take a photo
+                        navigator.camera.getPicture(function(imageData)
+                            {
+                                if($this.hasClass('on-issue-form')){
+                                    self.saveDefect(function(defect_id){
+                                        if(typeof defect_id == 'undefined')
+                                            return false;
+
+                                        editPhoto5(imageData, defect_id, $this);
+                                    });
+                                }else {
+                                    editPhoto5(imageData, question_id, $this)
+                                }
                             }, function(message)
                             {
                                 alert("Image load failed because: " + message);
@@ -4320,9 +4566,10 @@ var Inspections = function()
 	* resets the popSelectors and loads their values as appropriate.
 	* If an existing defect is being shown, the defect values are preselected.
 	*/
-	this.initDefectForm = function(inspectionItem, resetLocation)
+	this.initDefectForm = function(inspectionItem, resetLocation, addNewQuestionIssue)
 	{
 	    if (typeof(resetLocation)=='undefined') resetLocation = true;
+        if (typeof(addNewQuestionIssue)=='undefined') addNewQuestionIssue = false;
 
 		self.lastKeyPress = null;
 		self.doingSave = false;
@@ -4355,7 +4602,7 @@ var Inspections = function()
 		// If an inspection item has been passed through, set the item details from it, otherwise initialise to blank.
 		var currentLocation = self.objPopLocation.getValue();
 
-		if(inspectionItem == null)
+		if(inspectionItem == null || addNewQuestionIssue)
 		{
 			$("#frmDefectDetails #observation").val("");
             self.objPopLocation.clear("", "Choose");
@@ -4363,28 +4610,31 @@ var Inspections = function()
             $("#frmDefectDetails #itemtype").val("0");
             $("#frmDefectDetails #numrepeats").val("0");
 
-			// if(!$("#photoWrapper").hasClass("hidden"))
-			// {
-				// $("#photoWrapper").addClass("hidden");
-			// }
+            if(addNewQuestionIssue && inspectionItem){
+                $("#frmDefectDetails #seq_no").val(inspectionItem.seq_no);
+                var seq_no2 = inspectionItem.seq_no2;
+                if(!seq_no2)
+                    seq_no2 = 1;
+                $("#frmDefectDetails #seq_no2").val(seq_no2+1);
+            }else{
+                // Get the next inspectionitems sequence number for this audit
+                var sql = "SELECT MAX(seq_no) as seq_no " +
+                    "FROM inspectionitems " +
+                    "WHERE inspection_id = ? AND deleted = 0";
 
-			// Get the next inspectionitems sequence number for this audit
-			var sql = "SELECT MAX(seq_no) as seq_no " +
-				"FROM inspectionitems " +
-				"WHERE inspection_id = ? AND deleted = 0";
+                objDBUtils.loadRecordSQL(sql, [objApp.keys.inspection_id], function(row)
+                {
+                    var seq_no = 1;
 
-			objDBUtils.loadRecordSQL(sql, [objApp.keys.inspection_id], function(row)
-			{
-				var seq_no = 1;
+                    if((row) && (row.seq_no != null))
+                    {
+                        seq_no = row.seq_no + 1;
+                    }
 
-				if((row) && (row.seq_no != null))
-				{
-					seq_no = row.seq_no + 1;
-				}
-
-				// Set the sequence number into the form.
-				$("#frmDefectDetails #seq_no").val(seq_no);
-			});
+                    // Set the sequence number into the form.
+                    $("#frmDefectDetails #seq_no").val(seq_no);
+                });
+            }
 		}
 		else
 		{
@@ -4398,6 +4648,7 @@ var Inspections = function()
             //self.touchScroll(document.querySelector("#frmDefectDetails #notes"));
 			$("#frmDefectDetails #created_by").val(inspectionItem.created_by);
 			$("#frmDefectDetails #seq_no").val(inspectionItem.seq_no);
+            $("#frmDefectDetails #seq_no2").val(inspectionItem.seq_no2?inspectionItem.seq_no2:1);
 
 			$("#photoWrapper").removeClass("hidden");
 
@@ -5731,6 +5982,8 @@ var Inspections = function()
             $("#frmDefectDetails #action").val(action);
         }
 
+        $("#frmDefectDetails #question").val(objApp.keys.question);
+
    		// Set the current inspection id into the form.
    		$("#frmDefectDetails #inspection_id").val(objApp.keys.inspection_id);
 
@@ -5750,6 +6003,7 @@ var Inspections = function()
         {
             if(row)
             {
+                console.log(row);
                 console.log('This inspection item has been added');
                 self.inAudit = true;
 
@@ -6219,7 +6473,7 @@ var Inspections = function()
             "WHERE ii.deleted = ? " +
             "AND ii.inspection_id = ? " +
             filter_string +
-            "ORDER BY ii.seq_no ASC";
+            "ORDER BY ii.seq_no, ii.seq_no2 ASC";
         blockElement('body');
 
         objDBUtils.loadRecordsSQL(sql, [0, objApp.keys.inspection_id], function (param, items) {
@@ -6234,6 +6488,7 @@ var Inspections = function()
             }
             else
             {
+                var questions = [];
                 var item_ids = [];
                 var inspection_items = [];
                 var thumbnails = {};
@@ -6279,16 +6534,6 @@ var Inspections = function()
                     self.keySortArray[sq] = row.id;
                     sq = sq + 2;
 
-                    html += '<tr rel="' + row.id + '">';
-                    html += '<td class="nodelete"></td>';
-                    html += '<td><span class="seq_no">' + seq_no + '</span>';
-                    if(self.finalised == 0) {
-                        html += '<div class="capture-buttons leftmargin">' +
-                            '<a href="#" data-id="'+ row.id +'" class="capture-question-image left"><img width="40" src="images/camera-75.png" /></a>&nbsp;' +
-                            '<a href="#" data-id="'+ row.id +'" class="select-question-image left"><img width="40" src="images/gallery-75.png" /></a>&nbsp;' +
-                            '<a href="#" style="margin-top: 5px;" rel="' + row.id + '" class="edit_issue_btn">Edit</a>' +
-                            '</div>';
-                    }
                     var details = '';
                     if(row.observation){
                         details += '<br/>';
@@ -6302,35 +6547,86 @@ var Inspections = function()
                         details += '<br/>';
                         details += 'Action: ' + row.action;
                     }
-                    html += '<td>' + row.question + (details?'<br/>-------'+details:'') + '</td>';
 
-                    /* Photo list */
-                    if(typeof thumbnails[row.id] != 'undefined' && thumbnails[row.id].length){
-                        html += '<td>';
-                        for(var j in thumbnails[row.id]){
-                            html += '<div>';
-                            html += '<img style="display: inline;" width="150" height="100" src="data:image/jpeg;base64,' + thumbnails[row.id][j].photodata_tmb + '" />';
-                            html += '&nbsp;<a href="#" style="display: inline;" class="remove-photo" data-id="' + thumbnails[row.id][j].sig_id + '">Remove</a>';
-                            html += '</div>';
+                    if(questions.indexOf(row.question) == -1){
+                        /* First issue in question */
+                        html += '<tr rel="' + row.id + '">';
+                        html += '<td class="nodelete"></td>';
+                        html += '<td><span class="seq_no">' + seq_no + '</span>';
+                        if(self.finalised == 0) {
+                            if(details == ''){
+                                html += '<div class="capture-buttons leftmargin">' +
+                                    '<a href="#" style="margin-top: 5px;" rel="' + row.id + '" class="edit_issue_btn">Add issue</a>' +
+                                    '</div>';
+                            }else{
+                                html += '<div class="capture-buttons leftmargin">' +
+                                    '<a href="#" style="margin-top: 5px;" rel="' + row.id + '" class="add_issue_btn">Add issue</a>' +
+                                    '</div>';
+                            }
+
                         }
                         html += '</td>';
-                    }else{
+
+                        html += '<td>' + row.question + '</td>';
                         html += '<td></td>';
+
+                        if(self.finalised == 1){
+                            var answer = row.notes?row.notes:'NA';
+                        }else{
+                            var answer = '<select style="width: auto;" data-id="'+ row.id +'" autocomplete="off" class="selector select-answer">' +
+                                '<option value="">NA</option>' +
+                                '<option value="Yes" '+(row.notes=='Yes'?'selected':'')+'>Yes</option>' +
+                                '<option value="No" '+(row.notes=='No'?'selected':'')+'>No</option>' +
+                                '</select>';
+
+                        }
+
+                        html += '<td>' + answer + '</td>';
+                        html += '</tr>';
+                        questions.push(row.question);
                     }
 
-                    if(self.finalised == 1){
-                        var answer = row.notes?row.notes:'NA';
-                    }else{
-                        var answer = '<select style="width: auto;" data-id="'+ row.id +'" autocomplete="off" class="selector select-answer">' +
-                            '<option value="">NA</option>' +
-                            '<option value="Yes" '+(row.notes=='Yes'?'selected':'')+'>Yes</option>' +
-                            '<option value="No" '+(row.notes=='No'?'selected':'')+'>No</option>' +
-                            '</select>';
-
+                    if(row.observation || row.location || row.action){
+                        html += '<tr class="question-issues" rel="' + row.id + '">';
+                        html += '<td class="nodelete"></td>';
+                        html += '<td>';
+                        if(self.finalised == 0) {
+                            html += '<div class="capture-buttons">' +
+                                '<a href="#" data-id="'+ row.id +'" class="capture-question-image left"><img width="40" src="images/camera-75.png" /></a>&nbsp;' +
+                                '<a href="#" data-id="'+ row.id +'" class="select-question-image left"><img width="40" src="images/gallery-75.png" /></a>&nbsp;' +
+                                '<a href="#" style="margin-top: 5px;" rel="' + row.id + '" class="edit_issue_btn">Edit</a>' +
+                                '</div><br/>';
+                        }
+                        if(row.location){
+                            html += row.location + '</td>';
+                        }else{
+                            html += 'No location</td>';
+                        }
+                        if(row.observation){
+                            html += '<td>' + row.observation + '</td>';
+                        }else{
+                            html += '<td>No observation</td>';
+                        }
+                        if(row.action){
+                            html += '<td>' + row.action + '</td>';
+                        }else{
+                            html += '<td>No action</td>';
+                        }
+                        /* Photo list */
+                        if(typeof thumbnails[row.id] != 'undefined' && thumbnails[row.id].length){
+                            html += '<td>';
+                            for(var j in thumbnails[row.id]){
+                                html += '<div>';
+                                html += '<img style="display: inline;" width="150" height="100" src="data:image/jpeg;base64,' + thumbnails[row.id][j].photodata_tmb + '" />';
+                                html += '&nbsp;<a href="#" style="display: inline;" class="remove-photo" data-id="' + thumbnails[row.id][j].sig_id + '">Remove</a>';
+                                html += '</div>';
+                            }
+                            html += '</td>';
+                        }else{
+                            html += '<td>No photos</td>';
+                        }
+                        html += '</tr>';
                     }
-
-                    html += '<td>' + answer + '</td>';
-                    html += '</tr>';
 
                     var key = row.location.trim();
                     if(key)
@@ -6446,7 +6742,6 @@ var Inspections = function()
                 self.setTableWidths2('tblDefectListingHeader', 'tblDefectListing', 5);
 
                 self.scroller = new IScroll5("#defectScrollWrapper", { click: true, hScrollbar: false, vScrollbar: false, scrollbarClass: 'myScrollbarSm'});
-
                 if(self.last_scroller_y != -1)
                 {
                     self.scroller.scrollTo(self.last_scroller_x, self.last_scroller_y);
@@ -6456,203 +6751,67 @@ var Inspections = function()
 
                 $("#tblDefectListing tr td .remove-photo").bind(objApp.touchEvent, function(e)
                 {
+                    self.last_scroller_x = self.scroller.x;
+                    self.last_scroller_y = self.scroller.y;
                     e.preventDefault();
                     // If the inspection is finalised - do nothing
                     if(self.finalised == 1) {
                         return;
                     }
-
-                    var significant_id = $(this).attr("data-id");
-                    self.deleteSignificantItem(significant_id);
-                    self.loadQuestionItems();
+                    if(confirm("Would you like to delete this photo?")){
+                        var significant_id = $(this).attr("data-id");
+                        self.deleteSignificantItem(significant_id);
+                        self.loadQuestionItems();
+                    }
                 });
 
                 $('#tblDefectListing a.edit_issue_btn').bind(objApp.touchEvent, function(e){
-                    // if(objUtils.isMobileDevice())
-                    {
-                        self.last_scroller_x = self.scroller.x;
-                        self.last_scroller_y = self.scroller.y;
-                    }
+                    self.last_scroller_x = self.scroller.x;
+                    self.last_scroller_y = self.scroller.y;
                     e.preventDefault();
                     if(self.is_change_order)
                     {
                         is_change_order = false;
                         return;
                     }
-                    var $t = $(this)
-                        , inspection_item_id = this.rel;
+                    var $t = $(this), inspection_item_id = this.rel;
 
-                    if(confirm("Would you like to edit this item?"))
+                    blockElement('body');
+
+                    // Load the inspection item record
+                    objDBUtils.loadRecord("inspectionitems", inspection_item_id, function(inspection_item_id, item)
                     {
-                        blockElement('body');
+                        unblockElement('body');
+                        if(!item)
+                            return;
 
-                        // Load the inspection item record
-                        objDBUtils.loadRecord("inspectionitems", inspection_item_id, function(inspection_item_id, item)
-                        {
-                            unblockElement('body');
-                            if(!item)
-                                return;
-
-                            objApp.keys.inspection_item_id = item.id;
-                            objApp.keys.level = item.level;
-                            objApp.keys.area = item.area;
-                            objApp.keys.issue = item.issue;
-                            objApp.keys.detail = item.detail;
-                            self.showStep2(item);
-                        }, inspection_item_id);
-                    }
+                        objApp.keys.inspection_item_id = item.id;
+                        self.showStep2(item);
+                    }, inspection_item_id);
                 });
 
-                $(".capture-question-image, .select-question-image").unbind(objApp.touchEvent);
-                $(".capture-question-image, .select-question-image").bind(objApp.touchEvent, function(e)
-                {
+                $('#tblDefectListing a.add_issue_btn').bind(objApp.touchEvent, function(e){
+                    self.last_scroller_x = self.scroller.x;
+                    self.last_scroller_y = self.scroller.y;
                     e.preventDefault();
-                    if(self.finalised == 1) {
-                        alert("Sorry, this inspection has been finalised.  If you wish to add more issues, please un-finalise the inspection first");
+                    if(self.is_change_order)
+                    {
+                        is_change_order = false;
                         return;
                     }
-                    var $this = $(this);
-                    var question_id = $this.attr('data-id');
-                    self.current_table = "inspectionitemphotos";
-                    self.current_key = "inspection_id";
+                    var $t = $(this), inspection_item_id = this.rel;
 
-                    if(!objApp.empty(objApp.getKey("reinspection_id"))) {
-                        self.current_table = "reinspectionitemphotos";
-                        self.current_key = "reinspection_id";
-                    }
+                    blockElement('body');
 
-                    // Get the current maximum photo sequence number for this inspection item
-                    var sql = "SELECT MAX(seq_no) as seq_no " +
-                        "FROM " + self.current_table + " " +
-                        "WHERE " + self.current_key + " = ? " +
-                        "AND deleted = 0";
-                    objDBUtils.loadRecordSQL(sql, [objApp.getKey(self.current_key)], function(row)
+                    // Load the inspection item record
+                    objDBUtils.loadRecord("inspectionitems", inspection_item_id, function(inspection_item_id, item)
                     {
-                        var seq_no = 1;  // Default sequence number to 1.
-                        if(row)
-                        {
-                            seq_no = row.seq_no;
-
-                            if((seq_no == null) || (seq_no == 0))
-                            {
-                                seq_no = 0;
-                            }
-                            seq_no += 1;
-                        }
-                        var editPhoto5 = function(photoData, defect_id)
-                        {
-                            if(typeof defect_id == 'undefined' || defect_id == '' || defect_id == 0)
-                                return false;
-
-                            // Setup a new image object, using the photo data as the image source
-                            objImage = new Image();
-
-                            objImage.src = 'data:image/jpeg;base64,' + photoData;
-
-                            //notes = "";
-
-                            // When the image has loaded, setup the image marker object
-                            objImage.onload = function()
-                            {
-                                // Resize the image so it's 600px wide
-                                objResizer = new imageResizer(objImage);
-                                var imageData = objResizer.resize(600);
-
-
-                                // Create a thumbnail version of the image
-                                objImage = new Image();
-                                objImage.src = 'data:image/jpeg;base64,' + imageData;
-
-                                objImage.onload = function()
-                                {
-                                    objResizer = new imageResizer(objImage);
-                                    var thumbData = objResizer.resize(90);
-
-                                    // Save both the thumbnail and the full version to the local file system.
-                                    var fail = function(error)
-                                    {
-                                        alert("storePhotosOnFS::Caught error: " + error.code);
-                                    }
-
-                                    // Make sure the current inspection id is valid - there seems to be a bug sometimes when the id is corrupted
-
-                                    var check_table = "inspections";
-                                    if(self.current_table == "reinspectionitemphotos") {
-                                        check_table = "reinspections";
-                                    }
-
-                                    objDBUtils.loadRecord(check_table, objApp.getKey(self.current_key), function(param, row)
-                                    {
-                                        if(!row)
-                                        {
-                                            alert("The current inspection id is NOT valid");
-                                            return;
-                                        }
-                                        user_id = localStorage.getItem("user_id");
-                                        var new_id = objDBUtils.makeInsertKey(objApp.sync_prefix);
-                                        var notes = "";
-
-                                        // Save the image data and notes back to the database
-                                        var sql = "INSERT INTO " + self.current_table + "(id, " + self.current_key + ", seq_no, photodata_tmb, photodata, notes, created_by, dirty) " +
-                                            "VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
-                                        var values = [new_id, objApp.getKey(self.current_key), seq_no, thumbData, imageData, notes, user_id, "1"];
-                                        objDBUtils.executeWithCBParam(sql, values, function(param)
-                                            {
-                                                // After the photo was saved, saving record for significant items
-                                                var insert_sql = "INSERT INTO significant_items(id, `type`, foreign_id, photo_id, created_by, dirty) " +
-                                                    "VALUES(?, ?, ?, ?, ?, ?)";
-                                                var insert_values = [objDBUtils.makeInsertKey(objApp.sync_prefix), self.current_table.replace('photos', ''), param.defect_id, param.photo_id, localStorage.getItem("user_id"), "1"];
-                                                objDBUtils.execute(insert_sql, insert_values, function(){
-                                                    self.loadQuestionItems();
-                                                });
-                                            },
-                                            {
-                                                photo_id: new_id,
-                                                defect_id: defect_id
-                                            });
-                                    }, function(t){}, "", self.finalised);
-                                }
-                            }
-                        }
-
-                        if($this.hasClass('capture-question-image')){
-                            if(objApp.phonegapBuild)
-                            {
-                                navigator.camera.getPicture(function(imageData)
-                                    {
-                                        editPhoto5(imageData, question_id);
-                                    }, function(message)
-                                    {
-                                        alert("Image load failed because: " + message);
-                                    },
-                                    {
-                                        quality: 50,
-                                        destinationType: Camera.DestinationType.DATA_URL
-                                    });
-                            }
-                        }else if($this.hasClass('select-question-image')){
-
-                            if(objApp.phonegapBuild)
-                            {
-                                // Invoke the camera API to allow the user to take a photo
-                                navigator.camera.getPicture(function(imageData)
-                                    {
-                                        editPhoto5(imageData, question_id)
-
-                                    }, function(message)
-                                    {
-                                        alert("Image load failed because: " + message);
-                                    },
-                                    {
-                                        quality: 50,
-                                        destinationType: Camera.DestinationType.DATA_URL,
-                                        sourceType : Camera.PictureSourceType.PHOTOLIBRARY,
-                                        correctOrientation: true
-                                    });
-                            }
-                        }
-
-                    });
+                        unblockElement('body');
+                        if(!item)
+                            return;
+                        console.log(item);
+                        self.showStep2(item, 1);
+                    }, inspection_item_id);
                 });
 
                 $("select.select-answer").unbind("change");
