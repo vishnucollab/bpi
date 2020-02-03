@@ -4931,6 +4931,23 @@ var Inspections = function()
 		});
 	}
 
+    this.deleteQuestionImage = function(item_id)
+    {
+        if (item_id == "")
+            return;
+
+        // Flag all related photo records as deleted.
+        var sql = "UPDATE inspectionitemphotos " +
+            "SET deleted = 1, dirty = 1 " +
+            "WHERE id = ?";
+
+        objDBUtils.execute(sql, [item_id], function()
+        {
+            // Reload the inspection photos listing
+            self.loadQuestionItems();
+        });
+    }
+
 	this.doDelayedSave = function()
 	{
 		var now = new Date();
@@ -6466,7 +6483,7 @@ var Inspections = function()
             filter_string = " AND (ii.location LIKE '%"+keyword+"%' OR ii.observation LIKE '%"+keyword+"%' OR ii.action LIKE '%"+keyword+"%' OR ii.notes LIKE '%"+keyword+"%' OR ii.question LIKE '%"+keyword+"%') ";
         }
 
-        var sql = "SELECT ii.*, iip.photodata_tmb, si.id as sig_id " +
+        var sql = "SELECT ii.*, iip.photodata_tmb, si.id as sig_id, si.photo_id " +
             "FROM inspectionitems ii " +
             "LEFT JOIN significant_items si ON si.foreign_id = ii.id AND si.deleted != 1 " +
             "LEFT JOIN inspectionitemphotos iip ON iip.id = si.photo_id " +
@@ -6504,7 +6521,8 @@ var Inspections = function()
                             thumbnails[item.id] = [];
                         thumbnails[item.id].push({
                             sig_id: item.sig_id,
-                            photodata_tmb: item.photodata_tmb
+                            photodata_tmb: item.photodata_tmb,
+                            photo_id: item.photo_id
                         });
                     }
                 }
@@ -6617,8 +6635,13 @@ var Inspections = function()
                             html += '<td>';
                             for(var j in thumbnails[row.id]){
                                 html += '<div>';
-                                html += '<img style="display: inline;" width="150" height="100" src="data:image/jpeg;base64,' + thumbnails[row.id][j].photodata_tmb + '" />';
-                                html += '&nbsp;<a href="#" style="display: inline;" class="remove-photo" data-id="' + thumbnails[row.id][j].sig_id + '">Remove</a>';
+                                if(self.finalised == 0){
+                                    html += '<a style="display: inline;" class="issue-photo" data-id="' + thumbnails[row.id][j].photo_id +'"><img width="150" height="100" src="data:image/jpeg;base64,' + thumbnails[row.id][j].photodata_tmb + '" /></a>';
+                                    html += '&nbsp;<a href="#" style="display: inline;" class="remove-photo" data-id="' + thumbnails[row.id][j].sig_id + '">Remove</a>';
+                                }else{
+                                    html += '<img style="display: inline;" width="150" height="100" src="data:image/jpeg;base64,' + thumbnails[row.id][j].photodata_tmb + '" />';
+                                }
+
                                 html += '</div>';
                             }
                             html += '</td>';
@@ -6749,6 +6772,115 @@ var Inspections = function()
                     self.last_scroller_y = -1;
                 }
 
+                var editIssuePhoto = function(photoID, photoData, notes)
+                {
+                    // Setup a new image object, using the photo data as the image source
+                    objImage = new Image();
+                    objImage.src = 'data:image/jpeg;base64,' + photoData;
+                    // When the image has loaded, setup the image marker object
+                    objImage.onload = function()
+                    {
+                        // Resize the image so it's 600px wide
+                        objResizer = new imageResizer(objImage);
+                        var imageData = objResizer.resize(600);
+
+                        objImage = new Image();
+                        objImage.src = 'data:image/jpeg;base64,' + imageData;
+                        //notes = "";
+
+                        objImage.onload = function()
+                        {
+                            objImageMarker = new imageMarker(objImage, "Edit Image", notes, function(imageMarkerResult)
+                            {
+                                // Handle the save event
+                                var imageData = imageMarkerResult.imageData;
+                                var notes = imageMarkerResult.notes;
+
+                                // Create a thumbnail version of the image
+                                objImage = new Image();
+                                objImage.src = 'data:image/jpeg;base64,' + imageData;
+
+                                objImage.onload = function()
+                                {
+                                    objResizer = new imageResizer(objImage);
+                                    var thumbData = objResizer.resize(90);
+
+                                    // Save the image data and notes back to the database
+                                    var sql = "UPDATE inspectionitemphotos " +
+                                        "SET photodata = ?, photodata_tmb = ?, notes = ?, dirty = 1 " +
+                                        "WHERE id = ?";
+
+                                    objDBUtils.execute(sql, [imageData, thumbData, notes, photoID], function()
+                                    {
+                                        self.loadQuestionItems();
+                                    });
+                                }
+                            }, self.deleteQuestionImage, photoID, false);
+                            objImageMarker.show();
+                        }
+                    }
+                }
+
+                $("#tblDefectListing tr td a.issue-photo").bind(objApp.touchEvent, function(e)
+                {
+                    self.last_scroller_x = self.scroller.x;
+                    self.last_scroller_y = self.scroller.y;
+                    e.preventDefault();
+                    // Get the id of the selected photo
+                    var photoID = $(this).attr("data-id");
+                    objDBUtils.loadRecord('inspectionitemphotos', photoID, function(photoID, row)
+                    {
+                        if(!row)
+                        {
+                            alert("Sorry, the photo record could not be loaded");
+                            return;
+                        }
+
+                        // If the fullsize version of the photo is not on the device, bring it down.
+                        if((row.photodata == null) || (row.photodata == ""))
+                        {
+                            if(confirm("The full size version of this photo is not on this device.  Would you like to download it now via the Internet?"))
+                            {
+                                var params = objApp.objSync.getLoginParams();
+                                if(!params)
+                                {
+                                    alert("Sorry, this request could not be completed");
+                                }
+                                blockElement('body');
+                                // Create the request URL
+                                var url = objApp.apiURL + "inspections/get_inspection_photo/" + photoID;
+                                params['version'] = objApp.version;
+                                $.post(url, params, function(data)
+                                {
+                                    unblockElement('body');
+
+                                    if(data.status == "OK")
+                                    {
+                                        if(data.photo != "")
+                                        {
+                                            var sql = "UPDATE inspectionitemphotos " +
+                                                "SET photodata = ? " +
+                                                "WHERE id = ?";
+
+                                            objDBUtils.execute(sql, [data.photo, photoID], function()
+                                            {
+                                                // Photo was downloaded and saved locally OK
+                                                editIssuePhoto(photoID, data.photo, row.notes);
+                                            });
+                                        }
+                                    }
+                                }, "json");
+                            }
+                        }
+                        else
+                        {
+                            // Photo data already present
+                            editIssuePhoto(photoID, row.photodata, row.notes);
+                        }
+
+                    }, photoID);
+                });
+
                 $("#tblDefectListing tr td .remove-photo").bind(objApp.touchEvent, function(e)
                 {
                     self.last_scroller_x = self.scroller.x;
@@ -6809,7 +6941,10 @@ var Inspections = function()
                         unblockElement('body');
                         if(!item)
                             return;
-                        console.log(item);
+                        objApp.keys.inspection_item_id = '';
+                        objApp.keys.location = '';
+                        objApp.keys.observation = '';
+                        objApp.keys.action = '';
                         self.showStep2(item, 1);
                     }, inspection_item_id);
                 });
