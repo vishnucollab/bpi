@@ -4616,6 +4616,7 @@ var Inspections = function()
                 if(!seq_no2)
                     seq_no2 = 1;
                 $("#frmDefectDetails #seq_no2").val(seq_no2+1);
+                $('#frmDefectDetails input[name="notes"]').val(inspectionItem.notes);
             }else{
                 // Get the next inspectionitems sequence number for this audit
                 var sql = "SELECT MAX(seq_no) as seq_no " +
@@ -4649,6 +4650,7 @@ var Inspections = function()
 			$("#frmDefectDetails #created_by").val(inspectionItem.created_by);
 			$("#frmDefectDetails #seq_no").val(inspectionItem.seq_no);
             $("#frmDefectDetails #seq_no2").val(inspectionItem.seq_no2?inspectionItem.seq_no2:1);
+            $('#frmDefectDetails input[name="notes"]').val(inspectionItem.notes);
 
 			$("#photoWrapper").removeClass("hidden");
 
@@ -4829,9 +4831,6 @@ var Inspections = function()
             {
                 if(row)
                 {
-                    // Now update the parent inspection record with the defect count.
-                    var num_defects = row.num_defects;
-
                     sql = "UPDATE inspectionitemphotos " +
                         "SET deleted = 1, dirty = 1 " +
                         "WHERE id = ?";
@@ -4847,9 +4846,6 @@ var Inspections = function()
             {
                 if(row)
                 {
-                    // Now update the parent inspection record with the defect count.
-                    var num_defects = row.num_defects;
-
                     sql = "UPDATE reinspectionitemphotos " +
                         "SET deleted = 1, dirty = 1 " +
                         "WHERE id = ?";
@@ -6538,6 +6534,7 @@ var Inspections = function()
 
                 var added_items = [];
 
+                var is_first_issue_in_question = 0;
                 for(r = 0; r < maxLoop; r++)
                 {
                     var row = inspection_items[r];
@@ -6591,7 +6588,7 @@ var Inspections = function()
                         if(self.finalised == 1){
                             var answer = row.notes?row.notes:'NA';
                         }else{
-                            var answer = '<select style="width: auto;" data-id="'+ row.id +'" autocomplete="off" class="selector select-answer">' +
+                            var answer = '<select style="width: auto;" data-question="'+ row.question +'" data-inspection-id="'+row.inspection_id+'" autocomplete="off" class="selector select-answer">' +
                                 '<option value="">NA</option>' +
                                 '<option value="Yes" '+(row.notes=='Yes'?'selected':'')+'>Yes</option>' +
                                 '<option value="No" '+(row.notes=='No'?'selected':'')+'>No</option>' +
@@ -6602,11 +6599,15 @@ var Inspections = function()
                         html += '<td>' + answer + '</td>';
                         html += '</tr>';
                         questions.push(row.question);
+                        is_first_issue_in_question = 1;
                     }
 
                     if(row.observation || row.location || row.action){
                         html += '<tr class="question-issues" rel="' + row.id + '">';
-                        html += '<td class="nodelete"></td>';
+                        if(is_first_issue_in_question)
+                            html += '<td class="delete main-item"></td>';
+                        else
+                            html += '<td class="delete"></td>';
                         html += '<td>';
                         if(self.finalised == 0) {
                             html += '<div class="capture-buttons">' +
@@ -6949,13 +6950,61 @@ var Inspections = function()
                     }, inspection_item_id);
                 });
 
+                $("#tblDefectListing tr td.delete").bind(objApp.touchEvent, function(e)
+                {
+                    self.last_scroller_x = self.scroller.x;
+                    self.last_scroller_y = self.scroller.y;
+                    e.preventDefault();
+
+                    // If the inspection is finalised - do nothing
+                    if(self.finalised == 1) {
+                        return;
+                    }
+
+                    var inspection_item_id = $(this).parent().attr("rel");
+                    var parent = $(this).parent();
+                    var table = $(parent).parent();
+
+                    // Remove any active states of the list items
+                    $(table).find("tr").removeClass("active");
+
+                    // Did the user click on the first column
+                    var idx = $(this).index();
+
+                    if(idx == 0)
+                    {
+                        // Setup delete
+                        // Get the item name
+                        var item_name = $(parent).find("td:eq(1)").text();
+                        item_name += ", " + $(parent).find("td:eq(2)").text();
+
+                        if(confirm("Would you like to delete this item?"))
+                        {
+                            if($(this).hasClass('main-item')){
+                                self.deleteSignificantItems(inspection_item_id);
+                                var sql = "UPDATE inspectionitems " +
+                                    "SET location = '', observation = '', action = '', dirty = 1 " +
+                                    "WHERE id = ?";
+                                objDBUtils.execute(sql, [inspection_item_id], function() {
+                                    self.loadQuestionItems();
+                                });
+                            }else{
+                                self.deleteDefect(inspection_item_id);
+                            }
+                            return;
+                        }
+                    }
+                    return false;
+                });
+
                 $("select.select-answer").unbind("change");
                 $("select.select-answer").change(function(){
-                    var inspection_item_id = $(this).attr('data-id');
+                    var question = $(this).attr('data-question');
+                    var inspection_id = $(this).attr('data-inspection-id');
                     var sql = "UPDATE inspectionitems " +
                         "SET notes = ?, dirty = 1 " +
-                        "WHERE id = ?";
-                    objDBUtils.execute(sql, [$(this).val(), inspection_item_id], function() {});
+                        "WHERE inspection_id = ? AND question = ?";
+                    objDBUtils.execute(sql, [$(this).val(), inspection_id, question], function() {});
                 });
             }
         }, "");

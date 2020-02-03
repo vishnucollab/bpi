@@ -646,8 +646,8 @@ function DBUtils()
 		// Execute the query
 	    this.db.transaction(function(transaction) 
 	    {
-            //console.log(sql);
-            //console.log(values);
+            console.log(sql);
+            console.log(values);
 	        transaction.executeSql(sql, values, function (transaction, result)
 	        {
 				// The query executed successfully.  Call the callback function
