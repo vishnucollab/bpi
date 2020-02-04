@@ -4612,11 +4612,23 @@ var Inspections = function()
 
             if(addNewQuestionIssue && inspectionItem){
                 $("#frmDefectDetails #seq_no").val(inspectionItem.seq_no);
-                var seq_no2 = inspectionItem.seq_no2;
-                if(!seq_no2)
-                    seq_no2 = 1;
-                $("#frmDefectDetails #seq_no2").val(seq_no2+1);
                 $('#frmDefectDetails input[name="notes"]').val(inspectionItem.notes);
+
+                // Get the next inspectionitems sub-sequence number for this audit
+                var sql = "SELECT MAX(seq_no2) as seq_no2 " +
+                    "FROM inspectionitems " +
+                    "WHERE inspection_id = ? and question = ? AND deleted = 0";
+
+                objDBUtils.loadRecordSQL(sql, [objApp.keys.inspection_id, inspectionItem.question], function(row)
+                {
+                    var seq_no2 = 1;
+                    if((row) && (row.seq_no2 != null))
+                    {
+                        seq_no2 = row.seq_no2 + 1;
+                    }
+                    // Set the sequence number into the form.
+                    $("#frmDefectDetails #seq_no2").val(seq_no2);
+                });
             }else{
                 // Get the next inspectionitems sequence number for this audit
                 var sql = "SELECT MAX(seq_no) as seq_no " +
@@ -4861,13 +4873,23 @@ var Inspections = function()
         objDBUtils.execute(sql, [foreign_id], function(){});
     }
 
-	this.deleteDefect = function(item_id)
+	this.deleteDefect = function(item_id, question)
 	{
         self.deleteSignificantItems(item_id);
 
         // Now delete the inspection item record itself
         objDBUtils.deleteRecord("inspectionitems", item_id, function()
         {
+
+            if(self.isReportsWithQuestions()){
+                objDBUtils.loadRecord("inspectionitems", item_id, function(item_id, item)
+                {
+                    if(!item)
+                        return;
+                    self.sortQuestionIssues(item.inspection_id, item.question);
+                }, item_id);
+            }
+
             // Final step is to update the inspection record with the correct stats.
             // Get the number of defects associated with this inspection
             var sql = "SELECT COUNT(*) as num_defects " +
@@ -6502,6 +6524,7 @@ var Inspections = function()
             else
             {
                 var questions = [];
+                var question_issues = {};
                 var item_ids = [];
                 var inspection_items = [];
                 var thumbnails = {};
@@ -6529,12 +6552,8 @@ var Inspections = function()
                 self.numberOfIssues = 0;
                 self.numberOfAcknowledgements = 0;
                 var sq = 2;
-
                 var r = 0;
-
                 var added_items = [];
-
-                var is_first_issue_in_question = 0;
                 for(r = 0; r < maxLoop; r++)
                 {
                     var row = inspection_items[r];
@@ -6599,15 +6618,16 @@ var Inspections = function()
                         html += '<td>' + answer + '</td>';
                         html += '</tr>';
                         questions.push(row.question);
-                        is_first_issue_in_question = 1;
                     }
 
+                    if(typeof question_issues[row.question] == "undefined"){
+                        question_issues[row.question] = 0;
+                    }
+                    question_issues[row.question]++;
+
                     if(row.observation || row.location || row.action){
-                        html += '<tr class="question-issues" rel="' + row.id + '">';
-                        if(is_first_issue_in_question)
-                            html += '<td class="delete main-item"></td>';
-                        else
-                            html += '<td class="delete"></td>';
+                        html += '<tr class="question-issues" data-question="'+row.question+'" rel="' + row.id + '">';
+                        html += '<td class="delete"></td>';
                         html += '<td>';
                         if(self.finalised == 0) {
                             html += '<div class="capture-buttons">' +
@@ -6762,6 +6782,12 @@ var Inspections = function()
                 html += '</table>';
 
                 $("#defectScrollWrapper").html(html);
+
+                for(var q in question_issues){
+                    if($('tr.question-issues[data-question="'+q+'"]').length == 1){
+                        $('tr.question-issues[data-question="'+q+'"] td.delete').addClass('main-item');
+                    }
+                }
 
                 self.setTableWidths2('tblDefectListingHeader', 'tblDefectListing', 5);
 
@@ -6973,11 +6999,6 @@ var Inspections = function()
 
                     if(idx == 0)
                     {
-                        // Setup delete
-                        // Get the item name
-                        var item_name = $(parent).find("td:eq(1)").text();
-                        item_name += ", " + $(parent).find("td:eq(2)").text();
-
                         if(confirm("Would you like to delete this item?"))
                         {
                             if($(this).hasClass('main-item')){
@@ -7429,6 +7450,26 @@ var Inspections = function()
 
         // Reload table
         //
+    }
+
+    this.sortQuestionIssues = function(inspection_id, question)
+    {
+        var sql = "SELECT id " +
+            "FROM inspectionitems " +
+            "WHERE inspection_id = ? AND question = ? AND deleted = 0";
+        objDBUtils.loadRecordsSQL(sql, [inspection_id, question], function(param, items)
+        {
+            if(items){
+                var counter = 1;
+                for(var i = 0; i < items.rows.length; i++) {
+                    var item = items.rows.item(i);
+                    var sql = "UPDATE inspectionitems " +
+                        "SET seq_no2 = ?, dirty = 1 " +
+                        "WHERE id = ?";
+                    objDBUtils.execute(sql, [counter++, item.id], null);
+                }
+            }
+        }, "");
     }
 
     /**
