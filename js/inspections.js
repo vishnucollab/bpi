@@ -6627,7 +6627,11 @@ var Inspections = function()
 
                     if(row.observation || row.location || row.action){
                         html += '<tr class="question-issues" data-question="'+row.question+'" rel="' + row.id + '">';
-                        html += '<td class="delete"></td>';
+                        if(self.finalised == 0) {
+                            html += '<td class="delete"></td>';
+                        } else {
+                            html += '<td class="nodelete"></td>';
+                        }
                         html += '<td>';
                         if(self.finalised == 0) {
                             html += '<div class="capture-buttons">' +
