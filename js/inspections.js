@@ -498,7 +498,10 @@ var Inspections = function()
 
                     // Now that the reinspections record has been created, now create the reinspection items,
                     // using the base inspection items as the foundation.
-                    sql = "SELECT * FROM inspectionitems WHERE inspection_id = ? AND deleted = 0";
+                    if(self.isReportsWithQuestions())
+                        sql = "SELECT * FROM inspectionitems WHERE inspection_id = ? AND notes = 'No' AND deleted = 0";
+                    else
+                        sql = "SELECT * FROM inspectionitems WHERE inspection_id = ? AND deleted = 0";
                     objDBUtils.loadRecordsSQL(sql, [inspection_id], function(param, items) {
                         if(!items)
                         {
@@ -7602,7 +7605,7 @@ var Inspections = function()
                     "LEFT JOIN reinspectionitemphotos riip ON riip.id = si.photo_id " +
                     "WHERE ii.deleted = 0 " +
                     "AND r.id = ? " +
-                    "ORDER BY ii.seq_no ASC";
+                    "ORDER BY ii.seq_no, ii.seq_no2 ASC";
 
                 $("#reinspectionScrollWrapper").html("");
 
@@ -7616,6 +7619,7 @@ var Inspections = function()
                         return;
                     }
 
+                    var questions = [];
                     var item_ids = [];
                     var reinspection_items = [];
                     var thumbnails = {};
@@ -7647,7 +7651,13 @@ var Inspections = function()
 
                         html += '<tr data-id="' + row.id + '">';
                         if(self.isReportsWithQuestions()){
-                            html += '<td>' + row.seq_no + '. ' + row.question + '</td>';
+                            if(questions.indexOf(row.question) == -1){
+                                html += '<td>' + row.seq_no + '. ' + row.question + '</td>';
+                                questions.push(row.question);
+                            }else{
+                                html += '<td><span class="hidden">' + row.seq_no + '. ' + row.question + '</span></td>';
+                            }
+
                             var cell2 = '';
                             if(row.location)
                                 cell2 += 'Location: ' + row.location + ' ';
