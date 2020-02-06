@@ -3829,7 +3829,7 @@ var Inspections = function()
                                                     seq_no2 = seq_no2 * 1;
                                                     seq_no2++;
 
-                                                    $("#frmDefectDetails #seq_no2").val(seq_no);
+                                                    $("#frmDefectDetails #seq_no2").val(seq_no2);
                                                 }
 
                                                 $("#frmDefectDetails #observation_suggestion tr td").unbind();
