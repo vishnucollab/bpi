@@ -7719,6 +7719,7 @@ var Inspections = function()
                         }
                         var rectifiedText = $(this).find("td:eq(4)").text();
                         $('#reinspection select#rectified').val(rectifiedText);
+                        $('#reinspection select#rectified').trigger('change');
                         $('#reinspection .infomation p').html(text);
                         $('#reinspection .infomation select#rectified').show();
                         $('#reinspection .infomation').removeClass('hidden');
