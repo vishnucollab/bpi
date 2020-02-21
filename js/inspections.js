@@ -815,17 +815,8 @@ var Inspections = function()
             else
                 $(".inspectionDetails .passed").addClass('active');
 
-            $('#inspectionStep3 #scoreContainer').removeClass('hidden');
-            $("#inspectionStep3 #score").val(self.inspection.initials);
-            if(inspection.finalised == 1){
-                $("#inspectionStep3 #score").prop('disabled', true);
-            }else{
-                $("#inspectionStep3 #score").prop('disabled', false);
-            }
         }else{
             $('.btnPassed-container, .btnFailed-container').addClass('hidden');
-            $('#inspectionStep3 #scoreContainer').addClass('hidden');
-            $("#inspectionStep3 #score").val('');
         }
         
         // Load the inspection object
@@ -3903,11 +3894,6 @@ var Inspections = function()
                 }
 
             });
-        });
-
-        $('#inspectionStep3 #score').unbind();
-        $('#inspectionStep3 #score').bind('keyup', function(){
-            self.updateScore();
         });
 	}
 
@@ -7851,18 +7837,6 @@ var Inspections = function()
         });
     }
 
-    this.updateScore = function()
-    {
-        var score = $("#inspectionStep3 #score").val();
-        /* Reuse initials for score */
-        var sql = "UPDATE inspections " +
-            "SET initials = ?, dirty = 1 " +
-            "WHERE id = ?";
-        self.inspection.initials = score;
-        $('#frmInspectionDetails #initials').val(score);
-        objDBUtils.execute(sql, [score, objApp.keys.inspection_id], function() {});
-    }
-
     // Update the reinspection and master inspection record with the new status
 	this.updateReinspectionPassFail = function(failed)
     {
@@ -8139,7 +8113,6 @@ var Inspections = function()
             $("#tblRateListing select.ratingSelect").attr("disabled", "disabled");
 
             $('#barrel_code').prop('disabled', true);
-            $("#inspectionStep3 #score").prop('disabled', true);
         }
         else
         {
@@ -8162,7 +8135,6 @@ var Inspections = function()
             $("#tblRateListing select.ratingSelect").removeAttr("disabled");
 
             $('#barrel_code').prop('disabled', false);
-            $("#inspectionStep3 #score").prop('disabled', false);
         }   
         
         this.setReadOnly();     
@@ -9475,18 +9447,18 @@ var Inspections = function()
                 'Are the water lines under pressure',
                 'Has stack work been carried out including waste traps connections',
                 'Has shower base been installed',
-                'Has the bath been installed and supported accordingly',
                 'Has the heating rough in been carried out including walkway to AH',
+                'Has the bath been installed and supported accordingly',
                 'Has the cooling rough in been carried out',
                 'Has sisalation paper to walls been installed and sealed correctly',
                 'Has sisalation paper to roof been installed and sealed correctly',
                 'Has wall insulation been installed',
                 'Has ceiling insulation been installed or loaded',
-                'Have all beams and connections been checked against the plans',
+                'Have studs been marked on the slab/timber floor',
                 'Have all point loads been supported correctly',
                 'Has the bracing that is visible been installed correctly',
-                'Have any holes larger than 25mm been drilled through the top plate and re- enforced',
-                'Are all holes drilled through studs more than 270mm apart',
+                'Are the holes drilled through frame for plumbing & electrical less than 25mm',
+                'Are holes drilled through frame more than 270mm',
                 'Have service pipes that are overlapping been Insulated or separated',
                 'Are walls plumb in accordance with the code',
                 'Are rooms the correct size as per plans',
@@ -9522,9 +9494,9 @@ var Inspections = function()
                 'Has all the water proofing been done prior to the installation of cabinets',
                 'Have all water bars been installed to wet area door openings',
                 'Has bath hob been water proofed and wet bar been installed around the hob',
-                'Has upper storey been water proofed correctly with water proof membrane installed to complete floor area of all wet areas',
-                'Have kitchen cabinets been installed',
-                'Have all vanities been installed',
+                'Has shower base screen completed',
+                'Has shower base installed',
+                'Has recess been waterproofed',
                 'Have laundry cabinets been installed',
                 'Have stone bench tops been installed',
                 'Has access hatch been installed to ceiling',
@@ -9532,7 +9504,7 @@ var Inspections = function()
                 'Have bricks been acid washed ',
                 'Have bricks been blended correctly',
                 'Have weep holes been installed accordingly (max 1200mm apart)',
-                'Are weep holes set at the correct height around the slab',
+                'Are weep holes set at the correct heiight arround the slab(75mm above the ground)',
                 'Has dampproof flashing been installed correctly',
                 'Have weep holes been installed correctly over windows',
                 'Has window flashings been installed correctly, run through the Articulation joint & 200mm past either side of window',
@@ -9543,9 +9515,9 @@ var Inspections = function()
                 'Is brickwork straight, level & plumb',
                 'Is there minimum of 3 brick courses over all steel lintels',
                 'Has brickwork been finished tight against the fascia',
-                'Does the brickwork hangover the rebate by more than 15mm',
-                'Does brickwork hangover the steel lintels by more than 25mm',
-                'Are there any mortar blow outs throughout the brickwork Including sills & reveals',
+                'Does the brickwork hang over the rebate by less than 15mm',
+                'Does the brickwork hang over the steel linets by less than 25mm',
+                'Brickwork is neat nad tidy with no blow outs throughtout the brickwork including sills and reveals',
                 'Is the mortar colour consistent throughout',
                 'Does the mortar strength appear correct',
                 'Are all window rubbers fitting correctly to sills & reveals',
