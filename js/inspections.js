@@ -3690,8 +3690,6 @@ var Inspections = function()
         $(".capture-question-image, .select-question-image").unbind(objApp.touchEvent);
         $(".capture-question-image, .select-question-image").bind(objApp.touchEvent, function(e)
         {
-            self.last_scroller_x = self.scroller.x;
-            self.last_scroller_y = self.scroller.y;
             e.preventDefault();
             if(self.finalised == 1) {
                 alert("Sorry, this inspection has been finalised.  If you wish to add more issues, please un-finalise the inspection first");
