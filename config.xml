@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <widget xmlns = "http://www.w3.org/ns/widgets"
         xmlns:gap = "http://phonegap.com/ns/1.0"
-        id = "com.simb.BlueprintVIC"
+        id = "com.simb.Blueprint"
         version = "2.0.17">
-    <name>Blueprint VIC</name>
+    <name>Blueprint</name>
 
     <description>
         Conduct onsite buidling inspections with Blueprint and produce beautiful reports that your clients will love.
