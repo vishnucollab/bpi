@@ -9510,7 +9510,7 @@ var Inspections = function()
                 'Have bricks been acid washed ',
                 'Have bricks been blended correctly',
                 'Have weep holes been installed accordingly (max 1200mm apart)',
-                'Have weepholes been set at the correct height, for future landscaping minimum 150mm to ground level',
+                'Have weep holes been set at the correct height, for future landscaping minimum 150mm to ground level',
                 'Has damp proof course flashing been installed correctly, not to be higher than finished floor slab level',
                 'Have weep holes been installed correctly over windows',
                 'Has window flashings been installed correctly, run through the Articulation joint & 200mm past either side of window',
