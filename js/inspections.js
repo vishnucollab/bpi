@@ -9456,7 +9456,7 @@ var Inspections = function()
                 'Have all point loads been supported correctly',
                 'Has the bracing that is visible been installed correctly',
                 'Are the holes drilled through frame for plumbing & electrical less than 25mm',
-                'Are the holes drilled thru the frame more than 270mm apart',
+                'Are the holes drilled through the frame more than 270mm apart',
                 'Have service pipes that are overlapping been Insulated or separated',
                 'Are walls plumb and square in accordance with the frame code',
                 'Are rooms the correct size as per plans',
