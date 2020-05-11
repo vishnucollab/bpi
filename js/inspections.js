@@ -1347,6 +1347,7 @@ var Inspections = function()
 		// Setup client and site popselectors
 		this.setupPopselectors();
         objApp.setBodyClass('inspection');
+        self.applyPermission();
 	}
 
     /**
@@ -7500,10 +7501,19 @@ var Inspections = function()
                 $('#btnUncertificatedRe').removeClass('hidden');
             }
 
-            if(self.isReportsWithQuestions())
+            if(self.isReportsWithQuestions()){
                 $('#btnSignificantItemsRe').addClass('hidden');
-            else
+                $('#rectified').html('<option value="Not Rectified">Not Rectified</option>\n' +
+                    '                        <option value="Rectified">Rectified</option>\n' +
+                    '                        <option value="BM Approved">BM Approve</option>')
+            }else{
                 $('#btnSignificantItemsRe').removeClass('hidden');
+                $('#rectified').html('<option value="Not Rectified">Not Rectified</option>\n' +
+                    '                        <option value="Rectified">Rectified</option>\n' +
+                    '                        <option value="Improvement Made">Improvement Made</option>\n' +
+                    '                        <option value="Approved By CM">Approved By CM</option>\n' +
+                    '                        <option value="NA">NA</option>');
+            }
 
             // We also need to load the inspection record
 
@@ -9435,9 +9445,10 @@ var Inspections = function()
                 'Is the site clean with safe access',
                 'Have external doors been installed to secure house',
                 'Has roof cover been Installed',
-                'Has antiponding boards been installed (required to roofs sarked with No eaves)',
+                'Have antiponding boards been installed (Required to tiled roofs with No eaves that have been sarked)',
                 'Have all flashings, capping’s and leadwork been carried out',
                 'Is the dwelling watertight',
+                'Has the meter box been installed and temporary support removed and steel pole not protruding into the room',
                 'Has the electrical rough in been carried out',
                 'Have ducts been installed for exhaust fans (external venting)',
                 'Have ducts been installed for rangehood (external venting)',
@@ -9448,13 +9459,13 @@ var Inspections = function()
                 'Has the heating rough in been carried out including walkway to AH',
                 'Has the bath been installed and supported accordingly',
                 'Has the cooling rough in been carried out',
-                'Has sisalation paper to walls been installed and sealed correctly',
-                'Has sisalation paper to roof been installed and sealed correctly',
+                'Has sisalation paper to wall been installed and sealed',
+                'Has sisalation paper to roof been installed and sealed',
                 'Has wall insulation been installed',
                 'Has ceiling insulation been installed or loaded',
-                'Have studs been marked on the slab/timber floor ( please add this into the general items section)',
+                'Have studs been marked on the slab/timber floor',
                 'Have all point loads been supported correctly',
-                'Has the bracing that is visible been installed correctly',
+                'Has the bracing that is visible been installed as per plans',
                 'Are the holes drilled through frame for plumbing & electrical less than 25mm',
                 'Are the holes drilled through the frame more than 270mm apart',
                 'Have service pipes that are overlapping been Insulated or separated',
@@ -9466,7 +9477,9 @@ var Inspections = function()
                 'Have all bulkheads been installed as per plans',
                 'Have ceiling noggins been installed over all walls (Min 150mm from internal corner)',
                 'Has change of direction noggins been installed',
-                'Have noggins been installed to bath hob and under bulkheads (Min 300mm apart)',
+                'Have all noggins been installed',
+                'Have noggins been installed around the bath hob (Note noggins required between studs greater than 300mm)',
+                'Have noggins been installed to bulkheads (Note noggins required between studs greater than 300mm)',
                 'Have ceiling noggins been installed to perimeter of garage',
                 'Have ceiling noggins been installed to support motor for garage door',
                 'Have wall noggins been installed for towel rail and toilet roll holder',
@@ -9476,13 +9489,14 @@ var Inspections = function()
                 'Have walls been straightened',
                 'Have ceilings been straightened',
                 'Is parapet framing complete',
-                'Have box gutter boards been installed as required'
+                'Have box gutter boards been installed as required',
+                'Pre Plaster is complete and no further items have been identified'
             ];
         else if(reportType == 'Builder: Pre-paint/fixing inspections')
             var questions = [
                 'Is the site sign installed',
                 'Is the site clean with safe access',
-                'Is plaster complete (Including external ceilings)',
+                'Is plaster complete',
                 'Has the patch & sand been carried out',
                 'Has all cornice or square set been completed',
                 'Are walls straight, allowable bow/deviation is 5mm in 1.8m',
@@ -9502,18 +9516,18 @@ var Inspections = function()
                 'Have kitchen cabinets been installed',
                 'Have all vanities been installed',
                 'Have laundry cabinets been installed',
-                'Has roof access opening surround and cover been installed',
+                'Has roof access hatch been fixed out and the cover installed',
                 'Has access hatch been installed to ceiling',
-                'Have porch and alfresco ceilings been installed',
-                'Has upper wall cladding been installed',
-                'Has brickwork been completed',
+                'Has the porch ceiling been installed and complete',
+                'Has the alfresco ceiling been installed and complete',
+                'Has wall cladding been installed',
                 'Have bricks been acid washed ',
                 'Have bricks been blended correctly',
                 'Have weep holes been installed accordingly (max 1200mm apart)',
                 'Have weep holes been set at the correct height, for future landscaping minimum 150mm to ground level',
                 'Has damp proof course flashing been installed correctly, not to be higher than finished floor slab level',
                 'Have weep holes been installed correctly over windows',
-                'Has window flashings been installed correctly, run through the Articulation joint & 200mm past either side of window',
+                'Have window flashings been installed through articulation joint over windows ',
                 'Are Articulation joints installed as per engineering and clear of debris',
                 'Are there any split bricks to the bottom course that may remain visible once landscaping is completed to correct height',
                 'Has the base brick course been laid on a mortar bed less than 20mm if it is to remain visible',
@@ -9524,14 +9538,15 @@ var Inspections = function()
                 'Has brickwork been finished tight against the fascia',
                 'Does the brickwork overhang the slab rebate by less than 15mm',
                 'Does the brickwork overhang the steel lintels by less than 25mm',
-                'Brickwork is neat and tidy with no blow outs throughout the brickwork including sills and reveals',
+                'Is the brickwork neat and tidy with no blow outs throughout the brickwork including sill and reveals',
                 'Is the mortar colour consistent throughout',
                 'Is mortar strength correct, scratch test mortar at inconspicuous location',
                 'Are all window rubbers fitting correctly to sills & reveals',
                 'Has there been a 10mm gap/expansion seal installed beside windows/doors for Articulation joint',
-                'Have all window eave and infills been installed',
-                'Has the vapour barrier been turned up against the slab and backfilled as required by NCC 3.2.2.6(c)',
-                'Is garage opening correct'
+                'Have all window infills been installed and complete',
+                'Have eaves been installed and complete',
+                'Is garage opening correct',
+                'Pre Paint is complete and no further items have been identified'
             ];
         self.isProcessing = true;
         self._addQuestionItems(questions, 0);
