@@ -7505,7 +7505,7 @@ var Inspections = function()
                 $('#btnSignificantItemsRe').addClass('hidden');
                 $('#rectified').html('<option value="Not Rectified">Not Rectified</option>\n' +
                     '                        <option value="Rectified">Rectified</option>\n' +
-                    '                        <option value="BM Approved">BM Approve</option>')
+                    '                        <option value="Management Approved">Management Approved</option>')
             }else{
                 $('#btnSignificantItemsRe').removeClass('hidden');
                 $('#rectified').html('<option value="Not Rectified">Not Rectified</option>\n' +
@@ -9517,7 +9517,6 @@ var Inspections = function()
                 'Have all vanities been installed',
                 'Have laundry cabinets been installed',
                 'Has roof access hatch been fixed out and the cover installed',
-                'Has access hatch been installed to ceiling',
                 'Has the porch ceiling been installed and complete',
                 'Has the alfresco ceiling been installed and complete',
                 'Has wall cladding been installed',
