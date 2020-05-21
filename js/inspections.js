@@ -9528,7 +9528,7 @@ var Inspections = function()
                 'Have weep holes been installed correctly over windows',
                 'Have window flashings been installed through articulation joint over windows ',
                 'Are Articulation joints installed as per engineering and clear of debris',
-                'Are there any split bricks to the bottom course that may remain visible once landscaping is completed to correct height',
+                'Confirm split bricks will not be seen to the bottom coarse once landscaping complete to the correct height',
                 'Has the base brick course been laid on a mortar bed less than 20mm if it is to remain visible',
                 'Are bed joints within Code, Min 7mm – Max 13mm',
                 'Are perp ends within Code, Min 5mm – Max 15mm (not more than 8mm variation)',
