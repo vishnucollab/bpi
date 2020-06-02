@@ -57,6 +57,7 @@ var Inspections = function()
     this.inspection = false;
     this.keySortArray = false;
     this.MAX_REPORT_PHOTOS = 12;
+    this.isProcessing = false;
 	
 	this.current_table = "inspectionitemphotos";
 	this.current_key = "inspection_id";
@@ -450,10 +451,10 @@ var Inspections = function()
     {
         if(!confirm("You are about to start a reinspection.  Are you sure you wish to continue?")) {
             return;
-        } 
-        
+        }
+        $('a.capture-signature-btn').hide();
         blockElement('body');
-        
+        self.updateInspectionPassFail(1);
         // Load the original inspection
         objDBUtils.loadRecord("inspections", inspection_id, function(inspection_id, row)
         {
@@ -497,7 +498,10 @@ var Inspections = function()
 
                     // Now that the reinspections record has been created, now create the reinspection items,
                     // using the base inspection items as the foundation.
-                    sql = "SELECT * FROM inspectionitems WHERE inspection_id = ? AND deleted = 0";
+                    if(self.isReportsWithQuestions())
+                        sql = "SELECT * FROM inspectionitems WHERE inspection_id = ? AND notes = 'No' AND deleted = 0";
+                    else
+                        sql = "SELECT * FROM inspectionitems WHERE inspection_id = ? AND deleted = 0";
                     objDBUtils.loadRecordsSQL(sql, [inspection_id], function(param, items) {
                         if(!items)
                         {
@@ -532,17 +536,10 @@ var Inspections = function()
                                 }
                             }, last_item);
                         }
-
                     },"");
-
-
                 });
-     
             });
-
-            
         }, inspection_id);
-
     }
 
     /***
@@ -713,10 +710,11 @@ var Inspections = function()
         }
     }
     
-    this.showStep2 = function(inspectionItem)
+    this.showStep2 = function(inspectionItem, addNewQuestionIssue)
     {
         self.setStep(2);
-
+        if(typeof addNewQuestionIssue == 'undefined')
+            addNewQuestionIssue = 0;
 		// Set the main heading
         self.checkIfNeedPhotos();
         objApp.setSubHeading("Add Issues");
@@ -725,11 +723,39 @@ var Inspections = function()
         if(( objApp.keys.report_type == "Quality Inspection") || (objApp.keys.report_type == "Builder: PCI/Final inspections")) {
             objApp.setSubExtraHeading("Step 2 of 5", true);
         }else {
-            objApp.setSubExtraHeading("Step 2 of 3", true);
+            if(self.isReportsWithQuestions()){
+                if(inspectionItem.question)
+                    objApp.setSubHeading("Add Issue: " + inspectionItem.question);
+                $('#btnStep2Back').unbind();
+                $("#btnStep2Back").bind(objApp.touchEvent, function(e)
+                {
+                    e.preventDefault();
+                    self.showStep3();
+                    return false;
+                });
+                $('#btnStep2Next').text('Save');
+                $('#btnAddDefect').addClass('hidden');
+                $('#btnStep2NewIssue, .for-questions-issues').removeClass('hidden');
+                $('.is_significant_option, #inspectionStep2 #btnCapturePhoto, #inspectionStep2 #btnEditNotes').addClass('hidden');
+                objApp.setSubExtraHeading("", false);
+            }else{
+                $('#btnStep2Back').unbind();
+                $("#btnStep2Back").bind(objApp.touchEvent, function(e)
+                {
+                    e.preventDefault();
+                    self.showStep1();
+                    return false;
+                });
+                $('#btnStep2Next').text('Next');
+                $('#btnAddDefect').removeClass('hidden');
+                $('#btnStep2NewIssue, .for-questions-issues').addClass('hidden');
+                $('.is_significant_option, #inspectionStep2 #btnCapturePhoto, #inspectionStep2 #btnEditNotes').removeClass('hidden');
+                objApp.setSubExtraHeading("Step 2 of 3", true);
+            }
+
         }
         $('#btnStep2Back').show();
         $('#inspectionStep2 #btnCapturePhoto').show();
-        $("#btnAddDefect").remove('hidden');
         $('#btnStep2Next').parent().show();
 
         $('#inspectionStep2 #frmDefectDetails tr#action_wrapper').show();
@@ -745,9 +771,10 @@ var Inspections = function()
         $("#inspectionStep2 textarea#observation").val('');
         $("#inspectionStep2 ul#popAction li:first-child").text('Choose');
         $("#historyModal").hide();
-		
+
         if (inspectionItem) {
-            self.initDefectForm(inspectionItem);
+            self.initDefectForm(inspectionItem, true, addNewQuestionIssue);
+            objApp.keys.question = inspectionItem.question;
         }
         else
         {
@@ -755,6 +782,7 @@ var Inspections = function()
 			objApp.keys.location = '';
 			objApp.keys.observation = '';
 			objApp.keys.action = '';
+            objApp.keys.question = '';
             self.initDefectForm(null);
         }
             	
@@ -762,6 +790,7 @@ var Inspections = function()
     
     this.showStep3 = function()
     {
+        self.isProcessing = false;
         self.isAddingSignificantItem = 0;
         self.setStep(3);
         objApp.clearMain();
@@ -771,6 +800,24 @@ var Inspections = function()
         $("a.btnReinspect").unbind();
 
         $("#inspectionStep3").removeClass("hidden");
+
+        if(self.isReportsWithQuestions()){
+            $("#inspectionStep3 a.passed").bind(objApp.touchEvent, function(){
+                self.updateInspectionPassFail(0);
+            });
+
+            $("#inspectionStep3 a.failed").bind(objApp.touchEvent, function(){
+                self.updateInspectionPassFail(1);
+            });
+            $('.btnPassed-container, .btnFailed-container').removeClass('hidden');
+            if (self.inspection.failed == 1)
+                $(".inspectionDetails .failed").addClass('active');
+            else
+                $(".inspectionDetails .passed").addClass('active');
+
+        }else{
+            $('.btnPassed-container, .btnFailed-container').addClass('hidden');
+        }
         
         // Load the inspection object
         objDBUtils.loadRecord("inspections", objApp.keys.inspection_id, function(inspection_id, inspection) {
@@ -975,10 +1022,22 @@ var Inspections = function()
         // set the default notes.
         if($("#inspection #notes").val() == "") {
             report_type = $("#inspection #report_type").val();
-
             if( (report_type == "Quality Inspection") || (report_type == "Builder: PCI/Final inspections") || (report_type == "Fix / Plaster Inspection")) {
                 $("#inspection #notes").val(self.default_notes);
+            }else if(report_type == "Builder: Pre-plaster and lock up inspections"){
+                var notes = "1. Quality of brickwork to be checked and any defects to be noted.\n\n"+
+                    "2. Confirm if any damage to wall bracing has occurred\n\n"+
+                    "3. Have downpipes been checked (pops in right position as per plans)\n\n" +
+                    "4. Site Manager to confirm that frame has been approved by authorties before plaster commences.\n";
+                $("#inspection #notes").val(notes);
+            }else if(report_type == "Builder: Pre-paint/fixing inspections"){
+                var notes = "1. Have downpipes been Installed and connected to SWD\n\n"+
+                    "2. Has the Gas line been Installed\n\n"+
+                    "3. Has the Garage door been Installed\n\n" +
+                    "4. Is there any reinforcement bars visible around the house.\n";
+                $("#inspection #notes").val(notes);
             }
+
         }
     }
 
@@ -1228,9 +1287,6 @@ var Inspections = function()
 		var last_name = localStorage.getItem("last_name");
 		var user_id = localStorage.getItem("user_id");
 		var email = localStorage.getItem("email");
-		var initials = localStorage.getItem("initials");
-        if (typeof initials == 'undefined')
-            initials = '';
 		if((first_name == null) || (first_name == "") || (last_name == null) || (last_name == "") ||
 			(email == null) || (email == "") || (user_id == null) || (user_id == "") )
 		{
@@ -1241,7 +1297,7 @@ var Inspections = function()
 		var inspector = first_name + " " + last_name;
 		$("#inspection #inspectionInspector").val(inspector);
 		$("#inspection #inspectionInspector").attr("readonly", "readonly");
-		$("#inspection #initials").val(initials);
+		$("#inspection #initials").val('');
 
 		$("#inspection #duration").val("0");
 		$("#inspection #created_by").val(user_id);
@@ -1276,8 +1332,10 @@ var Inspections = function()
         $(".inspectionDetails #btnStep1Next").hide();
 
         // By default an inspection should be set as failed.
-        $("a#passed").removeClass('active');
-        $("a#failed").addClass('active');
+        if(self.isReportsWithQuestions()){
+            $("#inspectionStep3 a.failed").addClass('active');
+            $("#inspectionStep3 a.passed").removeClass('active');
+        }
 
         // Make sure the coversheet notes button is hidden.
         $("div.btnEditNotes").hide();
@@ -1289,6 +1347,7 @@ var Inspections = function()
 		// Setup client and site popselectors
 		this.setupPopselectors();
         objApp.setBodyClass('inspection');
+        self.applyPermission();
 	}
 
     /**
@@ -1758,10 +1817,6 @@ var Inspections = function()
         $(".inspectionDetails #addPhoto-wrapper #addPhotoFromGallery").unbind();
         $(".inspectionDetails #btnCapturePhoto").unbind();
         $("#tblInspectionListing a.action").unbind();
-        $('#inspectionList .btnContainer a#passed').unbind();
-        $('#inspectionList .btnContainer a#failed').unbind();
-        $(".inspectionDetails a#failed").unbind();
-        $(".inspectionDetails a#passed").unbind();
         $("#historyReinspection td a.action").unbind();
         $("#inspection #report_type").unbind();
         $('#reportComments').unbind();
@@ -1809,25 +1864,6 @@ var Inspections = function()
             self.loadAddressBookList();
 
             self.resolveEmailReportRecipients();
-        });
-        
-
-        $('#inspectionList .btnContainer a#passed').bind(objApp.touchEvent, function() {
-            if (!$(this).hasClass("active"))
-            {
-                $(this).parent().parent().find("a#failed.active").removeClass("active");
-                $(this).addClass("active");
-                self.doInspectionSearch();
-            }
-        });
-        
-        $('#inspectionList .btnContainer a#failed').bind(objApp.touchEvent, function() {
-            if (!$(this).hasClass("active"))
-            {
-                $(this).parent().parent().find("a#passed.active").removeClass("active");
-                $(this).addClass("active");
-                self.doInspectionSearch();
-            } 
         });
         
         $("#doInspectionSearch").bind(objApp.touchEvent, function() {
@@ -2079,6 +2115,20 @@ var Inspections = function()
                 $('.client-pci').show();
             }else{
                 $('.client-pci').hide();
+            }
+            /* Change the default notes */
+            if(selected_report_type == "Builder: Pre-plaster and lock up inspections"){
+                var notes = "1. Quality of brickwork to be checked and any defects to be noted.\n\n"+
+                    "2. Confirm if any damage to wall bracing has occurred\n\n"+
+                    "3. Have downpipes been checked (pops in right position as per plans)\n\n" +
+                    "4. Site Manager to confirm that frame has been approved by authorties before plaster commences.\n";
+                $("#inspection #notes").val(notes);
+            }else if(selected_report_type == "Builder: Pre-paint/fixing inspections"){
+                var notes = "1. Have downpipes been Installed and connected to SWD\n\n"+
+                    "2. Has the Gas line been Installed\n\n"+
+                    "3. Has the Garage door been Installed\n\n" +
+                    "4. Is there any reinforcement bars visible around the house.\n";
+                $("#inspection #notes").val(notes);
             }
         });
         
@@ -2356,7 +2406,11 @@ var Inspections = function()
 
             self.checkSaveInspection(0);
 
-            self.showStep2();
+            if(self.isReportsWithQuestions($('#inspection #report_type').val())){
+                self.addQuestionItems($('#inspection #report_type').val());
+            }else{
+                self.showStep2();
+            }
 			return false;
 		});
 
@@ -2384,7 +2438,10 @@ var Inspections = function()
             }
 
 			e.preventDefault();
+            if(self.isProcessing)
+                return;
 
+            self.isProcessing = true;
             /* This step is ONLY for normal issues, NOT the significant issue */
             self.saveDefect(function() {
                 // Update the finish time of the audit
@@ -2418,7 +2475,6 @@ var Inspections = function()
                         {
                             unblockElement('body');
                             self.doingSave = false;
-
                             self.showStep3();
                         });
                     }
@@ -2556,6 +2612,8 @@ var Inspections = function()
         $(".inspectionDetails #tblDefectListingHeader th").bind(objApp.touchEvent, function(e)
 		{
 			e.preventDefault();
+			if(self.isReportsWithQuestions())
+			    return false;
 
 			var newSortBy = $(this).attr("class");
 
@@ -2780,7 +2838,10 @@ var Inspections = function()
             self.setDefaultNotes();
 
             if (objApp.keys.reinspection_id == "") {
-                var objNoteModal = new noteModal("Coversheet Notes", $("#inspection #notes").val(), function(notes) {
+                var modalTitle = "Coversheet Notes"
+                if(self.isReportsWithQuestions())
+                    var modalTitle = "Notes";
+                var objNoteModal = new noteModal(modalTitle, $("#inspection #notes").val(), function(notes) {
                     // The user has updated the notes value.
                     // Update the toggle (and therefore the form) with the new value.
                     $("#inspection #notes").val(notes);
@@ -2797,7 +2858,8 @@ var Inspections = function()
                     }
                 });
             }
-			objNoteModal.show();
+            if(typeof objNoteModal != 'undefined')
+			    objNoteModal.show();
 
 			if(self.finalised == 1)
 			{
@@ -2889,10 +2951,24 @@ var Inspections = function()
 		/***
 		* Capture the event when the user clicks on the Add Issue button
 		*/
-		$("#btnAddDefect").bind(objApp.touchEvent, function(e)
+        $("#btnAddDefect, #btnStep2NewIssue").unbind();
+		$("#btnAddDefect, #btnStep2NewIssue").bind(objApp.touchEvent, function(e)
 		{
+            var location =	self.objPopLocation.getText();
+            var action = self.objPopAction.getText();
+
+            if(location == '' || location.toUpperCase() == "CHOOSE"){
+                alert('Please select location');
+                return;
+            }
+
             if($('#observation').val().trim()==''){
                 alert('Please insert the observation');
+                return;
+            }
+
+            if(action == '' || action.toUpperCase() == "CHOOSE"){
+                alert('Please select action');
                 return;
             }
 
@@ -2912,15 +2988,28 @@ var Inspections = function()
                 // When adding a new defect, hide the delete defect button
                 $("#btnDeleteDefect").css("visibility", "hidden");
 
-                // Increment the sequence number
-                var seq_no = $("#frmDefectDetails #seq_no").val();
-                if(seq_no == "") {
-                    seq_no = 1;
-                } else {
-                    seq_no = seq_no * 1;
-                    seq_no++;
+                if(objApp.keys.question == ''){
+                    // Increment the sequence number
+                    var seq_no = $("#frmDefectDetails #seq_no").val();
+                    if(seq_no == "") {
+                        seq_no = 1;
+                    } else {
+                        seq_no = seq_no * 1;
+                        seq_no++;
 
-                    $("#frmDefectDetails #seq_no").val(seq_no);
+                        $("#frmDefectDetails #seq_no").val(seq_no);
+                    }
+                }else{
+                    // Increment the sub-sequence number
+                    var seq_no2 = $("#frmDefectDetails #seq_no2").val();
+                    if(seq_no2 == "") {
+                        seq_no2 = 1;
+                    } else {
+                        seq_no2 = seq_no2 * 1;
+                        seq_no2++;
+
+                        $("#frmDefectDetails #seq_no2").val(seq_no2);
+                    }
                 }
 
                 // Remove event binding
@@ -3066,35 +3155,6 @@ var Inspections = function()
   		{
             objApp.objInspection.checkSaveInspection();
   		});
-
-        $(".inspectionDetails a#failed").bind(objApp.touchEvent, function(e) {
-            e.preventDefault();
-
-            if(self.finalised == 0) {
-                if(objApp.context == "reinspections")
-                {
-                    $("#reinspection input#failed").val(1);
-                    objApp.objInspection.checkUpdateInspection();
-                }
-                else
-                    objApp.objInspection.checkSaveInspection();
-
-            }
-        });
-
-        $(".inspectionDetails a#passed").bind(objApp.touchEvent, function(e) {
-            e.preventDefault();
-
-            if(self.finalised == 0) {
-            if(objApp.context == "reinspections")
-            {
-                $("#reinspection input#failed").val(0);
-                objApp.objInspection.checkUpdateInspection();
-            }
-            else
-                objApp.objInspection.checkSaveInspection();
-            }
-        });
 
         $("#btnReportPhotos").bind(objApp.touchEvent, function(e) {
             e.preventDefault();
@@ -3528,94 +3588,60 @@ var Inspections = function()
                                     alert("The current reinspection id is NOT valid");
                                     return;
                                 }
-
+                                if(!self.isReportsWithQuestions())
+                                    self.deleteSignificantItems(defect_id, objApp.getKey('reinspection_id'));
                                 user_id = localStorage.getItem("user_id");
                                 var new_id = objDBUtils.makeInsertKey(objApp.sync_prefix);
                                 var notes = "";
 
-                                if(objApp.phonegapBuild)
-                                {
-                                    // Phonegap build - save the images to the file system
-                                    // Request access to the file system
-                                    window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem)
-                                    {
-                                        var file_name = new_id + "_thumb.jpg";
-                                        // Get permission to write the file
-                                        fileSystem.root.getFile(file_name, {create: true, exclusive: false}, function(fileEntry)
-                                        {
-                                            // Create the file write object
-                                            fileEntry.createWriter(function(writer)
-                                            {
-                                                writer.onwriteend = function(evt)
-                                                {
-                                                    // Get the file URI for the thumbnail image
-                                                    var uri_thumb = fileEntry.toURI();
-                                                    // Now write the full image to the file system
-                                                    var file_name = new_id + ".jpg";
-                                                    fileSystem.root.getFile(file_name, {create: true, exclusive: false}, function(fileEntry)
-                                                    {
-                                                        // Create the file write object
-                                                        fileEntry.createWriter(function(writer)
-                                                        {
-                                                            writer.onwriteend = function(evt)
-                                                            {
-                                                                // Get the file URI for the thumbnail image
-                                                                var uri = fileEntry.toURI();
-                                                                // Save the image data and notes back to the database
-                                                                var sql = "INSERT INTO reinspectionitemphotos(id, reinspection_id, seq_no, photodata_tmb, photodata, notes, created_by, dirty) " +
-                                                                    "VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
-                                                                var values = [new_id, objApp.getKey('reinspection_id'), seq_no, uri_thumb, uri, notes, user_id, "1"];
+                                // Save the image data and notes back to the database
+                                var sql = "INSERT INTO reinspectionitemphotos(id, reinspection_id, seq_no, photodata_tmb, photodata, notes, created_by, dirty) " +
+                                    "VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
+                                var values = [new_id, objApp.getKey('reinspection_id'), seq_no, thumbData, imageData, notes, user_id, "1"];
 
-                                                                objDBUtils.executeWithCBParam(sql, values, function(param)
-                                                                    {
-                                                                        // After the photo was saved, saving record for significant items
-                                                                        var insert_sql = "INSERT INTO significant_items(id, `type`, foreign_id, photo_id, created_by, dirty) " +
-                                                                            "VALUES(?, ?, ?, ?, ?, ?)";
-                                                                        var insert_values = [objDBUtils.makeInsertKey(objApp.sync_prefix), self.current_table.replace('photos', ''), param.defect_id, param.photo_id, localStorage.getItem("user_id"), "1"];
-                                                                        objDBUtils.execute(insert_sql, insert_values, function(){
-                                                                            if(!objApp.empty(objApp.getKey("reinspection_id"))) {
-                                                                                // Load the reinspection items
-                                                                                var sql = "SELECT ri.id, ii.seq_no, ii.location, ii.action, ii.observation, ri.rectified, r.failed " +
-                                                                                    "FROM inspectionitems ii " +
-                                                                                    "INNER JOIN reinspectionitems ri ON ri.inspectionitem_id = ii.id " +
-                                                                                    "INNER JOIN reinspections r ON r.id = ri.reinspection_id " +
-                                                                                    "WHERE ii.deleted = 0 " +
-                                                                                    "AND r.id = ? " +
-                                                                                    "ORDER BY ii.seq_no ASC";
-                                                                                objDBUtils.loadRecordsSQL(sql, [objApp.keys.reinspection_id], function (param, items) {
-                                                                                    if (!items) {
-                                                                                        // Handle no items
-                                                                                    }
-                                                                                    else {
-                                                                                        self.defectsReArray = [];
-                                                                                        self.defectsReObjects = {};
-                                                                                        var maxLoop = items.rows.length;
-                                                                                        for (var idx = 0; idx < maxLoop; idx++) {
-                                                                                            var r = items.rows.item(idx);
-                                                                                            self.defectsReArray.push(r);
-                                                                                            self.defectsReObjects[r.id] = r;
-                                                                                        }
-                                                                                    }
-                                                                                });
-                                                                            }
-                                                                            alert('New significant image has been added successfully.');
-                                                                        });
-                                                                    },
-                                                                    {
-                                                                        photo_id: new_id,
-                                                                        defect_id: defect_id
-                                                                    });
-                                                            };
-                                                            writer.write(imageData);
-                                                        }, fail);
-                                                    }, fail);
-                                                };
-                                                // Write the thumbnail data to the file.
-                                                writer.write(thumbData);
-                                            }, fail);
-                                        }, fail);
-                                    }, fail);
-                                }
+                                objDBUtils.executeWithCBParam(sql, values, function(param)
+                                {
+                                    // After the photo was saved, saving record for significant items
+                                    var insert_sql = "INSERT INTO significant_items(id, `type`, foreign_id, photo_id, created_by, dirty) " +
+                                        "VALUES(?, ?, ?, ?, ?, ?)";
+                                    var insert_values = [objDBUtils.makeInsertKey(objApp.sync_prefix), self.current_table.replace('photos', ''), param.defect_id, param.photo_id, localStorage.getItem("user_id"), "1"];
+                                    objDBUtils.execute(insert_sql, insert_values, function(){
+                                        if(!objApp.empty(objApp.getKey("reinspection_id"))) {
+                                            if(self.isReportsWithQuestions())
+                                                self.loadReinspectionItems(objApp.getKey('reinspection_id'));
+                                            else{
+                                                // Load the reinspection items
+                                                var sql = "SELECT ri.id, ii.seq_no, ii.location, ii.action, ii.observation, ri.rectified, r.failed " +
+                                                    "FROM inspectionitems ii " +
+                                                    "INNER JOIN reinspectionitems ri ON ri.inspectionitem_id = ii.id " +
+                                                    "INNER JOIN reinspections r ON r.id = ri.reinspection_id " +
+                                                    "WHERE ii.deleted = 0 " +
+                                                    "AND r.id = ? " +
+                                                    "ORDER BY ii.seq_no ASC";
+                                                objDBUtils.loadRecordsSQL(sql, [objApp.keys.reinspection_id], function (param, items) {
+                                                    if (!items) {
+                                                        // Handle no items
+                                                    }
+                                                    else {
+                                                        self.defectsReArray = [];
+                                                        self.defectsReObjects = {};
+                                                        var maxLoop = items.rows.length;
+                                                        for (var idx = 0; idx < maxLoop; idx++) {
+                                                            var r = items.rows.item(idx);
+                                                            self.defectsReArray.push(r);
+                                                            self.defectsReObjects[r.id] = r;
+                                                        }
+                                                    }
+                                                });
+                                                alert('New significant image has been added successfully.');
+                                            }
+                                        }
+                                    });
+                                },
+                                {
+                                    photo_id: new_id,
+                                    defect_id: defect_id
+                                });
                             }, function(t){}, "", self.finalised);
                         }
                     }
@@ -3646,6 +3672,213 @@ var Inspections = function()
                         navigator.camera.getPicture(function(imageData)
                             {
                                 editPhoto4(imageData, reinspectionItemID);
+                            }, function(message)
+                            {
+                                alert("Image load failed because: " + message);
+                            },
+                            {
+                                quality: 50,
+                                destinationType: Camera.DestinationType.DATA_URL,
+                                sourceType : Camera.PictureSourceType.PHOTOLIBRARY,
+                                correctOrientation: true
+                            });
+                    }
+                }
+
+            });
+        });
+
+        $(".capture-question-image, .select-question-image").unbind(objApp.touchEvent);
+        $(".capture-question-image, .select-question-image").bind(objApp.touchEvent, function(e)
+        {
+            e.preventDefault();
+            if(self.finalised == 1) {
+                alert("Sorry, this inspection has been finalised.  If you wish to add more issues, please un-finalise the inspection first");
+                return;
+            }
+
+            var $this = $(this);
+
+            if($this.hasClass('on-issue-form')){
+                var location =	self.objPopLocation.getText();
+                var action = self.objPopAction.getText();
+                var observation =  $("#frmDefectDetails #observation").val();
+
+                if((location == "") || (location.toUpperCase() == "CHOOSE") || (action == "") || (action.toUpperCase() == "CHOOSE")  || observation == "")
+                {
+                    alert('Please enter other fields before selecting the image.');
+                    return;
+                }
+            }
+
+            var question_id = $this.attr('data-id');
+            self.current_table = "inspectionitemphotos";
+            self.current_key = "inspection_id";
+
+            if(!objApp.empty(objApp.getKey("reinspection_id"))) {
+                self.current_table = "reinspectionitemphotos";
+                self.current_key = "reinspection_id";
+            }
+
+            // Get the current maximum photo sequence number for this inspection item
+            var sql = "SELECT MAX(seq_no) as seq_no " +
+                "FROM " + self.current_table + " " +
+                "WHERE " + self.current_key + " = ? " +
+                "AND deleted = 0";
+            objDBUtils.loadRecordSQL(sql, [objApp.getKey(self.current_key)], function(row)
+            {
+                var seq_no = 1;  // Default sequence number to 1.
+                if(row)
+                {
+                    seq_no = row.seq_no;
+
+                    if((seq_no == null) || (seq_no == 0))
+                    {
+                        seq_no = 0;
+                    }
+                    seq_no += 1;
+                }
+                var editPhoto5 = function(photoData, defect_id, $this)
+                {
+                    if(typeof defect_id == 'undefined' || defect_id == '' || defect_id == 0)
+                        return false;
+
+                    // Setup a new image object, using the photo data as the image source
+                    objImage = new Image();
+
+                    objImage.src = 'data:image/jpeg;base64,' + photoData;
+
+                    //notes = "";
+
+                    // When the image has loaded, setup the image marker object
+                    objImage.onload = function()
+                    {
+                        // Resize the image so it's 600px wide
+                        objResizer = new imageResizer(objImage);
+                        var imageData = objResizer.resize(600);
+
+
+                        // Create a thumbnail version of the image
+                        objImage = new Image();
+                        objImage.src = 'data:image/jpeg;base64,' + imageData;
+
+                        objImage.onload = function()
+                        {
+                            objResizer = new imageResizer(objImage);
+                            var thumbData = objResizer.resize(90);
+
+                            // Save both the thumbnail and the full version to the local file system.
+                            var fail = function(error)
+                            {
+                                alert("storePhotosOnFS::Caught error: " + error.code);
+                            }
+
+                            // Make sure the current inspection id is valid - there seems to be a bug sometimes when the id is corrupted
+
+                            var check_table = "inspections";
+                            if(self.current_table == "reinspectionitemphotos") {
+                                check_table = "reinspections";
+                            }
+
+                            objDBUtils.loadRecord(check_table, objApp.getKey(self.current_key), function(param, row)
+                            {
+                                if(!row)
+                                {
+                                    alert("The current inspection id is NOT valid");
+                                    return;
+                                }
+                                user_id = localStorage.getItem("user_id");
+                                var new_id = objDBUtils.makeInsertKey(objApp.sync_prefix);
+                                var notes = "";
+
+                                // Save the image data and notes back to the database
+                                var sql = "INSERT INTO " + self.current_table + "(id, " + self.current_key + ", seq_no, photodata_tmb, photodata, notes, created_by, dirty) " +
+                                    "VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
+                                var values = [new_id, objApp.getKey(self.current_key), seq_no, thumbData, imageData, notes, user_id, "1"];
+                                objDBUtils.executeWithCBParam(sql, values, function(param)
+                                    {
+                                        // After the photo was saved, saving record for significant items
+                                        var insert_sql = "INSERT INTO significant_items(id, `type`, foreign_id, photo_id, created_by, dirty) " +
+                                            "VALUES(?, ?, ?, ?, ?, ?)";
+                                        var insert_values = [objDBUtils.makeInsertKey(objApp.sync_prefix), self.current_table.replace('photos', ''), param.defect_id, param.photo_id, localStorage.getItem("user_id"), "1"];
+                                        objDBUtils.execute(insert_sql, insert_values, function(){
+                                            if($this.hasClass('on-issue-form')){
+                                                alert('New issue has been added successfully.');
+                                                $("#inspectionStep2 textarea#observation").val('');
+                                                $("#inspectionStep2 ul#popAction li:first-child").text('Choose');
+                                                // Clear all defect related keys
+                                                objApp.keys.inspection_item_id = "";
+                                                objApp.keys.observation = '';
+                                                objApp.keys.action = '';
+
+                                                // Increment the sequence number
+                                                var seq_no2 = $("#frmDefectDetails #seq_no2").val();
+                                                if(seq_no2 == "") {
+                                                    seq_no2 = 1;
+                                                } else {
+                                                    seq_no2 = seq_no2 * 1;
+                                                    seq_no2++;
+
+                                                    $("#frmDefectDetails #seq_no2").val(seq_no2);
+                                                }
+
+                                                $("#frmDefectDetails #observation_suggestion tr td").unbind();
+                                                $("#frmDefectDetails #observation_suggestion").empty();
+                                            }else{
+                                                self.loadQuestionItems();
+                                            }
+                                        });
+                                    },
+                                    {
+                                        photo_id: new_id,
+                                        defect_id: defect_id
+                                    });
+                            }, function(t){}, "", self.finalised);
+                        }
+                    }
+                }
+
+                if($this.hasClass('capture-question-image')){
+                    if(objApp.phonegapBuild)
+                    {
+                        navigator.camera.getPicture(function(imageData)
+                            {
+                                if($this.hasClass('on-issue-form')){
+                                    self.saveDefect(function(defect_id){
+                                        if(typeof defect_id == 'undefined')
+                                            return false;
+
+                                        editPhoto5(imageData, defect_id, $this);
+                                    });
+                                }else{
+                                    editPhoto5(imageData, question_id, $this);
+                                }
+                            }, function(message)
+                            {
+                                alert("Image load failed because: " + message);
+                            },
+                            {
+                                quality: 50,
+                                destinationType: Camera.DestinationType.DATA_URL
+                            });
+                    }
+                }else if($this.hasClass('select-question-image')){
+
+                    if(objApp.phonegapBuild)
+                    {
+                        // Invoke the camera API to allow the user to take a photo
+                        navigator.camera.getPicture(function(imageData)
+                            {
+                                if($this.hasClass('on-issue-form')){
+                                    self.saveDefect(function(defect_id){
+                                        if(typeof defect_id == 'undefined')
+                                            return false;
+
+                                        editPhoto5(imageData, defect_id, $this);
+                                    });
+                                }else {
+                                    editPhoto5(imageData, question_id, $this)
+                                }
                             }, function(message)
                             {
                                 alert("Image load failed because: " + message);
@@ -3989,7 +4222,7 @@ var Inspections = function()
             $("#significantItemsList").addClass('on-reinspection-page');
             var sql = "SELECT rip.*, si.foreign_id as defect_id " +
                 "FROM reinspectionitemphotos rip " +
-                "INNER JOIN significant_items si ON si.photo_id = rip.id " +
+                "INNER JOIN significant_items si ON si.photo_id = rip.id AND si.deleted = 0 " +
                 "INNER JOIN reinspectionitems rii ON rii.id = si.foreign_id " +
                 "INNER JOIN inspectionitems ii ON ii.id = rii.inspectionitem_id " +
                 "WHERE rip.deleted = ? " +
@@ -4005,7 +4238,7 @@ var Inspections = function()
             $("#significantItemsList").removeClass('on-reinspection-page');
             var sql = "SELECT ip.*, si.foreign_id as defect_id " +
                 "FROM inspectionitemphotos ip " +
-                "INNER JOIN significant_items si ON si.photo_id = ip.id " +
+                "INNER JOIN significant_items si ON si.photo_id = ip.id AND si.deleted = 0 " +
                 "INNER JOIN inspectionitems ii ON ii.id = si.foreign_id " +
                 "WHERE ip.deleted = ? " +
                 "AND ip.inspection_id = ? " +
@@ -4166,44 +4399,62 @@ var Inspections = function()
                     {
                         var row = items.rows.item(r);
 
-                        if(row.photodata != "")
+                        if(row.photodata_tmb != "")
                         {
-                            // Define the file name that the thumbnail should have
-                            var file_name = row.id + "_thumb.jpg";
-                            //var file_name = row.id;
+                            if(row.photodata_tmb.indexOf('_thumb') == -1){
+                                var sourceArray = self.defectsObjects;
+                                if(!objApp.empty(objApp.getKey("reinspection_id")))
+                                    sourceArray = self.defectsReObjects;
+                                html += '<tr>';
+                                html += '<td><a href="#" rel="'+row.id+'" class="delete-significant-item">Delele</a>#' + sourceArray[row.defect_id].seq_no + '</td>';
+                                html += '<td>' + sourceArray[row.defect_id].location +'</td>';
+                                html += '<td>' + sourceArray[row.defect_id].observation +'</td>';
+                                html += '<td><img width="150" height="100" src="data:image/jpeg;base64,' + row.photodata_tmb + '" /></td>';
+                                html += '</tr>';
+                                num_items++;
+                                r++;
+                                if(r < maxLoop)
+                                    doNextSig();
+                                else
+                                    showSignificantItemsHTML(html);
+                            }else{
+                                // Define the file name that the thumbnail should have
+                                var file_name = row.id + "_thumb.jpg";
+                                //var file_name = row.id;
 
-                            // Get permission to access the file entry
-                            fileSystem.root.getFile(file_name, {create: true}, function(fileEntry)
-                            {
-                                // Get access to the file object
-                                fileEntry.file(function(file)
+                                // Get permission to access the file entry
+                                fileSystem.root.getFile(file_name, {create: true}, function(fileEntry)
                                 {
-                                    // Create a file reader and read the file data.
-                                    var reader = new FileReader();
-
-                                    // When we've finished loading the file,
-                                    // build the HTML string and move to the next item
-                                    reader.onloadend = function(evt)
+                                    // Get access to the file object
+                                    fileEntry.file(function(file)
                                     {
-                                        var sourceArray = self.defectsObjects;
-                                        if(!objApp.empty(objApp.getKey("reinspection_id")))
-                                            sourceArray = self.defectsReObjects;
-                                        html += '<tr>';
-                                        html += '<td><a href="#" rel="'+row.id+'" class="delete-significant-item">Delele</a>#' + sourceArray[row.defect_id].seq_no + '</td>';
-                                        html += '<td>' + sourceArray[row.defect_id].location +'</td>';
-                                        html += '<td>' + sourceArray[row.defect_id].observation +'</td>';
-                                        html += '<td><img width="150" height="100" src="data:image/jpeg;base64,' + (evt.target && evt.target.result?evt.target.result:row.photodata_tmb) + '" /></td>';
-                                        html += '</tr>';
-                                        num_items++;
-                                        r++;
-                                        if(r < maxLoop)
-                                            doNextSig();
-                                        else
-                                            showSignificantItemsHTML(html);
-                                    };
-                                    reader.readAsText(file);
+                                        // Create a file reader and read the file data.
+                                        var reader = new FileReader();
+
+                                        // When we've finished loading the file,
+                                        // build the HTML string and move to the next item
+                                        reader.onloadend = function(evt)
+                                        {
+                                            var sourceArray = self.defectsObjects;
+                                            if(!objApp.empty(objApp.getKey("reinspection_id")))
+                                                sourceArray = self.defectsReObjects;
+                                            html += '<tr>';
+                                            html += '<td><a href="#" rel="'+row.id+'" class="delete-significant-item">Delele</a>#' + sourceArray[row.defect_id].seq_no + '</td>';
+                                            html += '<td>' + sourceArray[row.defect_id].location +'</td>';
+                                            html += '<td>' + sourceArray[row.defect_id].observation +'</td>';
+                                            html += '<td><img width="150" height="100" src="data:image/jpeg;base64,' + (evt.target && evt.target.result?evt.target.result:row.photodata_tmb) + '" /></td>';
+                                            html += '</tr>';
+                                            num_items++;
+                                            r++;
+                                            if(r < maxLoop)
+                                                doNextSig();
+                                            else
+                                                showSignificantItemsHTML(html);
+                                        };
+                                        reader.readAsText(file);
+                                    }, fail);
                                 }, fail);
-                            }, fail);
+                            }
                         }
                         else
                         {
@@ -4303,9 +4554,10 @@ var Inspections = function()
 	* resets the popSelectors and loads their values as appropriate.
 	* If an existing defect is being shown, the defect values are preselected.
 	*/
-	this.initDefectForm = function(inspectionItem, resetLocation)
+	this.initDefectForm = function(inspectionItem, resetLocation, addNewQuestionIssue)
 	{
 	    if (typeof(resetLocation)=='undefined') resetLocation = true;
+        if (typeof(addNewQuestionIssue)=='undefined') addNewQuestionIssue = false;
 
 		self.lastKeyPress = null;
 		self.doingSave = false;
@@ -4338,7 +4590,7 @@ var Inspections = function()
 		// If an inspection item has been passed through, set the item details from it, otherwise initialise to blank.
 		var currentLocation = self.objPopLocation.getValue();
 
-		if(inspectionItem == null)
+		if(inspectionItem == null || addNewQuestionIssue)
 		{
 			$("#frmDefectDetails #observation").val("");
             self.objPopLocation.clear("", "Choose");
@@ -4346,28 +4598,44 @@ var Inspections = function()
             $("#frmDefectDetails #itemtype").val("0");
             $("#frmDefectDetails #numrepeats").val("0");
 
-			// if(!$("#photoWrapper").hasClass("hidden"))
-			// {
-				// $("#photoWrapper").addClass("hidden");
-			// }
+            if(addNewQuestionIssue && inspectionItem){
+                $("#frmDefectDetails #seq_no").val(inspectionItem.seq_no);
+                $('#frmDefectDetails input[name="notes"]').val(inspectionItem.notes);
 
-			// Get the next inspectionitems sequence number for this audit
-			var sql = "SELECT MAX(seq_no) as seq_no " +
-				"FROM inspectionitems " +
-				"WHERE inspection_id = ? AND deleted = 0";
+                // Get the next inspectionitems sub-sequence number for this audit
+                var sql = "SELECT MAX(seq_no2) as seq_no2 " +
+                    "FROM inspectionitems " +
+                    "WHERE inspection_id = ? and question = ? AND deleted = 0";
 
-			objDBUtils.loadRecordSQL(sql, [objApp.keys.inspection_id], function(row)
-			{
-				var seq_no = 1;
+                objDBUtils.loadRecordSQL(sql, [objApp.keys.inspection_id, inspectionItem.question], function(row)
+                {
+                    var seq_no2 = 1;
+                    if((row) && (row.seq_no2 != null))
+                    {
+                        seq_no2 = row.seq_no2 + 1;
+                    }
+                    // Set the sequence number into the form.
+                    $("#frmDefectDetails #seq_no2").val(seq_no2);
+                });
+            }else{
+                // Get the next inspectionitems sequence number for this audit
+                var sql = "SELECT MAX(seq_no) as seq_no " +
+                    "FROM inspectionitems " +
+                    "WHERE inspection_id = ? AND deleted = 0";
 
-				if((row) && (row.seq_no != null))
-				{
-					seq_no = row.seq_no + 1;
-				}
+                objDBUtils.loadRecordSQL(sql, [objApp.keys.inspection_id], function(row)
+                {
+                    var seq_no = 1;
 
-				// Set the sequence number into the form.
-				$("#frmDefectDetails #seq_no").val(seq_no);
-			});
+                    if((row) && (row.seq_no != null))
+                    {
+                        seq_no = row.seq_no + 1;
+                    }
+
+                    // Set the sequence number into the form.
+                    $("#frmDefectDetails #seq_no").val(seq_no);
+                });
+            }
 		}
 		else
 		{
@@ -4381,6 +4649,8 @@ var Inspections = function()
             //self.touchScroll(document.querySelector("#frmDefectDetails #notes"));
 			$("#frmDefectDetails #created_by").val(inspectionItem.created_by);
 			$("#frmDefectDetails #seq_no").val(inspectionItem.seq_no);
+            $("#frmDefectDetails #seq_no2").val(inspectionItem.seq_no2?inspectionItem.seq_no2:1);
+            $('#frmDefectDetails input[name="notes"]').val(inspectionItem.notes);
 
 			$("#photoWrapper").removeClass("hidden");
 
@@ -4498,36 +4768,116 @@ var Inspections = function()
             }
         }, 'td');
     }
+
+    this.deleteSignificantItem = function(sig_id, reinspection_id)
+    {
+        if(typeof reinspection_id == 'undefined'){
+            var sql = "SELECT inspectionitemphotos.* FROM inspectionitemphotos " +
+                "INNER JOIN significant_items ON significant_items.photo_id = inspectionitemphotos.id " +
+                "WHERE significant_items.id = ?";
+            objDBUtils.loadRecordSQL(sql, [sig_id], function(row)
+            {
+                if(row)
+                {
+                    // Now update the parent inspection record with the defect count.
+                    var num_defects = row.num_defects;
+
+                    sql = "UPDATE inspectionitemphotos " +
+                        "SET deleted = 1, dirty = 1 " +
+                        "WHERE id = ?";
+
+                    objDBUtils.execute(sql, [row.id], function(){});
+                }
+            });
+        }else{
+            var sql = "SELECT reinspectionitemphotos.* FROM reinspectionitemphotos " +
+                "INNER JOIN significant_items ON significant_items.photo_id = reinspectionitemphotos.id " +
+                "WHERE significant_items.id = ?";
+            objDBUtils.loadRecordSQL(sql, [sig_id], function(row)
+            {
+                if(row)
+                {
+                    // Now update the parent inspection record with the defect count.
+                    var num_defects = row.num_defects;
+
+                    sql = "UPDATE reinspectionitemphotos " +
+                        "SET deleted = 1, dirty = 1 " +
+                        "WHERE id = ?";
+
+                    objDBUtils.execute(sql, [row.id], function(){});
+                }
+            });
+        }
+
+
+        var sql = "UPDATE significant_items " +
+            "SET deleted = 1, dirty = 1 " +
+            "WHERE id = ?";
+        objDBUtils.execute(sql, [sig_id], function(){});
+    }
+
 	/***
 	* Delete the specified inspection item (defect)
 	* We need to delete all related inspection item photos, and then the inspection item itself
 	*/
-	this.deleteDefect = function(item_id)
-	{
+	this.deleteSignificantItems = function(foreign_id, reinspection_id)
+    {
         // Flag all related photo records as deleted.
-        var sql = "SELECT inspectionitemphotos.* FROM inspectionitemphotos " +
-            "INNER JOIN significant_items ON significant_items.photo_id = inspectionitemphotos.id " +
-            "WHERE significant_items.foreign_id = ?";
-
-        objDBUtils.loadRecordSQL(sql, [item_id], function(row)
-        {
-            if(row)
+        if(typeof reinspection_id == 'undefined'){
+            var sql = "SELECT inspectionitemphotos.* FROM inspectionitemphotos " +
+                "INNER JOIN significant_items ON significant_items.photo_id = inspectionitemphotos.id " +
+                "WHERE significant_items.foreign_id = ?";
+            objDBUtils.loadRecordSQL(sql, [foreign_id], function(row)
             {
-                // Now update the parent inspection record with the defect count.
-                var num_defects = row.num_defects;
+                if(row)
+                {
+                    sql = "UPDATE inspectionitemphotos " +
+                        "SET deleted = 1, dirty = 1 " +
+                        "WHERE id = ?";
 
-                sql = "UPDATE inspectionitemphotos " +
-                    "SET deleted = 1, dirty = 1 " +
-                    "WHERE id = ?";
+                    objDBUtils.execute(sql, [row.id], function(){});
+                }
+            });
+        }else{
+            var sql = "SELECT reinspectionitemphotos.* FROM reinspectionitemphotos " +
+                "INNER JOIN significant_items ON significant_items.photo_id = reinspectionitemphotos.id " +
+                "WHERE significant_items.foreign_id = ?";
+            objDBUtils.loadRecordSQL(sql, [foreign_id], function(row)
+            {
+                if(row)
+                {
+                    sql = "UPDATE reinspectionitemphotos " +
+                        "SET deleted = 1, dirty = 1 " +
+                        "WHERE id = ?";
 
-                objDBUtils.execute(sql, [row.id], function(){});
-            }
-        });
+                    objDBUtils.execute(sql, [row.id], function(){});
+                }
+            });
+        }
 
+        var sql = "UPDATE significant_items " +
+            "SET deleted = 1, dirty = 1 " +
+            "WHERE foreign_id = ?";
+        objDBUtils.execute(sql, [foreign_id], function(){});
+    }
+
+	this.deleteDefect = function(item_id, question)
+	{
+        self.deleteSignificantItems(item_id);
 
         // Now delete the inspection item record itself
         objDBUtils.deleteRecord("inspectionitems", item_id, function()
         {
+
+            if(self.isReportsWithQuestions()){
+                objDBUtils.loadRecord("inspectionitems", item_id, function(item_id, item)
+                {
+                    if(!item)
+                        return;
+                    self.sortQuestionIssues(item.inspection_id, item.question);
+                }, item_id);
+            }
+
             // Final step is to update the inspection record with the correct stats.
             // Get the number of defects associated with this inspection
             var sql = "SELECT COUNT(*) as num_defects " +
@@ -4560,11 +4910,7 @@ var Inspections = function()
                 }
             });
         });
-        
-        var sql = "UPDATE significant_items " +
-            "SET deleted = 1, dirty = 1 " +
-            "WHERE foreign_id = ?";
-        objDBUtils.execute(sql, [item_id], function(){});
+
         // two time doing arrow down functionality to update wrong tag ID's
         self.handleMoveInspectionItem(item_id, 'down');
         self.handleMoveInspectionItem(item_id, 'down');
@@ -4590,6 +4936,23 @@ var Inspections = function()
             self.loadPhotos();
 		});
 	}
+
+    this.deleteQuestionImage = function(item_id)
+    {
+        if (item_id == "")
+            return;
+
+        // Flag all related photo records as deleted.
+        var sql = "UPDATE inspectionitemphotos " +
+            "SET deleted = 1, dirty = 1 " +
+            "WHERE id = ?";
+
+        objDBUtils.execute(sql, [item_id], function()
+        {
+            // Reload the inspection photos listing
+            self.loadQuestionItems();
+        });
+    }
 
 	this.doDelayedSave = function()
 	{
@@ -5619,7 +5982,6 @@ var Inspections = function()
             if((callback != undefined) && (callback != "")) {
                 callback()
             }
-
 			return;
    		}
    		else
@@ -5643,6 +6005,8 @@ var Inspections = function()
             $("#frmDefectDetails #action").val(action);
         }
 
+        $("#frmDefectDetails #question").val(objApp.keys.question);
+
    		// Set the current inspection id into the form.
    		$("#frmDefectDetails #inspection_id").val(objApp.keys.inspection_id);
 
@@ -5662,6 +6026,7 @@ var Inspections = function()
         {
             if(row)
             {
+                console.log(row);
                 console.log('This inspection item has been added');
                 self.inAudit = true;
 
@@ -5794,11 +6159,7 @@ var Inspections = function()
                     unblockElement('body');
 
                     // Update the table row with the modified text
-                    if(objApp.keys.report_type == 'Handovers' || 1) {
-                        $(self.reinspectionItemRow).find("td:eq(4)").text(rectified_status);
-                    } else {
-                        var rectifiedText = $(self.reinspectionItemRow).find("td:eq(3)").text(rectified_status);
-                    }
+                    $(self.reinspectionItemRow).find("td:eq(4)").text(rectified_status);
                 });
             });
 
@@ -5998,7 +6359,7 @@ var Inspections = function()
                     objApp.keys.report_type = inspection.report_type;
 
                     // If we have an active inspection then show the coversheet notes button
-                    if(self.finalised == 0) {
+                    if(inspection.finalised == 0) {
                         $("div.btnEditNotes").show();
                         $("a.btnEditClientNotes").show();
                         $("a.btnEditPrivateNotes").show();
@@ -6091,12 +6452,592 @@ var Inspections = function()
         }
     }
 
+    this.loadQuestionItems = function()
+    {
+        $('#btnStep3AddAnotherIssue').addClass('hidden');
+        $('.btnSignificantItems').addClass('hidden');
+        // Ensure a valid inspection id is set
+        if(objApp.keys.inspection_id == "")
+        {
+            return;
+        }
+        locations = {};
+        actions = {};
+        this.keySortArray = {};
+        var listDeleteMode = true;
+
+        $("#tblDefectListingHeader th").eq(1).text('Item');
+        $("#tblDefectListingHeader th").eq(2).text('Question');
+        $("#tblDefectListingHeader th").eq(3).text('Photo');
+        $("#tblDefectListingHeader th").eq(4).text('Answer');
+
+        // Unbind any more button events
+        $("#defectScrollWrapper").unbind();
+        $("#tblDefectListing td").unbind();
+        $("#tblDefectListing a.edit_issue_btn").unbind();
+
+        // Kill iScroll if it already exists
+        if(this.scroller) {
+            this.scroller.destroy();
+            this.scroller = null;
+        }
+
+        var filter_string = '';
+        var keyword = $('#keywords').val();
+        if (keyword != '')
+        {
+            filter_string = " AND (ii.location LIKE '%"+keyword+"%' OR ii.observation LIKE '%"+keyword+"%' OR ii.action LIKE '%"+keyword+"%' OR ii.notes LIKE '%"+keyword+"%' OR ii.question LIKE '%"+keyword+"%') ";
+        }
+
+        var sql = "SELECT ii.*, iip.photodata_tmb, si.id as sig_id, si.photo_id " +
+            "FROM inspectionitems ii " +
+            "LEFT JOIN significant_items si ON si.foreign_id = ii.id AND si.deleted != 1 " +
+            "LEFT JOIN inspectionitemphotos iip ON iip.id = si.photo_id " +
+            "WHERE ii.deleted = ? " +
+            "AND ii.inspection_id = ? " +
+            filter_string +
+            "ORDER BY ii.seq_no, ii.seq_no2 ASC";
+        blockElement('body');
+
+        objDBUtils.loadRecordsSQL(sql, [0, objApp.keys.inspection_id], function (param, items) {
+            unblockElement('body');
+            $("#defectScrollWrapper").html("");
+
+            self.defectsArray = [];
+            self.defectsObjects = {};
+            if(!items)
+            {
+
+            }
+            else
+            {
+                var questions = [];
+                var question_issues = {};
+                var item_ids = [];
+                var inspection_items = [];
+                var thumbnails = {};
+
+                for(var i = 0; i < items.rows.length; i++){
+                    var item = items.rows.item(i);
+                    if(item_ids.indexOf(item.id) == -1){
+                        inspection_items.push(item);
+                        item_ids.push(item.id);
+                    }
+                    if(item.photodata_tmb){
+                        if(typeof thumbnails[item.id] == 'undefined')
+                            thumbnails[item.id] = [];
+                        thumbnails[item.id].push({
+                            sig_id: item.sig_id,
+                            photodata_tmb: item.photodata_tmb,
+                            photo_id: item.photo_id
+                        });
+                    }
+                }
+                // Loop through the items and put them into the table.
+                var html = '<table id="tblDefectListing" class="listing">';
+
+                var maxLoop = inspection_items.length;
+                self.numberOfIssues = 0;
+                self.numberOfAcknowledgements = 0;
+                var sq = 2;
+                var r = 0;
+                var added_items = [];
+                for(r = 0; r < maxLoop; r++)
+                {
+                    var row = inspection_items[r];
+                    var seq_no = row.seq_no;
+                    if (added_items.indexOf(row.id) != -1)
+                        continue;
+                    added_items.push(row.id);
+                    self.defectsArray.push(row);
+                    self.defectsObjects[row.id] = row;
+                    // Store the current sequence order of the row so we can quickly sort the
+                    // items on move up / move down event.
+                    self.keySortArray[sq] = row.id;
+                    sq = sq + 2;
+
+                    var details = '';
+                    if(row.observation){
+                        details += '<br/>';
+                        details += 'Observation: ' + row.observation;
+                    }
+                    if(row.location){
+                        details += '<br/>';
+                        details += 'Location: ' + row.location;
+                    }
+                    if(row.action){
+                        details += '<br/>';
+                        details += 'Action: ' + row.action;
+                    }
+
+                    if(questions.indexOf(row.question) == -1){
+                        /* First issue in question */
+                        html += '<tr rel="' + row.id + '">';
+                        html += '<td class="nodelete"></td>';
+                        html += '<td><span class="seq_no">' + seq_no + '</span>';
+                        if(self.finalised == 0) {
+                            if(details == ''){
+                                html += '<div class="capture-buttons leftmargin">' +
+                                    '<a href="#" style="margin-top: 5px;" rel="' + row.id + '" class="edit_issue_btn">Add issue</a>' +
+                                    '</div>';
+                            }else{
+                                html += '<div class="capture-buttons leftmargin">' +
+                                    '<a href="#" style="margin-top: 5px;" rel="' + row.id + '" class="add_issue_btn">Add issue</a>' +
+                                    '</div>';
+                            }
+
+                        }
+                        html += '</td>';
+
+                        html += '<td>' + row.question + '</td>';
+                        html += '<td></td>';
+
+                        if(self.finalised == 1){
+                            var answer = row.notes?row.notes:'NA';
+                        }else{
+                            var answer = '<select style="width: auto;" data-question="'+ row.question +'" data-inspection-id="'+row.inspection_id+'" autocomplete="off" class="selector select-answer">' +
+                                '<option value="">NA</option>' +
+                                '<option value="Yes" '+(row.notes=='Yes'?'selected':'')+'>Yes</option>' +
+                                '<option value="No" '+(row.notes=='No'?'selected':'')+'>No</option>' +
+                                '</select>';
+
+                        }
+
+                        html += '<td>' + answer + '</td>';
+                        html += '</tr>';
+                        questions.push(row.question);
+                    }
+
+                    if(typeof question_issues[row.question] == "undefined"){
+                        question_issues[row.question] = 0;
+                    }
+                    question_issues[row.question]++;
+
+                    if(row.observation || row.location || row.action){
+                        html += '<tr class="question-issues" data-question="'+row.question+'" rel="' + row.id + '">';
+                        if(self.finalised == 0) {
+                            html += '<td class="delete"></td>';
+                        } else {
+                            html += '<td class="nodelete"></td>';
+                        }
+                        html += '<td>';
+                        if(self.finalised == 0) {
+                            html += '<div class="capture-buttons">' +
+                                '<a href="#" data-id="'+ row.id +'" class="capture-question-image left"><img width="40" src="images/camera-75.png" /></a>&nbsp;' +
+                                '<a href="#" data-id="'+ row.id +'" class="select-question-image left"><img width="40" src="images/gallery-75.png" /></a>&nbsp;' +
+                                '<a href="#" style="margin-top: 5px;" rel="' + row.id + '" class="edit_issue_btn">Edit</a>' +
+                                '</div><br/>';
+                        }
+                        if(row.location){
+                            html += row.location + '</td>';
+                        }else{
+                            html += 'No location</td>';
+                        }
+                        if(row.observation){
+                            html += '<td>' + row.observation + '</td>';
+                        }else{
+                            html += '<td>No observation</td>';
+                        }
+                        if(row.action){
+                            html += '<td>' + row.action + '</td>';
+                        }else{
+                            html += '<td>No action</td>';
+                        }
+                        /* Photo list */
+                        if(typeof thumbnails[row.id] != 'undefined' && thumbnails[row.id].length){
+                            html += '<td>';
+                            for(var j in thumbnails[row.id]){
+                                html += '<div>';
+                                if(self.finalised == 0){
+                                    html += '<a style="display: inline;" class="issue-photo" data-id="' + thumbnails[row.id][j].photo_id +'"><img width="150" height="100" src="data:image/jpeg;base64,' + thumbnails[row.id][j].photodata_tmb + '" /></a>';
+                                    html += '&nbsp;<a href="#" style="display: inline;" class="remove-photo" data-id="' + thumbnails[row.id][j].sig_id + '">Remove</a>';
+                                }else{
+                                    html += '<img style="display: inline;" width="150" height="100" src="data:image/jpeg;base64,' + thumbnails[row.id][j].photodata_tmb + '" />';
+                                }
+
+                                html += '</div>';
+                            }
+                            html += '</td>';
+                        }else{
+                            html += '<td>No photos</td>';
+                        }
+                        html += '</tr>';
+                    }
+
+                    var key = row.location.trim();
+                    if(key)
+                    {
+                        if(locations.hasOwnProperty(key) )
+                        {
+                            locations[key] += 1;
+                        }
+                        else
+                        {
+                            locations[key] = 1;
+                        }
+                    }
+
+                    if (row.action)
+                    {
+                        row.action = $.trim(row.action.replace(/"/g, ''));
+                        if (actions.hasOwnProperty(row.action))
+                            actions[row.action] += 1;
+                        else
+                            actions[row.action] = 1;
+                    }
+
+                    if(row.itemtype == 0) {
+                        self.numberOfIssues++;
+                    } else {
+                        self.numberOfAcknowledgements++;
+                    }
+                }
+
+                /* If have actions, so graph with actions, if not, show graph with locations */
+                if(!jQuery.isEmptyObject(actions))
+                {
+                    var data = new google.visualization.DataTable();
+                    data.addColumn('string', 'Actions');
+                    data.addColumn('number', 'Quantity');
+
+                    var keys = [];
+                    var total_defects = 0;
+                    $.each( actions, function( key, value ) {
+                        total_defects += parseInt(value);
+                    });
+                    $.each( actions, function( key, value ) {
+                        if (keys.indexOf(key) == -1)
+                            keys.push(key);
+                        key += ': ' + value + ' (' + Math.round(value/total_defects*1000)/10.0 + '%)';
+                        data.addRow([key, value]);
+                    });
+
+                    var fontSize = 14;
+                    if (keys.length > 19){
+                        fontSize = 13;
+                    }
+                    if (keys.length > 22){
+                        fontSize = 12;
+                    }
+                    if (keys.length > 24){
+                        fontSize = 11;
+                    }
+                    if (keys.length > 26){
+                        fontSize = 10;
+                    }
+                    var options = {
+                        title: '',
+                        width: '100%',
+                        height: '100%',
+                        pieSliceText: 'value',
+                        is3D: true,
+                        chartArea:{
+                            left:50,
+                            height: '99%',
+                            top: '1%',
+                            width: '100%'
+                        },
+                        legend: {
+                            alignment: 'center',
+                            width: '100%',
+                            textStyle: {
+                                fontSize: fontSize
+                            }
+                        }
+                    };
+
+                    chart.draw(data, options);
+                }
+                else if(!jQuery.isEmptyObject(locations))
+                {
+                    var data = new google.visualization.DataTable();
+                    data.addColumn('string', 'Location');
+                    data.addColumn('number', 'Quantity');
+
+                    $.each( locations, function( key, value ) {
+                        data.addRow([key, value]);
+                    });
+
+                    var options = {
+                        title: '',
+                        width: '100%',
+                        height: '100%',
+                        pieSliceText: 'percentage',
+                        is3D: true,
+                    };
+
+                    chart.draw(data, options);
+                }
+
+                current_inspection_id = objApp.keys.inspection_id;
+
+                html += '</table>';
+
+                $("#defectScrollWrapper").html(html);
+
+                for(var q in question_issues){
+                    if($('tr.question-issues[data-question="'+q+'"]').length == 1){
+                        $('tr.question-issues[data-question="'+q+'"] td.delete').addClass('main-item');
+                    }
+                }
+
+                self.setTableWidths2('tblDefectListingHeader', 'tblDefectListing', 5);
+
+                self.scroller = new IScroll5("#defectScrollWrapper", { click: true, hScrollbar: false, vScrollbar: false, scrollbarClass: 'myScrollbarSm'});
+                if(self.last_scroller_y != -1)
+                {
+                    self.scroller.scrollTo(self.last_scroller_x, self.last_scroller_y);
+                    self.last_scroller_x = -1;
+                    self.last_scroller_y = -1;
+                }
+
+                var editIssuePhoto = function(photoID, photoData, notes)
+                {
+                    // Setup a new image object, using the photo data as the image source
+                    objImage = new Image();
+                    objImage.src = 'data:image/jpeg;base64,' + photoData;
+                    // When the image has loaded, setup the image marker object
+                    objImage.onload = function()
+                    {
+                        // Resize the image so it's 600px wide
+                        objResizer = new imageResizer(objImage);
+                        var imageData = objResizer.resize(600);
+
+                        objImage = new Image();
+                        objImage.src = 'data:image/jpeg;base64,' + imageData;
+                        //notes = "";
+
+                        objImage.onload = function()
+                        {
+                            objImageMarker = new imageMarker(objImage, "Edit Image", notes, function(imageMarkerResult)
+                            {
+                                // Handle the save event
+                                var imageData = imageMarkerResult.imageData;
+                                var notes = imageMarkerResult.notes;
+
+                                // Create a thumbnail version of the image
+                                objImage = new Image();
+                                objImage.src = 'data:image/jpeg;base64,' + imageData;
+
+                                objImage.onload = function()
+                                {
+                                    objResizer = new imageResizer(objImage);
+                                    var thumbData = objResizer.resize(90);
+
+                                    // Save the image data and notes back to the database
+                                    var sql = "UPDATE inspectionitemphotos " +
+                                        "SET photodata = ?, photodata_tmb = ?, notes = ?, dirty = 1 " +
+                                        "WHERE id = ?";
+
+                                    objDBUtils.execute(sql, [imageData, thumbData, notes, photoID], function()
+                                    {
+                                        self.loadQuestionItems();
+                                    });
+                                }
+                            }, self.deleteQuestionImage, photoID, false);
+                            objImageMarker.show();
+                        }
+                    }
+                }
+
+                $("#tblDefectListing tr td a.issue-photo").bind(objApp.touchEvent, function(e)
+                {
+                    self.last_scroller_x = self.scroller.x;
+                    self.last_scroller_y = self.scroller.y;
+                    e.preventDefault();
+                    // Get the id of the selected photo
+                    var photoID = $(this).attr("data-id");
+                    objDBUtils.loadRecord('inspectionitemphotos', photoID, function(photoID, row)
+                    {
+                        if(!row)
+                        {
+                            alert("Sorry, the photo record could not be loaded");
+                            return;
+                        }
+
+                        // If the fullsize version of the photo is not on the device, bring it down.
+                        if((row.photodata == null) || (row.photodata == ""))
+                        {
+                            if(confirm("The full size version of this photo is not on this device.  Would you like to download it now via the Internet?"))
+                            {
+                                var params = objApp.objSync.getLoginParams();
+                                if(!params)
+                                {
+                                    alert("Sorry, this request could not be completed");
+                                }
+                                blockElement('body');
+                                // Create the request URL
+                                var url = objApp.apiURL + "inspections/get_inspection_photo/" + photoID;
+                                params['version'] = objApp.version;
+                                $.post(url, params, function(data)
+                                {
+                                    unblockElement('body');
+
+                                    if(data.status == "OK")
+                                    {
+                                        if(data.photo != "")
+                                        {
+                                            var sql = "UPDATE inspectionitemphotos " +
+                                                "SET photodata = ? " +
+                                                "WHERE id = ?";
+
+                                            objDBUtils.execute(sql, [data.photo, photoID], function()
+                                            {
+                                                // Photo was downloaded and saved locally OK
+                                                editIssuePhoto(photoID, data.photo, row.notes);
+                                            });
+                                        }
+                                    }
+                                }, "json");
+                            }
+                        }
+                        else
+                        {
+                            // Photo data already present
+                            editIssuePhoto(photoID, row.photodata, row.notes);
+                        }
+
+                    }, photoID);
+                });
+
+                $("#tblDefectListing tr td .remove-photo").bind(objApp.touchEvent, function(e)
+                {
+                    self.last_scroller_x = self.scroller.x;
+                    self.last_scroller_y = self.scroller.y;
+                    e.preventDefault();
+                    // If the inspection is finalised - do nothing
+                    if(self.finalised == 1) {
+                        return;
+                    }
+                    if(confirm("Would you like to delete this photo?")){
+                        var significant_id = $(this).attr("data-id");
+                        self.deleteSignificantItem(significant_id);
+                        self.loadQuestionItems();
+                    }
+                });
+
+                $('#tblDefectListing a.edit_issue_btn').bind(objApp.touchEvent, function(e){
+                    self.last_scroller_x = self.scroller.x;
+                    self.last_scroller_y = self.scroller.y;
+                    e.preventDefault();
+                    if(self.is_change_order)
+                    {
+                        is_change_order = false;
+                        return;
+                    }
+                    var $t = $(this), inspection_item_id = this.rel;
+
+                    blockElement('body');
+
+                    // Load the inspection item record
+                    objDBUtils.loadRecord("inspectionitems", inspection_item_id, function(inspection_item_id, item)
+                    {
+                        unblockElement('body');
+                        if(!item)
+                            return;
+
+                        objApp.keys.inspection_item_id = item.id;
+                        self.showStep2(item);
+                    }, inspection_item_id);
+                });
+
+                $('#tblDefectListing a.add_issue_btn').bind(objApp.touchEvent, function(e){
+                    self.last_scroller_x = self.scroller.x;
+                    self.last_scroller_y = self.scroller.y;
+                    e.preventDefault();
+                    if(self.is_change_order)
+                    {
+                        is_change_order = false;
+                        return;
+                    }
+                    var $t = $(this), inspection_item_id = this.rel;
+
+                    blockElement('body');
+
+                    // Load the inspection item record
+                    objDBUtils.loadRecord("inspectionitems", inspection_item_id, function(inspection_item_id, item)
+                    {
+                        unblockElement('body');
+                        if(!item)
+                            return;
+                        objApp.keys.inspection_item_id = '';
+                        objApp.keys.location = '';
+                        objApp.keys.observation = '';
+                        objApp.keys.action = '';
+                        self.showStep2(item, 1);
+                    }, inspection_item_id);
+                });
+
+                $("#tblDefectListing tr td.delete").bind(objApp.touchEvent, function(e)
+                {
+                    self.last_scroller_x = self.scroller.x;
+                    self.last_scroller_y = self.scroller.y;
+                    e.preventDefault();
+
+                    // If the inspection is finalised - do nothing
+                    if(self.finalised == 1) {
+                        return;
+                    }
+
+                    var inspection_item_id = $(this).parent().attr("rel");
+                    var parent = $(this).parent();
+                    var table = $(parent).parent();
+
+                    // Remove any active states of the list items
+                    $(table).find("tr").removeClass("active");
+
+                    // Did the user click on the first column
+                    var idx = $(this).index();
+
+                    if(idx == 0)
+                    {
+                        if(confirm("Would you like to delete this item?"))
+                        {
+                            if($(this).hasClass('main-item')){
+                                self.deleteSignificantItems(inspection_item_id);
+                                var sql = "UPDATE inspectionitems " +
+                                    "SET location = '', observation = '', action = '', dirty = 1 " +
+                                    "WHERE id = ?";
+                                objDBUtils.execute(sql, [inspection_item_id], function() {
+                                    self.loadQuestionItems();
+                                });
+                            }else{
+                                self.deleteDefect(inspection_item_id);
+                            }
+                            return;
+                        }
+                    }
+                    return false;
+                });
+
+                $("select.select-answer").unbind("change");
+                $("select.select-answer").change(function(){
+                    var question = $(this).attr('data-question');
+                    var inspection_id = $(this).attr('data-inspection-id');
+                    var sql = "UPDATE inspectionitems " +
+                        "SET notes = ?, dirty = 1 " +
+                        "WHERE inspection_id = ? AND question = ?";
+                    objDBUtils.execute(sql, [$(this).val(), inspection_id, question], function() {});
+                });
+            }
+        }, "");
+    }
+
 	/* **
 	* loadInspectionItems loads the inspection items that belong to this inspection
 	* and shows them in the items table
 	 */
 	this.loadInspectionItems = function()
-	{  
+	{
+	    if(self.isReportsWithQuestions()){
+	        self.loadQuestionItems();
+	        return;
+        }
+        if(!self.finalised){
+            $('#btnStep3AddAnotherIssue').removeClass('hidden');
+            if($("#inspection #report_type2").val() == 'Builder inspection')
+                $('.unfinalised-builder-report-only').removeClass("hidden");
+        }
 	    locations = {};
         actions = {};
 		// Ensure a valid inspection id is set
@@ -6109,20 +7050,10 @@ var Inspections = function()
 
 		var listDeleteMode = true;
 
-		if(objApp.keys.report_type == 'Handovers' || 1)
-		{
-			$("#tblDefectListingHeader th").eq(4).show();
-		}
-		else
-		{
-			$("#tblDefectListingHeader th").eq(4).hide();
-		}
-
-        // Remove the triangle from the table header cells
-		//$("#tblDefectListingHeader th .triangle").remove();
-
-        // Inject the triangle
-		//$("#tblDefectListingHeader th[class='" + self.itemSortBy + "']").append('<span class="triangle ' + self.itemSortDir + '"></span>');
+        $("#tblDefectListingHeader th").eq(1).text('Tag Id');
+        $("#tblDefectListingHeader th").eq(2).text('Location');
+        $("#tblDefectListingHeader th").eq(3).text('Observation');
+        $("#tblDefectListingHeader th").eq(4).text('Action');
 
 		// Unbind any more button events
 		$("#defectScrollWrapper").unbind();
@@ -6201,7 +7132,7 @@ var Inspections = function()
 			        html += '<td><span class="seq_no">' + seq_no + '</span>';
 
                     if(self.finalised == 0) {
-			            html += '<a href="#" rel="' + row.id + '" class="edit_issue_btn">Edit Issue</a>';
+                        html += '<a href="#" rel="' + row.id + '" class="edit_issue_btn">Edit Issue</a>';
 
                         if (maxLoop > 1)
                         {
@@ -6211,7 +7142,7 @@ var Inspections = function()
                                 html += '<span class="arrow up"></span></td>';
                             else
                                 html += '<span class="arrow up"></span><span class="arrow down"></span></td>';
-			            }
+                        }
                     }
                     
                     var key = row.location.trim();
@@ -6223,22 +7154,18 @@ var Inspections = function()
                     {
                         locations[key] = 1; 
                     }
-                    
+
                     html += '<td>' + row.location + '</td>';
 			        html += '<td>' + row.observation + '</td>';
-
-					if(objApp.keys.report_type == 'Handovers' || 1)
-					{
-					    html += '<td>' + row.action + '</td>';
-                        if (row.action)
-                        {
-                            row.action = $.trim(row.action.replace(/"/g, ''));
-                            if (actions.hasOwnProperty(row.action))
-                                actions[row.action] += 1;
-                            else
-                                actions[row.action] = 1;
-                        }
-					}
+                    html += '<td>' + row.action + '</td>';
+                    if (row.action)
+                    {
+                        row.action = $.trim(row.action.replace(/"/g, ''));
+                        if (actions.hasOwnProperty(row.action))
+                            actions[row.action] += 1;
+                        else
+                            actions[row.action] = 1;
+                    }
 
 			        html += '</tr>';
 
@@ -6517,6 +7444,25 @@ var Inspections = function()
         //
     }
 
+    this.sortQuestionIssues = function(inspection_id, question)
+    {
+        var sql = "SELECT id " +
+            "FROM inspectionitems " +
+            "WHERE inspection_id = ? AND question = ? AND deleted = 0";
+        objDBUtils.loadRecordsSQL(sql, [inspection_id, question], function(param, items)
+        {
+            if(items){
+                var counter = 1;
+                for(var i = 0; i < items.rows.length; i++) {
+                    var item = items.rows.item(i);
+                    var sql = "UPDATE inspectionitems " +
+                        "SET seq_no2 = ?, dirty = 1 " +
+                        "WHERE id = ?";
+                    objDBUtils.execute(sql, [counter++, item.id], null);
+                }
+            }
+        }, "");
+    }
 
     /**
     * Loads the reinspections screen.
@@ -6527,7 +7473,7 @@ var Inspections = function()
             alert("Inspections::loadReinspectionItems - Invalid reinspection id");
             return;
         }
-        
+        $('a.capture-signature-btn').hide();
         // Kill iScroll if it already exists
         if(this.scroller) {
             this.scroller.destroy();
@@ -6553,6 +7499,20 @@ var Inspections = function()
             }else{
                 $('#btnCertificatedRe').addClass('hidden');
                 $('#btnUncertificatedRe').removeClass('hidden');
+            }
+
+            if(self.isReportsWithQuestions()){
+                $('#btnSignificantItemsRe').addClass('hidden');
+                $('#rectified').html('<option value="Not Rectified">Not Rectified</option>\n' +
+                    '                        <option value="Rectified">Rectified</option>\n' +
+                    '                        <option value="Management Approved">Management Approved</option>')
+            }else{
+                $('#btnSignificantItemsRe').removeClass('hidden');
+                $('#rectified').html('<option value="Not Rectified">Not Rectified</option>\n' +
+                    '                        <option value="Rectified">Rectified</option>\n' +
+                    '                        <option value="Improvement Made">Improvement Made</option>\n' +
+                    '                        <option value="Approved By CM">Approved By CM</option>\n' +
+                    '                        <option value="NA">NA</option>');
             }
 
             // We also need to load the inspection record
@@ -6594,8 +7554,15 @@ var Inspections = function()
                 // Show the reinspection screen
                 $("#reinspection").removeClass("hidden");
 
-                // Ensure a valid inspection id is set
-                $("#tblReinspectionHeader th").eq(3).show();
+                if(self.isReportsWithQuestions()){
+                    $("#tblReinspectionHeader th").eq(0).text('Question');
+                    $("#tblReinspectionHeader th").eq(1).text('Location/Action');
+                    $("#tblReinspectionHeader th").eq(3).text('Photo');
+                }else{
+                    $("#tblReinspectionHeader th").eq(0).text('Tag Id');
+                    $("#tblReinspectionHeader th").eq(1).text('Location');
+                    $("#tblReinspectionHeader th").eq(3).text('Action');
+                }
 
                 // Initialise passed/failed indicators
                 if(reinspection.failed == 1) {
@@ -6624,13 +7591,15 @@ var Inspections = function()
                 }
 
                 // Load the reinspection items
-                var sql = "SELECT ri.id, ii.seq_no, ii.location, ii.action, ii.observation, ri.rectified, r.failed " +
+                var sql = "SELECT ri.id, ii.seq_no, ii.location, ii.question, ii.action, ii.observation, ri.rectified, r.failed, riip.photodata_tmb, si.id as sig_id " +
                     "FROM inspectionitems ii " +
                     "INNER JOIN reinspectionitems ri ON ri.inspectionitem_id = ii.id " +
                     "INNER JOIN reinspections r ON r.id = ri.reinspection_id " +
+                    "LEFT JOIN significant_items si ON si.foreign_id = ri.id " +
+                    "LEFT JOIN reinspectionitemphotos riip ON riip.id = si.photo_id " +
                     "WHERE ii.deleted = 0 " +
                     "AND r.id = ? " +
-                    "ORDER BY ii.seq_no ASC";
+                    "ORDER BY ii.seq_no, ii.seq_no2 ASC";
 
                 $("#reinspectionScrollWrapper").html("");
 
@@ -6644,21 +7613,78 @@ var Inspections = function()
                         return;
                     }
 
+                    var questions = [];
+                    var item_ids = [];
+                    var reinspection_items = [];
+                    var thumbnails = {};
+
+                    for(var i = 0; i < items.rows.length; i++){
+                        var item = items.rows.item(i);
+                        if(item_ids.indexOf(item.id) == -1){
+                            reinspection_items.push(item);
+                            item_ids.push(item.id);
+                        }
+                        if(item.photodata_tmb){
+                            if(typeof thumbnails[item.id] == 'undefined')
+                                thumbnails[item.id] = [];
+                            thumbnails[item.id].push({
+                                sig_id: item.sig_id,
+                                photodata_tmb: item.photodata_tmb
+                            });
+                        }
+                    }
                     // Loop through the items and put them into the table.
                     var html = '<table id="tblReinspectionListing" class="listing">';
 
                     var maxLoop = items.rows.length;
                     var r = 0;
                     for(r = 0; r < maxLoop; r++) {
-                        var row = items.rows.item(r);
+                        var row = reinspection_items[r];;
                         self.defectsReArray.push(row);
                         self.defectsReObjects[row.id] = row;
+
                         html += '<tr data-id="' + row.id + '">';
-                        html += '<td>' + row.seq_no + '</td>';
-                        html += '<td>' + row.location + '</td>';
-                        html += '<td>' + row.observation + '</td>';
-                        html += '<td>' + row.action + '</td>';
-                        html += '<td>' + row.rectified + '</td>';
+                        if(self.isReportsWithQuestions()){
+                            if(questions.indexOf(row.question) == -1){
+                                html += '<td>' + row.seq_no + '. ' + row.question + '</td>';
+                                questions.push(row.question);
+                            }else{
+                                html += '<td><span class="hidden">' + row.seq_no + '. ' + row.question + '</span></td>';
+                            }
+
+                            var cell2 = '';
+                            if(row.location)
+                                cell2 += 'Location: ' + row.location + ' ';
+                            if(cell2)
+                                cell2 += '<br/>';
+                            if(row.action)
+                                cell2 += 'Action: ' + row.action;
+                            html += '<td>' + cell2 + '</td>';
+                            html += '<td>' + row.observation + '</td>';
+
+                            /* Photo list */
+                            if(typeof thumbnails[row.id] != 'undefined' && thumbnails[row.id].length){
+                                html += '<td>';
+                                for(var j in thumbnails[row.id]){
+                                    html += '<div>';
+                                    html += '<img style="display: inline;" width="150" height="100" src="data:image/jpeg;base64,' + thumbnails[row.id][j].photodata_tmb + '" />';
+                                    html += '&nbsp;<a href="#" style="display: inline;" class="remove-re-photo" data-id="' + thumbnails[row.id][j].sig_id + '">Remove</a>';
+                                    html += '</div>';
+                                }
+                                html += '</td>';
+                            }else{
+                                html += '<td></td>';
+                            }
+
+                            html += '<td>' + row.rectified + '</td>';
+                        }else{
+                            html += '<td>' + row.seq_no + '</td>';
+                            html += '<td>' + row.location + '</td>';
+                            html += '<td>' + row.observation + '</td>';
+                            html += '<td>' + row.action + '</td>';
+                            html += '<td>' + row.rectified + '</td>';
+                        }
+
                         html += '</tr>';
                     }
                     html += '</table>';
@@ -6679,16 +7705,29 @@ var Inspections = function()
                         self.reinspectionItemRow = $(this);
 
                         var text = $(this).find("td:eq(0)").text() + ". ";
-                        text += $(this).find("td:eq(1)").text() + ", ";
-                        text += $(this).find("td:eq(2)").text();
+                        if(self.isReportsWithQuestions()){
+                            text += '<br/>' + $(this).find("td:eq(1)").text();
+                        }else{
+                            text += $(this).find("td:eq(1)").text() + ", ";
+                            text += $(this).find("td:eq(2)").text();
+                        }
                         var rectifiedText = $(this).find("td:eq(4)").text();
                         $('#reinspection select#rectified').val(rectifiedText);
+                        $('#reinspection select#rectified').trigger('change');
                         $('#reinspection .infomation p').html(text);
                         $('#reinspection .infomation select#rectified').show();
                         $('#reinspection .infomation').removeClass('hidden');
                         if(objApp.keys.report_type == "Quality Inspection" || objApp.keys.report_type.indexOf('Builder') != -1){
                             $('#reinspection .capture-buttons').removeClass('hidden');
                         }
+                    });
+
+                    $("#tblReinspectionListing tr td .remove-re-photo").bind(objApp.touchEvent, function(e)
+                    {
+                        e.preventDefault();
+                        var significant_id = $(this).attr("data-id");
+                        self.deleteSignificantItem(significant_id, objApp.keys.reinspection_id);
+                        self.loadReinspectionItems(objApp.keys.reinspection_id);
                     });
 
                     // Handle the event when the rectified status of the item is updated
@@ -6783,6 +7822,26 @@ var Inspections = function()
             var num_photos = row.num_items;
 
             $("#reinspection #btnCapturePhoto div.numImgCurr").html(num_photos);
+        });
+    }
+
+    this.updateInspectionPassFail = function(failed)
+    {
+        blockElement('body');
+        var sql = "UPDATE inspections " +
+            "SET failed = ?, dirty = 1 " +
+            "WHERE id = ?";
+
+        objDBUtils.execute(sql, [failed, objApp.keys.inspection_id], function() {
+            // All done.
+            if(failed) {
+                $("#inspectionStep3 a.failed").addClass('active');
+                $("#inspectionStep3 a.passed").removeClass('active');
+            } else {
+                $("#inspectionStep3 a.failed").removeClass('active');
+                $("#inspectionStep3 a.passed").addClass('active');
+            }
+            unblockElement('body');
         });
     }
 
@@ -8365,6 +9424,158 @@ var Inspections = function()
                 });
             }
         }
+    }
+
+    this.isReportsWithQuestions = function(reportType)
+    {
+        if(typeof reportType == 'undefined')
+            reportType = objApp.keys.report_type;
+        return reportType == 'Builder: Pre-plaster and lock up inspections' || reportType == 'Builder: Pre-paint/fixing inspections';
+    }
+
+    this.addQuestionItems = function(reportType)
+    {
+        if(self.isProcessing)
+            return false;
+        if(typeof reportType == 'undefined')
+            reportType = objApp.keys.report_type;
+        if(reportType == 'Builder: Pre-plaster and lock up inspections')
+            var questions = [
+                'Is the site sign visible',
+                'Is the site clean with safe access',
+                'Have external doors been installed to secure house',
+                'Has roof cover been Installed',
+                'Have antiponding boards been installed (Required to tiled roofs with No eaves that have been sarked)',
+                'Have all flashings, capping’s and leadwork been carried out',
+                'Is the dwelling watertight',
+                'Has the meter box been installed and temporary support removed and steel pole not protruding into the room',
+                'Has the electrical rough in been carried out',
+                'Have ducts been installed for exhaust fans (external venting)',
+                'Have ducts been installed for rangehood (external venting)',
+                'Has the plumbing rough in been carried out including gas points',
+                'Are the water lines under pressure',
+                'Has stack work been carried out including waste traps connections',
+                'Have shower bases been installed',
+                'Has the heating rough in been carried out including walkway to AH',
+                'Has the bath been installed and supported accordingly',
+                'Has the cooling rough in been carried out',
+                'Has sisalation paper to wall been installed and sealed',
+                'Has sisalation paper to roof been installed and sealed',
+                'Has wall insulation been installed',
+                'Has ceiling insulation been installed or loaded',
+                'Have studs been marked on the slab/timber floor',
+                'Have all point loads been supported correctly',
+                'Has the bracing that is visible been installed as per plans',
+                'Are the holes drilled through frame for plumbing & electrical less than 25mm',
+                'Are the holes drilled through the frame more than 270mm apart',
+                'Have service pipes that are overlapping been Insulated or separated',
+                'Are walls plumb and square in accordance with the frame code',
+                'Are rooms the correct size as per plans',
+                'Are door openings correct width & height as per plans',
+                'Is ceiling the correct height as per plans',
+                'Have wall intersection blocks been installed & nailed accordingly',
+                'Have all bulkheads been installed as per plans',
+                'Have ceiling noggins been installed over all walls (Min 150mm from internal corner)',
+                'Has change of direction noggins been installed',
+                'Have all noggins been installed',
+                'Have noggins been installed around the bath hob (Note noggins required between studs greater than 300mm)',
+                'Have noggins been installed to bulkheads (Note noggins required between studs greater than 300mm)',
+                'Have ceiling noggins been installed to perimeter of garage',
+                'Have ceiling noggins been installed to support motor for garage door',
+                'Have wall noggins been installed for towel rail and toilet roll holder',
+                'Has roof access hole been framed out',
+                'Have windows been installed and supported as per manufactures instructions',
+                'Are all window configurations correct?',
+                'Have walls been straightened',
+                'Have ceilings been straightened',
+                'Is parapet framing complete',
+                'Have box gutter boards been installed as required',
+                'Pre Plaster is complete and no further items have been identified'
+            ];
+        else if(reportType == 'Builder: Pre-paint/fixing inspections')
+            var questions = [
+                'Is the site sign installed',
+                'Is the site clean with safe access',
+                'Is plaster complete',
+                'Has the patch & sand been carried out',
+                'Has all cornice or square set been completed',
+                'Are walls straight, allowable bow/deviation is 5mm in 1.8m',
+                'Are cornice lines straight allowable bow/deviation deviation is 4mm in 2.0m',
+                'Have all doors been installed with even margins to all 3 edges, minimum 2mm to maximum 5mm, also maximum 30mm to bottom of door to allow for floor coverings',
+                'Are all doors swinging the correct way as per plans',
+                'Have all architraves been installed with an even quirk size',
+                'Have all skirtings been installed including garage',
+                'Are all skirtings straight at external corners and not out of square, allowable bow/deviation is 5mm in 1.8m',
+                'Has all the water proofing been done prior to the installation of cabinets',
+                'Have waterstops been installed to the entry of all wet areas.',
+                'Has bath hob been water proofed and water stops been installed around the bath opening to hob',
+                'Has the shower base screed been completed',
+                'Have shower bases been installed',
+                'Has shower recess been waterproofed',
+                'Has upper storey been water proofed correctly with water proof membrane installed to complete floor area of all wet areas, or tile underlay installed and made water resistant',
+                'Have kitchen cabinets been installed',
+                'Have all vanities been installed',
+                'Have laundry cabinets been installed',
+                'Has roof access hatch been fixed out and the cover installed',
+                'Has the porch ceiling been installed and complete',
+                'Has the alfresco ceiling been installed and complete',
+                'Has wall cladding been installed',
+                'Have bricks been acid washed ',
+                'Have bricks been blended correctly',
+                'Have weep holes been installed accordingly (max 1200mm apart)',
+                'Have weep holes been set at the correct height, for future landscaping minimum 150mm to ground level',
+                'Has damp proof course flashing been installed correctly, not to be higher than finished floor slab level',
+                'Have weep holes been installed correctly over windows',
+                'Have window flashings been installed through articulation joint over windows ',
+                'Are Articulation joints installed as per engineering and clear of debris',
+                'Confirm split bricks will not be seen to the bottom coarse once landscaping complete to the correct height',
+                'Has the base brick course been laid on a mortar bed less than 20mm if it is to remain visible',
+                'Are bed joints within Code, Min 7mm – Max 13mm',
+                'Are perp ends within Code, Min 5mm – Max 15mm (not more than 8mm variation)',
+                'Is brickwork straight, level & plumb',
+                'Is there a minimum of 3 brick courses over all steel lintels',
+                'Has brickwork been finished tight against the fascia',
+                'Does the brickwork overhang the slab rebate by less than 15mm',
+                'Does the brickwork overhang the steel lintels by less than 25mm',
+                'Is the brickwork neat and tidy with no blow outs throughout the brickwork including sill and reveals',
+                'Is the mortar colour consistent throughout',
+                'Is mortar strength correct, scratch test mortar at inconspicuous location',
+                'Are all window rubbers fitting correctly to sills & reveals',
+                'Has there been a 10mm gap/expansion seal installed beside windows/doors for Articulation joint',
+                'Have all window infills been installed and complete',
+                'Have eaves been installed and complete',
+                'Is garage opening correct',
+                'Pre Paint is complete and no further items have been identified'
+            ];
+        self.isProcessing = true;
+        self._addQuestionItems(questions, 0);
+    }
+
+    this._addQuestionItems = function(questions, index){
+        if(typeof questions[index] == 'undefined'){
+            self.isProcessing = false;
+            return self.showStep3();
+        }
+
+        var sql = "SELECT * " +
+            "FROM inspectionitems " +
+            "WHERE inspection_id = ? AND question = ? AND deleted = 0";
+        var seq_no = parseInt(index) + 1;
+        var inspection_item_id = objDBUtils.makeInsertKey(objApp.sync_prefix) + seq_no;
+        objDBUtils.loadRecordSQL(sql, [objApp.keys.inspection_id, questions[index]], function(row)
+        {
+            if(row)
+            {
+                console.log('This question item has been added');
+                console.log(row);
+            }
+            else
+            {
+                var insert_sql = "INSERT INTO inspectionitems(id, inspection_id, seq_no, location, question, observation, action, hash, created_by, dirty) VALUES(?,?,?,?,?,?,?,?,?,?)";
+                objDBUtils.execute(insert_sql, [inspection_item_id, objApp.keys.inspection_id, seq_no, '', questions[index], '', '', objUtils.MD5(questions[index].toUpperCase()), localStorage.getItem("user_id"), 1], function(){});
+            }
+            self._addQuestionItems(questions, seq_no);
+        });
     }
 };
 

@@ -87,7 +87,7 @@
             }, false);
 
             objDBUtils.createTablesTable();
-
+            /*
             if (typeof navigator.contacts != 'undefined'){
                 navigator.contacts.find(["emails", "name"], function(contacts){
                     for (var i=0; i<contacts.length; i++)
@@ -101,6 +101,7 @@
                         alert('Cannot get contacts');
                 });
             }
+            */
         }
 
     </script>
@@ -537,7 +538,7 @@
                             <td><label for="observation">Observation</label>  </td>
                             <td><textarea id="observation" name="observation"></textarea></td>
                         </tr>
-                        <tr class="unfinalised-builder-report-only">
+                        <tr class="unfinalised-builder-report-only is_significant_option">
                             <td><label for="is_significant">Is significant?</label>  </td>
                             <td><input class="ignore" type="checkbox" id="is_significant" /></td>
                         </tr>
@@ -558,6 +559,10 @@
                                     <a href="#" class="capture-significant-image left"><img width="40" src="images/camera-75.png" /></a>&nbsp;
                                     <a href="#" class="select-significant-image left"><img width="40" src="images/gallery-75.png" /></a>
                                 </div>
+                                <div class="left leftmargin hidden for-questions-issues">
+                                    <a href="#" class="capture-question-image on-issue-form left"><img width="40" src="images/camera-75.png" /></a>&nbsp;
+                                    <a href="#" class="select-question-image on-issue-form left"><img width="40" src="images/gallery-75.png" /></a>
+                                </div>
                             </td>
                         </tr>
                     </table>
@@ -574,7 +579,10 @@
                 <input type="hidden" id="inspection_id" name="inspection_id" value="" />
                 <input type="hidden" id="created_by" name="created_by" value="" />
                 <input type="hidden" id="seq_no" name="seq_no" value="" />
+                <input type="hidden" id="question" name="question" value="" />
                 <input type="hidden" id="hash" name="hash" value="" />
+                <input type="hidden" id="notes" name="notes" value="" />
+                <input type="hidden" id="seq_no2" name="seq_no2" value="" />
             </form>
 
             <div class="controlBtns bottomBtns" >
@@ -583,8 +591,9 @@
                 <div class="btnContainer left">
                     <a id="btnStep2Back" class="mtop20 left gotoStep1 btn-bg-w81" href="#">Back</a>
                 </div>
-                <div class="btnContainer right">
-                     <a id="btnStep2Next" class="mtop20 right btn-bg-w81" href="#">Next</a>
+                <div class="btnContainer right" style="width: 280px;">
+                    <a id="btnStep2Next" class="mtop20 right btn-bg-w81" href="#">Next</a>
+                    <a id="btnStep2NewIssue" class="mtop20 right btn-bg-w81 hidden" href="#" style="margin-right: 10px;background: #009fe3;border-radius: 5px;width: 170px;">Save & Add new</a>
                 </div>
                 <div class="btnContainer left btnEditNotes" id="btnEditNotes">
                     <a href="#" class="btnNotes "></a>
@@ -625,12 +634,12 @@
             </fieldset>
             <div class="bottomBtns">
 
-                <div class="btnContainer left hidden reinspectOnly">
+                <div class="btnContainer left hidden reinspectOnly btnPassed-container">
                     <a href="#" id="btnPassed" class="passed"></a>
                     <span>Passed</span>
                 </div>
 
-                <div class="btnContainer left hidden reinspectOnly">
+                <div class="btnContainer left hidden reinspectOnly btnFailed-container">
                     <a href="#" id="btnFailed" class="failed"></a>
                     <span>Failed</span>
                 </div>
@@ -1046,7 +1055,6 @@
                         <option value="Not Rectified">Not Rectified</option>
                         <option value="Rectified">Rectified</option>
                         <option value="Improvement Made">Improvement Made</option>
-                        <option value="On Order">On Order</option>
                         <option value="Approved By CM">Approved By CM</option>
                         <option value="NA">NA</option>
                     </select>

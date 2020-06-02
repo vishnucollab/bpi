@@ -241,6 +241,7 @@ function Sync()
         parameters['data'] = objDBUtils.data;
         parameters['anticache'] = Math.floor(Math.random() * 999999);
         parameters['start_time'] = objApp.objSync.startTime;
+        parameters["z"] = 'Here is dummy text. Post data will be cut off a part. This will fix that issue.';
         objApp.objSync.startTime = '';
         objApp.objSync.lastSyncDatetime = new Date();
         for(var i = 1; i < objDBUtils.tables.length; i++){
@@ -549,6 +550,7 @@ function Sync()
         parameters['data'] = $.base64('encode', self.validData(objDBUtils.data));
         parameters['anticache'] = Math.floor(Math.random() * 999999);
         parameters['start_time'] = objApp.objSync.startTime;
+        parameters["z"] = 'Here is dummy text. Post data will be cut off a part. This will fix that issue.';
         objApp.objSync.startTime = '';
 		var refreshSync = "false";
         self.doServerLog(self.validData(objDBUtils.data));
@@ -756,10 +758,11 @@ function Sync()
 		window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem)
 		{
 			// Get a recordset of any photos that have not yet been moved to the filesystem
-			var sql = "SELECT iip.* " +
+			var sql = "SELECT iip.*, i.report_type, si.id as sig_id " +
 				"FROM inspectionitemphotos iip " +
+                "INNER JOIN inspections i ON i.id = iip.inspection_id " +
+                "LEFT JOIN significant_items si ON si.photo_id = iip.id AND si.deleted != 1 " +
 				"WHERE length(iip.photodata_tmb) > 500";
-				
 			objDBUtils.loadRecordsSQL(sql, [], function(param, items)
 			{
 				if(!items)
@@ -776,55 +779,60 @@ function Sync()
 				var doNext = function()
 				{
 					var row = items.rows.item(r);
-					var tmb_data = row.photodata_tmb;       
-					
-					var file_name = row.id + "_thumb.jpg";
-					
-					// Get permission to write the file
-					fileSystem.root.getFile(file_name, {create: true, exclusive: false}, function(fileEntry)
-					{
-						// Create the file write object
-						fileEntry.createWriter(function(writer)
-						{
-					        writer.onwriteend = function(evt) 
-					        {
-								// Get the file URI
-                                if (is_on_simulator)
-                                    var uri = fileEntry.fullPath;
-                                else
-								    var uri = fileEntry.toURI();
-								
-								// Update the database with the URI
-								sql = "UPDATE inspectionitemphotos " +
-									"SET photodata_tmb = ? " +
-									"WHERE id = ?";
-									
-								objDBUtils.execute(sql, [uri, row.id], function()
-								{
-									r++;
-									
-									if(r < maxLoop)
-									{
-										doNext();
-									}
-									else
-									{
-										self.syncFinished();						
-									}					
-								});									
-					        };
-							
-							// Write the thumbnail data to the file.
-                            if (is_on_simulator) {
-                                writer.write(new Blob([tmb_data]));
-                            } else {
-                                writer.write(tmb_data);
-                            }
-							
-							
-						}, fail);
-							
-					}, fail);
+					/* Do not convert raw data to image for significant photos of pre-plaster and pre-paint report */
+                    if(row.sig_id && (row.report_type == 'Builder: Pre-plaster and lock up inspections' || row.report_type == 'Builder: Pre-paint/fixing inspections')) {
+                        r++;
+                        if(r < maxLoop)
+                            doNext();
+                        else
+                            self.syncFinished();
+                    }else{
+                        var tmb_data = row.photodata_tmb;
+                        var file_name = row.id + "_thumb.jpg";
+
+                        // Get permission to write the file
+                        fileSystem.root.getFile(file_name, {create: true, exclusive: false}, function(fileEntry)
+                        {
+                            // Create the file write object
+                            fileEntry.createWriter(function(writer)
+                            {
+                                writer.onwriteend = function(evt)
+                                {
+                                    // Get the file URI
+                                    if (is_on_simulator)
+                                        var uri = fileEntry.fullPath;
+                                    else
+                                        var uri = fileEntry.toURI();
+
+                                    // Update the database with the URI
+                                    sql = "UPDATE inspectionitemphotos " +
+                                        "SET photodata_tmb = ? " +
+                                        "WHERE id = ?";
+
+                                    objDBUtils.execute(sql, [uri, row.id], function()
+                                    {
+                                        r++;
+
+                                        if(r < maxLoop)
+                                        {
+                                            doNext();
+                                        }
+                                        else
+                                        {
+                                            self.syncFinished();
+                                        }
+                                    });
+                                };
+                                // Write the thumbnail data to the file.
+                                if (is_on_simulator) {
+                                    writer.write(new Blob([tmb_data]));
+                                } else {
+                                    writer.write(tmb_data);
+                                }
+                            }, fail);
+
+                        }, fail);
+                    }
 				}
 				
 				if(r < maxLoop)
@@ -833,10 +841,8 @@ function Sync()
 					{     
 						 $("#accountMessage #general").text("Moving thumbnails to local file system");	
 					}
-										
 					doNext();
-				}								
-
+				}
 			}, "");				
 
 		}, fail);  
@@ -997,50 +1003,46 @@ function Sync()
 					}, "json");
 				}				
 				
-				if(objApp.phonegapBuild)
+				if(row.photodata)
 				{
-					// If phonegap is being used, the image data is on the file system. 
-					// Get the thumbnail
-					var file_name = row.id + "_thumb.jpg";
-					 
-					objUtils.readFile(file_name, function(success, data)
-					{
-						if(!success)	
-						{
-							alert("Couldn't read file: " + file_name);
-							return;
-						}
-						
-						photodata_tmb = data;
-						
-						// Now get the big image
-						file_name = row.id + ".jpg";
-						
-						objUtils.readFile(file_name, function(success, data)
-						{
-							if(!success)	
-							{
-								alert("Couldn't read file: " + file_name);
-								return;
-							}
+				    if(row.photodata_tmb.indexOf('_thumb') == -1){
+                        photodata = row.photodata;
+                        photodata_tmb = row.photodata_tmb;
+                        uploadPhoto(photodata_tmb, photodata);
+                    }else{
+                        // If phonegap is being used, the image data is on the file system.
+                        // Get the thumbnail
+                        var file_name = row.id + "_thumb.jpg";
 
-							photodata = data;
-							
-							uploadPhoto(photodata_tmb, photodata);
-						});						
-					});			
+                        objUtils.readFile(file_name, function(success, data)
+                        {
+                            if(!success)
+                            {
+                                alert("Couldn't read file: " + file_name);
+                                return;
+                            }
+
+                            photodata_tmb = data;
+
+                            // Now get the big image
+                            file_name = row.id + ".jpg";
+
+                            objUtils.readFile(file_name, function(success, data)
+                            {
+                                if(!success)
+                                {
+                                    alert("Couldn't read file: " + file_name);
+                                    return;
+                                }
+
+                                photodata = data;
+
+                                uploadPhoto(photodata_tmb, photodata);
+                            });
+                        });
+                    }
 				}
-				else
-				{
-					// If phonegap is not being used, the image data
-					// is stored in the database itself.
-					photodata = row.photodata;	
-					photodata_tmb = row.photodata_tmb;
-                    
-					uploadPhoto(photodata_tmb, photodata);
-				}
-				
-			}	
+			}
 			
 			if(r < maxLoop)				
 			{

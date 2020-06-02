@@ -1326,7 +1326,7 @@ aside textarea
 #inspectionStep3 #tblDefectListing span.seq_no{
     float: left;
 }
-#inspectionStep3 #tblDefectListing a.edit_issue_btn{
+#inspectionStep3 #tblDefectListing a.edit_issue_btn, #inspectionStep3 #tblDefectListing a.add_issue_btn{
     float: left;
     margin-left:10px;
     text-decoration:none;
@@ -1456,13 +1456,24 @@ aside textarea
 .inspectionDetails #searchItemsContainer{
     float: right;
     width: 223px;
-    margin-right: 10px;
+    margin-right: 50px;
 }
     .inspectionDetails #searchItemsContainer #keywords{
         font-size: 18px;
         width: 200px;
         padding: 10px;
     }
+
+.inspectionDetails #scoreContainer{
+    float: right;
+    width: 140px;
+    margin-right: 45px;
+}
+.inspectionDetails #scoreContainer #score{
+    font-size: 18px;
+    width: 60px;
+    padding: 10px;
+}
 
 .inspectionDetails .bottomBtns {
     width: 100%;

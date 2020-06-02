@@ -1393,6 +1393,8 @@ function DBUtils()
 				"'seq_no' INTEGER NOT NULL, " +
 				"'location' VARCHAR NOT NULL, " +
 				"'action' VARCHAR NOT NULL, " +
+                "'question' VARCHAR NULL, " +
+                "'seq_no2' INTEGER NULL, " +
 				"'observation' VARCHAR NOT NULL, " +
                 "'rectified' VARCHAR NOT NULL DEFAULT 'Not Rectified', " +
 				"'hash' VARCHAR NOT NULL, " +
