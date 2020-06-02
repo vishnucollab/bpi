@@ -1267,8 +1267,9 @@ function DBUtils()
                 "'signature_2' TEXT DEFAULT NULL, " +
 				"'certificated' SMALLINT(6) DEFAULT 0, " +
                 "'created_by' INTEGER NOT NULL, " +
-				"'deleted' INTEGER NOT NULL DEFAULT 0 , " + 
-				"'dirty' INTEGER NOT NULL DEFAULT 1)";
+				"'deleted' INTEGER NOT NULL DEFAULT 0 , " +
+                "'new_report' INTEGER NOT NULL DEFAULT 1 , " +
+                "'dirty' INTEGER NOT NULL DEFAULT 1)";
 
 		this.db.transaction(function(transaction) 
 		{

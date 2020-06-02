@@ -58,7 +58,7 @@ var Inspections = function()
     this.keySortArray = false;
     this.MAX_REPORT_PHOTOS = 12;
     this.isProcessing = false;
-	
+
 	this.current_table = "inspectionitemphotos";
 	this.current_key = "inspection_id";
 	
@@ -2404,13 +2404,13 @@ var Inspections = function()
                 return;
             }
 
-            self.checkSaveInspection(0);
-
-            if(self.isReportsWithQuestions($('#inspection #report_type').val())){
-                self.addQuestionItems($('#inspection #report_type').val());
-            }else{
-                self.showStep2();
-            }
+            self.checkSaveInspection(0, function(){
+                if(self.isReportsWithQuestions($('#inspection #report_type').val())){
+                    self.addQuestionItems($('#inspection #report_type').val());
+                }else{
+                    self.showStep2();
+                }
+            });
 			return false;
 		});
 
@@ -6270,7 +6270,7 @@ var Inspections = function()
 	* details form.  It checks if enough information has been provided and if so, adds/updates the
 	* inspection.
 	*/
-	this.checkSaveInspection = function(blockBody)
+	this.checkSaveInspection = function(blockBody, callback_func)
 	{
 	    if (typeof blockBody == 'undefined')
             blockBody = 1;
@@ -6387,6 +6387,10 @@ var Inspections = function()
 			        self.checkCanDelete();
 
                     self.doingSave = false;
+
+                    if(typeof callback_func == "function"){
+                        callback_func();
+                    }
                 });
 
 			});
@@ -7501,20 +7505,6 @@ var Inspections = function()
                 $('#btnUncertificatedRe').removeClass('hidden');
             }
 
-            if(self.isReportsWithQuestions()){
-                $('#btnSignificantItemsRe').addClass('hidden');
-                $('#rectified').html('<option value="Not Rectified">Not Rectified</option>\n' +
-                    '                        <option value="Rectified">Rectified</option>\n' +
-                    '                        <option value="Management Approved">Management Approved</option>')
-            }else{
-                $('#btnSignificantItemsRe').removeClass('hidden');
-                $('#rectified').html('<option value="Not Rectified">Not Rectified</option>\n' +
-                    '                        <option value="Rectified">Rectified</option>\n' +
-                    '                        <option value="Improvement Made">Improvement Made</option>\n' +
-                    '                        <option value="Approved By CM">Approved By CM</option>\n' +
-                    '                        <option value="NA">NA</option>');
-            }
-
             // We also need to load the inspection record
 
             objDBUtils.loadRecord("inspections", reinspection.inspection_id, function(param, inspection) {
@@ -7558,10 +7548,22 @@ var Inspections = function()
                     $("#tblReinspectionHeader th").eq(0).text('Question');
                     $("#tblReinspectionHeader th").eq(1).text('Location/Action');
                     $("#tblReinspectionHeader th").eq(3).text('Photo');
+
+                    $('#btnSignificantItemsRe').addClass('hidden');
+                    $('#rectified').html('<option value="Not Rectified">Not Rectified</option>\n' +
+                        '                        <option value="Rectified">Rectified</option>\n' +
+                        '                        <option value="Management Approved">Management Approved</option>');
                 }else{
                     $("#tblReinspectionHeader th").eq(0).text('Tag Id');
                     $("#tblReinspectionHeader th").eq(1).text('Location');
                     $("#tblReinspectionHeader th").eq(3).text('Action');
+
+                    $('#btnSignificantItemsRe').removeClass('hidden');
+                    $('#rectified').html('<option value="Not Rectified">Not Rectified</option>\n' +
+                        '                        <option value="Rectified">Rectified</option>\n' +
+                        '                        <option value="Improvement Made">Improvement Made</option>\n' +
+                        '                        <option value="Approved By CM">Approved By CM</option>\n' +
+                        '                        <option value="NA">NA</option>');
                 }
 
                 // Initialise passed/failed indicators
@@ -9428,9 +9430,10 @@ var Inspections = function()
 
     this.isReportsWithQuestions = function(reportType)
     {
+        var new_report = self.inspection ? parseInt(self.inspection.new_report): 1;
         if(typeof reportType == 'undefined')
             reportType = objApp.keys.report_type;
-        return reportType == 'Builder: Pre-plaster and lock up inspections' || reportType == 'Builder: Pre-paint/fixing inspections';
+        return new_report && (reportType == 'Builder: Pre-plaster and lock up inspections' || reportType == 'Builder: Pre-paint/fixing inspections');
     }
 
     this.addQuestionItems = function(reportType)
