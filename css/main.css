@@ -1617,6 +1617,7 @@ aside textarea
     height: 65px;
     width: 65px;
     position: fixed;
+    z-index: 1;
 }
 
 .inspectionDetails a.capture-signature-btn{
