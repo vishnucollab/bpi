@@ -16,8 +16,8 @@ window.requestFileSystem  = window.requestFileSystem || window.webkitRequestFile
 function App() 
 {
 	var self = this;	// Create a reference to the object itself
-	//this.apiURL = "http://bpi-api.wearebuilding.net/";
-    this.apiURL = "http://app.bpigrp.com.au/api/";
+	this.apiURL = "http://bpi-api.wearebuilding.net/";
+    //this.apiURL = "http://app.bpigrp.com.au/api/";
 	this.phonegapBuild = true; 	// Set this to true when phonegap is the target
 	this.version = '2.0.21';				// Identifies the app version to the server
     this.patch = '21';
