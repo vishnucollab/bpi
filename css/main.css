@@ -2350,6 +2350,10 @@ table th, td {
     text-overflow: ellipsis;
 }
 
+#frmInspectionDetails table td{
+    padding: 5px 10px !important;
+}
+
 #inspection table td, #inspection td ,#inspectionStep2 table th, #inspectionStep2 td
 {
     border: none; 

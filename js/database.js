@@ -529,8 +529,8 @@ function DBUtils()
 			if(!$(this).hasClass("ignore"))
 			{
 			    var field_name = $(this).attr("id");	
-				var field_val = $(this).val();               
-        
+				var field_val = $(this).val();
+
                 fields.push(field_name); 
                 values.push(field_val); 
 			} 
@@ -1237,8 +1237,9 @@ function DBUtils()
 				"'builder_id' VARCHAR NOT NULL, " +
                 "'supervisor_id' VARCHAR NULL, " +
 				"'weather' VARCHAR, " +	
-				"'lot_no' VARCHAR, " +	
-				"'address' VARCHAR, " +	
+				"'lot_no' VARCHAR, " +
+                "'house_no' VARCHAR, " +
+                "'address' VARCHAR, " +
 				"'suburb' VARCHAR, " +	
 				"'postcode' VARCHAR, " +	
 				"'state' VARCHAR, " +	

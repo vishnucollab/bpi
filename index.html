@@ -296,53 +296,6 @@
     </div>
 </div> <!--! end of login screen wrapper -->
 <!-- creating user screen -->
-<div class="twocolumn hidden" id="create_user_screen">
-    <div id="header">
-        <div class="left">
-            <h1>Blueprint Inspections</h1>
-        </div>
-    </div>
-
-    <div id="subheader">
-        <div class="left">
-            <h1>Create A User Account</h1>
-        </div>
-    </div>
-
-    <form action="#" method="post" id="frmCreateUser">
-        <div>
-            <div id="error_msg_new_user" style="color: red; display: none; padding: 10px 0 0 100px">
-                <span></span>
-            </div>
-
-            <fieldset class="thefs">
-                <legend class="theleg">Your Details</legend>
-                <label for="n_first_name">First Name <span class="required">*</span></label>
-                <input type="text" name="n_first_name" id="n_first_name" value="" class="required" tabindex="10" />
-                <label for="n_last_name">Last Name <span class="required">*</span></label>
-                <input type="text" name="n_last_name" id="n_last_name" value="" class="required" tabindex="20" />
-                <label for="n_mobile">Mobile <span class="required">*</span></label>
-                <input type="text" name="n_mobile" id="n_mobile" value="" class="required" tabindex="30" />
-            </fieldset>
-
-            <fieldset class="thefs">
-                <legend class="theleg">Your Details</legend>
-                <label for="n_email">Email Address <span class="required">*</span></label>
-                <input type="text" name="n_email" id="n_email" value="" class="required" tabindex="40" />
-                <label for="n_password">Nominate A Password <span class="required">*</span></label>
-                <input type="password" name="n_password" id="n_password" value="" class="required" tabindex="50" />
-                <label for="n_repassword">Repeat Your Password <span class="required">*</span></label>
-                <input type="password" name="n_repassword" id="n_repassword" value="" class="required" tabindex="60" equalto="#n_password" />
-            </fieldset>
-            <div id="createAccbtns">
-                <input type="submit" class="submit" value="Create My Account &raquo;" tabindex="200" id="createAccbtn"/>
-                <a id="btnBack" class="button" href="#">&laquo; Back to Login</a>
-            </div>
-
-        </div>
-    </form>
-    <footer><span>&copy; Blueprint, 2014</span></footer>
-</div> <!--! end of create user screen -->
 
 <!-- inspection listing screen -->
 <div id="main" class="hidden">
@@ -462,15 +415,19 @@
                     <table>
                         <tr>
                             <td><label for="lot_no">Lot No</label></td>
-                            <td><input type="text" name="lot_no" id="lot_no" value="" class="" tabindex="5" /></td>
+                            <td><input type="text" name="lot_no" id="lot_no" value="" class="" tabindex="10" /></td>
+                        </tr>
+                        <tr>
+                            <td><label for="house_no">House No</label></td>
+                            <td><input type="text" name="house_no" id="house_no" value="" class="" tabindex="11" /></td>
                         </tr>
                         <tr>
                             <td><label for="address">Address</label></td>
-                            <td><input type="text" name="address" id="address" value="" class="" tabindex="5" /></td>
+                            <td><input type="text" name="address" id="address" value="" class="" tabindex="12" /></td>
                         </tr>
                         <tr>
                             <td><label for="suburb">Suburb</label></td>
-                            <td><input type="text" name="suburb" id="suburb" value="" class="" tabindex="6" /></td>
+                            <td><input type="text" name="suburb" id="suburb" value="" class="" tabindex="13" /></td>
                         </tr>
                         <!-- <tr>
                         	<td><label for="postcode">Postcode</label></td>

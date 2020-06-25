@@ -285,7 +285,7 @@ var Inspections = function()
 			    }
 
 			    html += objApp.formatUserDate(inspDate) + '</td>';  
-			    html += '<td>' + row.lot_no + ' ' + row.address + ' ' + row.suburb + '</td>';
+			    html += '<td>' + self.buildInspectionAddress(row, 1) + '</td>';
 			    html += '<td>' + row.name + '</td>';
                 var report_type = row.report_type.replace('inspections', 'inspection');
                 if (report_type == 'Builder: PCI/Final inspection')
@@ -469,7 +469,7 @@ var Inspections = function()
             objApp.keys.report_type = row.report_type;
             self.inspection = row;
 
-            var inspection_property = "Lot " + row.lot_no + ", " + row.address + ", " + row.suburb;
+            var inspection_property = self.buildInspectionAddress(row);
 
 
             // Clear all "most recent" flags in the reinspections table
@@ -827,7 +827,7 @@ var Inspections = function()
             
             self.inspection = inspection;
 
-            var inspection_property = "Lot " + inspection.lot_no + ", " + inspection.address + ", " + inspection.suburb;
+            var inspection_property = self.buildInspectionAddress(inspection);
             
             objApp.setSubHeading("Review Inspection @ " + inspection_property);  
             
@@ -921,7 +921,7 @@ var Inspections = function()
         
 
         // Set the main heading
-        var inspection_property = "Lot " + self.inspection.lot_no + ", " + self.inspection.address + ", " + self.inspection.suburb;
+        var inspection_property = self.buildInspectionAddress(self.inspection);
         objApp.setSubHeading("Materials to be left on site");
         
         //if((self.inspection.report_type == "Builder: PCI/Final inspections" && objApp.keys.reinspection_id != "") || self.inspection.report_type == "Fix / Plaster Inspection") {
@@ -974,7 +974,7 @@ var Inspections = function()
         self.setStep(5);
 
         // Set the main heading
-        var inspection_property = "Lot " + self.inspection.lot_no + ", " + self.inspection.address + ", " + self.inspection.suburb;
+        var inspection_property = self.buildInspectionAddress(self.inspection);
         objApp.setSubHeading("Rate Inspection @ " + inspection_property);
         objApp.setSubExtraHeading("Step 5 of 5", true);
 
@@ -1051,7 +1051,7 @@ var Inspections = function()
             }
             else
             {
-                text += "LOT" + inspection.lot_no + ". " +  inspection.address + ". " + inspection.suburb;
+                text += self.buildInspectionAddress(inspection);
                 objApp.setExtraHeading(text, true);
                 if (inspection.failed == 1)
                 {
@@ -1135,7 +1135,7 @@ var Inspections = function()
 			    html += '"></span>';
 
 			    html += objApp.formatUserDate(inspDate) + '</td>';
-			    html += '<td>' + row.lot_no + ' ' + row.address + ' ' + row.suburb + ' ' + row.postcode + '</td>';
+			    html += '<td>' + self.buildInspectionAddress(row, 1) + '</td>';
 			    html += '<td><div class="i-passed">';
                 if (row.failed == 0)
                     html += 'Failed<a href="#" class="failed"></a></div>';
@@ -1245,6 +1245,7 @@ var Inspections = function()
 
         $(".inspectionDetails #btnCapturePhoto .numImgCurr").text(self.numImgCurr);
         $('#frmInspectionDetails #lot_no').val('');
+        $('#frmInspectionDetails #house_no').val('');
         $('#frmInspectionDetails #address').val('');
         $('#frmInspectionDetails #suburb').val('');
         $('#frmInspectionDetails #postcode').val('');
@@ -1453,6 +1454,7 @@ var Inspections = function()
         
         $("#inspection #weather").val(inspection.weather);
         $("#inspection #lot_no").val(inspection.lot_no);
+        $("#inspection #house_no").val(inspection.house_no);
         $("#inspection #address").val(inspection.address);
         $("#inspection #suburb").val(inspection.suburb);
         $("#inspection #postcode").val(inspection.postcode);
@@ -2890,7 +2892,7 @@ var Inspections = function()
         });
 
 
-        $('#frmInspectionDetails #lot_no').change(function(){
+        $('#frmInspectionDetails #lot_no, #frmInspectionDetails #house_no').change(function(){
             self.updateExtraSubHeader();
             self.checkSaveInspection(0);
            });
@@ -4489,11 +4491,13 @@ var Inspections = function()
 	    return;
         var text = '';
         var lot = $('#frmInspectionDetails #lot_no').val();
+        var house_no = $('#frmInspectionDetails #house_no').val();
+        var house_no = $('#frmInspectionDetails #house_no').val();
         var address = $('#frmInspectionDetails #address').val();
         var suburb = $('#frmInspectionDetails #suburb').val();
         // var postcode = $('#frmInspectionDetails #postcode').val();
         // var state = self.objPopState.getText();
-        text = 'LOT ' + lot + ', ' +address + ', ' + suburb;
+        text = 'LOT ' + lot + ', ' + house_no + ', ' +address + ', ' + suburb;
         // alert(text);
 		objApp.setExtraHeading(text, true);
 	}
@@ -8948,12 +8952,21 @@ var Inspections = function()
     /**
     * Given an inspection object, this method builds a property address string.
     */
-    this.buildInspectionAddress = function(inspection) {
-        if(!inspection) {
+    this.buildInspectionAddress = function(obj, is_short) {
+        if(!obj)
             return "";
-        }
+        if(typeof is_short == 'undefined')
+            is_short = 0;
         
-        var result = "Lot " + inspection.lot_no.trim() + ", " + inspection.address.trim() + ", " + inspection.suburb.trim();
+        var result = is_short?"":"Lot";
+        if(obj.lot_no.trim())
+            result += ' ' + obj.lot_no.trim();
+        if(typeof obj.house_no != 'undefined' && obj.house_no.trim())
+            result += ', ' + obj.house_no.trim();
+        if(obj.address.trim())
+            result += (is_short?' ':', ') + obj.address.trim();
+        if(obj.suburb.trim())
+            result += (is_short?' ':', ') + obj.suburb.trim();
         return result;
     }
 
@@ -9579,6 +9592,6 @@ var Inspections = function()
             }
             self._addQuestionItems(questions, seq_no);
         });
-    }
+    };
 };
 
