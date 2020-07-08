@@ -38,8 +38,8 @@ function DBUtils()
 	this.tables.push(new Array('reinspections', 1.2));
 	this.tables.push(new Array('inspectionitems', 1.0));
 	this.tables.push(new Array('reinspectionitems', 1.0));
-	//this.tables.push(new Array('inspectionitemphotos', 1.0));
-	//this.tables.push(new Array('reinspectionitemphotos', 1.0));
+	this.tables.push(new Array('inspectionitemphotos', 1.0));
+	this.tables.push(new Array('reinspectionitemphotos', 1.0));
     this.tables.push(new Array('users', 1.0));
     this.tables.push(new Array('contacts', 1.0));
     this.tables.push(new Array('contactsfavourites', 1.0));
