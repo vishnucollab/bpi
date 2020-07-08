@@ -7598,11 +7598,11 @@ var Inspections = function()
 
                 // Load the reinspection items
                 var sql = "SELECT ri.id, ii.seq_no, ii.location, ii.question, ii.action, ii.observation, ri.rectified, r.failed, riip.photodata_tmb, si.id as sig_id " +
-                    "FROM inspectionitems ii " +
-                    "INNER JOIN reinspectionitems ri ON ri.inspectionitem_id = ii.id " +
-                    "INNER JOIN reinspections r ON r.id = ri.reinspection_id " +
-                    "LEFT JOIN significant_items si ON si.foreign_id = ri.id " +
+                    "FROM reinspectionitems ri " +
+                    "LEFT JOIN significant_items si ON si.foreign_id = ri.id AND si.deleted != 1 " +
                     "LEFT JOIN reinspectionitemphotos riip ON riip.id = si.photo_id " +
+                    "INNER JOIN inspectionitems ii ON ri.inspectionitem_id = ii.id " +
+                    "INNER JOIN reinspections r ON r.id = ri.reinspection_id " +
                     "WHERE ii.deleted = 0 " +
                     "AND r.id = ? " +
                     "ORDER BY ii.seq_no, ii.seq_no2 ASC";
