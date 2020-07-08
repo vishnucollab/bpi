@@ -7602,7 +7602,7 @@ var Inspections = function()
 
                 var sql = "SELECT ri.id, ii.seq_no, ii.location, ii.question, ii.action, ii.observation, ri.rectified, r.failed " +
                     "FROM reinspectionitems ri " +
-                    "LEFT JOIN significant_items si ON si.foreign_id = ri.id AND si.deleted != 1 AND r.id = ? " +
+                    "LEFT JOIN significant_items si ON si.foreign_id = ri.id " +
                     "INNER JOIN inspectionitems ii ON ri.inspectionitem_id = ii.id " +
                     "INNER JOIN reinspections r ON r.id = ri.reinspection_id " +
                     "WHERE ii.deleted = 0 " +
@@ -7611,7 +7611,7 @@ var Inspections = function()
 
                 $("#reinspectionScrollWrapper").html("");
                 objApp.showHideSpinner(true, "#reinspection");
-                objDBUtils.loadRecordsSQL(sql, [reinspection_id, reinspection_id], function(param, items) {
+                objDBUtils.loadRecordsSQL(sql, [reinspection_id], function(param, items) {
                     doDebug('Hide spinner');
                     objApp.showHideSpinner(false, "#reinspection");
 
