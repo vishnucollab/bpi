@@ -259,7 +259,9 @@ function DBUtils()
 	{ 
 		// Run the query
 		this.db.transaction(function(transaction) 
-		{ 
+		{
+		    alert(sql);
+		    alert(serialize(values));
 			transaction.executeSql(sql, values, function (transaction, result) 
 			{            
 				// This record could not be found
@@ -662,6 +664,7 @@ function DBUtils()
 	*/
 	this.DB_error_handler = function(transaction, error)
 	{
+	    alert('DB_error_handler!');
 	   alert("Sorry, the following database error occured\n\n" +
 	      "Code: " + error.code + "\n" +
 	      "Message: " + error.message);
