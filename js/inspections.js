@@ -9580,8 +9580,3 @@ var Inspections = function()
         });
     }
 };
-
-
-function doDebug(msg){
-    alert(msg);
-}
