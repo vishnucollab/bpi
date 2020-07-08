@@ -260,8 +260,7 @@ function DBUtils()
 		// Run the query
 		this.db.transaction(function(transaction) 
 		{
-		    alert(sql);
-		    alert(serialize(values));
+		    alert(sql + ' - values: ' + values.join(", "));
 			transaction.executeSql(sql, values, function (transaction, result) 
 			{            
 				// This record could not be found
