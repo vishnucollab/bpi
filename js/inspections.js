@@ -7594,10 +7594,9 @@ var Inspections = function()
                 var sql = "SELECT ri.id, ii.seq_no, ii.location, ii.question, ii.action, ii.observation, ri.rectified, r.failed " +
                     "FROM inspectionitems ii " +
                     "INNER JOIN reinspectionitems ri ON ri.inspectionitem_id = ii.id " +
-                    "INNER JOIN reinspections r ON r.id = ri.reinspection_id " +
+                    "INNER JOIN reinspections r ON r.id = ri.reinspection_id AND r.id = ? " +
                     "LEFT JOIN significant_items si ON si.foreign_id = ri.id AND si.deleted != 1 " +
                     "WHERE ii.deleted = 0 " +
-                    "AND r.id = ? " +
                     "ORDER BY ii.seq_no, ii.seq_no2 ASC";
 
                 $("#reinspectionScrollWrapper").html("");
