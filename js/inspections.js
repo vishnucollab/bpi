@@ -7595,13 +7595,13 @@ var Inspections = function()
                     "FROM inspectionitems ii " +
                     "INNER JOIN reinspectionitems ri ON ri.inspectionitem_id = ii.id " +
                     "INNER JOIN reinspections r ON r.id = ri.reinspection_id " +
+                    "LEFT JOIN significant_items si ON si.foreign_id = ri.id AND si.deleted != 1 " +
                     "WHERE ii.deleted = 0 " +
                     "AND r.id = ? " +
                     "ORDER BY ii.seq_no, ii.seq_no2 ASC";
 
                 $("#reinspectionScrollWrapper").html("");
                 objApp.showHideSpinner(true, "#reinspection");
-                doDebug('reinspection_id 2: ' + reinspection_id);
                 objDBUtils.loadRecordsSQL(sql, [reinspection_id], function(param, items) {
                     doDebug('Hide spinner');
                     objApp.showHideSpinner(false, "#reinspection");
