@@ -3632,7 +3632,7 @@ var Inspections = function()
                                                             self.defectsReObjects[r.id] = r;
                                                         }
                                                     }
-                                                });
+                                                }, "");
                                                 alert('New significant image has been added successfully.');
                                             }
                                         }
@@ -7789,7 +7789,7 @@ var Inspections = function()
                             objNoteModal.setReadOnly();
                         }
                     });
-                });
+                }, "");
             }, "");
         }, "");
 
