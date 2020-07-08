@@ -263,7 +263,6 @@ function DBUtils()
 		    doDebug(sql + ' - values: ' + values.join(", "));
 			transaction.executeSql(sql, values, function (transaction, result) 
 			{
-                doDebug(result.rows.length);
 				// This record could not be found
 				if(result.rows.length == 0)
 				{
@@ -664,7 +663,6 @@ function DBUtils()
 	*/
 	this.DB_error_handler = function(transaction, error)
 	{
-       doDebug('DB_error_handler!');
 	   alert("Sorry, the following database error occured\n\n" +
 	      "Code: " + error.code + "\n" +
 	      "Message: " + error.message);
