@@ -3632,7 +3632,7 @@ var Inspections = function()
                                                             self.defectsReObjects[r.id] = r;
                                                         }
                                                     }
-                                                });
+                                                }, "");
                                                 alert('New significant image has been added successfully.');
                                             }
                                         }
@@ -4379,7 +4379,7 @@ var Inspections = function()
                         });
                     }
                 });
-            }
+            };
 
             if(objApp.phonegapBuild )
             {
@@ -4480,7 +4480,7 @@ var Inspections = function()
             else
                 showSignificantItemsHTML(html);
         }, "");
-    }
+    };
 
 
     this.updateExtraSubHeader = function()
@@ -5549,7 +5549,7 @@ var Inspections = function()
 
 
 		}, "");
-	}
+	};
 
     // When the user clicks on an inspection that has reinspections,  we show a modal
     // window so the user can select which inspection they wish to view.
@@ -5666,7 +5666,7 @@ var Inspections = function()
 
             }, "")
         });
-    }
+    };
 
     this.loadHistoryPhotos = function(inspectitem_id)
     {
@@ -6198,7 +6198,7 @@ var Inspections = function()
 			    self.setReturnInspectionID(objApp.keys.inspection_id);
 			});
 	    }, 250);
-    }
+    };
 
 	this.checkSaveReinspection = function(inspection_id, reinspection_date,failed)
     {
@@ -6221,7 +6221,7 @@ var Inspections = function()
                 self.reinspectionKey = items.rows.item(0).id;
             }
         }, "");
-    }
+    };
 
     this.checkUpdateInspection = function()
     {
@@ -7025,7 +7025,7 @@ var Inspections = function()
                 });
             }
         }, "");
-    }
+    };
 
 	/* **
 	* loadInspectionItems loads the inspection items that belong to this inspection
@@ -7446,7 +7446,7 @@ var Inspections = function()
 
         // Reload table
         //
-    }
+    };
 
     this.sortQuestionIssues = function(inspection_id, question)
     {
@@ -7466,7 +7466,7 @@ var Inspections = function()
                 }
             }
         }, "");
-    }
+    };
 
     /**
     * Loads the reinspections screen.
@@ -7595,8 +7595,8 @@ var Inspections = function()
                     "FROM inspectionitems ii " +
                     "INNER JOIN reinspectionitems ri ON ri.inspectionitem_id = ii.id " +
                     "INNER JOIN reinspections r ON r.id = ri.reinspection_id " +
-                    "LEFT JOIN significant_items si ON si.foreign_id = ii.id AND si.deleted != 1 " +
-                    "LEFT JOIN inspectionitemphotos riip ON riip.id = si.photo_id " +
+                    "LEFT JOIN significant_items si ON si.foreign_id = ri.id AND si.deleted != 1 " +
+                    "LEFT JOIN reinspectionitemphotos riip ON riip.id = si.photo_id " +
                     "WHERE ii.deleted = 0 " +
                     "AND r.id = ? " +
                     "ORDER BY ii.seq_no, ii.seq_no2 ASC";
