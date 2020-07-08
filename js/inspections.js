@@ -502,7 +502,6 @@ var Inspections = function()
                         sql = "SELECT * FROM inspectionitems WHERE inspection_id = ? AND notes = 'No' AND deleted = 0";
                     else
                         sql = "SELECT * FROM inspectionitems WHERE inspection_id = ? AND deleted = 0";
-                    alert(sql);
                     objDBUtils.loadRecordsSQL(sql, [inspection_id], function(param, items) {
                         if(!items)
                         {
@@ -7486,7 +7485,6 @@ var Inspections = function()
         }
         self.defectsArray = [];
         self.defectsObjects = {};
-        alert('loadReinspectionItems');
         $('body').addClass('reinspect');
         objDBUtils.loadRecord("reinspections", reinspection_id, function(param, reinspection) {
             if(!reinspection) {
@@ -7508,7 +7506,6 @@ var Inspections = function()
             }
 
             // We also need to load the inspection record
-            alert('loadRecord inspection');
             objDBUtils.loadRecord("inspections", reinspection.inspection_id, function(param, inspection) {
                 if(!inspection) {
                     alert("Couldn't load the inspection record!");
@@ -7537,7 +7534,6 @@ var Inspections = function()
 
                 // Clear the stage
                 objApp.clearMain();
-                alert('clearMain');
                 // Set the headinggs
                 objApp.setHeading("Blueprint Inspections");
                 objApp.setSubHeading("Reinspection");
@@ -7606,9 +7602,10 @@ var Inspections = function()
                     "ORDER BY ii.seq_no, ii.seq_no2 ASC";
 
                 $("#reinspectionScrollWrapper").html("");
-                alert('Load the reinspection items');
                 objApp.showHideSpinner(true, "#reinspection");
+                doDebug('reinspection_id: ' + reinspection_id);
                 objDBUtils.loadRecordsSQL(sql, [reinspection_id], function(param, items) {
+                    doDebug('Hide spinner');
                     objApp.showHideSpinner(false, "#reinspection");
 
                     self.defectsReArray = [];
@@ -9584,3 +9581,7 @@ var Inspections = function()
     }
 };
 
+
+function doDebug(msg){
+    alert(msg);
+}
