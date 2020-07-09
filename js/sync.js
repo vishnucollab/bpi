@@ -1074,6 +1074,37 @@ function Sync()
                             });
                         }
                     }
+                    else
+                    {
+                        alert("Your photo " + (r + 1) + " is not valid, please re-upload it again");
+                        // Set the dirty flag back to 0
+                        var sql = "UPDATE " + table + " " +
+                            "SET dirty = 0 " +
+                            "WHERE id = ?";
+
+                        objDBUtils.execute(sql, [row.id], function()
+                        {
+                            // Increment the row counter
+                            r++;
+
+                            // If there are more photos to upload upload them, otherwise start the normal sync.
+                            if(r < maxLoop)
+                            {
+                                doNext();
+                            }
+                            else
+                            {
+                                // If we're done with uploading inspection photos,
+                                // now upload reinspection photos
+                                if(photo_type == "inspection") {
+                                    self.uploadPhotos("reinspection");
+                                } else {
+                                    // If we're done with reinspection photos, finish up.
+                                    self.removeDirtyFlags();
+                                }
+                            }
+                        });
+                    }
                 }, row.id);
 			};
 			
