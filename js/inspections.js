@@ -4220,7 +4220,7 @@ var Inspections = function()
                 return;
             }
             $("#significantItemsList").addClass('on-reinspection-page');
-            var sql = "SELECT DISTINCT rip.*, si.foreign_id as defect_id " +
+            var sql = "SELECT rip.*, si.foreign_id as defect_id " +
                 "FROM reinspectionitemphotos rip " +
                 "INNER JOIN significant_items si ON si.photo_id = rip.id AND si.deleted = 0 " +
                 "INNER JOIN reinspectionitems rii ON rii.id = si.foreign_id " +
@@ -4236,7 +4236,7 @@ var Inspections = function()
                 return;
             }
             $("#significantItemsList").removeClass('on-reinspection-page');
-            var sql = "SELECT DISTINCT ip.*, si.foreign_id as defect_id " +
+            var sql = "SELECT ip.*, si.foreign_id as defect_id " +
                 "FROM inspectionitemphotos ip " +
                 "INNER JOIN significant_items si ON si.photo_id = ip.id AND si.deleted = 0 " +
                 "INNER JOIN inspectionitems ii ON ii.id = si.foreign_id " +
@@ -4387,7 +4387,6 @@ var Inspections = function()
                 {
                     alert("loadPhotos::Caught error: " + error.code);
                 };
-
                 // Request access to the file system
                 window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem)
                 {
@@ -4395,11 +4394,14 @@ var Inspections = function()
 
                     // Define the function to load the next image for phonegap builds.
                     // The thumbnail image data is coming straight from the local file system
+
+                    var showed_item_ids = [];
+
                     var doNextSig = function()
                     {
                         var row = items.rows.item(r);
 
-                        if(row.photodata_tmb != "")
+                        if(row.photodata_tmb != "" && showed_item_ids.indexOf(row.id) == -1)
                         {
                             if(row.photodata_tmb.indexOf('_thumb') == -1){
                                 var sourceArray = self.defectsObjects;
@@ -4411,6 +4413,7 @@ var Inspections = function()
                                 html += '<td>' + sourceArray[row.defect_id].observation +'</td>';
                                 html += '<td><img width="150" height="100" src="data:image/jpeg;base64,' + row.photodata_tmb + '" /></td>';
                                 html += '</tr>';
+                                showed_item_ids.push(row.id);
                                 num_items++;
                                 r++;
                                 if(r < maxLoop)
@@ -4444,6 +4447,7 @@ var Inspections = function()
                                             html += '<td>' + sourceArray[row.defect_id].observation +'</td>';
                                             html += '<td><img width="150" height="100" src="data:image/jpeg;base64,' + (evt.target && evt.target.result?evt.target.result:row.photodata_tmb) + '" /></td>';
                                             html += '</tr>';
+                                            showed_item_ids.push(row.id);
                                             num_items++;
                                             r++;
                                             if(r < maxLoop)
