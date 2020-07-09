@@ -4403,6 +4403,7 @@ var Inspections = function()
 
                         if(row.photodata_tmb != "" && showed_item_ids.indexOf(row.id) == -1)
                         {
+                            showed_item_ids.push(row.id);
                             if(row.photodata_tmb.indexOf('_thumb') == -1){
                                 var sourceArray = self.defectsObjects;
                                 if(!objApp.empty(objApp.getKey("reinspection_id")))
@@ -4413,7 +4414,6 @@ var Inspections = function()
                                 html += '<td>' + sourceArray[row.defect_id].observation +'</td>';
                                 html += '<td><img width="150" height="100" src="data:image/jpeg;base64,' + row.photodata_tmb + '" /></td>';
                                 html += '</tr>';
-                                showed_item_ids.push(row.id);
                                 num_items++;
                                 r++;
                                 if(r < maxLoop)
@@ -4447,7 +4447,6 @@ var Inspections = function()
                                             html += '<td>' + sourceArray[row.defect_id].observation +'</td>';
                                             html += '<td><img width="150" height="100" src="data:image/jpeg;base64,' + (evt.target && evt.target.result?evt.target.result:row.photodata_tmb) + '" /></td>';
                                             html += '</tr>';
-                                            showed_item_ids.push(row.id);
                                             num_items++;
                                             r++;
                                             if(r < maxLoop)
