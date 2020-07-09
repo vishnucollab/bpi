@@ -7604,14 +7604,12 @@ var Inspections = function()
                     "ORDER BY ii.seq_no, ii.seq_no2 ASC";
 
                 $("#reinspectionScrollWrapper").html("");
-                alert(sql + ' - ' + reinspection_id);
                 objApp.showHideSpinner(true, "#reinspection");
                 objDBUtils.loadRecordsSQL(sql, [reinspection_id], function(param, items) {
                     objApp.showHideSpinner(false, "#reinspection");
 
                     self.defectsReArray = [];
                     self.defectsReObjects = {};
-                    alert(items.toString());
                     if(!items) {
                         return;
                     }
@@ -7636,13 +7634,14 @@ var Inspections = function()
                             });
                         }
                     }
+
                     // Loop through the items and put them into the table.
                     var html = '<table id="tblReinspectionListing" class="listing">';
 
-                    var maxLoop = items.rows.length;
+                    var maxLoop = reinspection_items.length;
                     var r = 0;
                     for(r = 0; r < maxLoop; r++) {
-                        var row = reinspection_items[r];;
+                        var row = reinspection_items[r];
                         self.defectsReArray.push(row);
                         self.defectsReObjects[row.id] = row;
 
