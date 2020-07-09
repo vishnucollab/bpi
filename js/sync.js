@@ -961,7 +961,7 @@ function Sync()
 
                 // Define a method to actually upload the photo data once it has been retrieved
                 // either from the FS or from the database.
-                var uploadPhoto = function(photodata_tmb, photodata)
+                var uploadPhoto = function(photodata_tmb, photodata, item)
                 {
                     var params = {};
 
@@ -971,23 +971,22 @@ function Sync()
                     params['version'] = objApp.version;
 
                     // Add item details
-                    params["id"] = row.id;
-                    params["seq_no"] = row.seq_no;
-                    params["deleted"] = row.deleted;
+                    params["id"] = item.id;
+                    params["seq_no"] = item.seq_no;
+                    params["deleted"] = item.deleted;
                     params["photodata"] = photodata;
                     params["photodata_tmb"] = photodata_tmb;
-                    params["notes"] = row.notes;
+                    params["notes"] = item.notes;
                     params["photo_type"] = photo_type;
 
                     // The normal inspection table has the cover photo and report photos fields.
                     if(photo_type == "inspection") {
-                        params["inspection_id"] = row.inspection_id;
-                        params["is_cover_photo"] = row.is_cover_photo;
-                        params["is_report_photo"] = row.is_report_photo;
+                        params["inspection_id"] = item.inspection_id;
+                        params["is_cover_photo"] = item.is_cover_photo;
+                        params["is_report_photo"] = item.is_report_photo;
                     } else {
-                        params["reinspection_id"] = row.reinspection_id;
+                        params["reinspection_id"] = item.reinspection_id;
                     }
-
 
                     if(!self.silentMode)  $("#accountMessage #general").text("Uploading photo " + (r + 1));
 
@@ -1042,7 +1041,7 @@ function Sync()
                         if(item.photodata_tmb.indexOf('_thumb') == -1){
                             photodata = item.photodata;
                             photodata_tmb = item.photodata_tmb;
-                            uploadPhoto(photodata_tmb, photodata);
+                            uploadPhoto(photodata_tmb, photodata, item);
                         }else{
                             // If phonegap is being used, the image data is on the file system.
                             // Get the thumbnail
@@ -1069,7 +1068,7 @@ function Sync()
                                         return;
                                     }
                                     photodata = data;
-                                    uploadPhoto(photodata_tmb, photodata);
+                                    uploadPhoto(photodata_tmb, photodata, item);
                                 });
                             });
                         }
