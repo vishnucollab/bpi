@@ -3604,7 +3604,7 @@ var Inspections = function()
                                     // After the photo was saved, saving record for significant items
                                     var insert_sql = "INSERT INTO significant_items(id, `type`, foreign_id, photo_id, created_by, dirty) " +
                                         "VALUES(?, ?, ?, ?, ?, ?)";
-                                    var insert_values = [objDBUtils.makeInsertKey(objApp.sync_prefix), self.current_table.replace('photos', ''), param.defect_id, param.photo_id, localStorage.getItem("user_id"), "1"];
+                                    var insert_values = [objDBUtils.makeInsertKey(objApp.sync_prefix), 'reinspectionitem', param.defect_id, param.photo_id, localStorage.getItem("user_id"), "1"];
                                     objDBUtils.execute(insert_sql, insert_values, function(){
                                         if(!objApp.empty(objApp.getKey("reinspection_id"))) {
                                             if(self.isReportsWithQuestions())
