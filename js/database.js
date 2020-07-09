@@ -72,7 +72,8 @@ function DBUtils()
 		var table_version = this.tables[table_number][1];
         
         // NEVER send user data back - it is read only
-		if(((!send_photos) && (table_name == "inspectionitemphotos")) || (table_name == "users"))
+        // We're using uploadPhotos function to upload photos
+		if(table_name == "inspectionitemphotos" || table_name == "reinspectionitemphotos" || table_name == "users")
 		{
 			// Skip this table
 			var next_table = table_number + 1;
