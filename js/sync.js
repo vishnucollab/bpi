@@ -324,7 +324,8 @@ function Sync()
                                             var handleRecord = function (transaction, tblName, row) {
                                                 // Build the sql insert/update statement
                                                 var sql = self.buildSaveData(tblName, row);
-                                                transaction.executeSql(sql, self.saveData, function (transaction, result) {
+
+                                                function goNext(transaction){
                                                     // Increment the recordIndex
                                                     self.syncingIndexs[tblName][page]++;
                                                     if (self.syncingIndexs[tblName][page] >= self.syncingTables[tblName][page].length) {
@@ -344,24 +345,18 @@ function Sync()
                                                         row = self.syncingTables[tblName][page][self.syncingIndexs[tblName][page]];
                                                         handleRecord(transaction, tblName, row);
                                                     }
-
+                                                }
+                                                transaction.executeSql(sql, self.saveData, function (transaction, result) {
+                                                    goNext(transaction);
                                                 }, DBErrorHandler);
 
                                                 function DBErrorHandler(transaction, error)
                                                 {
                                                     var text_context = (typeof context != 'undefined' && context != "") ? "(" + context + ") " : "";
                                                     self.doServerLog("Error "+text_context+": " + error.message + " in " + sql + " (params : "+self.saveData.join(", ")+")");
-                                                    self.syncingCounter--;
-                                                    if(!self.silentMode) $("#accountMessage #general").text("Processing: " + (self.syncingTotalRequest - self.syncingCounter) + '/' + self.syncingTotalRequest);
-                                                    if (self.syncingCounter == 0) {
-                                                        self.updateLastSyncDate();
-                                                        if (!self.silentMode){
-                                                            self.tableIdx = 0;
-                                                            self.uploadPhotos("inspection");
-                                                        }
-                                                    }
+                                                    goNext(transaction);
                                                 }
-                                            }
+                                            };
 
                                             // Handle the first record for this table.
                                             handleRecord(transaction, tblName, row);
@@ -419,8 +414,8 @@ function Sync()
                                 {
                                     // Build the sql insert/update statement
                                     var sql = self.buildSaveData(tableName, row);
-                                    transaction.executeSql(sql, self.saveData, function (transaction, result)
-                                    {
+
+                                    function goNext(transaction){
                                         // Increment the recordIndex
                                         self.syncingIndexs[tableName]++;
                                         if(self.syncingIndexs[tableName] >= self.syncingTables[tableName].length)
@@ -443,24 +438,20 @@ function Sync()
                                             row = self.syncingTables[tableName][self.syncingIndexs[tableName]];
                                             handleRecord(transaction, tableName, row);
                                         }
+                                    }
 
+                                    transaction.executeSql(sql, self.saveData, function (transaction, result)
+                                    {
+                                        goNext(transaction);
                                     }, DBErrorHandler);
 
                                     function DBErrorHandler(transaction, error)
                                     {
                                         var text_context = (typeof context != 'undefined' && context != "") ? "(" + context + ") " : "";
                                         self.doServerLog("Error "+text_context+": " + error.message + " in " + sql + " (params : "+self.saveData.join(", ")+")");
-                                        self.syncingCounter--;
-                                        if(!self.silentMode) $("#accountMessage #general").text("Processing: " + (self.syncingTotalRequest - self.syncingCounter) + '/' + self.syncingTotalRequest);
-                                        if (self.syncingCounter == 0) {
-                                            self.updateLastSyncDate();
-                                            if (!self.silentMode){
-                                                self.tableIdx = 0;
-                                                self.uploadPhotos("inspection");
-                                            }
-                                        }
+                                        goNext(transaction);
                                     }
-                                }
+                                };
 
                                 // Handle the first record for this table.
                                 handleRecord(transaction, tableName, row);
@@ -700,7 +691,7 @@ function Sync()
         self.saveData.push('0'); /* dirty = 0 */
 		sql += header + ", dirty) " + footer + ", ?);";
 
-		return sql;		
+		return sql;
 	};	
 	
 	
@@ -1074,6 +1065,7 @@ function Sync()
     }
 
     this.doServerLog = function(log_msg){
+	    console.log(log_msg);
         var parameters = {};
         parameters['email'] = localStorage.getItem("email");
         parameters['password'] = localStorage.getItem("password");
