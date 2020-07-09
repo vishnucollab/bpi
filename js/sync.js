@@ -389,7 +389,18 @@ function Sync()
                                         self.callbackMethod(false);
                                     }
                                 }
-                            }, "");
+                            }, "").fail(function() {
+                                self.syncingCounter--;
+                                if(!self.silentMode) $("#accountMessage #general").text("Processing: " + (self.syncingTotalRequest - self.syncingCounter) + '/' + self.syncingTotalRequest);
+                                if (self.syncingCounter == 0) {
+                                    self.updateLastSyncDate();
+                                    if (!self.silentMode){
+                                        self.tableIdx = 0;
+                                        self.uploadPhotos("inspection");
+                                    }
+                                }
+                                self.doServerLog("[E8]: " + objApp.apiURL + 'account/get_data_table/' + tableName +'/' + refreshSync + '/' + p + ' - parameters: ' + parameters.join(','));
+                            });
                         }
 
                     }else{
@@ -512,7 +523,19 @@ function Sync()
                     self.callbackMethod(false);
                 }
             }
-        }, "");
+        }, "").fail(function() {
+            if(!self.silentMode)
+            {
+                unblockElement("body");
+                alert("Warning: An error occured during the data sync operation. Please report this error to the Blueprint team.");
+                $("#accountMessage #general").text("Sorry, something went wrong during the processing phase. Please report this error to the Blueprint team.");
+                self.doServerLog("[E6]: " + raw_data);
+            }
+            else if(self.callbackMethod != null)
+            {
+                self.callbackMethod(false);
+            }
+        });
     }
 
 	/***
@@ -611,7 +634,6 @@ function Sync()
                 // error
                 if(!self.silentMode)
                 {
-
                     unblockElement("body");
                     alert("Warning: An error occured during the data sync operation. Please report this error to the Blueprint team.");
                     $("#accountMessage #general").text("Sorry, something went wrong during the processing phase. Please report this error to the Blueprint team.");
@@ -622,7 +644,19 @@ function Sync()
                     self.callbackMethod(false);
                 }
             }
-		}, "");
+		}, "").fail(function() {
+            if(!self.silentMode)
+            {
+                unblockElement("body");
+                alert("Warning: An error occured during the data sync operation. Please report this error to the Blueprint team.");
+                $("#accountMessage #general").text("Sorry, something went wrong during the processing phase. Please report this error to the Blueprint team.");
+                self.doServerLog("[E7]");
+            }
+            else if(self.callbackMethod != null)
+            {
+                self.callbackMethod(false);
+            }
+        });
 	}
 
 	this.saveGraphs = function()
