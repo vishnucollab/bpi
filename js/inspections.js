@@ -4220,7 +4220,7 @@ var Inspections = function()
                 return;
             }
             $("#significantItemsList").addClass('on-reinspection-page');
-            var sql = "SELECT rip.*, si.foreign_id as defect_id " +
+            var sql = "SELECT DISTINCT rip.*, si.foreign_id as defect_id " +
                 "FROM reinspectionitemphotos rip " +
                 "INNER JOIN significant_items si ON si.photo_id = rip.id AND si.deleted = 0 " +
                 "INNER JOIN reinspectionitems rii ON rii.id = si.foreign_id " +
@@ -4236,7 +4236,7 @@ var Inspections = function()
                 return;
             }
             $("#significantItemsList").removeClass('on-reinspection-page');
-            var sql = "SELECT ip.*, si.foreign_id as defect_id " +
+            var sql = "SELECT DISTINCT ip.*, si.foreign_id as defect_id " +
                 "FROM inspectionitemphotos ip " +
                 "INNER JOIN significant_items si ON si.photo_id = ip.id AND si.deleted = 0 " +
                 "INNER JOIN inspectionitems ii ON ii.id = si.foreign_id " +
