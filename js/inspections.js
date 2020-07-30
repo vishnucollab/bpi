@@ -9409,7 +9409,11 @@ var Inspections = function()
         var new_report = self.inspection ? parseInt(self.inspection.new_report): 1;
         if(typeof reportType == 'undefined')
             reportType = objApp.keys.report_type;
-        return new_report && (reportType == 'Builder: Pre-plaster and lock up inspections' || reportType == 'Builder: Pre-paint/fixing inspections');
+        return new_report &&
+            (reportType == 'Builder: Pre-plaster and lock up inspections' ||
+                reportType == 'Builder: Pre-paint/fixing inspections' ||
+                reportType == 'Builder: Slab inspections' ||
+                reportType == 'Builder: Frame inspections');
     }
 
     this.addQuestionItems = function(reportType)
@@ -9526,6 +9530,69 @@ var Inspections = function()
                 'Have eaves been installed and complete',
                 'Is garage opening correct',
                 'Pre Paint is complete and no further items have been identified'
+            ];
+        else if(reportType == 'Builder: Slab inspections')
+            var questions = [
+                'Is site sign installed',
+                'Is the site clean with safe access',
+                'Difference between TBM & FFL is as per plans',
+                'Slab surface checked every 2m for level and plan marked to confirm, starting from pod starting point or corner to be confirmed',
+                'Smart wastes are level with slab surface,',
+                'All sewer pipes and risers are glued and capped',
+                'Slab finish is good with no cold joints visible',
+                'Garage/Alfresco & porch step downs have been checked and are as per plans',
+                'External slab rebate is clean and even and measures as per plans',
+                'Slab edge is good and no reinforcement bars have been exposed or no cold joints visible',
+                'Has slab site clean been completed',
+                'Has the vapour barrier been turned up against the slab and backfilled as required by NCC 3.2.2.6(c)',
+                'Has Part A of termite treatment been carried out (termite labels to riser pipes)'
+            ];
+        else if(reportType == 'Builder: Frame inspections')
+            var questions = [
+                'Is site sign visible',
+                'Is the site clean with safe access',
+                'Is frame complete',
+                'Have stumps been installed correctly',
+                'Have bearers been installed correctly',
+                'Have floor joist been installed correctly',
+                'Has sheet floor been installed as per manufacturers instructions',
+                'Have walls been installed as per plans',
+                'Are bottom plates not overhanging the floor/Slab by more than 10mm',
+                'Have walls been installed plumb in accordance with the code -5mm in 1.8m height',
+                'Are rooms the correct size as per plans',
+                'Are door openings correct width & height as per plans',
+                'Have the bottom plates been cut out from door openings',
+                'Are the ceiling heights as per plans',
+                'Have wall intersection blocks been installed & nailed accordingly',
+                'Have gang nails been installed to the intersecting top plate walls',
+                'Have bulkheads been installed as per plans',
+                'Have ceiling noggins been installed over all walls (Min 150mm from internal corner)',
+                'Have change of direction noggins been installed',
+                'Have ceiling noggins been installed to perimeter of garage',
+                'Has roof access opening been framed out',
+                'Have windows been installed and supported as per manufacturers instructions',
+                'Have windows been installed at the correct height',
+                'Are all structural beams installed as per engineering',
+                'Have all structural beams been fixed as per engineering',
+                'Have all double/multiple studs been installed as per engineering',
+                'Has all bracing been installed as per engineering',
+                'Have upper floor joist been installed as per engineering & layout correct',
+                'Has sheet flooring been installed as per manufacturers instructions',
+                'Have trusses been installed as per truss layout & computations',
+                'Are trusses plumb and straight',
+                'Has Ribbon plate been installed correctly to perimeter of the house',
+                'Have bottom chord ties been installed correctly',
+                'Are all bottom chords straight',
+                'Have sheer blocks been installed to bottom chords at wall bracing points',
+                'Are girder trusses supported as per truss layout',
+                'Has truss bracing been installed as per truss layout and ends bent around under the top plates and top of truss',
+                'Has truss connections been installed as per truss layout and hi load brackets/Joist hangers/triple grips fixed accordingly',
+                'Have double trusses been joined and nailed as per truss layout',
+                'Are truss rafter tail lengths right for eave size',
+                'Have blocks been installed behind saddle trusses',
+                'Have out riggers been installed for barge fascia',
+                'Have L-Brackets been installed at 1.8m centres to bottom chord/Top plate and nailed centred to slots and left proud for movement',
+                'Valley boards have been installed and finish back to the fascia and ends supported by noggins'
             ];
         self.isProcessing = true;
         self._addQuestionItems(questions, 0);
