@@ -9518,7 +9518,7 @@ var Inspections = function()
                 'Are perp ends within Code, Min 5mm – Max 15mm (not more than 8mm variation)',
                 'Is brickwork straight, level & plumb',
                 'Is there a minimum of 3 brick courses over all steel lintels',
-                'Has brickwork been finished tight against the fascia',
+                'Has brickwork been finished tight against the fascia/capping',
                 'Does the brickwork overhang the slab rebate by less than 15mm',
                 'Does the brickwork overhang the steel lintels by less than 25mm',
                 'Is the brickwork neat and tidy with no blow outs throughout the brickwork including sill and reveals',
@@ -9534,7 +9534,7 @@ var Inspections = function()
         else if(reportType == 'Builder: Slab inspections')
             var questions = [
                 'Is site sign installed',
-                'Is the site clean with safe access',
+                'Is the site clean with clear access',
                 'Difference between TBM & FFL is as per plans',
                 'Slab surface checked every 2m for level and plan marked to confirm, starting from pod starting point or corner to be confirmed',
                 'Smart wastes are level with slab surface,',
@@ -9545,12 +9545,13 @@ var Inspections = function()
                 'Slab edge is good and no reinforcement bars have been exposed or no cold joints visible',
                 'Has slab site clean been completed',
                 'Has the vapour barrier been turned up against the slab and backfilled as required by NCC 3.2.2.6(c)',
-                'Has Part A of termite treatment been carried out (termite labels to riser pipes)'
+                'Has Part A of termite treatment been carried out (termite labels to riser pipes)',
+                'Slab Inspection is complete and no further items have been identified'
             ];
         else if(reportType == 'Builder: Frame inspections')
             var questions = [
                 'Is site sign visible',
-                'Is the site clean with safe access',
+                'Is the site clean with clear access',
                 'Is frame complete',
                 'Have stumps been installed correctly',
                 'Have bearers been installed correctly',
@@ -9592,7 +9593,8 @@ var Inspections = function()
                 'Have blocks been installed behind saddle trusses',
                 'Have out riggers been installed for barge fascia',
                 'Have L-Brackets been installed at 1.8m centres to bottom chord/Top plate and nailed centred to slots and left proud for movement',
-                'Valley boards have been installed and finish back to the fascia and ends supported by noggins'
+                'Valley boards have been installed and finish back to the fascia and ends supported by noggins',
+                'Frame Inspection is complete and no further items have been identified'
             ];
         self.isProcessing = true;
         self._addQuestionItems(questions, 0);
