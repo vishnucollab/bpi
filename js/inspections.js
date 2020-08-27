@@ -8935,13 +8935,13 @@ var Inspections = function()
             is_short = 0;
         
         var result = is_short?"":"Lot";
-        if(obj.lot_no.trim())
+        if(obj.lot_no && obj.lot_no.trim())
             result += ' ' + obj.lot_no.trim();
-        if(typeof obj.house_no != 'undefined' && obj.house_no.trim())
+        if(typeof obj.house_no != 'undefined' && obj.house_no && obj.house_no.trim())
             result += ', ' + obj.house_no.trim();
-        if(obj.address.trim())
+        if(obj.address && obj.address.trim())
             result += (is_short?' ':', ') + obj.address.trim();
-        if(obj.suburb.trim())
+        if(obj.suburb && obj.suburb.trim())
             result += (is_short?' ':', ') + obj.suburb.trim();
         return result;
     }

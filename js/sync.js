@@ -401,7 +401,7 @@ function Sync()
                                         self.uploadPhotos("inspection");
                                     }
                                 }
-                                self.doServerLog("[E8]: " + objApp.apiURL + 'account/get_data_table/' + tableName +'/' + refreshSync + '/' + p + ' - parameters: ' + parameters.join(','));
+                                self.doServerLog("[E8]: " + objApp.apiURL + 'account/get_data_table/' + tableName +'/' + refreshSync + '/' + p);
                             });
                         }
 
@@ -526,9 +526,9 @@ function Sync()
                 }
             }
         }, "").fail(function() {
-            self.doServerLog("[E6]: " + objApp.apiURL + 'account/get_data_table/' + tableName +'/' + refreshSync + ' - parameters: ' + parameters.join('') + ' - try_count: ' + try_count);
+            self.doServerLog("[E6]: " + objApp.apiURL + 'account/get_data_table/' + tableName +'/' + refreshSync + ' - try_count: ' + try_count);
             /* Give it a try */
-            if(try_count == 0){
+            if(try_count == 0 && typeof parameters == 'object'){
                 self.getDataTable(tableName, parameters, 1);
             }else{
                 if(!self.silentMode)
