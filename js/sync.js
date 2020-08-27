@@ -260,8 +260,10 @@ function Sync()
         $.post(objApp.apiURL + 'account/update_last_sync_date/', parameters , function(data){});
     }
 
-    this.getDataTable = function(tableName, parameters)
+    this.getDataTable = function(tableName, parameters, try_count)
     {
+        if(typeof try_count == 'undefined')
+            try_count = 0;
         var refreshSync = "false";
         if(objApp.objSync.refreshSync)
             refreshSync = "true";
@@ -324,7 +326,8 @@ function Sync()
                                             var handleRecord = function (transaction, tblName, row) {
                                                 // Build the sql insert/update statement
                                                 var sql = self.buildSaveData(tblName, row);
-                                                transaction.executeSql(sql, self.saveData, function (transaction, result) {
+
+                                                function goNext(transaction){
                                                     // Increment the recordIndex
                                                     self.syncingIndexs[tblName][page]++;
                                                     if (self.syncingIndexs[tblName][page] >= self.syncingTables[tblName][page].length) {
@@ -344,24 +347,18 @@ function Sync()
                                                         row = self.syncingTables[tblName][page][self.syncingIndexs[tblName][page]];
                                                         handleRecord(transaction, tblName, row);
                                                     }
-
+                                                }
+                                                transaction.executeSql(sql, self.saveData, function (transaction, result) {
+                                                    goNext(transaction);
                                                 }, DBErrorHandler);
 
                                                 function DBErrorHandler(transaction, error)
                                                 {
                                                     var text_context = (typeof context != 'undefined' && context != "") ? "(" + context + ") " : "";
                                                     self.doServerLog("Error "+text_context+": " + error.message + " in " + sql + " (params : "+self.saveData.join(", ")+")");
-                                                    self.syncingCounter--;
-                                                    if(!self.silentMode) $("#accountMessage #general").text("Processing: " + (self.syncingTotalRequest - self.syncingCounter) + '/' + self.syncingTotalRequest);
-                                                    if (self.syncingCounter == 0) {
-                                                        self.updateLastSyncDate();
-                                                        if (!self.silentMode){
-                                                            self.tableIdx = 0;
-                                                            self.uploadPhotos("inspection");
-                                                        }
-                                                    }
+                                                    goNext(transaction);
                                                 }
-                                            }
+                                            };
 
                                             // Handle the first record for this table.
                                             handleRecord(transaction, tblName, row);
@@ -394,7 +391,18 @@ function Sync()
                                         self.callbackMethod(false);
                                     }
                                 }
-                            }, "");
+                            }, "").fail(function() {
+                                self.syncingCounter--;
+                                if(!self.silentMode) $("#accountMessage #general").text("Processing: " + (self.syncingTotalRequest - self.syncingCounter) + '/' + self.syncingTotalRequest);
+                                if (self.syncingCounter == 0) {
+                                    self.updateLastSyncDate();
+                                    if (!self.silentMode){
+                                        self.tableIdx = 0;
+                                        self.uploadPhotos("inspection");
+                                    }
+                                }
+                                self.doServerLog("[E8]: " + objApp.apiURL + 'account/get_data_table/' + tableName +'/' + refreshSync + '/' + p + ' - parameters: ' + parameters.join(','));
+                            });
                         }
 
                     }else{
@@ -419,8 +427,8 @@ function Sync()
                                 {
                                     // Build the sql insert/update statement
                                     var sql = self.buildSaveData(tableName, row);
-                                    transaction.executeSql(sql, self.saveData, function (transaction, result)
-                                    {
+
+                                    function goNext(transaction){
                                         // Increment the recordIndex
                                         self.syncingIndexs[tableName]++;
                                         if(self.syncingIndexs[tableName] >= self.syncingTables[tableName].length)
@@ -443,24 +451,20 @@ function Sync()
                                             row = self.syncingTables[tableName][self.syncingIndexs[tableName]];
                                             handleRecord(transaction, tableName, row);
                                         }
+                                    }
 
+                                    transaction.executeSql(sql, self.saveData, function (transaction, result)
+                                    {
+                                        goNext(transaction);
                                     }, DBErrorHandler);
 
                                     function DBErrorHandler(transaction, error)
                                     {
                                         var text_context = (typeof context != 'undefined' && context != "") ? "(" + context + ") " : "";
                                         self.doServerLog("Error "+text_context+": " + error.message + " in " + sql + " (params : "+self.saveData.join(", ")+")");
-                                        self.syncingCounter--;
-                                        if(!self.silentMode) $("#accountMessage #general").text("Processing: " + (self.syncingTotalRequest - self.syncingCounter) + '/' + self.syncingTotalRequest);
-                                        if (self.syncingCounter == 0) {
-                                            self.updateLastSyncDate();
-                                            if (!self.silentMode){
-                                                self.tableIdx = 0;
-                                                self.uploadPhotos("inspection");
-                                            }
-                                        }
+                                        goNext(transaction);
                                     }
-                                }
+                                };
 
                                 // Handle the first record for this table.
                                 handleRecord(transaction, tableName, row);
@@ -521,7 +525,24 @@ function Sync()
                     self.callbackMethod(false);
                 }
             }
-        }, "");
+        }, "").fail(function() {
+            self.doServerLog("[E6]: " + objApp.apiURL + 'account/get_data_table/' + tableName +'/' + refreshSync + ' - parameters: ' + parameters.join('') + ' - try_count: ' + try_count);
+            /* Give it a try */
+            if(try_count == 0){
+                self.getDataTable(tableName, parameters, 1);
+            }else{
+                if(!self.silentMode)
+                {
+                    unblockElement("body");
+                    alert("Warning: An error occured during the data sync operation. Please report this error to the Blueprint team.");
+                    $("#accountMessage #general").text("Sorry, something went wrong during the processing phase. Please report this error to the Blueprint team.");
+                }
+                else if(self.callbackMethod != null)
+                {
+                    self.callbackMethod(false);
+                }
+            }
+        });
     }
 
 	/***
@@ -620,7 +641,6 @@ function Sync()
                 // error
                 if(!self.silentMode)
                 {
-
                     unblockElement("body");
                     alert("Warning: An error occured during the data sync operation. Please report this error to the Blueprint team.");
                     $("#accountMessage #general").text("Sorry, something went wrong during the processing phase. Please report this error to the Blueprint team.");
@@ -631,7 +651,19 @@ function Sync()
                     self.callbackMethod(false);
                 }
             }
-		}, "");
+		}, "").fail(function() {
+            if(!self.silentMode)
+            {
+                unblockElement("body");
+                alert("Warning: An error occured during the data sync operation. Please report this error to the Blueprint team.");
+                $("#accountMessage #general").text("Sorry, something went wrong during the processing phase. Please report this error to the Blueprint team.");
+                self.doServerLog("[E7]");
+            }
+            else if(self.callbackMethod != null)
+            {
+                self.callbackMethod(false);
+            }
+        });
 	}
 
 	this.saveGraphs = function()
@@ -700,7 +732,7 @@ function Sync()
         self.saveData.push('0'); /* dirty = 0 */
 		sql += header + ", dirty) " + footer + ", ?);";
 
-		return sql;		
+		return sql;
 	};	
 	
 	
@@ -900,7 +932,7 @@ function Sync()
         }
         
         // Get a recordset of photos with their dirty flags set
-		var sql = "SELECT * " +
+		var sql = "SELECT id " +
 			"FROM " + table + " " +
 			"WHERE dirty = 1";
 
@@ -925,107 +957,95 @@ function Sync()
 			
 			var doNext = function()
 			{
-				var row = items.rows.item(r);
-				var photodata = "";
-				var photodata_tmb = "";
-				
-				// Define a method to actually upload the photo data once it has been retrieved
-				// either from the FS or from the database.
-				var uploadPhoto = function(photodata_tmb, photodata)
-				{
-					var params = {};
-					
-					// Add login details
-					params['email'] = localStorage.getItem("email");
-					params['password'] = localStorage.getItem("password");		
-					params['version'] = objApp.version;	
-					
-					// Add item details
-					params["id"] = row.id;
-					params["seq_no"] = row.seq_no;
-					params["deleted"] = row.deleted;
-					params["photodata"] = photodata;
-					params["photodata_tmb"] = photodata_tmb;
-					params["notes"] = row.notes;
+                var row = items.rows.item(r);
+
+                // Define a method to actually upload the photo data once it has been retrieved
+                // either from the FS or from the database.
+                var uploadPhoto = function(photodata_tmb, photodata, item)
+                {
+                    var params = {};
+
+                    // Add login details
+                    params['email'] = localStorage.getItem("email");
+                    params['password'] = localStorage.getItem("password");
+                    params['version'] = objApp.version;
+
+                    // Add item details
+                    params["id"] = item.id;
+                    params["seq_no"] = item.seq_no;
+                    params["deleted"] = item.deleted;
+                    params["photodata"] = photodata;
+                    params["photodata_tmb"] = photodata_tmb;
+                    params["notes"] = item.notes;
                     params["photo_type"] = photo_type;
-                    
+
                     // The normal inspection table has the cover photo and report photos fields.
                     if(photo_type == "inspection") {
-                        params["inspection_id"] = row.inspection_id;
-                        params["is_cover_photo"] = row.is_cover_photo;
-                        params["is_report_photo"] = row.is_report_photo;
+                        params["inspection_id"] = item.inspection_id;
+                        params["is_cover_photo"] = item.is_cover_photo;
+                        params["is_report_photo"] = item.is_report_photo;
                     } else {
-                        params["reinspection_id"] = row.reinspection_id;                        
+                        params["reinspection_id"] = item.reinspection_id;
                     }
-                    
 
-					if(!self.silentMode)  $("#accountMessage #general").text("Uploading photo " + (r + 1));
-					
-					// Invoke the upload
-					$.post(objApp.apiURL + "inspections/upload_photo", params, function(data)
-					{
-						if(data.status != "OK")
-						{
-							alert("An error occured whilst trying to upload the photo: " + data.message);
-							return;
-						}
-						
-						// The photo uploaded OK  
-						
-						// Set the dirty flag back to 0
-						var sql = "UPDATE " + table + " " + 
-							"SET dirty = 0 " + 
-							"WHERE id = ?";
-							
-						objDBUtils.execute(sql, [row.id], function()
-						{
-							// Increment the row counter
-							r++;
-							
-							// If there are more photos to upload upload them, otherwise start the normal sync.
-							if(r < maxLoop)				
-							{
-								doNext();
-							}
-							else
-							{
+                    if(!self.silentMode)  $("#accountMessage #general").text("Uploading photo " + (r + 1));
+
+                    // Invoke the upload
+                    $.post(objApp.apiURL + "inspections/upload_photo", params, function(data)
+                    {
+                        if(data.status != "OK")
+                        {
+                            alert("An error occured whilst trying to upload the photo: " + data.message);
+                            return;
+                        }
+
+                        // The photo uploaded OK
+
+                        // Set the dirty flag back to 0
+                        var sql = "UPDATE " + table + " " +
+                            "SET dirty = 0 " +
+                            "WHERE id = ?";
+
+                        objDBUtils.execute(sql, [row.id], function()
+                        {
+                            // Increment the row counter
+                            r++;
+
+                            // If there are more photos to upload upload them, otherwise start the normal sync.
+                            if(r < maxLoop)
+                            {
+                                doNext();
+                            }
+                            else
+                            {
                                 // If we're done with uploading inspection photos,
                                 // now upload reinspection photos
-								if(photo_type == "inspection") {
+                                if(photo_type == "inspection") {
                                     self.uploadPhotos("reinspection");
                                 } else {
                                     // If we're done with reinspection photos, finish up.
                                     self.removeDirtyFlags();
                                 }
-							}							
-						});
-						
-					}, "json");
-				}				
-				
-				if(row.photodata)
-				{
-				    if(row.photodata_tmb.indexOf('_thumb') == -1){
-                        photodata = row.photodata;
-                        photodata_tmb = row.photodata_tmb;
-                        uploadPhoto(photodata_tmb, photodata);
-                    }else{
-                        // If phonegap is being used, the image data is on the file system.
-                        // Get the thumbnail
-                        var file_name = row.id + "_thumb.jpg";
-
-                        objUtils.readFile(file_name, function(success, data)
-                        {
-                            if(!success)
-                            {
-                                alert("Couldn't read file: " + file_name);
-                                return;
                             }
+                        });
+                    }, "json");
+                };
 
-                            photodata_tmb = data;
+                objDBUtils.loadRecord(table, row.id, function(item_id, item)
+                {
+                    var photodata = "";
+                    var photodata_tmb = "";
 
-                            // Now get the big image
-                            file_name = row.id + ".jpg";
+                    if(item.photodata)
+                    {
+                        if(item.photodata_tmb.indexOf('_thumb') == -1){
+                            photodata = item.photodata;
+                            photodata_tmb = item.photodata_tmb;
+                            uploadPhoto(photodata_tmb, photodata, item);
+                        }else{
+                            // If phonegap is being used, the image data is on the file system.
+                            // Get the thumbnail
+                            var file_name = item.id + "_thumb.jpg";
 
                             objUtils.readFile(file_name, function(success, data)
                             {
@@ -1035,14 +1055,57 @@ function Sync()
                                     return;
                                 }
 
-                                photodata = data;
+                                photodata_tmb = data;
 
-                                uploadPhoto(photodata_tmb, photodata);
+                                // Now get the big image
+                                file_name = item.id + ".jpg";
+
+                                objUtils.readFile(file_name, function(success, data)
+                                {
+                                    if(!success)
+                                    {
+                                        alert("Couldn't read file: " + file_name);
+                                        return;
+                                    }
+                                    photodata = data;
+                                    uploadPhoto(photodata_tmb, photodata, item);
+                                });
                             });
+                        }
+                    }
+                    else
+                    {
+                        alert("Your photo " + (r + 1) + " is not valid, please re-upload it again");
+                        // Set the dirty flag back to 0
+                        var sql = "UPDATE " + table + " " +
+                            "SET dirty = 0 " +
+                            "WHERE id = ?";
+
+                        objDBUtils.execute(sql, [row.id], function()
+                        {
+                            // Increment the row counter
+                            r++;
+
+                            // If there are more photos to upload upload them, otherwise start the normal sync.
+                            if(r < maxLoop)
+                            {
+                                doNext();
+                            }
+                            else
+                            {
+                                // If we're done with uploading inspection photos,
+                                // now upload reinspection photos
+                                if(photo_type == "inspection") {
+                                    self.uploadPhotos("reinspection");
+                                } else {
+                                    // If we're done with reinspection photos, finish up.
+                                    self.removeDirtyFlags();
+                                }
+                            }
                         });
                     }
-				}
-			}
+                }, row.id);
+			};
 			
 			if(r < maxLoop)				
 			{
@@ -1074,6 +1137,7 @@ function Sync()
     }
 
     this.doServerLog = function(log_msg){
+	    console.log(log_msg);
         var parameters = {};
         parameters['email'] = localStorage.getItem("email");
         parameters['password'] = localStorage.getItem("password");
