@@ -994,7 +994,7 @@ var Inspections = function()
 
         objApp.clearMain();
 
-        objDBUtils.loadRecord("inspections", objApp.keys.inspection_id, function(param, reinspection) {
+        objDBUtils.loadRecord("inspections", objApp.keys.inspection_id, function(param, inspection) {
             if(!inspection) {
                 alert("Couldn't load the inspection record!");
                 return;
