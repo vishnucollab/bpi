@@ -2041,6 +2041,7 @@ table.listing
 .listing td
 {
 	font-size: 18px;
+    color: #4d4d4d;
 }
 
 .listing th, .listing th a
@@ -2069,9 +2070,9 @@ table.listing
     line-height: 30px;
 }
 
-.listing td
+.listing.no-border th, .listing.no-border td
 {
-    color: #4d4d4d;
+    border: none;
 } 
 
 .listing tr:nth-child(2n+1) td
@@ -2405,6 +2406,9 @@ a.yesno_enabled
     text-shadow: #007b87 0px 1px 0;
     text-transform: none;
 }
+a.yesno_enabled.small{
+    padding: 10px;
+}
 
 a.yesno_enabled:hover {
     background: #4072A3;
@@ -2430,7 +2434,9 @@ a.yesno_disabled
     text-shadow: #FFFFFF 0px 1px 0;
     text-transform: none;
 }
-
+a.yesno_disabled.small {
+    padding: 10px;
+}
 a.yesno_disabled:hover {
     background: #9B9B9B;
 }
@@ -2478,3 +2484,25 @@ a.yesno_disabled:hover {
 #frmEmailTo ul.select2-selection__rendered li{margin: 5px 5px 5px 0;padding: 0 5px 0 5px;float: left;clear: none;}
 #frmEmailTo .select2-selection--multiple{border-color:#bbbbbb;}
 #frmEmailTo .select2-container{min-width: 800px;}
+
+.inspectionDetails #installedItemsScrollWrapper2{
+    height: 390px;
+    overflow: hidden;
+    max-height: 390px;
+    min-height: 390px;
+    width: 100% !important;
+}
+
+.inspectionDetails .bottomBtns a.button.btnItemType{
+    top: 30px;
+    margin-left: 5px;
+    background: #f7f7f7;
+    color: #888;
+    text-shadow: none;
+    border: 1px solid;
+}
+.inspectionDetails .bottomBtns a.button.btnItemType:hover,
+.inspectionDetails .bottomBtns a.button.btnItemType.selected{
+    background: #009fe3;
+    color: #fff;
+}

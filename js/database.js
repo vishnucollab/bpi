@@ -643,7 +643,7 @@ function DBUtils()
 				values.push(primaryKey);			
 			}
 		}
-        
+
 		// Execute the query
 	    this.db.transaction(function(transaction) 
 	    {
@@ -1268,6 +1268,36 @@ function DBUtils()
                 "'signature_1' TEXT DEFAULT NULL, " +
                 "'signature_2' TEXT DEFAULT NULL, " +
 				"'certificated' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_1' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_2' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_3' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_4' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_5' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_6' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_7' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_8' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_9' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_10' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_11' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_12' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_13' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_14' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_15' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_16' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_17' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_18' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_19' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_20' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_21' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_22' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_23' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_24' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_25' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_26' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_27' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_28' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_29' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_30' SMALLINT(6) DEFAULT 0, " +
                 "'created_by' INTEGER NOT NULL, " +
 				"'deleted' INTEGER NOT NULL DEFAULT 0 , " +
                 "'new_report' INTEGER NOT NULL DEFAULT 1 , " +
@@ -1340,6 +1370,36 @@ function DBUtils()
                 "'grout_samples' SMALLINT(6) DEFAULT 0, " +
                 "'barrel_code' TEXT DEFAULT NULL, " +
                 "'certificated' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_1' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_2' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_3' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_4' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_5' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_6' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_7' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_8' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_9' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_10' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_11' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_12' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_13' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_14' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_15' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_16' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_17' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_18' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_19' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_20' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_21' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_22' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_23' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_24' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_25' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_26' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_27' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_28' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_29' SMALLINT(6) DEFAULT 0, " +
+                "'extra_item_30' SMALLINT(6) DEFAULT 0, " +
                 "'created_by' INTEGER NOT NULL DEFAULT 48, " + 
                 "'deleted' INTEGER NOT NULL DEFAULT 0, " + 
                 "'dirty' INTEGER NOT NULL DEFAULT 1)";

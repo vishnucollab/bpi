@@ -57,6 +57,7 @@ var Inspections = function()
     this.inspection = false;
     this.keySortArray = false;
     this.MAX_REPORT_PHOTOS = 12;
+    this.TOTAL_EXTRA_ITEMS = 17;
     this.isProcessing = false;
 
 	this.current_table = "inspectionitemphotos";
@@ -488,9 +489,18 @@ var Inspections = function()
                 var values = [reinspection_id, inspection_id, curdate, 1, 1,self.reinspectionNotes,
                 row.min_roof_tiles, row.min_ridge_tiles, row.touch_up_paint, row.min_flooring_tiles, row.grout_samples,
                     row.practical_completed, row.barrel_code, row.certificated];
-                
-                sql = "INSERT INTO reinspections(id, inspection_id, reinspection_date, failed, most_recent,notes, " +
-                    "min_roof_tiles, min_ridge_tiles, touch_up_paint, min_flooring_tiles, grout_samples, practical_completed, barrel_code, certificated ) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+
+                sql = "INSERT INTO reinspections(id, inspection_id, reinspection_date, failed, most_recent, notes, min_roof_tiles, min_ridge_tiles, touch_up_paint, min_flooring_tiles, grout_samples, practical_completed, barrel_code, certificated ";
+
+                for(var i = 1; i <= self.TOTAL_EXTRA_ITEMS; i++) {
+                    sql += ', extra_item_' + i;
+                    values.push(row['extra_item_' + i]);
+                }
+
+                sql += ') VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?';
+                for(var i = 1; i <= self.TOTAL_EXTRA_ITEMS; i++)
+                    sql += ',?';
+                sql += ')';
 
                 objDBUtils.execute(sql, values, function(){
                     
@@ -719,9 +729,13 @@ var Inspections = function()
         self.checkIfNeedPhotos();
         objApp.setSubHeading("Add Issues");
         $("div.btnEditNotes").show();
-
+        $('.unfinalised-final-report-only').addClass('hidden');
+        $("#inspectionStep2 .btnItemType").removeClass('selected');
         if(( objApp.keys.report_type == "Quality Inspection") || (objApp.keys.report_type == "Builder: PCI/Final inspections")) {
             objApp.setSubExtraHeading("Step 2 of 5", true);
+            if (self.finalised != 1) {
+                $('.unfinalised-final-report-only').removeClass('hidden');
+            }
         }else {
             if(self.isReportsWithQuestions()){
                 if(inspectionItem.question)
@@ -980,39 +994,15 @@ var Inspections = function()
 
         objApp.clearMain();
 
-        if(self.inspection) {
-            if(!objApp.empty(self.inspection.brickwork)) {
-                $("#brickwork").val(self.inspection.brickwork);
+        objDBUtils.loadRecord("inspections", objApp.keys.inspection_id, function(param, reinspection) {
+            if(!inspection) {
+                alert("Couldn't load the inspection record!");
+                return;
             }
-
-            if(!objApp.empty(self.inspection.paint_quality)) {
-                $("#paint_quality").val(self.inspection.paint_quality);
-            }
-
-            if(!objApp.empty(self.inspection.plaster_quality)) {
-                $("#plaster_quality").val(self.inspection.plaster_quality);
-            }
-
-            if(!objApp.empty(self.inspection.interior_quality)) {
-                $("#interior_quality").val(self.inspection.interior_quality);
-            }
-
-            if(!objApp.empty(self.inspection.exterior_quality)) {
-                $("#exterior_quality").val(self.inspection.exterior_quality);
-            }
-
-            var brickwork = parseInt($('#inspectionStep5 #brickwork').val());
-            var paintQuality = parseInt($('#inspectionStep5 #paint_quality').val());
-            var plasterQuality = parseInt($('#inspectionStep5 #plaster_quality').val());
-            var interiorQuality = parseInt($('#inspectionStep5 #interior_quality').val());
-            var exteriorQuality = parseInt($('#inspectionStep5 #exterior_quality').val());
-            var total = brickwork + paintQuality + plasterQuality + interiorQuality + exteriorQuality;
-            $('#inspectionStep5 #total').text(total + '/25');
-        }
-
-        $("#inspectionStep5").removeClass("hidden");
-
-        self.setTableWidths2('tblRateListingHeader', 'tblRateListing', 2, 500);
+            self.setValueYesNoItems(inspection);
+            $("#inspectionStep5").removeClass("hidden");
+            self.scroller = new IScroll('#installedItemsScrollWrapper2', { click: true, hScrollbar: false, vScrollbar: false, scrollbarClass: 'myScrollbarSm'});
+        }, "");
     }
 
     // Sets the default notes if no notes have been entered.
@@ -2407,6 +2397,11 @@ var Inspections = function()
                return;
             }
 
+            if($('#frmDefectDetails #itemtype').val()==0){
+                alert('Please select at least one category');
+                return;
+            }
+
             if(self.isAddingSignificantItem == 1){
                 alert('Please select an image for significant issue');
                 return;
@@ -2947,6 +2942,11 @@ var Inspections = function()
                 return;
             }
 
+            if($('#frmDefectDetails #itemtype').val()==0){
+                alert('Please select at least one category');
+                return;
+            }
+
             if(self.isAddingSignificantItem == 1){
                 alert('Please select an image for significant issue');
                 return;
@@ -3076,36 +3076,7 @@ var Inspections = function()
             var exteriorQuality = parseInt($('#inspectionStep5 #exterior_quality').val());
             var total = brickwork + paintQuality + plasterQuality + interiorQuality + exteriorQuality;
             $('#inspectionStep5 #total').text(total + '/25');
-        }
-
-        $("#rateScrollWrapper #brickwork").change(function(){
-            SaveRateTotalInspections();
-            self.checkSaveRateInspection();
-        });
-
-        $("#rateScrollWrapper #paint_quality").change(function(){
-            SaveRateTotalInspections();
-
-            self.checkSaveRateInspection();
-        });
-
-        $("#rateScrollWrapper #plaster_quality").change(function(){
-            SaveRateTotalInspections();
-
-            self.checkSaveRateInspection();
-        });
-
-        $("#rateScrollWrapper #interior_quality").change(function(){
-            SaveRateTotalInspections();
-
-            self.checkSaveRateInspection();
-        });
-
-        $("#rateScrollWrapper #exterior_quality").change(function(){
-            SaveRateTotalInspections();
-
-            self.checkSaveRateInspection();
-        });
+        };
 
 		// Setup toggle controls
   		var objToggleNotes = new toggleControl("toggleNotes", "#frmInspectionDetails #notes", "text", "Notes", function()
@@ -3144,6 +3115,15 @@ var Inspections = function()
                 self.showSignificantItems(2);
             else
                 self.showSignificantItems(3);
+        });
+
+        $("#inspectionStep2 .btnItemType").unbind(objApp.touchEvent);
+        $("#inspectionStep2 .btnItemType").bind(objApp.touchEvent, function(e) {
+            e.preventDefault();
+            var val = $(this).attr('data-value');
+            $("#frmDefectDetails #itemtype").val(val);
+            $("#inspectionStep2 .btnItemType").removeClass('selected');
+            $(this).addClass('selected');
         });
 
         $("#btnSendReport, #btnSendReport2, #btnSendReport3").unbind(objApp.touchEvent);
@@ -3256,6 +3236,12 @@ var Inspections = function()
                 alert('Please enter other fields before selecting the image.');
                 return;
             }
+
+            if($('#frmDefectDetails #itemtype').val()==0){
+                alert('Please select at least one category');
+                return;
+            }
+
             var $this = $(this);
             self.current_table = "inspectionitemphotos";
             self.current_key = "inspection_id";
@@ -3869,6 +3855,8 @@ var Inspections = function()
 
             });
         });
+
+        self.bindYesNoButtons();
 	}
 
     this.showReportPhotos = function()
@@ -4636,6 +4624,8 @@ var Inspections = function()
 
             $("#frmDefectDetails #itemtype").val(inspectionItem.itemtype);
             $("#frmDefectDetails #numrepeats").val(inspectionItem.numrepeats);
+
+            $("#inspectionStep2 .btnItemType[data-value="+ inspectionItem.itemtype +"]").addClass('selected');
 		}
 
         if($("#frmDefectDetails #itemtype").val() == "1") {
@@ -5953,6 +5943,7 @@ var Inspections = function()
 		var location =	self.objPopLocation.getText();
 		var action = self.objPopAction.getText();
 		var observation =  $("#frmDefectDetails #observation").val();
+        var itemtype =  $("#frmDefectDetails #itemtype").val();
 
    		if((location == "") || (location.toUpperCase() == "CHOOSE") || observation == "")
    		{
@@ -6000,13 +5991,12 @@ var Inspections = function()
 
         var sql = "SELECT * " +
             "FROM inspectionitems " +
-            "WHERE inspection_id = ? AND location = ? AND observation = ? AND action = ? AND deleted = 0";
+            "WHERE inspection_id = ? AND location = ? AND observation = ? AND action = ? AND itemtype = ? AND deleted = 0";
 
-        objDBUtils.loadRecordSQL(sql, [objApp.keys.inspection_id, location, observation, action], function(row)
+        objDBUtils.loadRecordSQL(sql, [objApp.keys.inspection_id, location, observation, action, itemtype], function(row)
         {
             if(row)
             {
-                console.log(row);
                 console.log('This inspection item has been added');
                 self.inAudit = true;
 
@@ -8767,7 +8757,6 @@ var Inspections = function()
 
         blockElement('body');
         objDBUtils.loadRecord("users", self.inspection.supervisor_id.length==0?-1:self.inspection.supervisor_id, function(param, supervisor) {
-            console.log(supervisor);
             if (supervisor){
                 supervisor_email = supervisor.email;
             }
@@ -9639,5 +9628,46 @@ var Inspections = function()
             self._addQuestionItems(questions, seq_no);
         });
     };
+
+    this.setValueYesNoItems = function(obj){
+        for(var i = 1; i <= self.TOTAL_EXTRA_ITEMS; i++){
+            if(obj['extra_item_' + i] == 1) {
+                $('a[data-id="btnEx'+i+'Yes"]').removeClass("yesno_disabled").addClass("yesno_enabled");
+                $('a[data-id="btnEx'+i+'No"]').removeClass("yesno_enabled").addClass("yesno_disabled");
+                $("#extra_item_" + i).val("1");
+            } else if(obj['extra_item_' + i] == 0 || obj['extra_item_' + i] == null) {
+                $('a[data-id="btnEx'+i+'Yes"]').removeClass("yesno_enabled").addClass("yesno_disabled");
+                $('a[data-id="btnEx'+i+'No"]').removeClass("yesno_disabled").addClass("yesno_enabled");
+                $("#extra_item_" + i).val("0");
+            }
+        }
+    }
+
+    this.bindYesNoButtons = function(){
+        for(var i = 1; i <= self.TOTAL_EXTRA_ITEMS; i++) {
+            $('a[data-id="btnEx'+i+'Yes"]').unbind(objApp.touchEvent);
+            $('a[data-id="btnEx'+i+'Yes"]').bind(objApp.touchEvent, function (e) {
+                if (self.finalised == 1)
+                    return false;
+                var id = $(this).attr('data-id').replace('btnEx', '').replace('Yes', '');
+                $('a[data-id="btnEx'+id+'Yes"]').removeClass("yesno_disabled").addClass("yesno_enabled");
+                $('a[data-id="btnEx'+id+'No"]').removeClass("yesno_enabled").addClass("yesno_disabled");
+                $("#extra_item_" + id).val("1");
+                objDBUtils.execute("UPDATE inspections SET extra_item_"+id+" = 1, dirty = 1 WHERE id = ?", [objApp.keys.inspection_id], function(){});
+                return false;
+            });
+            $('a[data-id="btnEx'+i+'No"]').unbind(objApp.touchEvent);
+            $('a[data-id="btnEx'+i+'No"]').bind(objApp.touchEvent, function (e) {
+                if (self.finalised == 1)
+                    return false;
+                var id = $(this).attr('data-id').replace('btnEx', '').replace('No', '');
+                $('a[data-id="btnEx'+id+'Yes"]').removeClass("yesno_enabled").addClass("yesno_disabled");
+                $('a[data-id="btnEx'+id+'No"]').removeClass("yesno_disabled").addClass("yesno_enabled");
+                $("#extra_item_" + id).val("0");
+                objDBUtils.execute("UPDATE inspections SET extra_item_"+id+" = 0, dirty = 1 WHERE id = ?", [objApp.keys.inspection_id], function(){});
+                return false;
+            });
+        }
+    }
 };
 
