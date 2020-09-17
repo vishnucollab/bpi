@@ -2992,6 +2992,8 @@ var Inspections = function()
                 
                 // Clear the
                 $("#frmDefectDetails #observation_suggestion").empty();
+                $("#frmDefectDetails #itemtype").val(0);
+                $("#inspectionStep2 .btnItemType").removeClass('selected');
 
                 // Initialise defect form.
                 //self.initDefectForm(null, false);
@@ -3045,18 +3047,6 @@ var Inspections = function()
 				unblockElement('body');
 			}, 500);
 		});
-
-        $("a.itemtype").bind(objApp.touchEvent, function(e) {
-            if($(this).hasClass("acknowledgement")) {
-                $(this).removeClass("acknowledgement");
-                $("#itemtype").val("0");
-            } else {
-                $(this).addClass("acknowledgement");
-                $("#itemtype").val("1");
-            }
-
-            self.saveDefect();
-        });
 
 		// Handle the event when the user clicks on the PRINT button
 		// to print the inspection report.
@@ -4564,6 +4554,7 @@ var Inspections = function()
             self.objPopLocation.clear("", "Choose");
 			$("#frmDefectDetails #created_by").val(user_id);
             $("#frmDefectDetails #itemtype").val("0");
+            $("#inspectionStep2 .btnItemType").removeClass('selected');
             $("#frmDefectDetails #numrepeats").val("0");
 
             if(addNewQuestionIssue && inspectionItem){
@@ -4625,14 +4616,9 @@ var Inspections = function()
             $("#frmDefectDetails #itemtype").val(inspectionItem.itemtype);
             $("#frmDefectDetails #numrepeats").val(inspectionItem.numrepeats);
 
+            $("#inspectionStep2 .btnItemType").removeClass('selected');
             $("#inspectionStep2 .btnItemType[data-value="+ inspectionItem.itemtype +"]").addClass('selected');
 		}
-
-        if($("#frmDefectDetails #itemtype").val() == "1") {
-            $("a.itemtype").addClass("acknowledgement");
-        } else {
-            $("a.itemtype").removeClass("acknowledgement");
-        }
 
 		$("#frmDefectDetails #observation_suggestion").empty();
         $("#observationFS").hide();
@@ -9631,11 +9617,18 @@ var Inspections = function()
 
     this.setValueYesNoItems = function(obj){
         for(var i = 1; i <= self.TOTAL_EXTRA_ITEMS; i++){
-            if(obj['extra_item_' + i] == 1) {
+            if(obj['extra_item_' + i] == 2) {
+                $('a[data-id="btnEx'+i+'Yes2"]').removeClass("yesno_disabled").addClass("yesno_enabled");
+                $('a[data-id="btnEx'+i+'Yes"]').removeClass("yesno_enabled").addClass("yesno_disabled");
+                $('a[data-id="btnEx'+i+'No"]').removeClass("yesno_enabled").addClass("yesno_disabled");
+                $("#extra_item_" + i).val("2");
+            } else if(obj['extra_item_' + i] == 1) {
+                $('a[data-id="btnEx'+i+'Yes2"]').removeClass("yesno_enabled").addClass("yesno_disabled");
                 $('a[data-id="btnEx'+i+'Yes"]').removeClass("yesno_disabled").addClass("yesno_enabled");
                 $('a[data-id="btnEx'+i+'No"]').removeClass("yesno_enabled").addClass("yesno_disabled");
                 $("#extra_item_" + i).val("1");
             } else if(obj['extra_item_' + i] == 0 || obj['extra_item_' + i] == null) {
+                $('a[data-id="btnEx'+i+'Yes2"]').removeClass("yesno_enabled").addClass("yesno_disabled");
                 $('a[data-id="btnEx'+i+'Yes"]').removeClass("yesno_enabled").addClass("yesno_disabled");
                 $('a[data-id="btnEx'+i+'No"]').removeClass("yesno_disabled").addClass("yesno_enabled");
                 $("#extra_item_" + i).val("0");
@@ -9645,11 +9638,24 @@ var Inspections = function()
 
     this.bindYesNoButtons = function(){
         for(var i = 1; i <= self.TOTAL_EXTRA_ITEMS; i++) {
+            $('a[data-id="btnEx'+i+'Yes2"]').unbind(objApp.touchEvent);
+            $('a[data-id="btnEx'+i+'Yes2"]').bind(objApp.touchEvent, function (e) {
+                if (self.finalised == 1)
+                    return false;
+                var id = $(this).attr('data-id').replace('btnEx', '').replace('Yes2', '');
+                $('a[data-id="btnEx'+id+'Yes2"]').removeClass("yesno_disabled").addClass("yesno_enabled");
+                $('a[data-id="btnEx'+id+'Yes"]').removeClass("yesno_enabled").addClass("yesno_disabled");
+                $('a[data-id="btnEx'+id+'No"]').removeClass("yesno_enabled").addClass("yesno_disabled");
+                $("#extra_item_" + id).val("2");
+                objDBUtils.execute("UPDATE inspections SET extra_item_"+id+" = 2, dirty = 1 WHERE id = ?", [objApp.keys.inspection_id], function(){});
+                return false;
+            });
             $('a[data-id="btnEx'+i+'Yes"]').unbind(objApp.touchEvent);
             $('a[data-id="btnEx'+i+'Yes"]').bind(objApp.touchEvent, function (e) {
                 if (self.finalised == 1)
                     return false;
                 var id = $(this).attr('data-id').replace('btnEx', '').replace('Yes', '');
+                $('a[data-id="btnEx'+id+'Yes2"]').removeClass("yesno_enabled").addClass("yesno_disabled");
                 $('a[data-id="btnEx'+id+'Yes"]').removeClass("yesno_disabled").addClass("yesno_enabled");
                 $('a[data-id="btnEx'+id+'No"]').removeClass("yesno_enabled").addClass("yesno_disabled");
                 $("#extra_item_" + id).val("1");
@@ -9661,6 +9667,7 @@ var Inspections = function()
                 if (self.finalised == 1)
                     return false;
                 var id = $(this).attr('data-id').replace('btnEx', '').replace('No', '');
+                $('a[data-id="btnEx'+id+'Yes2"]').removeClass("yesno_enabled").addClass("yesno_disabled");
                 $('a[data-id="btnEx'+id+'Yes"]').removeClass("yesno_enabled").addClass("yesno_disabled");
                 $('a[data-id="btnEx'+id+'No"]').removeClass("yesno_disabled").addClass("yesno_enabled");
                 $("#extra_item_" + id).val("0");
