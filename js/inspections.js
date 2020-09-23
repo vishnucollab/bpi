@@ -2528,27 +2528,15 @@ var Inspections = function()
                     grout_samples,practical_completed,barrel_code,objApp.keys.reinspection_id], null);
             }
             else {
-                self.checkSaveInspection();
+                self.checkSaveInspection(1, function(){
+                    objApp.cleanup();
+                    self.setReturnInspectionID("");
+                    self.setupInspections();
+                    objApp.context = "inspections";
+                    objApp.setBodyClass('inspections');
+                });
             }
-
             e.preventDefault();
-
-            if( (objApp.keys.report_type == 'Quality Inspection' || objApp.keys.report_type == 'Builder: PCI/Final inspections') && objApp.keys.reinspection_id == "") {
-                //self.showStep5();
-                objApp.cleanup();
-                self.setReturnInspectionID("");
-                self.setupInspections();
-                objApp.context = "inspections";
-                objApp.setBodyClass('inspections');
-            }
-            else {
-                objApp.cleanup();
-                self.setReturnInspectionID("");
-                self.setupInspections();
-                objApp.context = "inspections";
-                objApp.setBodyClass('inspections');
-            }
-
             return false;
         });
 
