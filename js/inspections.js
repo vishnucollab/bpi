@@ -8751,7 +8751,7 @@ var Inspections = function()
     
     this.resolveEmailReportRecipients = function() {
 
-        var office_email = 'info@bpigrp.com.au';
+        var office_email = 'bookings@bpi360.com.au';
         var builder_email = "";
         var supervisor_email = "";
         var user_email = localStorage.getItem("email");
@@ -8777,8 +8777,13 @@ var Inspections = function()
                     var recipients = user_email;
                     var old_recipients = $("#recipients").val();
 
+                    var need_office_email = 0;
                     if($("#emailToOffice").is(":checked")) {
-                        recipients += "," + office_email;
+                        if(!objApp.empty(recipients)) {
+                            recipients += ",";
+                        }
+                        need_office_email = 1;
+                        recipients += office_email;
                     }
                     else
                     {
@@ -8843,6 +8848,7 @@ var Inspections = function()
                     else
                         var recipients_array = recipients.split(',');
 
+                    var office_email_not_in_address_book = 1;
                     var builder_email_not_in_address_book = 1;
                     var supervisor_email_not_in_address_book = 1;
                     var options = "";
@@ -8854,6 +8860,9 @@ var Inspections = function()
                         {
                             options += "<option value='"+value+"' >"+value+"</option>";
                         }
+                        if (value == office_email){
+                            office_email_not_in_address_book = 0;
+                        }
                         if (value == builder_email){
                             builder_email_not_in_address_book = 0;
                         }
@@ -8861,6 +8870,12 @@ var Inspections = function()
                             supervisor_email_not_in_address_book = 0;
                         }
                     });
+                    if (office_email_not_in_address_book){
+                        if (need_office_email)
+                            options += "<option value='"+office_email+"' selected>"+office_email+"</option>";
+                        else
+                            options += "<option value='"+office_email+"'>"+office_email+"</option>";
+                    }
                     if (builder_email_not_in_address_book){
                         if (need_builder_email)
                             options += "<option value='"+builder_email+"' selected>"+builder_email+"</option>";
