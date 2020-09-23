@@ -9639,7 +9639,7 @@ var Inspections = function()
         for(var i = 1; i <= self.TOTAL_EXTRA_ITEMS; i++){
             if(obj['extra_item_' + i] == 2) {
                 $('a[data-id="btnEx'+i+'Yes2"]').removeClass("yesno_disabled").addClass("yesno_enabled");
-                $('a[data-id="btnEx'+i+'Yes"]').removeClass("yesno_enabled").addClass("yesno_disabled");
+                $('a[data-id="btnEx'+i+'Yes"]').removeClass("yesno_disabled").addClass("yesno_enabled");
                 $('a[data-id="btnEx'+i+'No"]').removeClass("yesno_enabled").addClass("yesno_disabled");
                 $("#extra_item_" + i).val("2");
             } else if(obj['extra_item_' + i] == 1) {
@@ -9664,7 +9664,7 @@ var Inspections = function()
                     return false;
                 var id = $(this).attr('data-id').replace('btnEx', '').replace('Yes2', '');
                 $('a[data-id="btnEx'+id+'Yes2"]').removeClass("yesno_disabled").addClass("yesno_enabled");
-                $('a[data-id="btnEx'+id+'Yes"]').removeClass("yesno_enabled").addClass("yesno_disabled");
+                $('a[data-id="btnEx'+id+'Yes"]').removeClass("yesno_disabled").addClass("yesno_enabled");
                 $('a[data-id="btnEx'+id+'No"]').removeClass("yesno_enabled").addClass("yesno_disabled");
                 $("#extra_item_" + id).val("2");
                 objDBUtils.execute("UPDATE inspections SET extra_item_"+id+" = 2, dirty = 1 WHERE id = ?", [objApp.keys.inspection_id], function(){});
