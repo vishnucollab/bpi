@@ -57,7 +57,7 @@ var Inspections = function()
     this.inspection = false;
     this.keySortArray = false;
     this.MAX_REPORT_PHOTOS = 12;
-    this.TOTAL_EXTRA_ITEMS = 17;
+    this.TOTAL_EXTRA_ITEMS = 18;
     this.isProcessing = false;
 
 	this.current_table = "inspectionitemphotos";
