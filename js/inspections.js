@@ -3403,6 +3403,9 @@ var Inspections = function()
 
                                                                                     $("#frmDefectDetails #observation_suggestion tr td").unbind();
                                                                                     $("#frmDefectDetails #observation_suggestion").empty();
+
+                                                                                    $("#frmDefectDetails #itemtype").val("0");
+                                                                                    $("#inspectionStep2 .btnItemType").removeClass('selected');
                                                                                 }
                                                                             });
                                                                         });
@@ -3783,6 +3786,9 @@ var Inspections = function()
 
                                                 $("#frmDefectDetails #observation_suggestion tr td").unbind();
                                                 $("#frmDefectDetails #observation_suggestion").empty();
+
+                                                $("#frmDefectDetails #itemtype").val("0");
+                                                $("#inspectionStep2 .btnItemType").removeClass('selected');
                                             }else{
                                                 self.loadQuestionItems();
                                             }
