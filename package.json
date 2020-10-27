@@ -1,0 +1,22 @@
+{
+  "name": "blueprint",
+  "version": "1.0.0",
+  "description": "Conduct onsite buidling inspections with Blueprint and produce beautiful reports that your clients will love.",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Nycran/Blueprint.git"
+  },
+  "keywords": [
+    "blueprint"
+  ],
+  "author": "SIMB",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Nycran/Blueprint/issues"
+  },
+  "homepage": "https://github.com/Nycran/Blueprint#readme"
+}
