@@ -18,5 +18,8 @@
   "bugs": {
     "url": "https://bitbucket.org/simbau/blueprint.git/issues"
   },
-  "homepage": "https://bitbucket.org/simbau/blueprint.git#readme"
+  "homepage": "https://bitbucket.org/simbau/blueprint.git#readme",
+  "dependencies": {
+    "cordova-ios": "4.5.3"
+  }
 }

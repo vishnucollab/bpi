@@ -27,7 +27,7 @@
     </feature>
     <preference name="CordovaWebViewEngine" value="CDVWKWebViewEngine" />
 
-    <engine name="ios" spec="^4.5.3" />
+    <engine name="ios" spec="4.5.3" />
 
     <gap:plugin name="cordova-plugin-battery-status" source="npm" spec="1.2.4"/>
     <gap:plugin name="cordova-plugin-ios-camera-permissions" source="npm" spec="1.2.0"/>
