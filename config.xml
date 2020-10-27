@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <widget xmlns = "http://www.w3.org/ns/widgets"
-        xmlns:gap = "http://phonegap.com/ns/1.0"
-        id = "com.simb.Blueprint-17680"
+        id = "com.simb.Blueprint"
         version = "2.0.23">
     <name>Blueprint</name>
 
@@ -44,14 +43,6 @@
     <feature name="CDVWKWebViewEngine">
         <param name="ios-package" value="CDVWKWebViewEngine" />
     </feature>
-
-    <config-file platform="ios" parent="UIStatusBarHidden">
-        <true/>
-    </config-file>
-
-    <config-file platform="ios" parent="UIViewControllerBasedStatusBarAppearance">
-        <false/>
-    </config-file>
 
     <platform name="ios">
         <icon src="resources/icon/ios/icon-32.png" width="32" height="32" />
