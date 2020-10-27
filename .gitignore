@@ -1,6 +1,6 @@
-Thumbs.db
 api/*
 .idea
 node_modules
 platforms
+plugins
 package-lock.json

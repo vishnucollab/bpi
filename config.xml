@@ -14,7 +14,7 @@
     </author>
 
     <access origin="*" />
-    <engine name="ios" spec="4.5.3" />
+    <engine name="ios" spec="5.0.0" />
 
     <plugin name="cordova-plugin-battery-status" source="npm" spec="1.2.4"/>
     <plugin name="cordova-plugin-ios-camera-permissions" source="npm" spec="1.2.0"/>
