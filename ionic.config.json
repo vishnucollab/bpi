@@ -1,0 +1,7 @@
+{
+  "name": "blueprint",
+  "type": "custom",
+  "integrations": {
+    "cordova": {}
+  }
+}
