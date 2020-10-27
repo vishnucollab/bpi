@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Nycran/Blueprint.git"
+    "url": "git+https://bitbucket.org/simbau/blueprint.git"
   },
   "keywords": [
     "blueprint"
@@ -16,7 +16,7 @@
   "author": "SIMB",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Nycran/Blueprint/issues"
+    "url": "https://bitbucket.org/simbau/blueprint.git/issues"
   },
-  "homepage": "https://github.com/Nycran/Blueprint#readme"
+  "homepage": "https://bitbucket.org/simbau/blueprint.git#readme"
 }
