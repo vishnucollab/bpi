@@ -33,15 +33,9 @@
     <plugin name="cordova-plugin-statusbar" source="npm" spec="2.2.3"/>
     <plugin name="cordova-plugin-file-opener2" source="npm" spec="2.0.19"/>
     <plugin name="cordova-plugin-sqlite-2" source="npm" spec="1.0.4"/>
-    <plugin name="cordova-plugin-wkwebview-engine" source="npm" spec="1.1.4"/>
 
     <preference name="Orientation" value="landscape" />
     <preference name="target-device" value="tablet" />
-    <preference name="CordovaWebViewEngine" value="CDVWKWebViewEngine" />
-
-    <feature name="CDVWKWebViewEngine">
-        <param name="ios-package" value="CDVWKWebViewEngine" />
-    </feature>
 
     <platform name="ios">
         <icon src="resources/icon/ios/icon-32.png" width="32" height="32" />
@@ -50,5 +44,17 @@
         <icon src="resources/icon/ios/icon-180.png" width="180" height="180" />
         <icon src="resources/icon/ios/icon-192.png" width="192" height="192" />
         <icon src="resources/icon/ios/icon-270.png" width="270" height="270" />
+    </platform>
+
+    <platform name="ios">
+        <config-file target="*-Info.plist" parent="NSLocationWhenInUseUsageDescription">
+            <string>Location is required so we can show you your nearby projects to support.</string>
+        </config-file>
+        <config-file target="*-Info.plist" parent="NSCameraUsageDescription">
+            <string>Camera access required in order to let you select pictures from camera.</string>
+        </config-file>
+        <config-file target="*-Info.plist" parent="NSPhotoLibraryUsageDescription">
+            <string>Photo library access required in order to let you select pictures from gallery/library.</string>
+        </config-file>
     </platform>
 </widget>
