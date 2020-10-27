@@ -61,7 +61,6 @@
     <access origin="*" />
 
     <platform name="ios">
-        <icon src="icon.png" />
         <icon src="resources/icon/ios/icon-32.png" gap:platform="ios" width="32" height="32" />
         <icon src="resources/icon/ios/icon-72.png" gap:platform="ios" width="72" height="72" />
         <icon src="resources/icon/ios/icon-144.png" gap:platform="ios" width="144" height="144" />
