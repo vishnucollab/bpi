@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <widget xmlns = "http://www.w3.org/ns/widgets"
-        id = "com.simb.Blueprint"
+        id = "au.com.simb.Blueprint"
         version = "2.0.23">
     <name>Blueprint</name>
 
