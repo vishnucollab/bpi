@@ -2526,6 +2526,12 @@ var Inspections = function()
                 var barrel_code = $("#barrel_code").val();
                 objDBUtils.execute(sql, [min_roof_tiles,min_ridge_tiles,touch_up_paint,min_flooring_tiles,
                     grout_samples,practical_completed,barrel_code,objApp.keys.reinspection_id], null);
+
+                objApp.cleanup();
+                self.setReturnInspectionID("");
+                self.setupInspections();
+                objApp.context = "inspections";
+                objApp.setBodyClass('inspections');
             }
             else {
                 self.checkSaveInspection(1, function(){
@@ -7532,7 +7538,7 @@ var Inspections = function()
                     $('#rectified').html('<option value="Not Rectified">Not Rectified</option>\n' +
                         '                        <option value="Rectified">Rectified</option>\n' +
                         '                        <option value="Improvement Made">Improvement Made</option>\n' +
-                        '                        <option value="Approved By CM">Approved By CM</option>\n' +
+                        '                        <option value="Management Approved">Management Approved</option>\n' +
                         '                        <option value="NA">NA</option>');
                 }
 
