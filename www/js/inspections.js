@@ -212,8 +212,6 @@ var Inspections = function()
         var filter_builder_id = selected_il_builder_id;
         var filter_finalised = $("#inspectionList #is_finalised").val();
         var filter_limit = $("#inspectionList #filter_limit").val();
-        if((filter_limit != "") && (filter_limit != "all"))
-            filter_limit = 50;
           
         if(searchText != "")
         {
@@ -269,6 +267,7 @@ var Inspections = function()
 			var html = '<table id="tblInspectionListing" class="listing">';
 			
 			var maxLoop = items.rows.length;
+            console.log(maxLoop);
 			var r = 0;
 			
 			for(r = 0; r < maxLoop; r++) {
