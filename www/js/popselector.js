@@ -3,7 +3,7 @@
 * @copyright: SIMB Pty Ltd 2010 - 2011
 */                     
 
-var popselector = function(selector, heading)
+var popselector = function(selector, heading, favouriteItems)
 {
 	this.selector = selector; 	// Assign the target selector so we can save results there later.
 	this.heading = heading;		// The heading to assign to the h1 tag.
@@ -18,6 +18,7 @@ var popselector = function(selector, heading)
 	this.deleteCallback = null;	// Set to a javascript method to enable the deletion of poplist items.
     this.scroller = false;
     this.doDeleteID = 0;
+    this.favouriteItems = typeof favouriteItems != 'undefined'?favouriteItems:null;
 	
 	var self = this;	// Store a reference to the object for use within window scope callbacks.
 	
@@ -88,14 +89,22 @@ var popselector = function(selector, heading)
 			div.append('<input type="button" id="btnPopSelectorAdd" value="Add New" />');
 			
 		div.append('</form>');
+		if (self.favouriteItems) {
+            var fHeight = 184;
+            div.append('<div id="favouriteOptionsWrapper" style="height: ' + fHeight + 'px; margin-bottom: 20px;"><div id="favouriteOptions" width: ' + width + 'px" ><p>Loading...</p></div></div>');
+            optionsHeight = optionsHeight - fHeight - 20;
+        }
 		div.append('<div id="popSelectorOptionsWrapper" style="height: ' + optionsHeight + 'px"><div id="popSelectorOptions" width: ' + width + 'px" ><p>Loading...</p></div></div>');
 		div.append('<div id="popSelectorControls">' +
 			'<a id="btnPopSelectorCancel" class="button" href="javascript:void(0);">Done</a>' +
 			'<a id="btnPopSelectorUp" class="button" href="javascript:void(0);">UP</a>' + 
 			'<a id="btnPopSelectorDown" class="button" href="javascript:void(0);">Down</a>' +
 		'</div>');
-        
-        var az = "<ul id='popAZ'>";
+        if (self.favouriteItems) {
+            var az = "<ul id='popAZ' class='has-favourite-items'>";
+        } else {
+            var az = "<ul id='popAZ'>";
+        }
         
         for(c = 97; c <= 122; c++)
         {
@@ -114,6 +123,7 @@ var popselector = function(selector, heading)
 		
 		// Load the options from the original control into the array
 		self.loadOptions();
+        self.buildFavouriteList();
 		
 		// Call the search method to fill the results.
 		self.search();
@@ -324,6 +334,67 @@ var popselector = function(selector, heading)
 			self.search();
 		}
 	}
+
+	this.buildFavouriteList = function()
+    {
+        if (!self.favouriteItems) return;
+        var html = "";
+
+        $("#popSelector #favouriteOptions").html("");
+        $("#popSelector #favouriteOptions").scrollTop(0);
+
+        for(var id in self.favouriteItems)
+        {
+            var match = true;
+
+            var val = id;
+            var text = self.favouriteItems[id];
+
+            if(match)
+            {
+                html += '<p id="' + val + '" ';
+                html += '><span>' + text + '</span>';
+                html += '</p>';
+            }
+        }
+        $("#popSelector #favouriteOptions").html(html);
+
+        /***
+         * Handle the event when the user clicks on an option.
+         */
+        $("#popSelector #favouriteOptions p").bind("click", function(e)
+        {
+            e.preventDefault();
+
+            // Get the id of the selected value
+            var id = $(this).attr("id");
+            var text = $(this).find("span").text();
+
+            if(id == "")
+                return;
+
+            // Add the active selected to it
+            $(this).addClass("selected");
+
+            // Set the value of the source selector
+            var first_element = $(self.selector + " li:eq(0)");
+
+            if(first_element != null)
+            {
+                $(first_element).attr("title", id);
+                $(first_element).text(text);
+                $(first_element).css("display", "block");
+            }
+
+            setTimeout(function()
+            {
+                self.close();
+
+            }, 100);
+
+            return false;
+        });
+    };
 	
 	/***
 	* The search function is invoked when the user taps the search button.

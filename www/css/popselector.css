@@ -99,8 +99,8 @@ ul.selector
         overflow-y: auto;
     }    
 	
-	#popSelector #popSelectorOptions
-	{
+	#popSelector #popSelectorOptions, #popSelector #favouriteOptions
+    {
 		margin: 5px 0 0 0;
 		padding: 0;
 		overflow-y: auto;
@@ -108,7 +108,7 @@ ul.selector
 		width: 440px;
 	}
 	
-		#popSelector #popSelectorOptions p
+		#popSelector #popSelectorOptions p, #popSelector #favouriteOptions p
 		{                
 			margin: 0 5px !important;
 			background-color: #EEEEEE;
@@ -120,6 +120,13 @@ ul.selector
             position: relative;
             display: block;
 		}
+        #popSelector #favouriteOptions p{
+            padding: 5px 5px 10px;
+            display: inline-block;
+            width: 45%;
+            margin-bottom: 5px !important;
+            height: 25px;
+        }
         
         #popSelector #popSelectorOptions p.deleteEnabled
         {

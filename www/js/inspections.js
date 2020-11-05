@@ -2412,7 +2412,7 @@ var Inspections = function()
                return;
             }
 
-            if($('#frmDefectDetails #itemtype').val()==0){
+            if($('#frmDefectDetails #itemtype').val()==0 && (objApp.keys.report_type == 'Quality Inspection' || objApp.keys.report_type == 'Builder: PCI/Final inspections')){
                 alert('Please select at least one category');
                 return;
             }
@@ -2955,7 +2955,7 @@ var Inspections = function()
                 return;
             }
 
-            if($('#frmDefectDetails #itemtype').val()==0){
+            if($('#frmDefectDetails #itemtype').val()==0 && (objApp.keys.report_type == 'Quality Inspection' || objApp.keys.report_type == 'Builder: PCI/Final inspections')){
                 alert('Please select at least one category');
                 return;
             }
@@ -3240,7 +3240,7 @@ var Inspections = function()
                 return;
             }
 
-            if($('#frmDefectDetails #itemtype').val()==0){
+            if($('#frmDefectDetails #itemtype').val()==0 && (objApp.keys.report_type == 'Quality Inspection' || objApp.keys.report_type == 'Builder: PCI/Final inspections')){
                 alert('Please select at least one category');
                 return;
             }
@@ -4558,7 +4558,16 @@ var Inspections = function()
         if(self.objPopAction == null)
         {
             // The pop selectors have not been initialised yet.
-            self.objPopAction = new popselector("#frmDefectDetails #popAction", "Please select an action");
+            self.objPopAction = new popselector("#frmDefectDetails #popAction", "Please select an action", {
+                'wMCvn1496267702229': 'Painter',
+                'EPDJx1497830372082': 'Carpenter',
+                'PJ6r-1498695426437': 'Plasterer',
+                'UTKUL1497504027196': 'Caulker',
+                'PJ6r-1498689594404': 'Cleaner',
+                'UTKUL1498623683921': 'Plumber',
+                'PJ6r-1498797187097': 'Electrician',
+                'EPDJx1498181040480': 'Bricklayer'
+            });
             self.objPopAction.callbackMethod = objApp.objInspection.handleActionChanged;
             self.objPopAction.addNewMethod = self.addNewAction;
             self.objPopAction.deleteCallback = self.deleteAction;
