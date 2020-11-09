@@ -7684,7 +7684,18 @@ var Inspections = function()
                         self.scroller = new IScroll('#reinspectionScrollWrapper', { click: true, hScrollbar: false, vScrollbar: false, scrollbarClass: 'myScrollbarSm'});
                     }
 
+                    // Handle the event when the rectified status of the item is updated
+                    $('#reinspection select#rectified').unbind("change");
+                    $('#reinspection select#rectified').bind("change", function() {
+
+                        var rectified_status = $(this).val();
+                        alert('Select: ' + rectified_status);
+                        self.checkSaveRectifiedInspectionitem(rectified_status);
+
+                    });
+
                     // Handle the event when the user clicks on a row in the item table
+                    $('#tblReinspectionListing tr').unbind(objApp.touchEvent);
                     $('#tblReinspectionListing tr').bind(objApp.touchEvent, function() {
 
                         var reinspectionItemID = $(this).attr("data-id");
@@ -7715,16 +7726,6 @@ var Inspections = function()
                         var significant_id = $(this).attr("data-id");
                         self.deleteSignificantItem(significant_id, objApp.keys.reinspection_id);
                         self.loadReinspectionItems(objApp.keys.reinspection_id);
-                    });
-
-                    // Handle the event when the rectified status of the item is updated
-                    $('#reinspection select#rectified').unbind("change");
-                    $('#reinspection select#rectified').bind("change", function() {
-
-                        var rectified_status = $(this).val();
-                        alert('Select: ' + rectified_status);
-                        self.checkSaveRectifiedInspectionitem(rectified_status);
-
                     });
 
                     $("#reinspection a.passed").bind(objApp.touchEvent, function(){
