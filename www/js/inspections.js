@@ -7699,6 +7699,7 @@ var Inspections = function()
                         }
                         var rectifiedText = $(this).find("td:eq(4)").text();
                         $('#reinspection select#rectified').val(rectifiedText);
+                        alert('Value before select: ' + rectifiedText);
                         $('#reinspection select#rectified').trigger('change');
                         $('#reinspection .infomation p').html(text);
                         $('#reinspection .infomation select#rectified').show();
@@ -7717,9 +7718,11 @@ var Inspections = function()
                     });
 
                     // Handle the event when the rectified status of the item is updated
+                    $('#reinspection select#rectified').unbind("change");
                     $('#reinspection select#rectified').bind("change", function() {
 
                         var rectified_status = $(this).val();
+                        alert('Select: ' + rectified_status);
                         self.checkSaveRectifiedInspectionitem(rectified_status);
 
                     });
