@@ -82,6 +82,7 @@ body
     padding: 0;
     position: relative;
     color: #5c5756;
+    height: 100vh; /*TODO FIX height when show image loading*/
 }
 
 body > div:focus {outline: none;}
@@ -118,7 +119,7 @@ body > div:focus {outline: none;}
 
 .wrapper
 {
-    margin-bottom: 20px;
+    /* margin-bottom: 20px; */
     height: 768px;
     padding: 0 0px; 
     max-width: none;

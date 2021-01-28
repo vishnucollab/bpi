@@ -48,11 +48,20 @@ function DBUtils()
 	// Open the database
 
 	if (typeof window.sqlitePlugin != 'undefined'){
-		console.log('Using sqlitePlugin');
-		this.db = window.sqlitePlugin.openDatabase(this.db_short_name + '.db', this.db_version, this.db_display_name, 1);
+        console.log('Using sqlitePlugin');
+        try {
+            this.db = window.sqlitePlugin.openDatabase(this.db_short_name + '.db', this.db_version, this.db_display_name, 1);
+        } catch(error) {
+
+        }
 	}
-	else
-		this.db = window.openDatabase(this.db_short_name, this.db_version, this.db_display_name, this.db_max_size);
+	else {
+        try {
+            this.db = window.openDatabase(this.db_short_name, this.db_version, this.db_display_name, this.db_max_size);
+        } catch(error) {
+
+        }
+    }
 	
 	// Determine if we have successfully opened the database or not.
 	if(!this.db)

@@ -18,7 +18,7 @@ function App()
 	var self = this;	// Create a reference to the object itself
 	this.apiURL = "http://bpi-api.wearebuilding.net/";
     //this.apiURL = "http://app.bpigrp.com.au/api/";
-	this.phonegapBuild = true; 	// Set this to true when phonegap is the target
+	this.phonegapBuild = false; 	// Set this to true when phonegap is the target
 	this.version = '2.0.23';				// Identifies the app version to the server
     this.patch = '23';
 	this.versionStatus = "Product";
@@ -325,7 +325,8 @@ function App()
 		var screenWidth = screen.width; 
         
 		// Set the main div height - all the content goes here
-		screenHeight = getAvailableHeight();
+        screenHeight = getAvailableHeight();
+        //screenHeight = screenHeight - 50;//
         var orientation = this.getOrientation();
 
         if(orientation == "landscape") {
