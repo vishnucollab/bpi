@@ -1721,7 +1721,7 @@ aside textarea
 
 .inspectionDetails #defectScrollWrapper{
     height: 275px;
-    overflow-x: hidden;
+    overflow: hidden;
     max-height: 275px;
     min-height: 275px;
 }
