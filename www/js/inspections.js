@@ -267,7 +267,6 @@ var Inspections = function()
 			var html = '<table id="tblInspectionListing" class="listing">';
 			
 			var maxLoop = items.rows.length;
-            console.log(maxLoop);
 			var r = 0;
 			
 			for(r = 0; r < maxLoop; r++) {
